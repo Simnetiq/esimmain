@@ -1,0 +1,68 @@
+[
+  {
+    "code": "US",
+    "name": "United States",
+    "translations": {
+      "en": "United States",
+      "es": "Estados Unidos",
+      "fr": "États-Unis",
+      "de": "Vereinigte Staaten",
+      "ar": "الولايات المتحدة",
+      "he": "ארצות הברית",
+      "ru": "Соединенные Штаты"
+    }
+  },
+  {
+    "code": "GB",
+    "name": "United Kingdom",
+    "translations": {
+      "en": "United Kingdom",
+      "es": "Reino Unido",
+      "fr": "Royaume-Uni",
+      "de": "Vereinigtes Königreich",
+      "ar": "المملكة المتحدة",
+      "he": "הממלכה המאוחדת",
+      "ru": "Великобритания"
+    }
+  },
+  {
+    "code": "FR",
+    "name": "France",
+    "translations": {
+      "en": "France",
+      "es": "Francia",
+      "fr": "France",
+      "de": "Frankreich",
+      "ar": "فرنسا",
+      "he": "צרפת",
+      "ru": "Франция"
+    }
+  },
+  {
+    "code": "DE",
+    "name": "Germany",
+    "translations": {
+      "en": "Germany",
+      "es": "Alemania",
+      "fr": "Allemagne",
+      "de": "Deutschland",
+      "ar": "ألمانيا",
+      "he": "גרמניה",
+      "ru": "Германия"
+    }
+  },
+  {
+    "code": "ES",
+    "name": "Spain",
+    "translations": {
+      "en": "Spain",
+      "es": "España",
+      "fr": "Espagne",
+      "de": "Spanien",
+      "ar": "إسبانيا",
+      "he": "ספרד",
+      "ru": "Испания"
+    }
+  }
+]
+

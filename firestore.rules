@@ -1,0 +1,278 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isSignedIn() && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+      
+      // User's eSIMs subcollection
+      match /esims/{esimId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) || isAdmin();
+        allow update: if isOwner(userId) || isAdmin();
+        allow delete: if isOwner(userId) || isAdmin();
+      }
+      
+      // User's transactions subcollection (for referral commissions, withdrawals, etc.)
+      match /transactions/{transactionId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) || isAdmin();
+        allow update: if isOwner(userId) || isAdmin();
+        allow delete: if isAdmin();
+      }
+      
+      // User's referral usages subcollection
+      match /referralUsages/{usageId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create: if isSignedIn();
+        allow update, delete: if isAdmin();
+      }
+    }
+    
+    // eSIMs collection (legacy/global)
+    match /esims/{esimId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+    
+    // Data plans collection
+    match /dataplans/{planId} {
+      allow read: if true; // Public read access for browsing plans
+      allow write: if isAdmin(); // Only admins can modify plans
+    }
+    
+    // eSIM Orders collection
+    match /esimOrders/{orderId} {
+      allow read: if isSignedIn() && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+    
+    // Transactions collection
+    match /transactions/{transactionId} {
+      allow read: if isSignedIn() && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+    
+    // Blog posts collection
+    match /blog_posts/{postId} {
+      allow read: if resource.data.status == 'published' || isAdmin();
+      allow write: if isAdmin();
+    }
+    
+    // Referral codes collection
+    match /referralCodes/{codeId} {
+      allow read: if true; // Public read to validate codes
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin() || (
+        isSignedIn() && resource.data.userId == request.auth.uid
+      );
+    }
+    
+    // Promo codes collection
+    match /promoCodes/{promoId} {
+      allow read: if true; // Public read to validate promo codes
+      allow write: if isAdmin(); // Only admins can manage promo codes
+    }
+    
+    // Referral usages collection
+    match /referralUsages/{usageId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+    
+    // Referral commissions collection
+    match /referralCommissions/{commissionId} {
+      allow read: if isSignedIn() && (
+        resource.data.referrerId == request.auth.uid || isAdmin()
+      );
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin();
+    }
+    
+    // Notifications collection
+    match /notifications/{notificationId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+    
+    // Settings collection
+    match /settings/{settingId} {
+      allow read: if true; // Public read for app configuration
+      allow write: if isAdmin();
+    }
+    
+    // Jobs/Applications collection
+    match /jobs/{jobId} {
+      allow read: if true; // Public read for job listings
+      allow write: if isAdmin();
+    }
+    
+    match /applications/{applicationId} {
+      allow read: if isAdmin() || (
+        isSignedIn() && resource.data.userId == request.auth.uid
+      );
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+    
+    // Newsletter collection
+    match /newsletter/{emailId} {
+      allow read: if isAdmin();
+      allow create: if true; // Public can subscribe
+      allow update, delete: if isAdmin();
+    }
+    
+    // Contact messages collection
+    match /contacts/{contactId} {
+      allow read: if isAdmin();
+      allow create: if true; // Anyone can send contact message
+      allow update, delete: if isAdmin();
+    }
+    
+    // Country design data collection
+    match /countriesDesign/{countryId} {
+      allow read: if true; // Public read for country information
+      allow write: if isAdmin();
+    }
+    
+    // Configuration collections (admin settings)
+    match /config/{configId} {
+      allow read: if isAdmin(); // Only admins can read config
+      allow write: if isAdmin();
+    }
+    
+    // App configuration (version, etc.)
+    match /app_config/{docId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+    
+    // Admin configuration (markup, environment, etc.)
+    match /admin_config/{docId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+    
+    // OpenRouter configuration
+    match /openRouterConfig/{docId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+    
+    // Version configuration
+    match /versionConfig/{docId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+    
+    // Markup configuration
+    match /markupConfig/{docId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+    
+    // Stripe configuration
+    match /stripeConfig/{docId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+    
+    // Airalo configuration
+    match /airaloConfig/{docId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+    
+    // Regions collection
+    match /regions/{regionId} {
+      allow read: if true; // Public read for region information
+      allow write: if isAdmin();
+    }
+    
+    // Countries collection
+    match /countries/{countryId} {
+      allow read: if true; // Public read for country information
+      allow write: if isAdmin(); // Only admins can modify countries
+    }
+    
+    // Sync logs collection (for API sync operations)
+    match /sync_logs/{logId} {
+      allow read: if isAdmin();
+      allow create: if true; // Allow API routes to create sync logs
+      allow update, delete: if isAdmin();
+    }
+    
+    // ============================================
+    // FRAUD DETECTION COLLECTIONS
+    // ============================================
+    
+    // Fraud tracking - purchase attempts
+    match /fraud_tracking_attempts/{attemptId} {
+      allow read: if isAdmin();
+      allow create: if true; // Allow API routes to track attempts
+      allow update: if isAdmin() || true; // Allow API routes to update status
+      allow delete: if isAdmin();
+    }
+    
+    // Fraud tracking - completed purchases
+    match /fraud_tracking_purchases/{purchaseId} {
+      allow read: if isAdmin();
+      allow create: if true; // Allow API routes to track purchases
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // Fraud blocklist
+    match /fraud_blocklist/{blockId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin(); // Only admins can manage blocklist
+    }
+    
+    // Orders collection (for payment tracking)
+    match /orders/{orderId} {
+      allow read: if isSignedIn() && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+      allow create: if true; // Allow API routes to create orders
+      allow update: if isAdmin() || true; // Allow webhook updates
+      allow delete: if isAdmin();
+    }
+    
+    // ============================================
+    // END FRAUD DETECTION COLLECTIONS
+    // ============================================
+    
+    // Default deny all other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

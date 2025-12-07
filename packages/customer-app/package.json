@@ -1,0 +1,58 @@
+{
+  "name": "@esim/customer-app",
+  "version": "1.0.0",
+  "description": "Customer-facing eSIM application",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@esim/shared": "*",
+    "@react-email/components": "^0.5.7",
+    "@react-email/render": "^1.4.0",
+    "@stripe/react-stripe-js": "^3.9.2",
+    "@stripe/stripe-js": "^7.9.0",
+    "@tailwindcss/typography": "^0.5.19",
+    "@tanstack/react-query": "^5.85.6",
+    "@types/node": "^24.3.0",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
+    "axios": "^1.11.0",
+    "date-fns": "^4.1.0",
+    "firebase": "^12.2.1",
+    "firebase-admin": "^13.5.0",
+    "framer-motion": "^11.18.2",
+    "i18next": "^25.5.2",
+    "lottie-react": "^2.4.1",
+    "lucide-react": "^0.542.0",
+    "marked": "^16.4.1",
+    "next": "^14.2.5",
+    "next-i18next": "^15.4.2",
+    "nodemailer": "^7.0.10",
+    "qrcode": "^1.5.4",
+    "qrcode.react": "^4.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-dropzone": "^14.3.8",
+    "react-google-recaptcha-v3": "^1.11.0",
+    "react-hook-form": "^7.62.0",
+    "react-hot-toast": "^2.6.0",
+    "react-i18next": "^15.7.3",
+    "react-qr-code": "^2.0.18",
+    "resend": "^6.2.0",
+    "stripe": "^19.3.1",
+    "typescript": "^5.9.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.0",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^8.0.0",
+    "eslint-config-next": "^14.2.5",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17"
+  }
+}
+
