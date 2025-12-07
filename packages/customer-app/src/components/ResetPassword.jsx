@@ -50,7 +50,7 @@ export default function ResetPassword() {
         }
 
         setTokenValid(true);
-      } catch (error) {
+      } catch {
         toast.error(t('auth.resetPassword.verifyFailed', 'Failed to verify reset link'));
         setTimeout(() => router.push('/forgot-password'), 2000);
       } finally {

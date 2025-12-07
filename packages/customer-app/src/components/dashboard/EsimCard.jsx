@@ -1,10 +1,11 @@
 'use client';
 
 import React from 'react';
-import { Globe, QrCode, Wifi, Phone, MessageSquare, Clock, Signal, ChevronRight } from 'lucide-react';
+import { Globe, QrCode, Wifi, Phone, MessageSquare, Clock, Signal } from 'lucide-react';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { getISOCode } from '@esim/shared/utils/countryCodeMap';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
+import Image from 'next/image';
 
 // Regional flag mapping - maps region names to actual flag files that exist
 // Available: eu.svg, un.svg, arab.svg, asean.svg, eac.svg, cefta.svg
@@ -25,7 +26,7 @@ const REGION_FLAGS = {
   'LATINAMERICA': null
 };
 
-const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, onDeleteOrder, isRTL }) => {
+const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
   const { t } = useI18n();
 
   // Format data usage with progress
@@ -171,7 +172,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, onDeleteOrder,
           {/* 4:3 Flag Container - Like CountryCard */}
           <div className="flex-shrink-0 w-16 sm:w-20 aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg flex items-center justify-center border-2 border-gray-200 overflow-hidden">
             {flagPath ? (
-              <img
+              <Image
                 src={flagPath}
                 alt={`${fullName} flag`}
                 width={80}
@@ -181,13 +182,15 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, onDeleteOrder,
                 onError={(e) => {
                   // Replace with globe icon on error
                   e.currentTarget.style.display = 'none';
-                  e.currentTarget.parentElement.innerHTML = `
-                    <div class="w-full h-full bg-gradient-to-br from-tufts-blue to-blue-600 flex items-center justify-center">
-                      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                  `;
+                  if (e.currentTarget.parentElement) {
+                    e.currentTarget.parentElement.innerHTML = `
+                      <div class="w-full h-full bg-gradient-to-br from-tufts-blue to-blue-600 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                    `;
+                  }
                 }}
               />
             ) : (

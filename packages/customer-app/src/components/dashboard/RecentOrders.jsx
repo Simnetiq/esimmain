@@ -80,7 +80,7 @@ const RecentOrders = ({ orders, loading, onViewQRCode }) => {
               // Silently fail - don't log errors to avoid console spam in development
               setUsageData(prev => ({ ...prev, [order.id]: null }));
             }
-          } catch (error) {
+          } catch {
             // Mark as attempted even if failed to prevent retry loop
             setUsageData(prev => ({ ...prev, [order.id]: null }));
             
@@ -96,7 +96,7 @@ const RecentOrders = ({ orders, loading, onViewQRCode }) => {
     if (orders && orders.length > 0) {
       fetchUsageForOrders();
     }
-  }, [orders]); // Only re-run when orders change
+  }, [orders, usageData, loadingUsage]); // Dependencies for useEffect
   
   return (
     <div className="bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
