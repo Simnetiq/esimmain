@@ -320,9 +320,9 @@ export async function POST(request) {
           
           if (emailResponse.ok) {
           } else {
-            const emailError = await emailResponse.json();
+            await emailResponse.json();
           }
-        } catch (emailError) {
+        } catch {
           // Don't fail the webhook if email fails
         }
         
@@ -335,7 +335,8 @@ export async function POST(request) {
             processingError: error.message,
             processingErrorAt: serverTimestamp()
           });
-        } catch (updateError) {
+        } catch {
+          // Ignore update errors
         }
         
         return NextResponse.json({

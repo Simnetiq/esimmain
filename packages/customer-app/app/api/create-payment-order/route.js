@@ -6,8 +6,7 @@ import {
   checkFraudRules, 
   trackPurchaseAttempt, 
   checkBlocklist,
-  logPriceManipulationAttempt,
-  addToBlocklist
+  logPriceManipulationAttempt
 } from '@esim/shared/services/fraudDetectionService';
 import crypto from 'crypto';
 
@@ -51,17 +50,18 @@ export const dynamic = 'force-dynamic';
 
 /**
  * Generate secure request hash for integrity verification
+ * Note: Reserved for future use with request signing
  */
-function generateRequestHash(data) {
-  const secret = process.env.PAYMENT_SECRET_KEY || process.env.STRIPE_SECRET_KEY_LIVE || 'fallback-secret';
-  const payload = JSON.stringify({
-    packageId: data.packageId,
-    email: data.email,
-    userId: data.userId,
-    timestamp: data.timestamp
-  });
-  return crypto.createHmac('sha256', secret).update(payload).digest('hex');
-}
+// function generateRequestHash(data) {
+//   const secret = process.env.PAYMENT_SECRET_KEY || process.env.STRIPE_SECRET_KEY_LIVE || 'fallback-secret';
+//   const payload = JSON.stringify({
+//     packageId: data.packageId,
+//     email: data.email,
+//     userId: data.userId,
+//     timestamp: data.timestamp
+//   });
+//   return crypto.createHmac('sha256', secret).update(payload).digest('hex');
+// }
 
 /**
  * Validate request timestamp (prevent replay attacks)
@@ -76,8 +76,9 @@ function isRequestFresh(timestamp) {
 
 /**
  * Check rate limiting per IP
+ * Note: userId and email parameters reserved for future rate limiting by user
  */
-async function checkRateLimit(ip, userId, email) {
+async function checkRateLimit(ip) {
   try {
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
     const attemptsRef = collection(db, 'payment_attempts');
@@ -296,7 +297,7 @@ export async function POST(request) {
     // ============================================
     // 2. RATE LIMITING
     // ============================================
-    const rateLimitCheck = await checkRateLimit(ip, userId, email);
+    const rateLimitCheck = await checkRateLimit(ip);
     if (!rateLimitCheck.allowed) {
       await logPaymentAttempt({
         packageId: order,
