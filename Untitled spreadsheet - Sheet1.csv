@@ -1,0 +1,82 @@
+,Compatibility,Packages,Order,Install,Usage,Authentication
+"User journey
+ Endpoint",,,,,,
+,View Compatible Devices,Browse eSIM packages,Proceed to checkout and place an order,Install eSiM via QR code,Monitor eSiM usage,For each request
+,Get Compatible Devices,Get Packages,Submit Order,Get installation instructions v2,Get Data Usage,Keguest Access loken
+Description,"Get Compatible Devices provides list or esim compatible devices to ensure customer has an eSIM compatible device before proceeding with browsing the eSIM packages and
+ blacing an order.","[Get Packages] provides Local, Regional and Global Packages available based on the applied filtering. The global
+ package Discover+ outers text & calls in addition to data
+ Optionally, the endpoint can also include all Top-up packages, although these cannot be directly used for the Top-up eSIM
+ endpoint. Note that the packages available in the Sandbox environment are for testing purposes ONLY and do not represent the actual packages offered in Production
+ covering 200+ destinations.
+ All packages are priced in USD; only USD is accepted at this
+ time
+ Tip: Partner can cache the result but periodically should be
+ oulled to avoid ottering packages not avallable any more of
+ temporarily, recommended to pull it every hour.","submit Order creates an order and provides the esim
+ including the ordered package details. There will be one or more items, depending on tne requested quanuty. Ine
+ response also contains a arcode_link to share with your user.
+ Important note
+ • make an order only in case of the payment is collected
+ from the end user
+ • all packages are priced in USD; only USD is accepted at this time.","tetrieving the language specific installation instructions of a specific eSIM from the Airalo Partners APl using the eSIM's
+ Installation methods:
+ • QR code - generate QR code on your own (attribute
+ ""ar code"") or use QR code link. See FAQ page https://
+ airalopartners.zendesk.com/hc/en-us/
+ articles/15337998731165-How-can-/-generate-a-QR-
+ code
+ • Manuall installation - see how to get the required details on
+ our FAe: hitos: laira lopartners.zendesk.com/hc/en-Us/
+ articles/16170208875677-Where-can-you-locate-the-SM-
+ DP-Address-and-Activation-code","[Get Data Usagel provides information about the usage of the esIM
+ Limitation: Make sure to cache the result for up to 15mins for
+ the same eSIM, endpoint allows 1 request for an eSIM per 15mins","Our API authentication adheres to the OAuth2 standard
+ Every API request must include the access_token Access tokens are valid for a maximum of one year."
+Response,"brand: Manufacturer, eg Google
+ name: eg. Pixel 5
+ madal
+ OS: Android or ios","Package.id: Main package id, required for ordering an eSIM
+ package through Submit order
+ Price: Retail price, considering as minimum price for Partners Net Price*: Package net price
+ Amount: Data volume in megabytes
+ Validity: Number of davs
+ Voicet. Credite in mins
+ Text*: Number of SMS messages
+ *only via v2 version of the endpoints","Package details
+ package id: Given package id manual_installation: Installation guide for manual installation
+ arcode installation: Installation quide for OR code base
+ eSiM details
+ iccid: Unique id for the SIM, required to store on partner side for reference
+ arcode_urt: Link for the QR code for the automatic installation ar_code: Build your own QR code
+ ann type: Manual or Automatic (v2 supports per OS) apn_value: APN to share and display to customers direct apple installation ur: now supports direct installation on ios devices","Translated installation instructions for both iOS and Android,
+ support different models and versions. The partner car create PDF and emails with step-by-step instructions. Also
+ contains esIM specitic codes and settinas
+ installation_via_qr_code: step-by-step installation guide for
+ OR Code
+ installation_manual: step-by-step installation guide for
+ manual setup
+ network setup: step-by-step installation guide for network
+ setup
+ aon type: ""automatic"" or ""manual
+ apn value: the value to be set in case of manual set is needed direct apple installation uri: now supports direct installation
+ on ios devices","remaining: kemaining data in megabytes
+ remaining voice*: Remaining voice minutes
+ remaining_text*: Remaining number of text messages total: Total data in megabytes
+ expired at: in case the backage is ACTIVE or EXPIRED or
+ FINISHED, the expire date is set
+ status. Status of the packace !! All Cases: ACTIVE.
+ NOT ACTIVE ACTIVE FINISHED LINKNOWN EXPIREDI
+ *only via v2 version of the endpoints","token_type: ""Bearer"",
+ expires in: 31622400.
+ access_token: Access token in string format. To be used during each API calls. Differs on each environment!"
+Request,,"Depending on the destination selection, the packages can be
+ Tiltered ov country. snowing local regional and clobal
+ nackages. The endnoint can nrovide details on ton-un
+ packages as well (include:""topup"" parameter)","package_id: id of local, regional or global package, returned by the (Get Package) endpoint
+ quantity: Usually i customer buys i more if the customer bis multiple or if it is a bulk order (e.g. for multiple customers) description: Ontiona but can he used tor tilterina orders inl
+ ¡Got Order lict
+ Tip: Use customer id, use customer id and own order id",iccid: Unique id for the eSIM (returned by Submit Order) (Path variable),"sim iccid: Inique id for the eSIM returned bvSubmit Orderl
+ (Path variable)","client_id: Given by Airalo during the onboarding client secret: Given by Airalo during the onboarding
+ arant tune: ""client credentials""
+ client id. client secrets are per environment"

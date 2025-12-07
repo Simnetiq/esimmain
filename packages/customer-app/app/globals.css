@@ -1,0 +1,209 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Custom Color Palette */
+    --jordy-blue: #C4CFCD;
+    --tufts-blue: #4975D4;
+    --alice-blue: #FBFBFB;
+    --cobalt-blue: #507A84;
+    --cool-black: #172C2E;
+    --eerie-black: #1F1F1F;
+    --white: #FFFFFF;
+    /* Shadow colors */
+    --shadow-primary: #4975d4a0;
+    --shadow-secondary: #c4cfcd40;
+  }
+
+  /* Base typography - uses Tailwind's font-sans which is configured with our fonts */
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: var(--white);
+    color: var(--eerie-black);
+    /* Font family via Tailwind's font-sans utility or direct CSS variable */
+    font-family: var(--font-dm-sans), var(--font-heebo), var(--font-ibm-plex-arabic), var(--font-rubik), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  /* RTL Language Support - Hebrew and Arabic */
+  [dir="rtl"] body,
+  html[dir="rtl"] body {
+    font-family: var(--font-heebo), var(--font-ibm-plex-arabic), var(--font-rubik), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  /* Typography - simplified, inherits font-family from html */
+  h1 { font-size: 3rem; font-weight: 700; line-height: 1.17; letter-spacing: -0.5px; }
+  h2 { font-size: 2.5rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.5px; }
+  h3 { font-size: 2rem; font-weight: 600; line-height: 1.25; letter-spacing: -0.25px; }
+  h4 { font-size: 1.5rem; font-weight: 600; line-height: 1.33; letter-spacing: -0.25px; }
+  p { font-size: 1.125rem; line-height: 1.33; }
+  table, table th, table td { font-size: 0.875rem; line-height: 1.43; }
+  table th { font-weight: 600; }
+}
+
+@layer components {
+  /* Buttons */
+  .btn-primary {
+    color: var(--white);
+    font-weight: 600;
+    background-color: var(--tufts-blue);
+    border-radius: 4px;
+    box-shadow: 0 4px 8px var(--shadow-primary);
+    padding: 8px 16px;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .btn-secondary {
+    color: var(--cool-black);
+    font-weight: 600;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px var(--shadow-secondary);
+    padding: 4px 8px;
+    transition: all 0.2s ease;
+  }
+  .btn-secondary:hover {
+    background: var(--alice-blue);
+  }
+
+  /* Card */
+  .card {
+    background: white;
+    border-radius: 4px;
+    padding: 24px;
+    box-shadow: 0 2px 4px var(--shadow-primary), 0 4px 8px var(--shadow-primary);
+    border: 1px solid rgba(147, 191, 238, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .card:hover {
+    box-shadow: 0 4px 8px var(--shadow-primary), 0 8px 16px var(--shadow-primary);
+    transform: translateY(-2px);
+    border-color: var(--jordy-blue);
+  }
+
+  /* Form inputs - simplified */
+  .input-field, .form-input {
+    width: 100%;
+    background-color: var(--white);
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .input-field:focus, .form-input:focus {
+    border-color: var(--tufts-blue);
+    box-shadow: 0 2px 8px #c1cfeba0;
+  }
+  .input-field::placeholder { color: #6b7280; opacity: 0.7; }
+
+  .form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Blog prose styles - only loaded on blog pages */
+  .prose table {
+    width: 100%;
+    margin: 1.5rem 0;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .prose th, .prose td {
+    padding: 0.5rem 1rem;
+    text-align: center;
+    min-width: 100px;
+    border-right: 1px solid var(--jordy-blue);
+    border-bottom: 1px solid var(--jordy-blue);
+  }
+  .prose th:last-child, .prose td:last-child { border-right: none; }
+  .prose tr:last-child td { border-bottom: none; }
+  .prose th {
+    font-weight: 600;
+    color: var(--alice-blue);
+    background-color: var(--cool-black);
+  }
+  .prose th:first-child { border-top-left-radius: 4px; }
+  .prose th:last-child { border-top-right-radius: 4px; }
+  .prose tr:last-child td:first-child { border-bottom-left-radius: 4px; }
+  .prose tr:last-child td:last-child { border-bottom-right-radius: 4px; }
+  .prose tr:nth-child(even) td { background-color: var(--alice-blue); }
+  .prose tr:hover td { background-color: var(--alice-blue); }
+
+  .prose blockquote {
+    border-left: 4px solid var(--tufts-blue);
+    padding: 0.5rem 0 0.5rem 1rem;
+    font-style: italic;
+  }
+  .prose strong { font-weight: 600; }
+  .prose blockquote strong { font-weight: 500; }
+
+  .prose img {
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    max-height: 600px;
+    object-fit: cover;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px var(--shadow-primary);
+    margin: 1.5rem auto;
+  }
+
+  .prose iframe {
+    width: 100%;
+    border-radius: 4px;
+    aspect-ratio: 16/9;
+  }
+
+  /* Blog headings */
+  .prose h1 { font-size: 1.75rem; font-weight: 700; margin: 2rem 0 1rem; }
+  .prose h2 { font-size: 1.5rem; font-weight: 600; margin: 1.5rem 0 0.75rem; }
+  .prose h3 { font-size: 1.25rem; font-weight: 600; margin: 1.25rem 0 0.5rem; }
+  .prose h4, .prose h5, .prose h6 { font-size: 1rem; font-weight: 500; margin: 1rem 0 0.5rem; }
+
+  /* Mobile prose adjustments */
+  @media (max-width: 767px) {
+    .prose { font-size: 0.875rem; }
+    .prose table { display: block; overflow-x: auto; white-space: nowrap; }
+    .prose th, .prose td { padding: 0.25rem 0.5rem; font-size: 0.75rem; min-width: 80px; }
+    .prose img { max-width: 100%; max-height: 500px; }
+  }
+}
+
+@layer utilities {
+  /* Custom colors - using Tailwind's color system */
+  .text-jordy-blue { color: var(--jordy-blue); }
+  .text-tufts-blue { color: var(--tufts-blue); }
+  .text-alice-blue { color: var(--alice-blue); }
+  .text-cobalt-blue { color: var(--cobalt-blue); }
+  .text-cool-black { color: var(--cool-black); }
+  .text-eerie-black { color: var(--eerie-black); }
+  
+  .bg-jordy-blue { background-color: var(--jordy-blue); }
+  .bg-tufts-blue { background-color: var(--tufts-blue); }
+  .bg-alice-blue { background-color: var(--alice-blue); }
+  .bg-cobalt-blue { background-color: var(--cobalt-blue); }
+  .bg-cool-black { background-color: var(--cool-black); }
+  .bg-eerie-black { background-color: var(--eerie-black); }
+
+  .border-jordy-blue { border-color: var(--jordy-blue); }
+  .border-tufts-blue { border-color: var(--tufts-blue); }
+  .border-cobalt-blue { border-color: var(--cobalt-blue); }
+
+  /* CSS animation */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out 0.2s both;
+  }
+}

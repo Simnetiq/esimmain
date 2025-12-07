@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>eSIM Service Dashboard</title>
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <div class="dashboard">
+    <header>
+      <h1>🚀 eSIM Service Dashboard</h1>
+      <div class="header-actions">
+        <span id="last-update">Last updated: Just now</span>
+        <button onclick="refreshData()" class="btn-refresh">Refresh</button>
+      </div>
+    </header>
+
+    <div class="container">
+      <!-- System Health -->
+      <section class="card">
+        <h2>System Health</h2>
+        <div class="health-grid">
+          <div class="health-item">
+            <div class="health-label">API Service</div>
+            <div class="health-status" id="health-api">
+              <span class="status-dot"></span>
+              <span class="status-text">Checking...</span>
+            </div>
+          </div>
+          <div class="health-item">
+            <div class="health-label">Redis</div>
+            <div class="health-status" id="health-redis">
+              <span class="status-dot"></span>
+              <span class="status-text">Checking...</span>
+            </div>
+          </div>
+          <div class="health-item">
+            <div class="health-label">Supabase</div>
+            <div class="health-status" id="health-supabase">
+              <span class="status-dot"></span>
+              <span class="status-text">Checking...</span>
+            </div>
+          </div>
+          <div class="health-item">
+            <div class="health-label">Docker</div>
+            <div class="health-status" id="health-docker">
+              <span class="status-dot"></span>
+              <span class="status-text">Checking...</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-content">
+            <div class="stat-label">Total Revenue</div>
+            <div class="stat-value" id="stat-revenue">$0</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📊</div>
+          <div class="stat-content">
+            <div class="stat-label">Total Transactions</div>
+            <div class="stat-value" id="stat-transactions">0</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📈</div>
+          <div class="stat-content">
+            <div class="stat-label">Today's Transactions</div>
+            <div class="stat-value" id="stat-today">0</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📧</div>
+          <div class="stat-content">
+            <div class="stat-label">Emails Sent</div>
+            <div class="stat-value" id="stat-emails">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Docker Containers -->
+      <section class="card">
+        <h2>Docker Containers</h2>
+        <div id="docker-containers" class="docker-grid">
+          <div class="loading">Loading containers...</div>
+        </div>
+      </section>
+
+      <!-- Recent Transactions -->
+      <section class="card">
+        <h2>Recent Transactions</h2>
+        <div class="table-container">
+          <table id="transactions-table">
+            <thead>
+              <tr>
+                <th>Payment ID</th>
+                <th>Provider</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="5" class="loading">Loading transactions...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Analytics Chart -->
+      <section class="card">
+        <h2>Transaction Analytics (Last 30 Days)</h2>
+        <canvas id="analyticsChart"></canvas>
+      </section>
+
+      <!-- Quick Actions -->
+      <section class="card">
+        <h2>Quick Actions</h2>
+        <div class="actions-grid">
+          <a href="/api/stats" target="_blank" class="action-btn">
+            <span class="action-icon">📊</span>
+            <span>View Stats API</span>
+          </a>
+          <a href="/api/health" target="_blank" class="action-btn">
+            <span class="action-icon">🏥</span>
+            <span>Health Check</span>
+          </a>
+          <a href="/api/transactions/recent" target="_blank" class="action-btn">
+            <span class="action-icon">💳</span>
+            <span>Recent Transactions</span>
+          </a>
+          <a href="/api/docker/containers" target="_blank" class="action-btn">
+            <span class="action-icon">🐳</span>
+            <span>Docker Status</span>
+          </a>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>
+
