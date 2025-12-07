@@ -160,12 +160,32 @@ export async function POST(request) {
     if (!simResponse.ok) {
       const errorText = await simResponse.text();
       
-      // Check if this is a retryable error
-      const canRetry = simResponse.status === 400 && errorText.includes('processing');
+      // Provide helpful error messages based on status code
+      let userMessage = `QR code retrieval failed: ${simResponse.statusText}`;
+      let canRetry = false;
+      
+      if (simResponse.status === 404) {
+        userMessage = 'This eSIM order was not found in the Airalo system. This usually happens when viewing sandbox/test orders in production mode. Only real production orders can be accessed.';
+      } else if (simResponse.status === 429) {
+        userMessage = 'Too many requests. Please wait a few minutes before trying again. Airalo API has rate limits: 100 requests per minute per eSIM.';
+      } else if (simResponse.status === 400 && errorText.includes('processing')) {
+        userMessage = 'Your eSIM is still being activated. Please wait 1-2 minutes and try again.';
+        canRetry = true;
+      } else if (simResponse.status === 401) {
+        userMessage = 'Authentication failed. Please contact support if this persists.';
+      }
+      
+      console.error('[Airalo QR Code] Error:', {
+        status: simResponse.status,
+        orderId: orderIdToUse,
+        mode: airaloMode,
+        error: errorText
+      });
       
       return NextResponse.json({
         success: false,
-        error: `QR code retrieval failed: ${simResponse.statusText} - ${errorText}`,
+        error: userMessage,
+        details: errorText,
         canRetry: canRetry
       }, { status: simResponse.status });
     }

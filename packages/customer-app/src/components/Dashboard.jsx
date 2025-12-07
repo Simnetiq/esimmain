@@ -293,7 +293,16 @@ const Dashboard = () => {
           .filter(doc => {
             // Filter out deleted orders (only if explicitly marked as deleted)
             const data = doc.data();
-            return data.deleted !== true;
+            if (data.deleted === true) return false;
+            
+            // Filter out test/sandbox orders to prevent 404 errors in production
+            // Test orders don't exist in production Airalo API
+            if (data.isTestMode === true || data.mode === 'sandbox' || data.test === true) {
+              console.log('[Dashboard] Skipping test/sandbox order:', doc.id);
+              return false;
+            }
+            
+            return true;
           })
           .map(async doc => {
           try {
