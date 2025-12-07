@@ -14,9 +14,25 @@ export async function POST(request) {
       }, { status: 400 });
     }
 
-    // Get Airalo credentials - try environment variables first, then Firestore
-    let clientId = process.env.AIRALO_CLIENT_ID;
-    let clientSecret = process.env.AIRALO_CLIENT_SECRET || process.env.AIRALO_CLIENT_SECRET_PRODUCTION;
+    // Determine Airalo mode (sandbox vs production)
+    const airaloMode = process.env.AIRALO_MODE || 'production';
+    const isSandbox = airaloMode === 'sandbox';
+    
+    // Get Airalo credentials based on mode
+    let clientId = isSandbox
+      ? process.env.AIRALO_CLIENT_ID_SANDBOX
+      : process.env.AIRALO_CLIENT_ID;
+      
+    let clientSecret = isSandbox
+      ? process.env.AIRALO_CLIENT_SECRET_SANDBOX
+      : (process.env.AIRALO_CLIENT_SECRET || process.env.AIRALO_CLIENT_SECRET_PRODUCTION);
+    
+    // Select correct base URL
+    const baseUrl = isSandbox 
+      ? (process.env.AIRALO_BASE_URL_SANDBOX || 'https://sandbox-partners-api.airalo.com')
+      : (process.env.AIRALO_BASE_URL || 'https://partners-api.airalo.com');
+    
+    console.log(`[Airalo Usage] Mode: ${airaloMode}, URL: ${baseUrl}`);
     
     // Fallback to Firestore config if env vars not set
     if (!clientId || !clientSecret) {
@@ -38,7 +54,6 @@ export async function POST(request) {
     }
 
     // Authenticate with Airalo API
-    const baseUrl = process.env.AIRALO_BASE_URL || 'https://partners-api.airalo.com';
     
     console.log('[Airalo Usage] Authenticating with Airalo API...');
     

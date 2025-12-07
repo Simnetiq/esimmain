@@ -419,9 +419,9 @@ export async function getUserFraudStats(db, userId) {
 }
 
 /**
- * Check if user/email is in blocklist
+ * Check if user/email/card is in blocklist
  */
-export async function checkBlocklist(db, userId, email) {
+export async function checkBlocklist(db, userId, email, cardFingerprint = null) {
   try {
     const blocklistRef = collection(db, 'fraud_blocklist');
     
@@ -437,13 +437,19 @@ export async function checkBlocklist(db, userId, email) {
       queries.push(getDocs(q2));
     }
 
+    // CRITICAL: Check card fingerprint blocklist
+    if (cardFingerprint) {
+      const q3 = query(blocklistRef, where('cardFingerprint', '==', cardFingerprint), where('active', '==', true));
+      queries.push(getDocs(q3));
+    }
+
     const results = await Promise.all(queries);
     const blocked = results.some(snapshot => !snapshot.empty);
 
     if (blocked) {
       return {
         blocked: true,
-        reason: 'Account has been blocked due to suspicious activity. Please contact support.'
+        reason: 'This payment method has been blocked due to suspicious activity. Please contact support.'
       };
     }
 
@@ -499,6 +505,10 @@ export async function logPriceManipulationAttempt(db, data) {
       priceDifference: data.priceDifference || null,
       ipAddress: data.ipAddress || null,
       userAgent: data.userAgent || null,
+      cardFingerprint: data.cardFingerprint || null,
+      cardLast4: data.cardLast4 || null,
+      cardBrand: data.cardBrand || null,
+      sessionId: data.sessionId || null,
       createdAt: serverTimestamp(),
       metadata: data.metadata || {}
     });
@@ -509,23 +519,37 @@ export async function logPriceManipulationAttempt(db, data) {
       email: data.email,
       packageId: data.packageId,
       databasePrice: data.databasePrice,
-      submittedPrice: data.submittedPrice
+      submittedPrice: data.submittedPrice,
+      cardFingerprint: data.cardFingerprint || 'not-available',
+      cardInfo: data.cardLast4 ? `${data.cardBrand} ****${data.cardLast4}` : 'unknown'
     });
 
-    // Auto-block user if they attempt price manipulation
-    if (data.autoBlock && (data.userId || data.email)) {
+    // Auto-block user AND card if they attempt price manipulation
+    if (data.autoBlock && (data.userId || data.email || data.cardFingerprint)) {
+      const blockReason = data.cardFingerprint 
+        ? `Auto-blocked: Price manipulation attempt. Tried to pay ${data.submittedPrice} for item priced at ${data.databasePrice}. Card ${data.cardBrand || 'unknown'} ****${data.cardLast4 || 'xxxx'} permanently blocked.`
+        : `Auto-blocked: Price manipulation attempt. Tried to pay ${data.submittedPrice} for item priced at ${data.databasePrice}`;
+      
       await addToBlocklist(db, {
         userId: data.userId,
         email: data.email,
-        reason: `Auto-blocked: Price manipulation attempt. Tried to pay ${data.submittedPrice} for item priced at ${data.databasePrice}`,
+        cardFingerprint: data.cardFingerprint,
+        cardLast4: data.cardLast4,
+        cardBrand: data.cardBrand,
+        reason: blockReason,
         createdBy: 'fraud_detection_system',
         metadata: {
           attemptId,
           packageId: data.packageId,
           databasePrice: data.databasePrice,
-          submittedPrice: data.submittedPrice
+          submittedPrice: data.submittedPrice,
+          sessionId: data.sessionId
         }
       });
+      
+      if (data.cardFingerprint) {
+        console.error('🚨 CARD FINGERPRINT BLOCKED:', data.cardFingerprint);
+      }
     }
 
     return { success: true, attemptId };

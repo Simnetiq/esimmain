@@ -176,20 +176,79 @@ async function handleCheckoutSessionCompleted(session) {
         difference: Math.abs(paidAmount - expectedAmount)
       });
       
-      // Log fraud attempt
+      // Get payment method details to block the card
+      let cardFingerprint = null;
+      let cardLast4 = null;
+      let cardBrand = null;
+      
       try {
-        const { addDoc, collection } = await import('firebase/firestore');
-        await addDoc(collection(db, 'fraud_attempts'), {
-          type: 'payment_amount_mismatch',
-          orderId,
-          paidAmount,
-          expectedAmount,
-          sessionId: session.id,
-          customerEmail: orderData.customerEmail,
-          timestamp: serverTimestamp()
-        });
+        if (session.payment_intent) {
+          const paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent);
+          if (paymentIntent.payment_method) {
+            const paymentMethod = await stripe.paymentMethods.retrieve(paymentIntent.payment_method);
+            if (paymentMethod.card) {
+              cardFingerprint = paymentMethod.card.fingerprint;
+              cardLast4 = paymentMethod.card.last4;
+              cardBrand = paymentMethod.card.brand;
+            }
+          }
+        }
       } catch (e) {
-        console.error('Failed to log fraud attempt:', e);
+        console.error('Failed to retrieve payment method for blocking:', e);
+      }
+      
+      // Log fraud attempt with card details
+      try {
+        const { addDoc, collection, logPriceManipulationAttempt, addToBlocklist } = await import('@esim/shared/services/fraudDetectionService');
+        
+        // Log the fraud attempt
+        await logPriceManipulationAttempt(db, {
+          packageId: orderData.packageId,
+          userId: orderData.userId,
+          email: orderData.customerEmail,
+          databasePrice: expectedAmount,
+          submittedPrice: paidAmount,
+          priceDifference: Math.abs(paidAmount - expectedAmount),
+          cardFingerprint,
+          cardLast4,
+          cardBrand,
+          sessionId: session.id,
+          autoBlock: true,
+          metadata: {
+            type: 'webhook_payment_amount_mismatch',
+            orderId,
+            timestamp: new Date().toISOString()
+          }
+        });
+
+        // CRITICAL: Block the card fingerprint to prevent reuse
+        if (cardFingerprint) {
+          await addToBlocklist(db, {
+            userId: orderData.userId,
+            email: orderData.customerEmail,
+            cardFingerprint: cardFingerprint,
+            cardLast4: cardLast4,
+            cardBrand: cardBrand,
+            reason: `AUTO-BLOCK: Price manipulation detected in webhook. Paid ${paidAmount} ${orderData.currency}, expected ${expectedAmount}. Card ${cardBrand} ****${cardLast4}`,
+            createdBy: 'webhook_fraud_detection',
+            metadata: {
+              orderId,
+              sessionId: session.id,
+              paidAmount,
+              expectedAmount,
+              difference: Math.abs(paidAmount - expectedAmount)
+            }
+          });
+          
+          console.error('🚨 CARD BLOCKED:', {
+            cardFingerprint,
+            cardLast4,
+            cardBrand,
+            email: orderData.customerEmail
+          });
+        }
+      } catch (e) {
+        console.error('Failed to log fraud attempt and block card:', e);
       }
       
       // Still process if user paid MORE (refund difference manually)
@@ -199,6 +258,8 @@ async function handleCheckoutSessionCompleted(session) {
           status: 'payment_mismatch',
           paymentStatus: 'failed',
           errorMessage: `Payment amount mismatch: paid ${paidAmount}, expected ${expectedAmount}`,
+          fraudBlocked: true,
+          blockedCard: cardFingerprint ? `${cardBrand} ****${cardLast4}` : 'unknown',
           updatedAt: serverTimestamp()
         });
         return;

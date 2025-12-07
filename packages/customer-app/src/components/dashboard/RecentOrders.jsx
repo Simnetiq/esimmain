@@ -25,14 +25,17 @@ const RecentOrders = ({ orders, loading, onViewQRCode }) => {
   const currentLanguage = getCurrentLanguage();
   const isRTL = getLanguageDirection(currentLanguage) === 'rtl';
   
-  // Fetch usage data for active orders (optional - only works with production Airalo credentials)
+  // Fetch usage data for ALL orders with ICCID (not just active)
+  // This allows us to detect expired eSIMs and show accurate remaining data
   useEffect(() => {
     const fetchUsageForOrders = async () => {
-      const activeOrders = orders.filter(order => 
-        order && order.status === 'active' && order.qrCode?.iccid
+      // Fetch for all orders that have an ICCID, regardless of status
+      // This ensures we can detect when an eSIM expires
+      const ordersWithIccid = orders.filter(order => 
+        order && order.qrCode?.iccid
       );
       
-      for (const order of activeOrders.slice(0, 5)) {
+      for (const order of ordersWithIccid.slice(0, 10)) {
         const alreadyFetched = usageData[order.id] !== undefined;
         const currentlyLoading = loadingUsage[order.id];
         
@@ -65,6 +68,10 @@ const RecentOrders = ({ orders, loading, onViewQRCode }) => {
                 total_voice: result.data?.total_voice || totalVoice,
                 total_text: result.data?.total_text || totalText,
                 is_unlimited: isUnlimited,
+                // Keep the status from the API (ACTIVE, EXPIRED, RECYCLED, FINISHED, etc.)
+                status: result.data?.status,
+                // Keep the expired_at timestamp
+                expired_at: result.data?.expired_at,
               };
               
               setUsageData(prev => ({ ...prev, [order.id]: combinedUsageData }));

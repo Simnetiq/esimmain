@@ -14,20 +14,37 @@ export async function POST(request) {
       }, { status: 400 });
     }
 
-    // Get Airalo credentials from Firestore
-    const airaloConfigRef = doc(db, 'config', 'airalo');
-    const airaloConfig = await getDoc(airaloConfigRef);
+    // Determine Airalo mode (sandbox vs production)
+    const airaloMode = process.env.AIRALO_MODE || 'production';
+    const isSandbox = airaloMode === 'sandbox';
     
-    if (!airaloConfig.exists()) {
-      return NextResponse.json({
-        success: false,
-        error: 'Airalo configuration not found'
-      }, { status: 400 });
+    // Get Airalo credentials based on mode
+    let clientId = isSandbox
+      ? process.env.AIRALO_CLIENT_ID_SANDBOX
+      : process.env.AIRALO_CLIENT_ID;
+      
+    let clientSecret = isSandbox
+      ? process.env.AIRALO_CLIENT_SECRET_SANDBOX
+      : (process.env.AIRALO_CLIENT_SECRET || process.env.AIRALO_CLIENT_SECRET_PRODUCTION);
+    
+    // Select correct base URL
+    const baseUrl = isSandbox 
+      ? (process.env.AIRALO_BASE_URL_SANDBOX || 'https://sandbox-partners-api.airalo.com')
+      : (process.env.AIRALO_BASE_URL || 'https://partners-api.airalo.com');
+    
+    console.log(`[Airalo Details] Mode: ${airaloMode}, URL: ${baseUrl}`);
+    
+    // Fallback to Firestore config if env vars not set
+    if (!clientId || !clientSecret) {
+      const airaloConfigRef = doc(db, 'config', 'airalo');
+      const airaloConfig = await getDoc(airaloConfigRef);
+      
+      if (airaloConfig.exists()) {
+        const configData = airaloConfig.data();
+        clientId = clientId || configData.api_key || configData.client_id;
+        clientSecret = clientSecret || configData.client_secret;
+      }
     }
-    
-    const configData = airaloConfig.data();
-    const clientId = configData.api_key;
-    const clientSecret = process.env.AIRALO_CLIENT_SECRET_PRODUCTION;
     
     if (!clientId || !clientSecret) {
       return NextResponse.json({
@@ -37,7 +54,6 @@ export async function POST(request) {
     }
 
     // Authenticate with Airalo API
-    const baseUrl = 'https://partners-api.airalo.com';
     const authResponse = await fetch(`${baseUrl}/v2/token`, {
       method: 'POST',
       headers: {
