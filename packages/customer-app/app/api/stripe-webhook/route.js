@@ -276,6 +276,7 @@ async function handleCheckoutSessionCompleted(session) {
       updatedAt: serverTimestamp()
     });
 
+    console.log('✅ Payment verified for order:', orderId);
     
     // ========================================
     // CREATE AIRALO eSIM ORDER
@@ -284,12 +285,15 @@ async function handleCheckoutSessionCompleted(session) {
       const packageId = orderData.packageId || orderData.planId;
       
       if (!packageId) {
+        console.error('❌ No package ID found in order data:', orderData);
         throw new Error('No package ID found in order data');
       }
 
       // Get Airalo credentials based on mode (sandbox or production)
       const airaloMode = process.env.AIRALO_MODE || 'production';
       const isSandbox = airaloMode === 'sandbox' || airaloMode === 'test';
+      
+      console.log(`🔧 Airalo Mode: ${airaloMode}, Package: ${packageId}`);
       
       // Use sandbox or production credentials
       const clientId = isSandbox 
@@ -308,10 +312,16 @@ async function handleCheckoutSessionCompleted(session) {
       console.log(`🌐 Airalo Mode: ${airaloMode}, URL: ${airaloBaseUrl}`);
       
       if (!clientId || !clientSecret) {
+        console.error('❌ Airalo credentials missing!', {
+          hasClientId: !!clientId,
+          hasClientSecret: !!clientSecret,
+          mode: airaloMode
+        });
         throw new Error('Airalo API credentials not configured');
       }
 
       // Step 1: Authenticate with Airalo OAuth2
+      console.log('🔐 Authenticating with Airalo...');
       const authResponse = await fetch(`${airaloBaseUrl}/v2/token`, {
         method: 'POST',
         headers: {
@@ -327,6 +337,7 @@ async function handleCheckoutSessionCompleted(session) {
 
       if (!authResponse.ok) {
         const errorText = await authResponse.text();
+        console.error('❌ Airalo auth failed:', errorText);
         throw new Error(`Airalo authentication failed: ${errorText}`);
       }
 
@@ -334,10 +345,14 @@ async function handleCheckoutSessionCompleted(session) {
       const accessToken = authData.data?.access_token;
 
       if (!accessToken) {
+        console.error('❌ No access token in response:', authData);
         throw new Error('No access token received from Airalo');
       }
 
+      console.log('✅ Airalo authenticated successfully');
+
       // Step 2: Create the eSIM order
+      console.log('📦 Creating Airalo order for package:', packageId);
       const orderResponse = await fetch(`${airaloBaseUrl}/v2/orders`, {
         method: 'POST',
         headers: {
@@ -353,22 +368,32 @@ async function handleCheckoutSessionCompleted(session) {
         })
       });
 
+      console.log('📡 Airalo order response status:', orderResponse.status);
 
       if (!orderResponse.ok) {
         const errorText = await orderResponse.text();
+        console.error('❌ Airalo order failed:', {
+          status: orderResponse.status,
+          error: errorText,
+          packageId,
+          orderId
+        });
         throw new Error(`Airalo order creation failed: ${errorText}`);
       }
 
       const airaloOrderResult = await orderResponse.json();
+      console.log('📦 Airalo order result:', JSON.stringify(airaloOrderResult).substring(0, 200));
 
       const airaloOrder = airaloOrderResult.data;
       const airaloOrderId = airaloOrder?.id;
       const simData = airaloOrder?.sims?.[0];
 
       if (!airaloOrderId) {
+        console.error('❌ No order ID in Airalo response:', airaloOrderResult);
         throw new Error('No order ID returned from Airalo');
       }
 
+      console.log('✅ Airalo order created:', airaloOrderId);
 
       // Step 3: Update order with eSIM data
       const esimUpdateData = {
@@ -390,23 +415,35 @@ async function handleCheckoutSessionCompleted(session) {
         esimUpdateData.qrCodeUrl = simData.qrcode_url;
         esimUpdateData.activationCode = simData.activation_code;
         esimUpdateData.simData = simData;
+        console.log('✅ eSIM data extracted, ICCID:', simData.iccid);
+      } else {
+        console.warn('⚠️ No SIM data in Airalo response');
       }
 
       await updateDoc(orderRef, esimUpdateData);
+      console.log('✅ Order updated to completed:', orderId);
 
       // Also update user's order if userId exists
       if (orderData.userId) {
         try {
           const userOrderRef = doc(db, 'users', orderData.userId, 'esims', orderId);
           await updateDoc(userOrderRef, esimUpdateData);
+          console.log('✅ User order updated:', orderData.userId);
         } catch (userOrderError) {
-          console.error('Error updating user order:', userOrderError);
+          console.error('❌ Error updating user order:', userOrderError);
           // Don't fail the whole process if user order update fails
         }
       }
 
+      console.log('🎉 eSIM creation complete for order:', orderId);
 
     } catch (airaloError) {
+      console.error('❌ AIRALO ERROR:', {
+        message: airaloError.message,
+        stack: airaloError.stack,
+        orderId,
+        packageId: orderData.packageId || orderData.planId
+      });
       
       // Update order with error status - payment completed but eSIM creation failed
       // Set completedAt to mark when we finished processing (even though it failed)
@@ -416,11 +453,13 @@ async function handleCheckoutSessionCompleted(session) {
         paymentStatus: 'completed',
         esimCreated: false,
         esimError: airaloError.message,
+        esimErrorStack: airaloError.stack,
         esimErrorAt: serverTimestamp(),
         completedAt: serverTimestamp(), // Mark processing as complete (with error)
         updatedAt: serverTimestamp()
       });
 
+      console.log('💔 Order marked as esim_creation_failed:', orderId);
     }
 
   } catch (error) {
