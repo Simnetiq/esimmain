@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@esim/shared/firebase/config';
-import { collection, query, where, getDocs, doc, deleteDoc, writeBatch } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, writeBatch } from 'firebase/firestore';
 
 /**
  * CLEAN SANDBOX/TEST ORDERS

@@ -42,7 +42,7 @@ async function checkRateLimit(ip) {
     }
     
     return { allowed: true };
-  } catch (error) {
+  } catch {
     return { allowed: true };
   }
 }
@@ -485,8 +485,8 @@ export async function POST(request) {
         userAgent,
         timestamp: serverTimestamp()
       });
-    } catch (logError) {
-      // Ignore
+    } catch {
+      // Ignore logging errors
     }
     
     return NextResponse.json(
