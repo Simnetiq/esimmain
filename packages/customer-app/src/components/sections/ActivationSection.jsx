@@ -138,11 +138,11 @@ export default function ActivationSection() {
                               onClick={handleIOSDownload}
                               className="btn-primary text-white shadow-sm inline-flex items-center w-full justify-center"
                             >
-                              <img 
+                              <Image 
                                 src="/images/logo_icon/apple.svg" 
                                 alt="iOS" 
-                                width="20"
-                                height="20"
+                                width={20}
+                                height={20}
                                 className="w-5 h-5 mr-2"
                               />
                               <span className="text-base">{t('activation.downloadOnIOS', 'Download on iOS')}</span>
@@ -184,11 +184,11 @@ export default function ActivationSection() {
                               onClick={handleAndroidDownload}
                               className="btn-primary text-white shadow-sm inline-flex items-center w-full justify-center"
                             >
-                              <img 
+                              <Image 
                                 src="/images/logo_icon/android.svg" 
                                 alt="Android" 
-                                width="18"
-                                height="18"
+                                width={18}
+                                height={18}
                                 className="w-4 h-4 mr-2"
                               />
                               <span className="text-base">{t('activation.downloadOnAndroid', 'Download on Android')}</span>
