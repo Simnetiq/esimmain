@@ -115,12 +115,12 @@ async function processStuckOrder(orderId, orderData) {
     };
 
     if (simData) {
-      esimUpdateData.iccid = simData.iccid;
-      esimUpdateData.lpa = simData.lpa;
-      esimUpdateData.matchingId = simData.matching_id;
-      esimUpdateData.qrCode = simData.qrcode || simData.lpa;
-      esimUpdateData.qrCodeUrl = simData.qrcode_url;
-      esimUpdateData.activationCode = simData.activation_code;
+      if (simData.iccid) esimUpdateData.iccid = simData.iccid;
+      if (simData.lpa) esimUpdateData.lpa = simData.lpa;
+      if (simData.matching_id) esimUpdateData.matchingId = simData.matching_id;
+      if (simData.qrcode || simData.lpa) esimUpdateData.qrCode = simData.qrcode || simData.lpa;
+      if (simData.qrcode_url) esimUpdateData.qrCodeUrl = simData.qrcode_url;
+      if (simData.activation_code) esimUpdateData.activationCode = simData.activation_code;
       esimUpdateData.simData = simData;
     }
 
