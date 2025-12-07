@@ -58,6 +58,7 @@ const EsimUsageModal = ({ esimUsage, onClose }) => {
           label: t('dashboard.status.active', 'Active') 
         };
       case 'EXPIRED':
+      case 'RECYCLED':
         return { 
           color: 'bg-red-500', 
           bgColor: 'bg-red-50', 
@@ -74,6 +75,15 @@ const EsimUsageModal = ({ esimUsage, onClose }) => {
           textColor: 'text-amber-700',
           icon: AlertCircle,
           label: t('dashboard.status.finished', 'Finished') 
+        };
+      case 'NOT_ACTIVE':
+        return { 
+          color: 'bg-gray-500', 
+          bgColor: 'bg-gray-50', 
+          borderColor: 'border-gray-100',
+          textColor: 'text-gray-700',
+          icon: Clock,
+          label: t('dashboard.status.notActive', 'Not Active') 
         };
       default:
         return { 

@@ -63,7 +63,7 @@ export async function POST(request) {
       });
     }
 
-    // PRODUCTION MODE - Get real QR code from Airalo
+    // PRODUCTION MODE - Get real QR code from Airalo via OAuth
     
     if (!orderIdToUse) {
       return NextResponse.json({
@@ -72,22 +72,87 @@ export async function POST(request) {
       }, { status: 400 });
     }
 
-    // Get API key from parameter or environment
-    const airaloApiKey = apiKey || process.env.AIRALO_API_KEY;
-    if (!airaloApiKey) {
+    // Import Firebase helpers
+    const { db: dbImport } = await import('@esim/shared/firebase/config');
+    const { doc: docImport, getDoc: getDocImport } = await import('firebase/firestore');
+    
+    // Determine Airalo mode (sandbox vs production)
+    const airaloMode = process.env.AIRALO_MODE || 'production';
+    const isSandbox = airaloMode === 'sandbox';
+    
+    // Get Airalo credentials based on mode
+    let clientId = isSandbox
+      ? process.env.AIRALO_CLIENT_ID_SANDBOX
+      : process.env.AIRALO_CLIENT_ID;
+      
+    let clientSecret = isSandbox
+      ? process.env.AIRALO_CLIENT_SECRET_SANDBOX
+      : (process.env.AIRALO_CLIENT_SECRET || process.env.AIRALO_CLIENT_SECRET_PRODUCTION);
+    
+    // Select correct base URL
+    const airaloBaseUrl = isSandbox 
+      ? (process.env.AIRALO_BASE_URL_SANDBOX || 'https://sandbox-partners-api.airalo.com')
+      : (process.env.AIRALO_BASE_URL || 'https://partners-api.airalo.com');
+    
+    console.log(`[Airalo QR Code] Mode: ${airaloMode}, URL: ${airaloBaseUrl}`);
+    
+    // Fallback to Firestore config if env vars not set
+    if (!clientId || !clientSecret) {
+      const airaloConfigRef = docImport(dbImport, 'config', 'airalo');
+      const airaloConfig = await getDocImport(airaloConfigRef);
+      
+      if (airaloConfig.exists()) {
+        const configData = airaloConfig.data();
+        clientId = clientId || configData.api_key || configData.client_id;
+        clientSecret = clientSecret || configData.client_secret;
+      }
+    }
+    
+    if (!clientId || !clientSecret) {
       return NextResponse.json({
         success: false,
-        error: 'Airalo API key not provided'
+        error: 'Airalo credentials not found'
       }, { status: 400 });
     }
 
-    const airaloBaseUrl = baseUrl || process.env.AIRALO_BASE_URL || 'https://partners-api.airalo.com';
+    // Authenticate with Airalo OAuth
+    const authResponse = await fetch(`${airaloBaseUrl}/v2/token`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        client_id: clientId,
+        client_secret: clientSecret,
+        grant_type: 'client_credentials'
+      })
+    });
+
+    if (!authResponse.ok) {
+      const errorText = await authResponse.text();
+      console.error('[Airalo QR Code] Auth failed:', errorText);
+      return NextResponse.json({
+        success: false,
+        error: `Authentication failed: ${authResponse.statusText}`
+      }, { status: 401 });
+    }
+
+    const authData = await authResponse.json();
+    const accessToken = authData.data?.access_token;
+
+    if (!accessToken) {
+      return NextResponse.json({
+        success: false,
+        error: 'No access token received from Airalo'
+      }, { status: 401 });
+    }
 
     // Get SIM details from Airalo API (includes QR code)
     const simResponse = await fetch(`${airaloBaseUrl}/v2/sims/${orderIdToUse}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${airaloApiKey}`,
+        'Authorization': `Bearer ${accessToken}`,
         'Accept': 'application/json'
       }
     });

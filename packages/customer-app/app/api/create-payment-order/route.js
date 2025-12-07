@@ -531,6 +531,9 @@ export async function POST(request) {
       mode: stripeMode,
       isTestMode: isTestMode,
       quantity: "1",
+      // Source tracking (web vs mobile)
+      source: 'web',
+      platform: platform || 'web',
       // Country information (CRITICAL for display)
       country_code: countryCode,
       country_region: countryName,
@@ -606,7 +609,8 @@ export async function POST(request) {
           name: packageName,
           language: language || 'en',
           userId: userId || '',
-          platform: platform || 'mobile',
+          source: 'web',
+          platform: platform || 'web',
           validated_price: validatedPrice.toString(),
           database_price: priceValidation.databasePrice.toString(),
           // Country info for order tracking
@@ -657,6 +661,8 @@ export async function POST(request) {
           email: email,
           name: packageName,
           language: language || 'en',
+          source: 'web',
+          platform: platform || 'web',
           validated_price: validatedPrice.toString(),
           database_price: priceValidation.databasePrice.toString(),
           // Country info for order tracking

@@ -281,13 +281,21 @@ const Dashboard = () => {
         await loadReferralStats();
         
         // Fetch eSIMs from mobile app collection structure (users/{userId}/esims)
+        // Note: We can't use where('deleted', '!=', true) because it excludes documents without the field
+        // Instead, we fetch all and filter in memory
         const esimsQuery = query(
           collection(db, 'users', currentUser.uid, 'esims')
         );
         
         const esimsSnapshot = await getDocs(esimsQuery);
         
-        const ordersData = await Promise.all(esimsSnapshot.docs.map(async doc => {
+        const ordersData = await Promise.all(esimsSnapshot.docs
+          .filter(doc => {
+            // Filter out deleted orders (only if explicitly marked as deleted)
+            const data = doc.data();
+            return data.deleted !== true;
+          })
+          .map(async doc => {
           try {
             const data = doc.data();
             
@@ -681,6 +689,48 @@ const Dashboard = () => {
     }
   };
 
+  const handleDeleteOrder = async (order) => {
+    if (!currentUser || !order) return;
+    
+    // Confirmation dialog
+    const confirmed = window.confirm(
+      t('dashboard.confirmDelete', 'Are you sure you want to delete this eSIM? This action cannot be undone.')
+    );
+    
+    if (!confirmed) return;
+    
+    try {
+      // Delete from user's esims subcollection
+      const userOrderRef = doc(db, 'users', currentUser.uid, 'esims', order.id);
+      await updateDoc(userOrderRef, {
+        deleted: true,
+        deletedAt: serverTimestamp(),
+        status: 'deleted'
+      });
+      
+      // Update local state - remove from orders list
+      setOrders(prevOrders => prevOrders.filter(o => o.id !== order.id));
+      
+      toast.success(t('dashboard.orderDeleted', 'eSIM deleted successfully'), {
+        duration: 3000,
+        style: {
+          background: '#10B981',
+          color: '#fff',
+        },
+      });
+      
+    } catch (error) {
+      console.error('Error deleting order:', error);
+      toast.error(t('dashboard.deleteOrderError', 'Failed to delete eSIM: {{error}}', { error: error.message }), {
+        duration: 4000,
+        style: {
+          background: '#EF4444',
+          color: '#fff',
+        },
+      });
+    }
+  };
+
   const handleCheckEsimUsage = async () => {
     if (!selectedOrder || loadingEsimUsage) return;
     
@@ -811,6 +861,7 @@ const Dashboard = () => {
         onCheckEsimUsage={handleCheckEsimUsage}
         loadingEsimDetails={loadingEsimDetails}
         loadingEsimUsage={loadingEsimUsage}
+        onDeleteOrder={handleDeleteOrder}
       />
 
       {/* eSIM Details Modal */}

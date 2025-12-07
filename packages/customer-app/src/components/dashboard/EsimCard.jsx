@@ -25,7 +25,7 @@ const REGION_FLAGS = {
   'LATINAMERICA': null
 };
 
-const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
+const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, onDeleteOrder, isRTL }) => {
   const { t } = useI18n();
 
   // Format data usage with progress
@@ -33,15 +33,19 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
     if (isUnlimited) return { text: t('dashboard.unlimited', 'Unlimited'), percentage: 0 };
     if (remaining == null || total == null) return null;
     
-    const remainingGB = remaining >= 1024 ? (remaining / 1024).toFixed(1) : remaining;
-    const totalGB = total >= 1024 ? (total / 1024).toFixed(1) : total;
-    const unit = remaining >= 1024 ? 'GB' : 'MB';
-    const usedPercentage = Math.round(((total - remaining) / total) * 100);
+    // Determine unit based on total (more consistent than using remaining)
+    const useGB = total >= 1024;
+    const unit = useGB ? 'GB' : 'MB';
+    
+    const remainingFormatted = useGB ? (remaining / 1024).toFixed(1) : Math.round(remaining);
+    const totalFormatted = useGB ? (total / 1024).toFixed(1) : Math.round(total);
+    
+    const usedPercentage = total > 0 ? Math.round(((total - remaining) / total) * 100) : 0;
     
     return {
-      text: `${remainingGB} / ${totalGB} ${unit}`,
-      remaining: remainingGB,
-      total: totalGB,
+      text: `${remainingFormatted} / ${totalFormatted} ${unit}`,
+      remaining: remainingFormatted,
+      total: totalFormatted,
       unit,
       percentage: usedPercentage,
       remainingPercentage: 100 - usedPercentage
@@ -75,8 +79,24 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
     return `/flags/4x3/${isoCode}.svg`;
   };
 
+  // Check if eSIM is expired based on usage data from Airalo API
+  const isExpired = usageData ? (
+    // Check API status field (EXPIRED, RECYCLED, FINISHED are considered expired)
+    usageData.status === 'EXPIRED' || 
+    usageData.status === 'RECYCLED' || 
+    usageData.status === 'FINISHED' ||
+    // Check expired_at timestamp if available
+    (usageData.expired_at && new Date(usageData.expired_at) < new Date())
+  ) : false;
+
   // Get status color and label
-  const getStatusInfo = (status) => {
+  const getStatusInfo = (status, isExpired) => {
+    // If we have usage data indicating expiration, use that
+    if (isExpired) {
+      return { color: 'bg-gray-400', textColor: 'text-gray-500', bgColor: 'bg-gray-100', label: t('dashboard.status.expired', 'Expired') };
+    }
+    
+    // Otherwise use the order status
     switch (status?.toLowerCase()) {
       case 'active':
         return { color: 'bg-emerald-500', textColor: 'text-emerald-600', bgColor: 'bg-emerald-50', label: t('dashboard.status.active', 'Active') };
@@ -91,7 +111,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
     }
   };
 
-  const statusInfo = getStatusInfo(order.status);
+  const statusInfo = getStatusInfo(order.status, isExpired);
   
   // Get country code - check multiple possible field names (camelCase and underscore)
   const countryCode = order.countryCode || order.country_code || null;
@@ -126,12 +146,16 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
 
   return (
     <div
-      className="group relative bg-white border border-gray-200 rounded-md hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer h-full"
+      className={`group relative bg-white border rounded-md hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer h-full ${
+        isExpired 
+          ? 'border-gray-300 opacity-75 hover:opacity-90' 
+          : 'border-gray-200'
+      }`}
       title={fullName}
       onClick={() => onViewQRCode(order)}
     >
       {/* Status Badge - Top Right */}
-      <div className="absolute top-2 right-2 z-10">
+      <div className={`absolute top-2 z-10 ${isRTL ? 'left-2' : 'right-2'}`}>
         <div className={`flex items-center gap-1.5 ${statusInfo.bgColor} px-2 py-1 rounded ${isRTL ? 'flex-row-reverse' : ''}`}>
           <div className={`w-1.5 h-1.5 rounded-full ${statusInfo.color}`}></div>
           <span className={`text-xs font-medium ${statusInfo.textColor}`}>
@@ -183,20 +207,20 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
           </div>
         </div>
 
-        {/* Data Usage Bar (if available) */}
-        {(usage || order.status === 'active') && (
+        {/* Data Usage Bar (show for active and expired eSIMs) */}
+        {(usage || order.status === 'active' || isExpired) && (
           <div className="mb-3">
             <div className={`flex items-center justify-between mb-1.5 ${isRTL ? 'flex-row-reverse' : ''}`}>
               <div className={`flex items-center gap-1.5 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                <Wifi className="w-3.5 h-3.5 text-tufts-blue" />
-                <span className="text-xs font-medium text-gray-600">
-                  {t('dashboard.dataRemaining', 'Data Remaining')}
+                <Wifi className={`w-3.5 h-3.5 ${isExpired ? 'text-gray-400' : 'text-tufts-blue'}`} />
+                <span className={`text-xs font-medium ${isExpired ? 'text-gray-500' : 'text-gray-600'}`}>
+                  {isExpired ? t('dashboard.dataUsed', 'Data Used') : t('dashboard.dataRemaining', 'Data Remaining')}
                 </span>
               </div>
               {loadingUsage ? (
                 <div className="animate-pulse bg-gray-200 h-3.5 w-16 rounded"></div>
               ) : usage ? (
-                <span className="text-xs font-semibold text-tufts-blue">
+                <span className={`text-xs font-semibold ${isExpired ? 'text-gray-500' : 'text-tufts-blue'}`}>
                   {usage.text}
                 </span>
               ) : (
@@ -212,13 +236,31 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
                 <div className="h-full w-full bg-gray-200 animate-pulse"></div>
               ) : usage ? (
                 <div 
-                  className="h-full bg-gradient-to-r from-tufts-blue to-blue-500 rounded transition-all duration-500"
+                  className={`h-full rounded transition-all duration-500 ${
+                    isExpired 
+                      ? 'bg-gradient-to-r from-gray-400 to-gray-500' 
+                      : 'bg-gradient-to-r from-tufts-blue to-blue-500'
+                  }`}
                   style={{ width: `${usage.remainingPercentage}%` }}
                 ></div>
               ) : (
-                <div className="h-full w-full bg-gradient-to-r from-tufts-blue to-blue-500 rounded"></div>
+                <div className={`h-full w-full rounded ${
+                  isExpired 
+                    ? 'bg-gradient-to-r from-gray-400 to-gray-500' 
+                    : 'bg-gradient-to-r from-tufts-blue to-blue-500'
+                }`}></div>
               )}
             </div>
+            
+            {/* Expiration Date (if expired and date available) */}
+            {isExpired && usageData?.expired_at && (
+              <div className={`flex items-center gap-1.5 mt-1.5 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <Clock className="w-3 h-3 text-gray-400" />
+                <span className="text-xs text-gray-500">
+                  {t('dashboard.expiredOn', 'Expired on')} {new Date(usageData.expired_at).toLocaleDateString()}
+                </span>
+              </div>
+            )}
           </div>
         )}
 
