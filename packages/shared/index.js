@@ -9,6 +9,7 @@ export * from './services/promoCodeService';
 // Utils
 export { default as providerUtils } from './utils/providerUtils';
 export * from './utils/priceUtils';
+export * from './utils/esimFieldMapper';
 
 // Hooks
 export { useCountries } from './hooks/useCountries';

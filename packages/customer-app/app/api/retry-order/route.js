@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@esim/shared/firebase/config';
-import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 /**
  * MANUAL ORDER RETRY ENDPOINT
@@ -165,10 +165,14 @@ export async function POST(request) {
     console.log('✅ Airalo order created:', airaloOrderId);
 
     // Step 3: Update Firebase with eSIM data
+    // IMPORTANT: Save both snake_case and camelCase for complete compatibility
+    const lpaString = simData?.qrcode || simData?.lpa;
+    
     const esimUpdateData = {
       status: 'completed',
       airaloOrderId: airaloOrderId,
       airaloOrderData: airaloOrder,
+      orderData: airaloOrder, // Also save as orderData for Dashboard.jsx
       esimCreated: true,
       esimCreatedAt: serverTimestamp(),
       completedAt: serverTimestamp(),
@@ -177,25 +181,62 @@ export async function POST(request) {
       retriedAt: serverTimestamp()
     };
 
+    // Add SIM data if available - save BOTH formats for complete compatibility
     if (simData) {
-      if (simData.iccid) esimUpdateData.iccid = simData.iccid;
-      if (simData.lpa) esimUpdateData.lpa = simData.lpa;
-      if (simData.matching_id) esimUpdateData.matchingId = simData.matching_id;
-      if (simData.qrcode || simData.lpa) esimUpdateData.qrCode = simData.qrcode || simData.lpa;
-      if (simData.qrcode_url) esimUpdateData.qrCodeUrl = simData.qrcode_url;
-      if (simData.activation_code) esimUpdateData.activationCode = simData.activation_code;
+      // snake_case fields (primary storage format)
+      esimUpdateData.iccid = simData.iccid || null;
+      esimUpdateData.qr_code = lpaString || null;
+      esimUpdateData.qr_code_url = simData.qrcode_url || null;
+      esimUpdateData.direct_apple_installation_url = simData.direct_apple_installation_url || simData.qrcode_url || null;
+      esimUpdateData.matching_id = simData.matching_id || null;
+      esimUpdateData.activation_code = simData.activation_code || simData.matching_id || null;
+      
+      // camelCase fields (for backwards compatibility)
+      esimUpdateData.lpa = lpaString || null;
+      esimUpdateData.qrCode = lpaString || null;
+      esimUpdateData.qrCodeUrl = simData.qrcode_url || null;
+      esimUpdateData.directAppleInstallationUrl = simData.direct_apple_installation_url || simData.qrcode_url || null;
+      esimUpdateData.matchingId = simData.matching_id || null;
+      esimUpdateData.activationCode = simData.activation_code || simData.matching_id || null;
+      
       esimUpdateData.simData = simData;
     }
 
     await updateDoc(orderRef, esimUpdateData);
 
     // Update user's order if exists
+    // CRITICAL: Use setDoc with merge to handle case where doc doesn't exist
     if (orderData.userId) {
       try {
         const userOrderRef = doc(db, 'users', orderData.userId, 'esims', orderId);
-        await updateDoc(userOrderRef, esimUpdateData);
+        const userOrderDoc = await getDoc(userOrderRef);
+        
+        if (userOrderDoc.exists()) {
+          await updateDoc(userOrderRef, esimUpdateData);
+        } else {
+          // Document doesn't exist - create it with full order data
+          console.log('⚠️ User order doc did not exist, creating...');
+          await setDoc(userOrderRef, {
+            ...orderData,
+            ...esimUpdateData,
+            userId: orderData.userId,
+            createdAt: orderData.createdAt || serverTimestamp()
+          });
+        }
       } catch (error) {
         console.error('Error updating user order:', error);
+        // Recovery attempt with setDoc merge
+        try {
+          const userOrderRef = doc(db, 'users', orderData.userId, 'esims', orderId);
+          await setDoc(userOrderRef, {
+            ...orderData,
+            ...esimUpdateData,
+            userId: orderData.userId
+          }, { merge: true });
+          console.log('✅ User order recovered with setDoc merge');
+        } catch (e) {
+          console.error('Recovery failed:', e);
+        }
       }
     }
 

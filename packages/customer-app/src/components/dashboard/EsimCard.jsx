@@ -1,11 +1,12 @@
 'use client';
 
 import React from 'react';
-import { Globe, QrCode, Wifi, Phone, MessageSquare, Clock, Signal } from 'lucide-react';
+import { Globe, QrCode, Wifi, Phone, MessageSquare, Clock, Signal, ChevronRight, Zap } from 'lucide-react';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { getISOCode } from '@esim/shared/utils/countryCodeMap';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
-import Image from 'next/image';
+import { mapPackageCountryData, mapPlanDetails } from '@esim/shared/utils/esimFieldMapper';
+// Using native img for flags due to Next.js Image optimization issues with SVGs
 
 // Regional flag mapping - maps region names to actual flag files that exist
 // Available: eu.svg, un.svg, arab.svg, asean.svg, eac.svg, cefta.svg
@@ -24,6 +25,48 @@ const REGION_FLAGS = {
   'OCEANIA': null,
   'CARIBBEAN': null,
   'LATINAMERICA': null
+};
+
+// Circular Progress Ring Component (Untitled UI style)
+const CircularProgress = ({ percentage, size = 48, strokeWidth = 4, isExpired = false }) => {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const offset = circumference - (percentage / 100) * circumference;
+  
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg className="transform -rotate-90" width={size} height={size}>
+        {/* Background circle */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          className="text-gray-100"
+        />
+        {/* Progress circle */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          className={`transition-all duration-500 ${isExpired ? 'text-gray-400' : 'text-tufts-blue'}`}
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className={`text-xs font-bold ${isExpired ? 'text-gray-500' : 'text-gray-700'}`}>
+          {percentage}%
+        </span>
+      </div>
+    </div>
+  );
 };
 
 const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
@@ -114,10 +157,11 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
 
   const statusInfo = getStatusInfo(order.status, isExpired);
   
-  // Get country code - check multiple possible field names (camelCase and underscore)
-  const countryCode = order.countryCode || order.country_code || null;
-  const countryName = order.countryName || order.country_region || null;
-  const isRegional = order.isRegional || order.is_regional || false;
+  // Use shared utility to get consistent country data (handles both formats)
+  const countryData = mapPackageCountryData(order);
+  const countryCode = countryData?.countryCode || null;
+  const countryName = countryData?.countryName || null;
+  const isRegional = countryData?.isRegional || false;
   
   const flagPath = getFlagPath(countryCode, isRegional);
   const usage = usageData ? formatDataUsage(usageData.remaining, usageData.total, usageData.is_unlimited) : null;
@@ -136,8 +180,13 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
     rawCountry_region: order.country_region
   });
   
-  // Plan details
-  const planDetails = order.planDetails || {};
+  // Use shared utility for plan details (handles both formats)
+  const rawPlanDetails = order.planDetails || {};
+  const mappedPlanDetails = mapPlanDetails(rawPlanDetails);
+  const planDetails = {
+    ...rawPlanDetails,
+    ...mappedPlanDetails
+  };
   const dataDisplay = planDetails.data || `${planDetails.dataAmountMb || 0} MB`;
   const validityDisplay = planDetails.validity ? `${planDetails.validity} ${t('dashboard.days', 'days')}` : null;
   
@@ -147,30 +196,30 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
 
   return (
     <div
-      className={`group relative bg-white border rounded-md hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer h-full ${
+      className={`group relative bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden cursor-pointer h-full ${
         isExpired 
-          ? 'border-gray-300 opacity-75 hover:opacity-90' 
-          : 'border-gray-200'
+          ? 'border border-gray-200 opacity-80 hover:opacity-100' 
+          : 'border border-gray-200 hover:border-tufts-blue/30'
       }`}
       title={fullName}
       onClick={() => onViewQRCode(order)}
     >
-      {/* Status Badge - Top Right */}
-      <div className={`absolute top-2 z-10 ${isRTL ? 'left-2' : 'right-2'}`}>
-        <div className={`flex items-center gap-1.5 ${statusInfo.bgColor} px-2 py-1 rounded ${isRTL ? 'flex-row-reverse' : ''}`}>
-          <div className={`w-1.5 h-1.5 rounded-full ${statusInfo.color}`}></div>
-          <span className={`text-xs font-medium ${statusInfo.textColor}`}>
-            {statusInfo.label}
-          </span>
+      {/* Card Header with Status */}
+      <div className={`relative px-4 sm:px-5 pt-4 sm:pt-5 pb-3 ${isRTL ? 'text-right' : 'text-left'}`}>
+        {/* Status Badge - Absolute positioned */}
+        <div className={`absolute top-3 ${isRTL ? 'left-3' : 'right-3'}`}>
+          <div className={`inline-flex items-center gap-1.5 ${statusInfo.bgColor} px-2.5 py-1 rounded-full ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`w-1.5 h-1.5 rounded-full ${statusInfo.color} animate-pulse`}></div>
+            <span className={`text-xs font-medium ${statusInfo.textColor}`}>
+              {statusInfo.label}
+            </span>
+          </div>
         </div>
-      </div>
 
-      {/* Card Content */}
-      <div className="p-4 sm:p-5 h-full flex flex-col">
-        {/* Country Flag & Name */}
-        <div className={`flex items-center gap-3 mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
-          {/* 4:3 Flag Container - Like CountryCard */}
-          <div className="flex-shrink-0 w-16 sm:w-20 aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg flex items-center justify-center border-2 border-gray-200 overflow-hidden">
+        {/* Country/Region Header */}
+        <div className={`flex items-center gap-3.5 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          {/* Flag Container - Featured Icon Style (Untitled UI) */}
+          <div className="flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center border border-gray-200 overflow-hidden shadow-sm">
             {flagPath ? (
               <img
                 src={flagPath}
@@ -182,7 +231,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
                   if (e.currentTarget.parentElement) {
                     e.currentTarget.parentElement.innerHTML = `
                       <div class="w-full h-full bg-gradient-to-br from-tufts-blue to-blue-600 flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                       </div>
@@ -192,136 +241,128 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-tufts-blue to-blue-600 flex items-center justify-center">
-                <Globe className="w-6 h-6 text-white" />
+                <Globe className="w-7 h-7 text-white" />
               </div>
             )}
           </div>
           
           <div className={`flex-1 min-w-0 ${isRTL ? 'text-right' : 'text-left'}`}>
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate leading-tight">
               {displayName}
             </h3>
-            <p className="text-xs sm:text-sm text-gray-600 truncate">
+            <p className="text-xs sm:text-sm text-gray-500 truncate mt-0.5">
               {order.planName || t('dashboard.unknownPlan', 'Unknown Plan')}
             </p>
           </div>
         </div>
-
-        {/* Data Usage Bar (show for active and expired eSIMs) */}
-        {(usage || order.status === 'active' || isExpired) && (
-          <div className="mb-3">
-            <div className={`flex items-center justify-between mb-1.5 ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <div className={`flex items-center gap-1.5 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                <Wifi className={`w-3.5 h-3.5 ${isExpired ? 'text-gray-400' : 'text-tufts-blue'}`} />
-                <span className={`text-xs font-medium ${isExpired ? 'text-gray-500' : 'text-gray-600'}`}>
-                  {isExpired ? t('dashboard.dataUsed', 'Data Used') : t('dashboard.dataRemaining', 'Data Remaining')}
-                </span>
-              </div>
-              {loadingUsage ? (
-                <div className="animate-pulse bg-gray-200 h-3.5 w-16 rounded"></div>
-              ) : usage ? (
-                <span className={`text-xs font-semibold ${isExpired ? 'text-gray-500' : 'text-tufts-blue'}`}>
-                  {usage.text}
-                </span>
-              ) : (
-                <span className="text-xs text-gray-400">
-                  {dataDisplay}
-                </span>
-              )}
-            </div>
-            
-            {/* Progress Bar */}
-            <div className="h-1.5 bg-gray-100 rounded overflow-hidden">
-              {loadingUsage ? (
-                <div className="h-full w-full bg-gray-200 animate-pulse"></div>
-              ) : usage ? (
-                <div 
-                  className={`h-full rounded transition-all duration-500 ${
-                    isExpired 
-                      ? 'bg-gradient-to-r from-gray-400 to-gray-500' 
-                      : 'bg-gradient-to-r from-tufts-blue to-blue-500'
-                  }`}
-                  style={{ width: `${usage.remainingPercentage}%` }}
-                ></div>
-              ) : (
-                <div className={`h-full w-full rounded ${
-                  isExpired 
-                    ? 'bg-gradient-to-r from-gray-400 to-gray-500' 
-                    : 'bg-gradient-to-r from-tufts-blue to-blue-500'
-                }`}></div>
-              )}
-            </div>
-            
-            {/* Expiration Date (if expired and date available) */}
-            {isExpired && usageData?.expired_at && (
-              <div className={`flex items-center gap-1.5 mt-1.5 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                <Clock className="w-3 h-3 text-gray-400" />
-                <span className="text-xs text-gray-500">
-                  {t('dashboard.expiredOn', 'Expired on')} {new Date(usageData.expired_at).toLocaleDateString()}
-                </span>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Plan Details Row */}
-        <div className={`flex flex-wrap gap-1.5 mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
-          {/* Validity */}
-          {validityDisplay && (
-            <div className={`flex items-center gap-1 bg-gray-50 px-2 py-1 rounded border border-gray-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <Clock className="w-3 h-3 text-gray-400" />
-              <span className="text-xs text-gray-600">{validityDisplay}</span>
-            </div>
-          )}
-          
-          {/* Voice Minutes */}
-          {planDetails.voice > 0 && (
-            <div className={`flex items-center gap-1 bg-gray-50 px-2 py-1 rounded border border-gray-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <Phone className="w-3 h-3 text-gray-400" />
-              <span className="text-xs text-gray-600">{planDetails.voice} {t('dashboard.min', 'min')}</span>
-            </div>
-          )}
-          
-          {/* SMS */}
-          {planDetails.sms > 0 && (
-            <div className={`flex items-center gap-1 bg-gray-50 px-2 py-1 rounded border border-gray-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <MessageSquare className="w-3 h-3 text-gray-400" />
-              <span className="text-xs text-gray-600">{planDetails.sms} SMS</span>
-            </div>
-          )}
-          
-          {/* Operator */}
-          {planDetails.operator && planDetails.operator !== 'Airalo Partner Network' && (
-            <div className={`flex items-center gap-1 bg-gray-50 px-2 py-1 rounded border border-gray-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <Signal className="w-3 h-3 text-gray-400" />
-              <span className="text-xs text-gray-600 truncate max-w-[100px]">{planDetails.operator}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Bottom Row: Price and QR Button */}
-        <div className={`mt-auto flex items-center justify-between pt-3 border-t border-gray-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
-          <div className="flex items-baseline gap-1">
-            <span className="text-lg font-bold text-tufts-blue">
-              {formatPrice(order.amount || 0)}
-            </span>
-          </div>
-
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onViewQRCode(order);
-            }}
-            className={`flex items-center gap-1.5 px-3 py-2 bg-tufts-blue text-white rounded hover:bg-tufts-blue/90 transition-all duration-200 ${isRTL ? 'flex-row-reverse' : ''}`}
-          >
-            <QrCode className="w-4 h-4" />
-            <span className="text-sm font-medium">{t('dashboard.viewQR', 'View QR')}</span>
-          </button>
-        </div>
       </div>
 
-      {/* Hover Effect */}
-      <div className="absolute inset-0 border-2 border-tufts-blue rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+      {/* Metrics Section - Untitled UI Card Style */}
+      <div className="px-4 sm:px-5 py-3 bg-gray-50/50 border-y border-gray-100">
+        <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+          {/* Data Usage with Circular Progress */}
+          <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            {loadingUsage ? (
+              <div className="w-12 h-12 rounded-full bg-gray-200 animate-pulse"></div>
+            ) : usage ? (
+              <CircularProgress 
+                percentage={usage.remainingPercentage} 
+                size={48} 
+                strokeWidth={4}
+                isExpired={isExpired}
+              />
+            ) : (
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                isExpired ? 'bg-gray-100' : 'bg-tufts-blue/10'
+              }`}>
+                <Wifi className={`w-5 h-5 ${isExpired ? 'text-gray-400' : 'text-tufts-blue'}`} />
+              </div>
+            )}
+            
+            <div className={`${isRTL ? 'text-right' : 'text-left'}`}>
+              <p className="text-xs text-gray-500 mb-0.5">
+                {isExpired ? t('dashboard.dataUsed', 'Data Used') : t('dashboard.dataRemaining', 'Remaining')}
+              </p>
+              {loadingUsage ? (
+                <div className="animate-pulse bg-gray-200 h-4 w-20 rounded"></div>
+              ) : (
+                <p className={`text-sm font-semibold ${isExpired ? 'text-gray-600' : 'text-gray-900'}`}>
+                  {usage ? usage.text : dataDisplay}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Validity Badge */}
+          {validityDisplay && (
+            <div className={`flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-gray-200 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <Clock className="w-3.5 h-3.5 text-gray-400" />
+              <span className="text-xs font-medium text-gray-600">{validityDisplay}</span>
+            </div>
+          )}
+        </div>
+        
+        {/* Expiration notice */}
+        {isExpired && usageData?.expired_at && (
+          <div className={`flex items-center gap-1.5 mt-2 pt-2 border-t border-gray-200 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <Clock className="w-3 h-3 text-amber-500" />
+            <span className="text-xs text-amber-600">
+              {t('dashboard.expiredOn', 'Expired on')} {new Date(usageData.expired_at).toLocaleDateString()}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Plan Features - Tag Style */}
+      {(planDetails.voice > 0 || planDetails.sms > 0 || (planDetails.operator && planDetails.operator !== 'Airalo Partner Network')) && (
+        <div className={`px-4 sm:px-5 py-2.5 flex flex-wrap gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          {planDetails.voice > 0 && (
+            <div className={`inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2 py-1 rounded-md text-xs font-medium ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <Phone className="w-3 h-3" />
+              <span>{planDetails.voice} {t('dashboard.min', 'min')}</span>
+            </div>
+          )}
+          
+          {planDetails.sms > 0 && (
+            <div className={`inline-flex items-center gap-1 bg-purple-50 text-purple-700 px-2 py-1 rounded-md text-xs font-medium ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <MessageSquare className="w-3 h-3" />
+              <span>{planDetails.sms} SMS</span>
+            </div>
+          )}
+          
+          {planDetails.operator && planDetails.operator !== 'Airalo Partner Network' && (
+            <div className={`inline-flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-1 rounded-md text-xs font-medium ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <Signal className="w-3 h-3" />
+              <span className="truncate max-w-[100px]">{planDetails.operator}</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Footer - Price & CTA */}
+      <div className={`px-4 sm:px-5 py-3.5 border-t border-gray-100 flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+        <div>
+          <p className="text-xs text-gray-500 mb-0.5">{t('dashboard.price', 'Price')}</p>
+          <p className="text-lg font-bold text-gray-900">
+            {formatPrice(order.amount || 0)}
+          </p>
+        </div>
+
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onViewQRCode(order);
+          }}
+          className={`group/btn inline-flex items-center gap-2 px-4 py-2.5 bg-tufts-blue text-white rounded-lg font-medium hover:bg-tufts-blue/90 active:scale-[0.98] transition-all duration-200 shadow-sm hover:shadow ${isRTL ? 'flex-row-reverse' : ''}`}
+        >
+          <QrCode className="w-4 h-4" />
+          <span className="text-sm">{t('dashboard.viewQR', 'View QR')}</span>
+          <ChevronRight className="w-4 h-4 opacity-60 group-hover/btn:translate-x-0.5 transition-transform" />
+        </button>
+      </div>
+
+      {/* Subtle Hover Glow Effect */}
+      <div className="absolute inset-0 rounded-xl ring-2 ring-tufts-blue/0 group-hover:ring-tufts-blue/20 transition-all duration-300 pointer-events-none"></div>
     </div>
   );
 };

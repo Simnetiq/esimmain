@@ -9,6 +9,14 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { esimService } from '@esim/shared/services/esimService';
 import { getReferralStats, createReferralCode } from '@esim/shared/services/referralService';
 import { getLanguageDirection, detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
+import { 
+  mapAiraloSimData, 
+  mapPackageCountryData, 
+  mapPlanDetails,
+  getQrCodeValue,
+  getAppleInstallUrl,
+  getIccid
+} from '@esim/shared/utils/esimFieldMapper';
 import toast from 'react-hot-toast';
 
 // Dashboard Components
@@ -17,8 +25,6 @@ import DashboardHeader from './dashboard/DashboardHeader';
 import RecentOrders from './dashboard/RecentOrders';
 import AccountSettings from './dashboard/AccountSettings';
 import QRCodeModal from './dashboard/QRCodeModal';
-import EsimDetailsModal from './dashboard/EsimDetailsModal';
-import EsimUsageModal from './dashboard/EsimUsageModal';
 import ReferralBottomSheet from './ReferralBottomSheet';
 
 const Dashboard = () => {
@@ -36,9 +42,11 @@ const Dashboard = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showReferralSheet, setShowReferralSheet] = useState(false);
   const [usageCache, setUsageCache] = useState({});
+  const [loadingUsageMap, setLoadingUsageMap] = useState({});
+
   
-  // Affiliate data
-  const [referralStats, setReferralStats] = useState({
+  // Affiliate data (used by setReferralStats, will be used in future referral UI)
+  const [, setReferralStats] = useState({
     referralCode: null,
     usageCount: 0,
     totalEarnings: 0,
@@ -131,7 +139,7 @@ const Dashboard = () => {
       'americas': 'Americas',
       'oceania': 'Oceania',
       'middle east': 'Middle East',
-      'caribbean': 'Caribbean',
+      'caribbean': 'Caribbean', 
       'latin america': 'Latin America'
     };
     
@@ -309,29 +317,25 @@ const Dashboard = () => {
           try {
             const data = doc.data();
             
-            
             // Extract QR code data from orderData.sims[0] structure (Airalo format)
-            const simData = data.orderData?.sims?.[0];
-            const fullLpaString = simData?.qrcode || simData?.lpa;
+            // Use both direct fields and nested structure for compatibility
+            const simData = data.orderData?.sims?.[0] || data.simData;
+            
+            // Use the shared utility to map SIM data consistently
+            const mappedQrData = simData ? mapAiraloSimData(simData) : null;
             
             // Determine the correct status - prioritize completed status for orders with eSIM data
             let orderStatus = data.status || 'pending';
-            if (simData && (data.paymentStatus === 'completed' || data.paymentStatus === 'paid')) {
+            const hasQrData = mappedQrData || data.qrCode || data.qr_code;
+            if (hasQrData && (data.paymentStatus === 'completed' || data.paymentStatus === 'paid')) {
               orderStatus = 'active'; // Mark as active if we have eSIM data and payment is complete
             }
             
-            // Extract country/region information from orderData directly
-            const packageSlug = data.orderData?.package_id || 
-                               data.orderData?.package || 
-                               data.packageId || 
-                               data.planId || 
-                               doc.id;
-            
-            // PRIORITY: Use direct country fields if available (from server-side order creation)
-            // These are set by create-payment-order and coinbase/create-charge routes
-            let countryCodeFromData = data.country_code?.toUpperCase() || null;
-            let countryNameFromData = data.country_region || null;
-            let isRegionalPlan = data.is_regional || false;
+            // Extract country/region information using shared utility
+            const countryData = mapPackageCountryData(data);
+            let countryCodeFromData = countryData?.countryCode || null;
+            let countryNameFromData = countryData?.countryName || null;
+            let isRegionalPlan = countryData?.isRegional || false;
             
             // Debug logging
             console.log('📍 Order country data:', { 
@@ -352,35 +356,57 @@ const Dashboard = () => {
               console.log('📍 Used fallback location info:', locationInfo);
             }
             
-            // Extract plan details from orderData
-            const planData = data.orderData || {};
-            const simData0 = planData.sims?.[0] || {};
+            // Extract plan details using shared utility
+            const planData = data.orderData || data.planDetails || {};
+            const mappedPlanDetails = mapPlanDetails(planData);
             
-            // Data info
-            const dataAmount = planData.data || data.data || simData?.data;
-            const dataAmountMb = planData.data_amount_mb || data.data_amount_mb || data.capacity;
-            const dataUnit = planData.data_unit || 'MB';
-            const validity = planData.validity || simData0.validity || planData.period || planData.day || data.validity;
-            const validityUnit = planData.validity_unit || 'days';
-            
-            // SMS and Voice info
-            const smsCount = planData.sms || simData0.text || data.sms || 0;
-            const voiceMinutes = planData.voice || planData.voice_minutes || simData0.voice || data.voice_minutes || 0;
-            
-            // Operator info
-            const operator = planData.operator || planData.networks || data.operator || 'Airalo Partner Network';
-            const esimType = planData.esim_type || data.esim_type || 'Prepaid';
+            // Merge with direct fields from data if available
+            const planDetails = {
+              ...mappedPlanDetails,
+              data: mappedPlanDetails.data || data.data,
+              dataAmountMb: mappedPlanDetails.dataAmountMb || data.data_amount_mb || data.capacity,
+              validity: mappedPlanDetails.validity || data.validity,
+              sms: mappedPlanDetails.sms || data.sms || 0,
+              voice: mappedPlanDetails.voice || data.voice_minutes || 0,
+              operator: mappedPlanDetails.operator || data.operator,
+              isUnlimited: mappedPlanDetails.isUnlimited || data.is_unlimited || false
+            };
             
             // Installation instructions from orderData
             const installationGuides = planData.installation_guides || {};
             const manualInstallation = planData.manual_installation || '';
             const qrcodeInstallation = planData.qrcode_installation || '';
-            
-            // APN info
-            const apnInfo = simData0.apn || {};
+            const apnInfo = simData?.apn || planData.apn || {};
             
             // Extract plan title
+            const packageSlug = data.orderData?.package_id || 
+                               data.orderData?.package || 
+                               data.packageId || 
+                               data.planId || 
+                               doc.id;
             let displayPlanName = data.planName || planData.package || data.customerName || packageSlug || 'Unknown Plan';
+            
+            // Build QR code object with all formats for complete compatibility
+            const qrCodeObject = mappedQrData ? {
+              ...mappedQrData,
+              isReal: true
+            } : {
+              // Fallback for orders with direct fields (both formats)
+              qr_code: data.qr_code || data.qrCode || data.lpa,
+              qr_code_url: data.qr_code_url || data.qrCodeUrl,
+              direct_apple_installation_url: data.direct_apple_installation_url || data.directAppleInstallationUrl || data.qr_code_url || data.qrCodeUrl,
+              iccid: data.iccid,
+              matching_id: data.matching_id || data.matchingId,
+              activation_code: data.activation_code || data.activationCode,
+              // camelCase aliases
+              qrCode: data.qrCode || data.qr_code || data.lpa,
+              qrCodeUrl: data.qrCodeUrl || data.qr_code_url,
+              directAppleInstallationUrl: data.directAppleInstallationUrl || data.direct_apple_installation_url || data.qrCodeUrl || data.qr_code_url,
+              lpa: data.lpa || data.qrCode || data.qr_code,
+              matchingId: data.matchingId || data.matching_id,
+              activationCode: data.activationCode || data.activation_code,
+              isReal: !!(data.qrCode || data.qr_code || data.lpa)
+            };
             
             return {
                 id: doc.id,
@@ -395,24 +421,16 @@ const Dashboard = () => {
                 customerEmail: data.customerEmail || data.userEmail || currentUser.email,
                 createdAt: data.createdAt || data.created_at,
                 updatedAt: data.updatedAt || data.updated_at,
-                // Map country/region information
+                // Map country/region information (both formats)
                 countryCode: countryCodeFromData,
                 countryName: countryNameFromData,
                 isRegional: isRegionalPlan,
+                country_code: countryCodeFromData?.toLowerCase(),
+                country_region: countryNameFromData,
+                is_regional: isRegionalPlan,
                 packageSlug: packageSlug,
                 // Plan details for display
-                planDetails: {
-                  data: dataAmount,
-                  dataAmountMb: dataAmountMb,
-                  dataUnit: dataUnit,
-                  validity: validity,
-                  validityUnit: validityUnit,
-                  operator: operator,
-                  esimType: esimType,
-                  sms: smsCount,
-                  voice: voiceMinutes,
-                  isUnlimited: planData.is_unlimited || data.is_unlimited || false
-                },
+                planDetails: planDetails,
                 // Installation instructions
                 installation: {
                   guides: installationGuides,
@@ -420,30 +438,12 @@ const Dashboard = () => {
                   qrcode: qrcodeInstallation,
                   apn: apnInfo
                 },
-                // Map QR code data from orderData.sims[0] (Airalo structure)
-                qrCode: simData ? {
-                  qrCode: fullLpaString,
-                  qrCodeUrl: simData.qrcode_url,
-                  directAppleInstallationUrl: simData.direct_apple_installation_url || simData.qrcode_url,
-                  iccid: simData.iccid,
-                  lpa: fullLpaString,
-                  matchingId: simData.matching_id,
-                  activationCode: simData.activation_code || simData.matching_id,
-                  smdpAddress: simData.lpa,
-                  isReal: true
-                } : {
-                  // Fallback for orders without orderData.sims structure
-                  qrCode: data.qrCode || data.orderResult?.qrCode,
-                  qrCodeUrl: data.qrCodeUrl || data.orderResult?.qrCodeUrl,
-                  directAppleInstallationUrl: data.directAppleInstallationUrl || data.orderResult?.directAppleInstallationUrl,
-                  iccid: data.iccid || data.orderResult?.iccid,
-                  lpa: data.lpa || data.orderResult?.lpa,
-                  matchingId: data.matchingId || data.orderResult?.matchingId
-                },
+                // QR code data (with all formats for compatibility)
+                qrCode: qrCodeObject,
                 // Include the raw orderData for reference
                 airaloOrderData: data.orderData
               };
-          } catch (error) {
+          } catch {
             return null;
           }
         })); // Use Promise.all for async map
@@ -513,6 +513,52 @@ const Dashboard = () => {
     }
   }, [authLoading, currentUser, router, currentLanguage]);
 
+  // Preload usage data for visible eSIMs (for card previews)
+  // DISABLED: Causes rate limiting issues with Airalo API (429 errors)
+  // Usage data is now only loaded when user clicks "Check Usage" in the modal
+  // This prevents hitting Airalo's rate limit of ~100 requests/minute
+  /*
+  useEffect(() => {
+    if (orders.length === 0) return;
+    
+    const preloadUsageData = async () => {
+      // Get ICCIDs that need usage data (limit to 2 to avoid rate limiting)
+      const iccidsToLoad = orders
+        .filter(o => o.status === 'active' || o.status === 'completed')
+        .map(o => o.qrCode?.iccid || o.iccid || o.airaloOrderData?.sims?.[0]?.iccid)
+        .filter(iccid => iccid && !usageCache[iccid])
+        .slice(0, 2); // Only load first 2 to avoid rate limiting
+      
+      if (iccidsToLoad.length === 0) return;
+      
+      console.log('[Dashboard] Preloading usage for', iccidsToLoad.length, 'eSIMs (sequential)');
+      
+      // Load sequentially with delay to avoid rate limiting
+      for (const iccid of iccidsToLoad) {
+        setLoadingUsageMap(prev => ({ ...prev, [iccid]: true }));
+        
+        try {
+          const result = await esimService.getEsimUsageByIccid(iccid);
+          if (result.success) {
+            setUsageCache(prev => ({ ...prev, [iccid]: result.data }));
+          }
+        } catch (error) {
+          console.log('[Dashboard] Failed to preload usage for', iccid.slice(-4), error.message);
+        } finally {
+          setLoadingUsageMap(prev => ({ ...prev, [iccid]: false }));
+        }
+        
+        // Wait 3 seconds between requests to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 3000));
+      }
+    };
+    
+    // Delay preload to not block initial render
+    const timer = setTimeout(preloadUsageData, 2000);
+    return () => clearTimeout(timer);
+  }, [orders, usageCache]);
+  */
+
   // Show loading spinner while auth is loading
   if (authLoading) {
     return (
@@ -530,13 +576,13 @@ const Dashboard = () => {
     return null;
   }
 
-  const activeOrders = orders.filter(order => {
+  // Active orders count (used for future stats display)
+  const _activeOrdersCount = orders.filter(order => {
     if (!order) return false;
-    // Consider an order active if it has 'active' status OR if it has completed payment and eSIM data
     return order.status === 'active' || 
            order.status === 'completed' || 
            (order.qrCode?.isReal && (order.paymentStatus === 'completed' || order.paymentStatus === 'paid'));
-  });
+  }).length;
 
 
   const handleViewQRCode = async (order) => {
@@ -693,7 +739,7 @@ const Dashboard = () => {
       const iccid = selectedOrder.qrCode?.iccid || selectedOrder.iccid;
       
       if (!iccid) {
-        alert(t('dashboard.noIccidFound', 'No ICCID found in this order. Cannot check eSIM details.'));
+        toast.error(t('dashboard.noIccidFound', 'No ICCID found in this order. Cannot check eSIM details.'));
         return;
       }
       
@@ -705,10 +751,21 @@ const Dashboard = () => {
         // Update country info if needed
         await updateOrderCountryInfo(selectedOrder, result.data);
       } else {
-        toast.error('Failed to get eSIM details');
+        toast.error(t('dashboard.failedToGetDetails', 'Failed to get eSIM details. Please try again later.'));
       }
-    } catch {
-      toast.error('Failed to check eSIM details');
+    } catch (error) {
+      console.error('[Dashboard] Error getting eSIM details:', error);
+      
+      // Handle specific error types
+      if (error.message?.includes('Authentication') || error.message?.includes('Unauthorized')) {
+        toast.error(t('dashboard.detailsAuthError', 'Unable to connect to eSIM provider. Please try again later.'), {
+          duration: 5000,
+        });
+      } else if (error.message?.includes('not found') || error.message?.includes('404')) {
+        toast.error(t('dashboard.esimNotFound', 'eSIM not found. It may have expired or been deactivated.'));
+      } else {
+        toast.error(t('dashboard.failedToCheckDetails', 'Failed to check eSIM details. Please try again.'));
+      }
     } finally {
       setLoadingEsimDetails(false);
     }
@@ -890,6 +947,8 @@ const Dashboard = () => {
           orders={orders}
           loading={loading}
           onViewQRCode={handleViewQRCode}
+          usageCache={usageCache}
+          loadingUsageMap={loadingUsageMap}
         />
 
         {/* Account Settings */}
@@ -900,28 +959,22 @@ const Dashboard = () => {
         />
       </div>
 
-      {/* QR Code Modal */}
+      {/* QR Code Modal - Now unified with details and usage */}
       <QRCodeModal 
         show={showQRModal}
         selectedOrder={selectedOrder}
-        onClose={() => setShowQRModal(false)}
+        onClose={() => {
+          setShowQRModal(false);
+          setEsimUsage(null);
+          setEsimDetails(null);
+        }}
         onCheckEsimDetails={handleCheckEsimDetails}
         onCheckEsimUsage={handleCheckEsimUsage}
         loadingEsimDetails={loadingEsimDetails}
         loadingEsimUsage={loadingEsimUsage}
         onDeleteOrder={handleDeleteOrder}
-      />
-
-      {/* eSIM Details Modal */}
-      <EsimDetailsModal 
-        esimDetails={esimDetails}
-        onClose={() => setEsimDetails(null)}
-      />
-
-      {/* eSIM Usage Modal */}
-      <EsimUsageModal 
         esimUsage={esimUsage}
-        onClose={() => setEsimUsage(null)}
+        esimDetails={esimDetails}
       />
 
       {/* Referral Bottom Sheet */}

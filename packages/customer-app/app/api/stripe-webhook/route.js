@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { db } from '@esim/shared/firebase/config';
-import { doc, updateDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, updateDoc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { 
   trackCompletedPurchase, 
   trackFailedPurchase 
@@ -199,7 +199,7 @@ async function handleCheckoutSessionCompleted(session) {
       
       // Log fraud attempt with card details
       try {
-        const { addDoc, collection, logPriceManipulationAttempt, addToBlocklist } = await import('@esim/shared/services/fraudDetectionService');
+        const { logPriceManipulationAttempt, addToBlocklist } = await import('@esim/shared/services/fraudDetectionService');
         
         // Log the fraud attempt
         await logPriceManipulationAttempt(db, {
@@ -396,24 +396,41 @@ async function handleCheckoutSessionCompleted(session) {
       console.log('✅ Airalo order created:', airaloOrderId);
 
       // Step 3: Update order with eSIM data
+      // IMPORTANT: We save both snake_case and camelCase for backwards compatibility
+      // This ensures all components (old and new) can read the data correctly
       const esimUpdateData = {
         status: 'completed',
         airaloOrderId: airaloOrderId,
         airaloOrderData: airaloOrder,
+        orderData: airaloOrder, // Also save as orderData for Dashboard.jsx
         esimCreated: true,
         esimCreatedAt: serverTimestamp(),
         completedAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
 
-      // Add SIM data if available
+      // Add SIM data if available - save BOTH formats for complete compatibility
       if (simData) {
-        if (simData.iccid) esimUpdateData.iccid = simData.iccid;
-        if (simData.lpa) esimUpdateData.lpa = simData.lpa;
-        if (simData.matching_id) esimUpdateData.matchingId = simData.matching_id;
-        if (simData.qrcode || simData.lpa) esimUpdateData.qrCode = simData.qrcode || simData.lpa;
-        if (simData.qrcode_url) esimUpdateData.qrCodeUrl = simData.qrcode_url;
-        if (simData.activation_code) esimUpdateData.activationCode = simData.activation_code;
+        const lpaString = simData.qrcode || simData.lpa;
+        
+        // snake_case fields (primary storage format)
+        esimUpdateData.iccid = simData.iccid || null;
+        esimUpdateData.qr_code = lpaString || null;
+        esimUpdateData.qr_code_url = simData.qrcode_url || null;
+        esimUpdateData.direct_apple_installation_url = simData.direct_apple_installation_url || simData.qrcode_url || null;
+        esimUpdateData.matching_id = simData.matching_id || null;
+        esimUpdateData.activation_code = simData.activation_code || simData.matching_id || null;
+        esimUpdateData.smdp_address = simData.lpa || null;
+        
+        // camelCase fields (for backwards compatibility)
+        esimUpdateData.lpa = lpaString || null;
+        esimUpdateData.qrCode = lpaString || null;
+        esimUpdateData.qrCodeUrl = simData.qrcode_url || null;
+        esimUpdateData.directAppleInstallationUrl = simData.direct_apple_installation_url || simData.qrcode_url || null;
+        esimUpdateData.matchingId = simData.matching_id || null;
+        esimUpdateData.activationCode = simData.activation_code || simData.matching_id || null;
+        esimUpdateData.smdpAddress = simData.lpa || null;
+        
         esimUpdateData.simData = simData;
         console.log('✅ eSIM data extracted, ICCID:', simData.iccid);
       } else {
@@ -424,15 +441,53 @@ async function handleCheckoutSessionCompleted(session) {
       console.log('✅ Order updated to completed:', orderId);
 
       // Also update user's order if userId exists
+      // CRITICAL: Use setDoc with merge:true to CREATE the document if it doesn't exist
+      // This fixes the bug where updateDoc fails silently if the doc wasn't created
       if (orderData.userId) {
         try {
           const userOrderRef = doc(db, 'users', orderData.userId, 'esims', orderId);
-          await updateDoc(userOrderRef, esimUpdateData);
-          console.log('✅ User order updated:', orderData.userId);
+          
+          // First, try to get the existing document to merge data properly
+          const userOrderDoc = await getDoc(userOrderRef);
+          
+          if (userOrderDoc.exists()) {
+            // Document exists, update it
+            await updateDoc(userOrderRef, esimUpdateData);
+            console.log('✅ User order updated:', orderData.userId);
+          } else {
+            // Document doesn't exist - CREATE it with all order data
+            // This handles the case where create-payment-order didn't save to user's collection
+            console.log('⚠️ User order doc did not exist, creating it now...');
+            const fullOrderData = {
+              ...orderData,  // Include original order data
+              ...esimUpdateData,  // Include new eSIM data
+              userId: orderData.userId,
+              createdAt: orderData.createdAt || serverTimestamp(),
+            };
+            await setDoc(userOrderRef, fullOrderData);
+            console.log('✅ User order CREATED:', orderData.userId);
+          }
         } catch (userOrderError) {
-          console.error('❌ Error updating user order:', userOrderError);
-          // Don't fail the whole process if user order update fails
+          console.error('❌ Error updating/creating user order:', userOrderError);
+          
+          // CRITICAL: Try one more time with setDoc to ensure the user gets their eSIM
+          try {
+            const userOrderRef = doc(db, 'users', orderData.userId, 'esims', orderId);
+            const fullOrderData = {
+              ...orderData,
+              ...esimUpdateData,
+              userId: orderData.userId,
+              recoveryAttempt: true,
+              recoveryAt: serverTimestamp()
+            };
+            await setDoc(userOrderRef, fullOrderData, { merge: true });
+            console.log('✅ User order RECOVERED with setDoc merge:', orderData.userId);
+          } catch (recoveryError) {
+            console.error('❌ CRITICAL: Failed to recover user order:', recoveryError);
+          }
         }
+      } else {
+        console.warn('⚠️ No userId in order data - user will need to check orders page manually');
       }
 
       console.log('🎉 eSIM creation complete for order:', orderId);

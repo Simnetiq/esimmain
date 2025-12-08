@@ -8,7 +8,6 @@ import {
   checkBlocklist,
   logPriceManipulationAttempt
 } from '@esim/shared/services/fraudDetectionService';
-import crypto from 'crypto';
 
 // ============================================
 // SECURITY CONFIGURATION
@@ -422,7 +421,7 @@ export async function POST(request) {
           const userData = userDoc.data();
           accountAge = userData.createdAt?.toDate() || null;
         }
-      } catch (error) {
+      } catch {
         // Continue without account age
       }
     }
@@ -709,7 +708,7 @@ export async function POST(request) {
         userAgent,
         timestamp: serverTimestamp()
       });
-    } catch (logError) {
+    } catch {
       // Ignore logging errors
     }
     

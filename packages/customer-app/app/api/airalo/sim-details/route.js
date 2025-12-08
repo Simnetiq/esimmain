@@ -16,44 +16,51 @@ export async function POST(request) {
 
     // Determine Airalo mode (sandbox vs production)
     const airaloMode = process.env.AIRALO_MODE || 'production';
-    const isSandbox = airaloMode === 'sandbox';
+    const isSandbox = airaloMode === 'sandbox' || airaloMode === 'test';
     
-    // Get Airalo credentials based on mode
+    // Get Airalo credentials based on mode (consistent with stripe-webhook)
     let clientId = isSandbox
-      ? process.env.AIRALO_CLIENT_ID_SANDBOX
+      ? (process.env.AIRALO_CLIENT_ID_SANDBOX || process.env.AIRALO_CLIENT_ID)
       : process.env.AIRALO_CLIENT_ID;
       
     let clientSecret = isSandbox
-      ? process.env.AIRALO_CLIENT_SECRET_SANDBOX
-      : (process.env.AIRALO_CLIENT_SECRET || process.env.AIRALO_CLIENT_SECRET_PRODUCTION);
+      ? (process.env.AIRALO_CLIENT_SECRET_SANDBOX || process.env.AIRALO_CLIENT_SECRET)
+      : process.env.AIRALO_CLIENT_SECRET;
     
     // Select correct base URL
     const baseUrl = isSandbox 
       ? (process.env.AIRALO_BASE_URL_SANDBOX || 'https://sandbox-partners-api.airalo.com')
       : (process.env.AIRALO_BASE_URL || 'https://partners-api.airalo.com');
     
-    console.log(`[Airalo Details] Mode: ${airaloMode}, URL: ${baseUrl}`);
+    console.log(`[Airalo Details] Mode: ${airaloMode}, isSandbox: ${isSandbox}, URL: ${baseUrl}`);
+    console.log(`[Airalo Details] Has clientId: ${!!clientId}, Has clientSecret: ${!!clientSecret}`);
     
     // Fallback to Firestore config if env vars not set
     if (!clientId || !clientSecret) {
+      console.log('[Airalo Details] Env vars missing, checking Firestore config...');
       const airaloConfigRef = doc(db, 'config', 'airalo');
       const airaloConfig = await getDoc(airaloConfigRef);
       
       if (airaloConfig.exists()) {
         const configData = airaloConfig.data();
-        clientId = clientId || configData.api_key || configData.client_id;
+        clientId = clientId || configData.client_id || configData.api_key;
         clientSecret = clientSecret || configData.client_secret;
+        console.log(`[Airalo Details] Firestore config loaded: hasClientId=${!!clientId}, hasSecret=${!!clientSecret}`);
+      } else {
+        console.log('[Airalo Details] No Firestore config found');
       }
     }
     
     if (!clientId || !clientSecret) {
+      console.error('[Airalo Details] ❌ Missing credentials after all fallbacks');
       return NextResponse.json({
         success: false,
-        error: 'Airalo credentials not found'
-      }, { status: 400 });
+        error: 'Airalo credentials not configured. Please set AIRALO_CLIENT_ID and AIRALO_CLIENT_SECRET environment variables.'
+      }, { status: 500 });
     }
 
     // Authenticate with Airalo API
+    console.log(`[Airalo Details] Authenticating with Airalo at ${baseUrl}/v2/token...`);
     const authResponse = await fetch(`${baseUrl}/v2/token`, {
       method: 'POST',
       headers: {
@@ -69,7 +76,14 @@ export async function POST(request) {
 
     if (!authResponse.ok) {
       const errorText = await authResponse.text();
-      throw new Error(`Authentication failed: ${authResponse.statusText} - ${errorText}`);
+      console.error(`[Airalo Details] ❌ Auth failed: ${authResponse.status} - ${errorText}`);
+      
+      // Return a more user-friendly error
+      return NextResponse.json({
+        success: false,
+        error: 'Unable to connect to eSIM provider. Please try again later.',
+        statusCode: 401
+      }, { status: 401 });
     }
 
     const authData = await authResponse.json();
@@ -118,17 +132,32 @@ export async function POST(request) {
 
     // Extract relevant data from SIM details
     const simData = simDetails.data;
+    const lpaString = simData?.qrcode || simData?.lpa || simData?.qr_code;
+    const appleInstallUrl = simData?.direct_apple_installation_url || 
+      (lpaString ? `https://esimsetup.apple.com/esim_qrcode_provisioning?carddata=${encodeURIComponent(lpaString)}` : null);
+    
+    // Return both snake_case and camelCase for complete compatibility
     const qrCodeData = {
-      qrCode: simData?.qr_code,
-      qrCodeUrl: simData?.qr_code_url,
+      // snake_case fields (for consistency with EsimQrCode.jsx)
+      qr_code: lpaString,
+      qr_code_url: simData?.qrcode_url || simData?.qr_code_url,
+      direct_apple_installation_url: appleInstallUrl,
+      matching_id: simData?.matching_id,
+      activation_code: simData?.activation_code,
+      // camelCase fields (for backwards compatibility)
+      qrCode: lpaString,
+      qrCodeUrl: simData?.qrcode_url || simData?.qr_code_url,
       activationCode: simData?.activation_code,
       iccid: simData?.iccid,
-      lpa: simData?.lpa,
-      directAppleInstallationUrl: simData?.direct_apple_installation_url,
+      lpa: lpaString,
+      directAppleInstallationUrl: appleInstallUrl,
       matchingId: simData?.matching_id,
       status: simData?.status,
       packageName: simData?.package?.title,
-      packageDetails: simData?.package
+      packageDetails: simData?.package,
+      // Country info
+      country_code: simData?.package?.country_code,
+      country_name: simData?.package?.country?.name || simData?.package?.country_name
     };
 
 

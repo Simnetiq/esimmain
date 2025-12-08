@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@esim/shared/firebase/config';
-import { collection, query, where, getDocs, deleteDoc, doc, Timestamp, writeBatch } from 'firebase/firestore';
+import { collection, query, where, getDocs, deleteDoc, doc, Timestamp } from 'firebase/firestore';
 
 export const dynamic = 'force-dynamic';
 
@@ -93,7 +93,7 @@ export async function POST(request) {
             try {
               await deleteDoc(doc(db, 'users', orderData.userId, 'esims', orderId));
               results.userOrdersDeleted++;
-            } catch (userDeleteError) {
+            } catch {
               // User order might not exist or already deleted
               console.log(`   Note: User order ${orderId} not found or already deleted`);
             }
