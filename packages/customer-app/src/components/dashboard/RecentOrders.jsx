@@ -119,7 +119,7 @@ const RecentOrders = ({ orders, loading, onViewQRCode }) => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {orders.slice(0, 6).map((order) => (
+                {orders.map((order) => (
                   order && (
                     <EsimCard
                       key={order.id || order.orderId || Math.random()}

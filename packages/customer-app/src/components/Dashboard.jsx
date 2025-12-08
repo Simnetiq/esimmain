@@ -449,7 +449,16 @@ const Dashboard = () => {
         
         const filteredOrders = ordersData.filter(Boolean); // Remove null entries
         
-        setOrders(filteredOrders);
+        // CRITICAL: Sort orders by creation date (newest first)
+        const sortedOrders = filteredOrders.sort((a, b) => {
+          const dateA = a.createdAt?.toDate?.() || a.createdAt || new Date(0);
+          const dateB = b.createdAt?.toDate?.() || b.createdAt || new Date(0);
+          return dateB - dateA; // Newest first
+        });
+        
+        console.log('[Dashboard] Loaded', sortedOrders.length, 'orders (sorted newest first)');
+        
+        setOrders(sortedOrders);
       } catch {
         // Set empty orders array on error
         setOrders([]);
