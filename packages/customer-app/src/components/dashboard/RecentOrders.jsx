@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Globe } from 'lucide-react';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { getLanguageDirection, detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
 import { usePathname } from 'next/navigation';
-import { esimService } from '@esim/shared/services/esimService';
 import EsimCard from './EsimCard';
 
-const RecentOrders = ({ orders, loading, onViewQRCode }) => {
+// Note: usageCache and loadingUsageMap are disabled to avoid Airalo API rate limiting
+// Usage data is loaded on-demand when user opens the QRCodeModal and clicks "Check Usage"
+const RecentOrders = ({ orders, loading, onViewQRCode, usageCache = {}, loadingUsageMap = {} }) => {
   const { t, locale } = useI18n();
   const pathname = usePathname();
-  const [usageData, setUsageData] = useState({});
-  const [loadingUsage, setLoadingUsage] = useState({});
   
   // Get current language for RTL detection
   const getCurrentLanguage = () => {
@@ -25,79 +24,7 @@ const RecentOrders = ({ orders, loading, onViewQRCode }) => {
   const currentLanguage = getCurrentLanguage();
   const isRTL = getLanguageDirection(currentLanguage) === 'rtl';
   
-  // Fetch usage data for ALL orders with ICCID (not just active)
-  // This allows us to detect expired eSIMs and show accurate remaining data
-  useEffect(() => {
-    const fetchUsageForOrders = async () => {
-      // Fetch for all orders that have an ICCID, regardless of status
-      // This ensures we can detect when an eSIM expires
-      const ordersWithIccid = orders.filter(order => 
-        order && order.qrCode?.iccid
-      );
-      
-      for (const order of ordersWithIccid.slice(0, 10)) {
-        const alreadyFetched = usageData[order.id] !== undefined;
-        const currentlyLoading = loadingUsage[order.id];
-        
-        if (!alreadyFetched && !currentlyLoading) {
-          setLoadingUsage(prev => ({ ...prev, [order.id]: true }));
-          
-          try {
-            const result = await esimService.getEsimUsageByIccid(order.qrCode.iccid);
-            if (result.success && result.data) {
-              // Combine usage data from Airalo API with package details from the order
-              // The usage API returns: remaining, total, remaining_voice, remaining_text, status, expired_at
-              // But it doesn't return: total_voice, total_text, is_unlimited (these come from the package)
-              const planDetails = order.planDetails || {};
-              const airaloOrderData = order.airaloOrderData || {};
-              const simData = airaloOrderData.sims?.[0] || {};
-              
-              // Get total voice/text from stored order data
-              const totalVoice = planDetails.voice || simData.voice || airaloOrderData.voice || 0;
-              const totalText = planDetails.sms || simData.text || airaloOrderData.text || 0;
-              const isUnlimited = planDetails.isUnlimited || airaloOrderData.is_unlimited || result.data?.is_unlimited || false;
-              
-              // Get total data from order if API didn't return it
-              const totalData = result.data?.total || planDetails.dataAmountMb || simData.data_amount_mb || 0;
-              
-              const combinedUsageData = {
-                ...result.data,
-                // Ensure total is set even if API didn't return it
-                total: result.data?.total || totalData,
-                // Add total_voice and total_text from package data (not returned by usage API)
-                total_voice: result.data?.total_voice || totalVoice,
-                total_text: result.data?.total_text || totalText,
-                is_unlimited: isUnlimited,
-                // Keep the status from the API (ACTIVE, EXPIRED, RECYCLED, FINISHED, etc.)
-                status: result.data?.status,
-                // Keep the expired_at timestamp
-                expired_at: result.data?.expired_at,
-              };
-              
-              setUsageData(prev => ({ ...prev, [order.id]: combinedUsageData }));
-            } else {
-              // Mark as attempted even if failed to prevent retry loop
-              // Silently fail - don't log errors to avoid console spam in development
-              setUsageData(prev => ({ ...prev, [order.id]: null }));
-            }
-          } catch {
-            // Mark as attempted even if failed to prevent retry loop
-            setUsageData(prev => ({ ...prev, [order.id]: null }));
-            
-            // Silently fail - usage data is optional and requires production credentials
-            // Don't show any errors in development to avoid console spam
-          } finally {
-            setLoadingUsage(prev => ({ ...prev, [order.id]: false }));
-          }
-        }
-      }
-    };
-    
-    if (orders && orders.length > 0) {
-      fetchUsageForOrders();
-    }
-  }, [orders, usageData, loadingUsage]); // Dependencies for useEffect
-  
+
   return (
     <div className="bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Recent Orders Section */}
@@ -119,18 +46,24 @@ const RecentOrders = ({ orders, loading, onViewQRCode }) => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {orders.map((order) => (
-                  order && (
+                {orders.map((order) => {
+                  if (!order) return null;
+                  // Get ICCID from order for cache lookup
+                  const iccid = order.qrCode?.iccid || order.iccid || order.airaloOrderData?.sims?.[0]?.iccid;
+                  const orderUsageData = iccid ? usageCache[iccid] : undefined;
+                  const isLoadingUsage = iccid ? loadingUsageMap[iccid] : false;
+                  
+                  return (
                     <EsimCard
                       key={order.id || order.orderId || Math.random()}
                       order={order}
-                      usageData={usageData[order.id]}
-                      loadingUsage={loadingUsage[order.id]}
+                      usageData={orderUsageData}
+                      loadingUsage={isLoadingUsage}
                       onViewQRCode={onViewQRCode}
                       isRTL={isRTL}
                     />
-                  )
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

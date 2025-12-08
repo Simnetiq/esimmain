@@ -1,13 +1,23 @@
 import { NextResponse } from 'next/server';
 
 // Generate mock QR code data for sandbox mode
+// Returns both snake_case and camelCase for complete compatibility
 function generateMockQR() {
   const mockIccid = `8901260${Math.floor(Math.random() * 10000000000000).toString().padStart(13, '0')}`;
   const mockActivationCode = `TEST_${Math.random().toString(36).substring(2, 14).toUpperCase()}`;
   const mockMatchingId = `MATCH_${Math.random().toString(36).substring(2, 12).toUpperCase()}`;
   const mockLpa = `LPA:1$test.smdp.io$${mockMatchingId}`;
+  const appleInstallUrl = `https://esimsetup.apple.com/esim_qrcode_provisioning?carddata=${encodeURIComponent(mockLpa)}`;
   
   return {
+    // snake_case fields (for consistency with EsimQrCode.jsx)
+    qr_code: mockLpa,
+    qr_code_url: 'https://test.example.com/qr.png',
+    direct_apple_installation_url: appleInstallUrl,
+    matching_id: mockMatchingId,
+    activation_code: mockActivationCode,
+    smdp_address: 'test.smdp.io',
+    // camelCase fields (for backwards compatibility)
     qrCode: mockLpa,
     lpa: mockLpa,
     iccid: mockIccid,
@@ -15,14 +25,14 @@ function generateMockQR() {
     matchingId: mockMatchingId,
     smdpAddress: 'test.smdp.io',
     qrCodeUrl: 'https://test.example.com/qr.png',
-    directAppleInstallationUrl: `https://esimsetup.apple.com/esim_qrcode_provisioning?carddata=${encodeURIComponent(mockLpa)}`
+    directAppleInstallationUrl: appleInstallUrl
   };
 }
 
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { orderId, airaloOrderId, isTestMode, mockSimData, apiKey, baseUrl } = body;
+    const { orderId, airaloOrderId, isTestMode, mockSimData } = body;
 
     if (!orderId && !airaloOrderId) {
       return NextResponse.json({
@@ -40,15 +50,26 @@ export async function POST(request) {
       
       // Use existing mock sim data if provided
       if (mockSimData) {
+        const lpaString = mockSimData.qrcode || mockSimData.lpa;
+        const appleUrl = lpaString ? `https://esimsetup.apple.com/esim_qrcode_provisioning?carddata=${encodeURIComponent(lpaString)}` : null;
+        
         qrData = {
-          qrCode: mockSimData.qrcode || mockSimData.lpa,
+          // snake_case fields (for consistency with EsimQrCode.jsx)
+          qr_code: lpaString,
+          qr_code_url: mockSimData.qrcode_url || 'https://test.example.com/qr.png',
+          direct_apple_installation_url: appleUrl,
+          matching_id: mockSimData.matching_id,
+          activation_code: mockSimData.activation_code,
+          smdp_address: 'test.smdp.io',
+          // camelCase fields (for backwards compatibility)
+          qrCode: lpaString,
           activationCode: mockSimData.activation_code,
           iccid: mockSimData.iccid,
           lpa: mockSimData.lpa,
           matchingId: mockSimData.matching_id,
           smdpAddress: 'test.smdp.io',
           qrCodeUrl: mockSimData.qrcode_url || 'https://test.example.com/qr.png',
-          directAppleInstallationUrl: `https://esimsetup.apple.com/esim_qrcode_provisioning?carddata=${encodeURIComponent(mockSimData.lpa)}`
+          directAppleInstallationUrl: appleUrl
         };
       } else {
         // Generate new mock QR data
@@ -78,23 +99,23 @@ export async function POST(request) {
     
     // Determine Airalo mode (sandbox vs production)
     const airaloMode = process.env.AIRALO_MODE || 'production';
-    const isSandbox = airaloMode === 'sandbox';
+    const isSandbox = airaloMode === 'sandbox' || airaloMode === 'test';
     
-    // Get Airalo credentials based on mode
+    // Get Airalo credentials based on mode (consistent with stripe-webhook)
     let clientId = isSandbox
-      ? process.env.AIRALO_CLIENT_ID_SANDBOX
+      ? (process.env.AIRALO_CLIENT_ID_SANDBOX || process.env.AIRALO_CLIENT_ID)
       : process.env.AIRALO_CLIENT_ID;
       
     let clientSecret = isSandbox
-      ? process.env.AIRALO_CLIENT_SECRET_SANDBOX
-      : (process.env.AIRALO_CLIENT_SECRET || process.env.AIRALO_CLIENT_SECRET_PRODUCTION);
+      ? (process.env.AIRALO_CLIENT_SECRET_SANDBOX || process.env.AIRALO_CLIENT_SECRET)
+      : process.env.AIRALO_CLIENT_SECRET;
     
     // Select correct base URL
     const airaloBaseUrl = isSandbox 
       ? (process.env.AIRALO_BASE_URL_SANDBOX || 'https://sandbox-partners-api.airalo.com')
       : (process.env.AIRALO_BASE_URL || 'https://partners-api.airalo.com');
     
-    console.log(`[Airalo QR Code] Mode: ${airaloMode}, URL: ${airaloBaseUrl}`);
+    console.log(`[Airalo QR Code] Mode: ${airaloMode}, isSandbox: ${isSandbox}, URL: ${airaloBaseUrl}`);
     
     // Fallback to Firestore config if env vars not set
     if (!clientId || !clientSecret) {
@@ -199,16 +220,26 @@ export async function POST(request) {
     const iccid = simData.iccid;
     const matchingId = simData.matching_id;
     const activationCode = simData.activation_code;
+    const appleInstallUrl = lpa ? `https://esimsetup.apple.com/esim_qrcode_provisioning?carddata=${encodeURIComponent(lpa)}` : null;
 
+    // Return BOTH snake_case and camelCase for complete compatibility
     return NextResponse.json({
       success: true,
+      // snake_case fields (for consistency with EsimQrCode.jsx)
+      qr_code: qrCode,
+      qr_code_url: simData.qrcode_url,
+      direct_apple_installation_url: appleInstallUrl,
+      matching_id: matchingId,
+      activation_code: activationCode,
+      smdp_address: simData.smdp_address,
+      // camelCase fields (for backwards compatibility)
       qrCode: qrCode,
       qrCodeUrl: simData.qrcode_url,
+      directAppleInstallationUrl: appleInstallUrl,
       activationCode: activationCode,
       iccid: iccid,
       lpa: lpa,
       matchingId: matchingId,
-      directAppleInstallationUrl: lpa ? `https://esimsetup.apple.com/esim_qrcode_provisioning?carddata=${encodeURIComponent(lpa)}` : null,
       smdpAddress: simData.smdp_address,
       orderDetails: simData,
       simDetails: simData,

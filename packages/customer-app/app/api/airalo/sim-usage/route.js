@@ -16,45 +16,47 @@ export async function POST(request) {
 
     // Determine Airalo mode (sandbox vs production)
     const airaloMode = process.env.AIRALO_MODE || 'production';
-    const isSandbox = airaloMode === 'sandbox';
+    const isSandbox = airaloMode === 'sandbox' || airaloMode === 'test';
     
-    // Get Airalo credentials based on mode
+    // Get Airalo credentials based on mode (consistent with stripe-webhook)
     let clientId = isSandbox
-      ? process.env.AIRALO_CLIENT_ID_SANDBOX
+      ? (process.env.AIRALO_CLIENT_ID_SANDBOX || process.env.AIRALO_CLIENT_ID)
       : process.env.AIRALO_CLIENT_ID;
       
     let clientSecret = isSandbox
-      ? process.env.AIRALO_CLIENT_SECRET_SANDBOX
-      : (process.env.AIRALO_CLIENT_SECRET || process.env.AIRALO_CLIENT_SECRET_PRODUCTION);
+      ? (process.env.AIRALO_CLIENT_SECRET_SANDBOX || process.env.AIRALO_CLIENT_SECRET)
+      : process.env.AIRALO_CLIENT_SECRET;
     
     // Select correct base URL
     const baseUrl = isSandbox 
       ? (process.env.AIRALO_BASE_URL_SANDBOX || 'https://sandbox-partners-api.airalo.com')
       : (process.env.AIRALO_BASE_URL || 'https://partners-api.airalo.com');
     
-    console.log(`[Airalo Usage] Mode: ${airaloMode}, URL: ${baseUrl}`);
+    console.log(`[Airalo Usage] Mode: ${airaloMode}, isSandbox: ${isSandbox}, URL: ${baseUrl}`);
     
     // Fallback to Firestore config if env vars not set
     if (!clientId || !clientSecret) {
+      console.log('[Airalo Usage] Env vars missing, checking Firestore config...');
       const airaloConfigRef = doc(db, 'config', 'airalo');
       const airaloConfig = await getDoc(airaloConfigRef);
       
       if (airaloConfig.exists()) {
         const configData = airaloConfig.data();
-        clientId = clientId || configData.api_key || configData.client_id;
+        clientId = clientId || configData.client_id || configData.api_key;
         clientSecret = clientSecret || configData.client_secret;
       }
     }
     
     if (!clientId || !clientSecret) {
+      console.error('[Airalo Usage] ❌ Missing credentials');
       return NextResponse.json({
         success: false,
-        error: 'Airalo credentials not found. Please configure AIRALO_CLIENT_ID and AIRALO_CLIENT_SECRET.'
-      }, { status: 400 });
+        error: 'Airalo credentials not configured.',
+        statusCode: 500
+      }, { status: 500 });
     }
 
     // Authenticate with Airalo API
-    
     console.log('[Airalo Usage] Authenticating with Airalo API...');
     
     const authResponse = await fetch(`${baseUrl}/v2/token`, {
@@ -72,8 +74,23 @@ export async function POST(request) {
 
     if (!authResponse.ok) {
       const errorText = await authResponse.text();
-      console.error('[Airalo Usage] Auth failed:', errorText);
-      throw new Error(`Authentication failed: ${authResponse.statusText} - ${errorText}`);
+      console.error('[Airalo Usage] ❌ Auth failed:', authResponse.status, errorText);
+      
+      // Handle rate limiting on auth endpoint
+      if (authResponse.status === 429) {
+        return NextResponse.json({
+          success: false,
+          error: 'Too many requests. Please wait a minute before checking usage again.',
+          statusCode: 429,
+          retryAfter: 60
+        }, { status: 429 });
+      }
+      
+      return NextResponse.json({
+        success: false,
+        error: 'Unable to connect to eSIM provider. Please try again later.',
+        statusCode: 401
+      }, { status: 401 });
     }
 
     const authData = await authResponse.json();

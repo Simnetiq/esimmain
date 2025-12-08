@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { doc, updateDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, updateDoc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@esim/shared/firebase/config';
 import { formatPriceNumber } from '@esim/shared/utils/priceUtils';
 
@@ -268,31 +268,85 @@ export async function POST(request) {
         }
         
         
-        // Update Firebase with eSIM data
-        await updateDoc(orderRef, {
+        // Extract SIM data for consistent field mapping
+        const simData = orderResult.data?.sims?.[0];
+        const lpaString = simData?.qrcode || simData?.lpa;
+        
+        // Build update data with BOTH snake_case and camelCase for complete compatibility
+        const esimUpdateData = {
           status: 'completed',
           paymentStatus: 'paid',
           airaloOrderId: orderResult.data.id,
           orderData: orderResult.data,
+          airaloOrderData: orderResult.data, // Also save as airaloOrderData for compatibility
           isTestMode: false,
           processed: true,
           processedAt: serverTimestamp(),
           updatedAt: serverTimestamp()
-        });
+        };
+        
+        // Add SIM data if available - save BOTH formats for complete compatibility
+        if (simData) {
+          // snake_case fields (primary storage format)
+          esimUpdateData.iccid = simData.iccid || null;
+          esimUpdateData.qr_code = lpaString || null;
+          esimUpdateData.qr_code_url = simData.qrcode_url || null;
+          esimUpdateData.direct_apple_installation_url = simData.direct_apple_installation_url || simData.qrcode_url || null;
+          esimUpdateData.matching_id = simData.matching_id || null;
+          esimUpdateData.activation_code = simData.activation_code || simData.matching_id || null;
+          
+          // camelCase fields (for backwards compatibility)
+          esimUpdateData.lpa = lpaString || null;
+          esimUpdateData.qrCode = lpaString || null;
+          esimUpdateData.qrCodeUrl = simData.qrcode_url || null;
+          esimUpdateData.directAppleInstallationUrl = simData.direct_apple_installation_url || simData.qrcode_url || null;
+          esimUpdateData.matchingId = simData.matching_id || null;
+          esimUpdateData.activationCode = simData.activation_code || simData.matching_id || null;
+          
+          esimUpdateData.simData = simData;
+        }
+        
+        // Update Firebase with eSIM data
+        await updateDoc(orderRef, esimUpdateData);
         
         // Also update user's collection if userId exists
+        // CRITICAL: Use setDoc with merge to handle case where doc doesn't exist
         if (userId) {
-          const userOrderRef = doc(db, 'users', userId, 'esims', orderId);
-          await updateDoc(userOrderRef, {
-            status: 'completed',
-            paymentStatus: 'paid',
-            airaloOrderId: orderResult.data.id,
-            orderData: orderResult.data,
-            isTestMode: false,
-            processed: true,
-            processedAt: serverTimestamp(),
-            updatedAt: serverTimestamp()
-          });
+          try {
+            const userOrderRef = doc(db, 'users', userId, 'esims', orderId);
+            const userOrderDoc = await getDoc(userOrderRef);
+            
+            const userUpdateData = esimUpdateData;
+            
+            if (userOrderDoc.exists()) {
+              await updateDoc(userOrderRef, userUpdateData);
+            } else {
+              // Document doesn't exist - create it with full order data
+              console.log('⚠️ User order doc did not exist, creating...');
+              await setDoc(userOrderRef, {
+                ...orderData,
+                ...userUpdateData,
+                userId: userId,
+                createdAt: orderData.createdAt || serverTimestamp()
+              });
+            }
+          } catch (userError) {
+            console.error('Error updating user order:', userError);
+            // Recovery attempt
+            try {
+              const userOrderRef = doc(db, 'users', userId, 'esims', orderId);
+              await setDoc(userOrderRef, {
+                ...orderData,
+                status: 'completed',
+                paymentStatus: 'paid',
+                airaloOrderId: orderResult.data.id,
+                orderData: orderResult.data,
+                userId: userId
+              }, { merge: true });
+            } catch (e) {
+              console.error('Recovery failed:', e);
+            }
+          }
         }
         
         
