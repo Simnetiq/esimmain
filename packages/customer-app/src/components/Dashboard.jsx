@@ -35,6 +35,7 @@ const Dashboard = () => {
   const [loadingEsimUsage, setLoadingEsimUsage] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showReferralSheet, setShowReferralSheet] = useState(false);
+  const [usageCache, setUsageCache] = useState({});
   
   // Affiliate data
   const [referralStats, setReferralStats] = useState({
@@ -458,7 +459,13 @@ const Dashboard = () => {
         
         console.log('[Dashboard] Loaded', sortedOrders.length, 'orders (sorted newest first)');
         
-        setOrders(sortedOrders);
+        const visibleOrders = sortedOrders.filter(o => {
+          const paid = (o.paymentStatus === 'completed' || o.paymentStatus === 'paid');
+          const completed = (o.status === 'completed' || o.status === 'active');
+          return paid || completed;
+        });
+
+        setOrders(visibleOrders);
       } catch {
         // Set empty orders array on error
         setOrders([]);
@@ -718,13 +725,27 @@ const Dashboard = () => {
     if (!confirmed) return;
     
     try {
-      // Delete from user's esims subcollection
+      // Soft delete from user's esims subcollection
       const userOrderRef = doc(db, 'users', currentUser.uid, 'esims', order.id);
       await updateDoc(userOrderRef, {
         deleted: true,
         deletedAt: serverTimestamp(),
         status: 'deleted'
       });
+      
+      // Also soft delete from global orders collection (if it exists)
+      try {
+        const globalOrderRef = doc(db, 'orders', order.id);
+        await updateDoc(globalOrderRef, {
+          deleted: true,
+          deletedAt: serverTimestamp(),
+          deletedByUser: currentUser.uid,
+          status: 'deleted'
+        });
+      } catch (globalError) {
+        // Global order might not exist or already deleted - this is OK
+        console.log('Note: Global order not found or already updated:', globalError.message);
+      }
       
       // Update local state - remove from orders list
       setOrders(prevOrders => prevOrders.filter(o => o.id !== order.id));
@@ -762,7 +783,13 @@ const Dashboard = () => {
         toast.error(t('dashboard.noIccidFoundUsage', 'No ICCID found in this order. Cannot check eSIM usage.'));
         return;
       }
-      
+
+      // Serve cached usage if available
+      if (usageCache[iccid]) {
+        setEsimUsage(usageCache[iccid]);
+        return;
+      }
+
       console.log('[Dashboard] Fetching usage for ICCID:', iccid);
       const result = await esimService.getEsimUsageByIccid(iccid);
       console.log('[Dashboard] Usage API result:', result);
@@ -795,6 +822,7 @@ const Dashboard = () => {
         
         console.log('[Dashboard] Combined usage data:', combinedUsageData);
         setEsimUsage(combinedUsageData);
+        setUsageCache(prev => ({ ...prev, [iccid]: combinedUsageData }));
         toast.success(t('dashboard.usageDataLoaded', 'Usage data loaded successfully'));
       } else {
         // Handle specific error cases
@@ -806,6 +834,8 @@ const Dashboard = () => {
           toast.error(t('dashboard.rateLimited', 'Please wait before checking again. Usage data can only be checked once every 15 minutes.'), {
             duration: 5000,
           });
+        } else if (result.statusCode === 401 || result.statusCode === 403) {
+          toast.error(t('dashboard.usageAuthFailed', 'Usage temporarily unavailable. Please try again later.'));
         } else {
           toast.error(t('dashboard.failedToGetEsimUsage', 'Failed to get eSIM usage: {{error}}', { error: result.error }));
         }

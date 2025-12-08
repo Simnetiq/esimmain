@@ -172,15 +172,12 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
           {/* 4:3 Flag Container - Like CountryCard */}
           <div className="flex-shrink-0 w-16 sm:w-20 aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg flex items-center justify-center border-2 border-gray-200 overflow-hidden">
             {flagPath ? (
-              <Image
+              <img
                 src={flagPath}
                 alt={`${fullName} flag`}
-                width={80}
-                height={60}
-                className="w-full h-full object-cover"
                 loading="lazy"
+                className="w-full h-full object-cover"
                 onError={(e) => {
-                  // Replace with globe icon on error
                   e.currentTarget.style.display = 'none';
                   if (e.currentTarget.parentElement) {
                     e.currentTarget.parentElement.innerHTML = `
