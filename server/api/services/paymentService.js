@@ -221,6 +221,8 @@ class PaymentService {
       });
 
       // 3. Create session with VALIDATED PRICE
+      const uniqueOrderId = `${order}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: [
@@ -237,11 +239,12 @@ class PaymentService {
           },
         ],
         mode: 'payment',
-        success_url: `${domain}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${domain}/payment-success?session_id={CHECKOUT_SESSION_ID}&order_id=${uniqueOrderId}`,
         cancel_url: `${domain}/checkout?canceled=true`,
         customer_email: email,
         metadata: {
-          orderId: order,
+          orderId: uniqueOrderId,
+          originalOrderId: order,
           planName: packageName,
           validated_price: validatedPrice.toString(),
           database_price: priceValidation.databasePrice.toString()
@@ -284,11 +287,15 @@ class PaymentService {
       
       const validatedPrice = priceValidation.price;
 
+      const uniqueOrderId = `${packageId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
       const paymentIntent = await stripe.paymentIntents.create({
         amount: Math.round(validatedPrice * 100), // VALIDATED PRICE
         currency: currency || 'usd',
         metadata: {
           ...metadata,
+          orderId: uniqueOrderId,
+          originalOrderId: packageId,
           validated_price: validatedPrice.toString(),
           database_price: priceValidation.databasePrice.toString()
         },

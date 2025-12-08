@@ -570,13 +570,21 @@ export async function POST(request) {
       }
     };
 
-    // Save to orders collection
-    const globalOrderRef = doc(db, 'orders', order);
+    // Generate UNIQUE document ID for this order (timestamp + random string)
+    // This prevents duplicate package purchases from overwriting each other
+    const uniqueOrderId = `${order}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Update orderData with unique ID
+    pendingOrderData.uniqueOrderId = uniqueOrderId;
+    pendingOrderData.originalOrderId = order;
+    
+    // Save to orders collection with UNIQUE ID
+    const globalOrderRef = doc(db, 'orders', uniqueOrderId);
     await setDoc(globalOrderRef, pendingOrderData);
     
     // Save to user's collection if userId is provided
     if (userId) {
-      const userOrderRef = doc(db, 'users', userId, 'esims', order);
+      const userOrderRef = doc(db, 'users', userId, 'esims', uniqueOrderId);
       await setDoc(userOrderRef, pendingOrderData);
     }
 
@@ -605,7 +613,7 @@ export async function POST(request) {
         amount: Math.round(validatedPrice * 100), // VALIDATED PRICE
         currency: currency.toLowerCase(),
         metadata: {
-          order_id: order,
+          order_id: uniqueOrderId, // USE UNIQUE ORDER ID
           email: email,
           name: packageName,
           language: language || 'en',
@@ -654,11 +662,12 @@ export async function POST(request) {
           },
         ],
         mode: 'payment',
-        success_url: getLocalizedUrl(`/payment-success?order_id=${order}&plan_id=${order}&email=${email}&total=${validatedPrice}&name=${encodeURIComponent(packageName)}&currency=${currency}`),
+        success_url: getLocalizedUrl(`/payment-success?order_id=${uniqueOrderId}&plan_id=${order}&email=${email}&total=${validatedPrice}&name=${encodeURIComponent(packageName)}&currency=${currency}`),
         cancel_url: getLocalizedUrl('/esim-plans?canceled=true'),
         customer_email: email,
         metadata: {
-          order_id: order,
+          order_id: uniqueOrderId,
+          package_id: order,
           email: email,
           name: packageName,
           language: language || 'en',

@@ -133,7 +133,7 @@ export async function POST(request) {
     console.log('[Airalo Usage] Raw API response:', JSON.stringify(usageData, null, 2));
 
     // Extract usage data - handle both nested and flat response structures
-    const rawData = usageData.data || usageData;
+    const rawData = usageData?.data || usageData || {};
     
     // Normalize the response to ensure consistent field names
     // Airalo API may return data in different formats
