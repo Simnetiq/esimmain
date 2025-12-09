@@ -75,17 +75,6 @@ export async function POST(request) {
     if (!authResponse.ok) {
       const errorText = await authResponse.text();
       console.error('[Airalo Usage] ❌ Auth failed:', authResponse.status, errorText);
-      
-      // Handle rate limiting on auth endpoint
-      if (authResponse.status === 429) {
-        return NextResponse.json({
-          success: false,
-          error: 'Too many requests. Please wait a minute before checking usage again.',
-          statusCode: 429,
-          retryAfter: 60
-        }, { status: 429 });
-      }
-      
       return NextResponse.json({
         success: false,
         error: 'Unable to connect to eSIM provider. Please try again later.',

@@ -14,3 +14,7 @@ curl -X POST https://www.simnetiq.store/api/retry-order \
 echo ""
 echo "✅ Done! Check your dashboard now."
 
+
+
+
+
