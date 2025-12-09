@@ -2,15 +2,15 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { db } from '@esim/shared/firebase/config';
 import { doc, updateDoc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { 
-  trackCompletedPurchase, 
-  trackFailedPurchase 
+import {
+  trackCompletedPurchase,
+  trackFailedPurchase
 } from '@esim/shared/services/fraudDetectionService';
 
 // Get Stripe secret key based on mode (test or live)
 const getStripeSecretKey = () => {
   const stripeMode = process.env.STRIPE_MODE || 'live';
-  
+
   if (stripeMode === 'test' || stripeMode === 'sandbox') {
     return process.env.STRIPE_SECRET_KEY_TEST || process.env.STRIPE_SECRET_KEY;
   } else {
@@ -21,7 +21,7 @@ const getStripeSecretKey = () => {
 // Get webhook secret based on mode
 const getWebhookSecret = () => {
   const stripeMode = process.env.STRIPE_MODE || 'live';
-  
+
   if (stripeMode === 'test' || stripeMode === 'sandbox') {
     return process.env.STRIPE_WEBHOOK_SECRET_TEST || process.env.STRIPE_WEBHOOK_SECRET;
   } else {
@@ -49,7 +49,7 @@ const stripe = stripeSecretKey ? new Stripe(stripeSecretKey, {
 export async function POST(request) {
   try {
     const webhookSecret = getWebhookSecret();
-    
+
     if (!stripe || !stripeSecretKey) {
       console.error('Stripe not configured');
       return NextResponse.json(
@@ -153,7 +153,7 @@ async function handleCheckoutSessionCompleted(session) {
     }
 
     const orderData = orderDoc.data();
-    
+
     // ========================================
     // SECURITY: Prevent duplicate eSIM creation
     // ========================================
@@ -161,13 +161,13 @@ async function handleCheckoutSessionCompleted(session) {
       console.log('eSIM already created for order:', orderId);
       return;
     }
-    
+
     // ========================================
     // SECURITY: Verify payment amount matches order
     // ========================================
     const paidAmount = session.amount_total / 100; // Convert from cents
     const expectedAmount = orderData.amount;
-    
+
     if (Math.abs(paidAmount - expectedAmount) > 0.01) {
       console.error('🚨 PAYMENT AMOUNT MISMATCH!', {
         orderId,
@@ -175,12 +175,12 @@ async function handleCheckoutSessionCompleted(session) {
         expectedAmount,
         difference: Math.abs(paidAmount - expectedAmount)
       });
-      
+
       // Get payment method details to block the card
       let cardFingerprint = null;
       let cardLast4 = null;
       let cardBrand = null;
-      
+
       try {
         if (session.payment_intent) {
           const paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent);
@@ -196,11 +196,11 @@ async function handleCheckoutSessionCompleted(session) {
       } catch (e) {
         console.error('Failed to retrieve payment method for blocking:', e);
       }
-      
+
       // Log fraud attempt with card details
       try {
         const { logPriceManipulationAttempt, addToBlocklist } = await import('@esim/shared/services/fraudDetectionService');
-        
+
         // Log the fraud attempt
         await logPriceManipulationAttempt(db, {
           packageId: orderData.packageId,
@@ -239,7 +239,7 @@ async function handleCheckoutSessionCompleted(session) {
               difference: Math.abs(paidAmount - expectedAmount)
             }
           });
-          
+
           console.error('🚨 CARD BLOCKED:', {
             cardFingerprint,
             cardLast4,
@@ -250,7 +250,7 @@ async function handleCheckoutSessionCompleted(session) {
       } catch (e) {
         console.error('Failed to log fraud attempt and block card:', e);
       }
-      
+
       // Still process if user paid MORE (refund difference manually)
       // Block if user paid LESS
       if (paidAmount < expectedAmount - 0.01) {
@@ -265,7 +265,7 @@ async function handleCheckoutSessionCompleted(session) {
         return;
       }
     }
-    
+
     // Update order to processing status - payment is now complete
     await updateDoc(orderRef, {
       status: 'processing',
@@ -277,13 +277,13 @@ async function handleCheckoutSessionCompleted(session) {
     });
 
     console.log('✅ Payment verified for order:', orderId);
-    
+
     // ========================================
     // CREATE AIRALO eSIM ORDER
     // ========================================
     try {
       const packageId = orderData.packageId || orderData.planId;
-      
+
       if (!packageId) {
         console.error('❌ No package ID found in order data:', orderData);
         throw new Error('No package ID found in order data');
@@ -292,25 +292,25 @@ async function handleCheckoutSessionCompleted(session) {
       // Get Airalo credentials based on mode (sandbox or production)
       const airaloMode = process.env.AIRALO_MODE || 'production';
       const isSandbox = airaloMode === 'sandbox' || airaloMode === 'test';
-      
+
       console.log(`🔧 Airalo Mode: ${airaloMode}, Package: ${packageId}`);
-      
+
       // Use sandbox or production credentials
-      const clientId = isSandbox 
+      const clientId = isSandbox
         ? (process.env.AIRALO_CLIENT_ID_SANDBOX || process.env.AIRALO_CLIENT_ID)
         : process.env.AIRALO_CLIENT_ID;
-      const clientSecret = isSandbox 
+      const clientSecret = isSandbox
         ? (process.env.AIRALO_CLIENT_SECRET_SANDBOX || process.env.AIRALO_CLIENT_SECRET)
         : process.env.AIRALO_CLIENT_SECRET;
-      
+
       // Airalo sandbox URL: https://sandbox-partners-api.airalo.com
       // Airalo production URL: https://partners-api.airalo.com
-      const airaloBaseUrl = isSandbox 
+      const airaloBaseUrl = isSandbox
         ? (process.env.AIRALO_BASE_URL_SANDBOX || 'https://sandbox-partners-api.airalo.com')
         : (process.env.AIRALO_BASE_URL || 'https://partners-api.airalo.com');
-      
+
       console.log(`🌐 Airalo Mode: ${airaloMode}, URL: ${airaloBaseUrl}`);
-      
+
       if (!clientId || !clientSecret) {
         console.error('❌ Airalo credentials missing!', {
           hasClientId: !!clientId,
@@ -412,7 +412,7 @@ async function handleCheckoutSessionCompleted(session) {
       // Add SIM data if available - save BOTH formats for complete compatibility
       if (simData) {
         const lpaString = simData.qrcode || simData.lpa;
-        
+
         // snake_case fields (primary storage format)
         esimUpdateData.iccid = simData.iccid || null;
         esimUpdateData.qr_code = lpaString || null;
@@ -421,7 +421,7 @@ async function handleCheckoutSessionCompleted(session) {
         esimUpdateData.matching_id = simData.matching_id || null;
         esimUpdateData.activation_code = simData.activation_code || simData.matching_id || null;
         esimUpdateData.smdp_address = simData.lpa || null;
-        
+
         // camelCase fields (for backwards compatibility)
         esimUpdateData.lpa = lpaString || null;
         esimUpdateData.qrCode = lpaString || null;
@@ -430,7 +430,7 @@ async function handleCheckoutSessionCompleted(session) {
         esimUpdateData.matchingId = simData.matching_id || null;
         esimUpdateData.activationCode = simData.activation_code || simData.matching_id || null;
         esimUpdateData.smdpAddress = simData.lpa || null;
-        
+
         esimUpdateData.simData = simData;
         console.log('✅ eSIM data extracted, ICCID:', simData.iccid);
       } else {
@@ -446,10 +446,10 @@ async function handleCheckoutSessionCompleted(session) {
       if (orderData.userId) {
         try {
           const userOrderRef = doc(db, 'users', orderData.userId, 'esims', orderId);
-          
+
           // First, try to get the existing document to merge data properly
           const userOrderDoc = await getDoc(userOrderRef);
-          
+
           if (userOrderDoc.exists()) {
             // Document exists, update it
             await updateDoc(userOrderRef, esimUpdateData);
@@ -469,7 +469,7 @@ async function handleCheckoutSessionCompleted(session) {
           }
         } catch (userOrderError) {
           console.error('❌ Error updating/creating user order:', userOrderError);
-          
+
           // CRITICAL: Try one more time with setDoc to ensure the user gets their eSIM
           try {
             const userOrderRef = doc(db, 'users', orderData.userId, 'esims', orderId);
@@ -499,7 +499,7 @@ async function handleCheckoutSessionCompleted(session) {
         orderId,
         packageId: orderData.packageId || orderData.planId
       });
-      
+
       // Update order with error status - payment completed but eSIM creation failed
       // Set completedAt to mark when we finished processing (even though it failed)
       // This ensures data consistency for queries filtering by completedAt
@@ -528,6 +528,12 @@ async function handleCheckoutSessionCompleted(session) {
  */
 async function handlePaymentIntentSucceeded(paymentIntent) {
   try {
+    const orderId = paymentIntent.metadata?.order_id;
+
+    if (!orderId) {
+      console.warn('No order_id in payment intent metadata');
+      return;
+    }
 
     // Get payment method details for fraud tracking
     let paymentMethodFingerprint = null;
@@ -537,7 +543,6 @@ async function handlePaymentIntentSucceeded(paymentIntent) {
     if (paymentIntent.payment_method) {
       try {
         const paymentMethod = await stripe.paymentMethods.retrieve(paymentIntent.payment_method);
-        
         if (paymentMethod.card) {
           paymentMethodFingerprint = paymentMethod.card.fingerprint;
           paymentMethodLast4 = paymentMethod.card.last4;
@@ -546,13 +551,6 @@ async function handlePaymentIntentSucceeded(paymentIntent) {
       } catch (error) {
         console.error('Error retrieving payment method:', error);
       }
-    }
-
-    // Try to find the order
-    const orderId = paymentIntent.metadata?.order_id;
-    if (!orderId) {
-      console.warn('No order_id in payment intent metadata');
-      return;
     }
 
     const orderRef = doc(db, 'orders', orderId);
@@ -590,8 +588,220 @@ async function handlePaymentIntentSucceeded(paymentIntent) {
       'paymentMethod.last4': paymentMethodLast4,
       'paymentMethod.brand': paymentMethodBrand,
       'paymentMethod.type': 'card',
+      stripePaymentIntentId: paymentIntent.id,
       updatedAt: serverTimestamp()
     });
+
+    // ============================================
+    // NEW: CREATE ESIM FOR MOBILE PAYMENTS
+    // ============================================
+    // Check if this is a mobile payment (no checkout session) and eSIM not yet created
+    // We check !orderData.esimCreated to avoid duplicates
+    if (!orderData.esimCreated && orderData.status !== 'completed') {
+      console.log('📱 Mobile payment detected, creating eSIM for order:', orderId);
+
+      // Verify payment amount
+      const paidAmount = paymentIntent.amount / 100;
+      const expectedAmount = orderData.amount;
+
+      // Allow small float difference
+      if (Math.abs(paidAmount - expectedAmount) > 0.01) {
+        console.error('🚨 Payment amount mismatch for mobile payment!', {
+          orderId,
+          paidAmount,
+          expectedAmount
+        });
+
+        // Only fail if paid LESS (block underpayment)
+        if (paidAmount < expectedAmount - 0.01) {
+          await updateDoc(orderRef, {
+            status: 'payment_mismatch',
+            paymentStatus: 'failed',
+            errorMessage: `Payment amount mismatch: paid ${paidAmount}, expected ${expectedAmount}`,
+            updatedAt: serverTimestamp()
+          });
+          return;
+        }
+      }
+
+      // Update to processing
+      await updateDoc(orderRef, {
+        status: 'processing',
+        paymentStatus: 'completed',
+        paymentCompletedAt: serverTimestamp(),
+        stripePaymentIntentId: paymentIntent.id,
+        updatedAt: serverTimestamp()
+      });
+
+      // Create Airalo eSIM (same logic as handleCheckoutSessionCompleted)
+      try {
+        const packageId = orderData.packageId || orderData.planId;
+
+        if (!packageId) {
+          throw new Error('No package ID found in order data');
+        }
+
+        // Get Airalo credentials
+        const airaloMode = process.env.AIRALO_MODE || 'production';
+        const isSandbox = airaloMode === 'sandbox' || airaloMode === 'test';
+
+        const clientId = isSandbox
+          ? (process.env.AIRALO_CLIENT_ID_SANDBOX || process.env.AIRALO_CLIENT_ID)
+          : process.env.AIRALO_CLIENT_ID;
+        const clientSecret = isSandbox
+          ? (process.env.AIRALO_CLIENT_SECRET_SANDBOX || process.env.AIRALO_CLIENT_SECRET)
+          : process.env.AIRALO_CLIENT_SECRET;
+        const airaloBaseUrl = isSandbox
+          ? (process.env.AIRALO_BASE_URL_SANDBOX || 'https://sandbox-partners-api.airalo.com')
+          : (process.env.AIRALO_BASE_URL || 'https://partners-api.airalo.com');
+
+        if (!clientId || !clientSecret) {
+          throw new Error('Airalo API credentials not configured');
+        }
+
+        // Authenticate with Airalo
+        console.log('🔐 Authenticating with Airalo for mobile payment...');
+        const authResponse = await fetch(`${airaloBaseUrl}/v2/token`, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            client_id: clientId,
+            client_secret: clientSecret,
+            grant_type: 'client_credentials'
+          })
+        });
+
+        if (!authResponse.ok) {
+          const errorText = await authResponse.text();
+          throw new Error(`Airalo authentication failed: ${errorText}`);
+        }
+
+        const authData = await authResponse.json();
+        const accessToken = authData.data?.access_token;
+
+        if (!accessToken) {
+          throw new Error('No access token received from Airalo');
+        }
+
+        // Create eSIM order
+        console.log('📦 Creating Airalo order for mobile payment:', packageId);
+        const orderResponse = await fetch(`${airaloBaseUrl}/v2/orders`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            package_id: packageId,
+            quantity: 1,
+            type: 'sim',
+            description: `Order ${orderId} for ${orderData.customerEmail || 'customer'}`
+          })
+        });
+
+        if (!orderResponse.ok) {
+          const errorText = await orderResponse.text();
+          throw new Error(`Airalo order creation failed: ${errorText}`);
+        }
+
+        const airaloOrderResult = await orderResponse.json();
+        const airaloOrder = airaloOrderResult.data;
+        const airaloOrderId = airaloOrder?.id;
+        const simData = airaloOrder?.sims?.[0];
+
+        if (!airaloOrderId) {
+          throw new Error('No order ID returned from Airalo');
+        }
+
+        console.log('✅ Airalo order created for mobile:', airaloOrderId);
+
+        // Update order with eSIM data
+        const esimUpdateData = {
+          status: 'completed',
+          airaloOrderId: airaloOrderId,
+          airaloOrderData: airaloOrder,
+          orderData: airaloOrder,
+          esimCreated: true,
+          esimCreatedAt: serverTimestamp(),
+          completedAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        };
+
+        if (simData) {
+          const lpaString = simData.qrcode || simData.lpa;
+
+          // snake_case fields
+          esimUpdateData.iccid = simData.iccid || null;
+          esimUpdateData.qr_code = lpaString || null;
+          esimUpdateData.qr_code_url = simData.qrcode_url || null;
+          esimUpdateData.direct_apple_installation_url = simData.direct_apple_installation_url || simData.qrcode_url || null; // Enhanced fallback
+          esimUpdateData.matching_id = simData.matching_id || null;
+          esimUpdateData.activation_code = simData.activation_code || simData.matching_id || null;
+          esimUpdateData.smdp_address = simData.lpa || null;
+
+          // camelCase fields
+          esimUpdateData.lpa = lpaString || null;
+          esimUpdateData.qrCode = lpaString || null;
+          esimUpdateData.qrCodeUrl = simData.qrcode_url || null;
+          esimUpdateData.directAppleInstallationUrl = simData.direct_apple_installation_url || simData.qrcode_url || null; // Enhanced fallback
+          esimUpdateData.matchingId = simData.matching_id || null;
+          esimUpdateData.activationCode = simData.activation_code || simData.matching_id || null;
+          esimUpdateData.smdpAddress = simData.lpa || null;
+
+          esimUpdateData.simData = simData;
+        }
+
+        await updateDoc(orderRef, esimUpdateData);
+        console.log('✅ Mobile order updated to completed:', orderId);
+
+        // Update user's esims collection
+        if (orderData.userId) {
+          try {
+            const userOrderRef = doc(db, 'users', orderData.userId, 'esims', orderId);
+            const userOrderDoc = await getDoc(userOrderRef);
+
+            if (userOrderDoc.exists()) {
+              await updateDoc(userOrderRef, esimUpdateData);
+            } else {
+              // Ensure we have all necessary fields for a new doc
+              const fullOrderData = {
+                ...orderData,
+                ...esimUpdateData,
+                userId: orderData.userId,
+                createdAt: orderData.createdAt || serverTimestamp(),
+              };
+              await setDoc(userOrderRef, fullOrderData);
+            }
+            console.log('✅ User order updated for mobile:', orderData.userId);
+          } catch (userOrderError) {
+            console.error('❌ Error updating user order:', userOrderError);
+          }
+        }
+
+        console.log('🎉 Mobile eSIM creation complete for order:', orderId);
+
+      } catch (airaloError) {
+        console.error('❌ AIRALO ERROR for mobile payment:', {
+          message: airaloError.message,
+          orderId,
+          packageId: orderData.packageId || orderData.planId
+        });
+
+        await updateDoc(orderRef, {
+          status: 'esim_creation_failed',
+          paymentStatus: 'completed',
+          esimCreated: false,
+          esimError: airaloError.message,
+          esimErrorAt: serverTimestamp(),
+          completedAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        });
+      }
+    }
 
   } catch (error) {
     console.error('Error handling payment intent succeeded:', error);
@@ -657,10 +867,10 @@ async function handleChargeSucceeded(charge) {
     }
 
     const orderRef = doc(db, 'orders', orderId);
-    
+
     // Track 3DS authentication result
     const threeDSecure = charge.payment_method_details?.card?.three_d_secure;
-    
+
     if (threeDSecure) {
       await updateDoc(orderRef, {
         'authentication.threeDSecure': {
@@ -690,7 +900,7 @@ async function handleChargeRefunded(charge) {
     }
 
     const orderRef = doc(db, 'orders', orderId);
-    
+
     await updateDoc(orderRef, {
       status: 'refunded',
       paymentStatus: 'refunded',
@@ -719,7 +929,7 @@ async function handleDisputeCreated(dispute) {
     }
 
     const orderRef = doc(db, 'orders', orderId);
-    
+
     await updateDoc(orderRef, {
       status: 'disputed',
       dispute: {
@@ -736,7 +946,7 @@ async function handleDisputeCreated(dispute) {
     const orderDoc = await getDoc(orderRef);
     if (orderDoc.exists()) {
       const orderData = orderDoc.data();
-      
+
       if (orderData.userId) {
         const userRef = doc(db, 'users', orderData.userId);
         await updateDoc(userRef, {

@@ -346,3 +346,6 @@ export default {
   buildOrderDetailsForQrCode,
   buildQrCodeData
 };
+
+
+

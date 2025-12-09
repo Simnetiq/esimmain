@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { db } from '@esim/shared/firebase/config';
 import { doc, setDoc, serverTimestamp, getDoc, collection, addDoc, query, where, getDocs, Timestamp } from 'firebase/firestore';
-import { 
-  checkFraudRules, 
-  trackPurchaseAttempt, 
+import {
+  checkFraudRules,
+  trackPurchaseAttempt,
   checkBlocklist,
   logPriceManipulationAttempt
 } from '@esim/shared/services/fraudDetectionService';
@@ -81,7 +81,7 @@ async function checkRateLimit(ip) {
   try {
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
     const attemptsRef = collection(db, 'payment_attempts');
-    
+
     // Check by IP
     if (ip) {
       const ipQuery = query(
@@ -94,7 +94,7 @@ async function checkRateLimit(ip) {
         return { allowed: false, reason: 'Too many requests from this IP. Please try again later.' };
       }
     }
-    
+
     return { allowed: true };
   } catch (error) {
     console.error('Rate limit check error:', error);
@@ -135,47 +135,47 @@ async function validateAndGetPrice(packageId, userId, submittedPrice) {
   // 1. Fetch package from database
   const packageRef = doc(db, 'dataplans', packageId);
   const packageSnap = await getDoc(packageRef);
-  
+
   if (!packageSnap.exists()) {
     return { valid: false, error: 'Package not found', code: 'PACKAGE_NOT_FOUND' };
   }
-  
+
   const packageData = packageSnap.data();
-  
+
   // 2. Check if package is enabled
   if (packageData.enabled === false || packageData.status === 'disabled') {
     return { valid: false, error: 'This package is not available', code: 'PACKAGE_DISABLED' };
   }
-  
+
   const databasePrice = parseFloat(packageData.price);
-  
+
   if (isNaN(databasePrice) || databasePrice <= 0) {
     return { valid: false, error: 'Invalid package price', code: 'INVALID_DB_PRICE' };
   }
-  
+
   // 3. Check for referral discount eligibility (SERVER-SIDE ONLY)
   let discountPercentage = 0;
   let minimumPrice = 0.5;
   let hasReferralDiscount = false;
-  
+
   if (userId) {
     try {
       const userRef = doc(db, 'users', userId);
       const userSnap = await getDoc(userRef);
-      
+
       if (userSnap.exists()) {
         const userData = userSnap.data();
         // Check multiple possible fields for referral status
-        hasReferralDiscount = userData.usedReferralCode || 
-                             userData.hasUsedReferralCode || 
-                             userData.referralCodeUsed || 
-                             false;
+        hasReferralDiscount = userData.usedReferralCode ||
+          userData.hasUsedReferralCode ||
+          userData.referralCodeUsed ||
+          false;
       }
-      
+
       // Get referral settings from database
       const settingsRef = doc(db, 'settings', 'general');
       const settingsSnap = await getDoc(settingsRef);
-      
+
       if (settingsSnap.exists()) {
         const settings = settingsSnap.data();
         discountPercentage = settings.referral?.discountPercentage || 17;
@@ -186,21 +186,21 @@ async function validateAndGetPrice(packageId, userId, submittedPrice) {
       // Continue without discount on error - safer
     }
   }
-  
+
   // 4. Calculate the CORRECT price (server-side)
   let validPrice = databasePrice;
   if (hasReferralDiscount && discountPercentage > 0) {
     validPrice = Math.max(minimumPrice, databasePrice * (100 - discountPercentage) / 100);
   }
-  
+
   // Round to 2 decimal places
   const roundedValidPrice = Math.round(validPrice * 100) / 100;
   const roundedSubmittedPrice = Math.round(parseFloat(submittedPrice) * 100) / 100;
-  
+
   // 5. Compare prices
   const priceDifference = Math.abs(roundedValidPrice - roundedSubmittedPrice);
   const priceMatches = priceDifference <= SECURITY_CONFIG.MAX_PRICE_TOLERANCE;
-  
+
   if (!priceMatches) {
     // SECURITY ALERT - Price manipulation detected
     console.error('🚨🚨🚨 PRICE MANIPULATION DETECTED 🚨🚨🚨', {
@@ -213,9 +213,9 @@ async function validateAndGetPrice(packageId, userId, submittedPrice) {
       hasReferralDiscount,
       timestamp: new Date().toISOString()
     });
-    
-    return { 
-      valid: false, 
+
+    return {
+      valid: false,
       error: 'Price validation failed',
       code: 'PRICE_MISMATCH',
       details: {
@@ -226,7 +226,7 @@ async function validateAndGetPrice(packageId, userId, submittedPrice) {
       }
     };
   }
-  
+
   return {
     valid: true,
     price: roundedValidPrice,
@@ -245,10 +245,10 @@ export async function POST(request) {
   const forwarded = request.headers.get('x-forwarded-for');
   const ip = forwarded ? forwarded.split(',')[0].trim() : request.headers.get('x-real-ip') || 'unknown';
   const userAgent = request.headers.get('user-agent') || 'unknown';
-  
+
   try {
     const body = await request.json();
-    
+
     // ============================================
     // 1. INPUT VALIDATION
     // ============================================
@@ -267,7 +267,7 @@ export async function POST(request) {
       timestamp,       // Request timestamp for replay protection
       nonce           // Unique request ID for duplicate prevention
     } = body;
-    
+
     // Validate required fields
     if (!order || !email) {
       return NextResponse.json(
@@ -275,7 +275,7 @@ export async function POST(request) {
         { status: 400 }
       );
     }
-    
+
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -284,7 +284,7 @@ export async function POST(request) {
         { status: 400 }
       );
     }
-    
+
     // Validate Stripe is configured
     if (!stripe || !stripeSecretKey) {
       return NextResponse.json(
@@ -309,7 +309,7 @@ export async function POST(request) {
         blocked: true,
         blockReason: rateLimitCheck.reason
       });
-      
+
       return NextResponse.json(
         { error: rateLimitCheck.reason, code: 'RATE_LIMITED' },
         { status: 429 }
@@ -332,7 +332,7 @@ export async function POST(request) {
         blocked: true,
         blockReason: 'Request timestamp expired'
       });
-      
+
       return NextResponse.json(
         { error: 'Request expired. Please refresh and try again.', code: 'REQUEST_EXPIRED' },
         { status: 400 }
@@ -355,7 +355,7 @@ export async function POST(request) {
         blocked: true,
         blockReason: blocklistCheck.reason
       });
-      
+
       return NextResponse.json(
         { error: blocklistCheck.reason, code: 'BLOCKED' },
         { status: 403 }
@@ -366,7 +366,7 @@ export async function POST(request) {
     // 5. PRICE VALIDATION (CRITICAL SECURITY)
     // ============================================
     const priceValidation = await validateAndGetPrice(order, userId, total || 0);
-    
+
     if (!priceValidation.valid) {
       // Log the fraud attempt
       await logPriceManipulationAttempt(db, {
@@ -385,7 +385,7 @@ export async function POST(request) {
           timestamp: new Date().toISOString()
         }
       });
-      
+
       await logPaymentAttempt({
         packageId: order,
         email,
@@ -399,13 +399,13 @@ export async function POST(request) {
         blocked: true,
         blockReason: 'Price manipulation detected'
       });
-      
+
       return NextResponse.json(
         { error: 'Payment validation failed. Please refresh and try again.', code: priceValidation.code },
         { status: 400 }
       );
     }
-    
+
     // USE THE VALIDATED PRICE FROM DATABASE
     const validatedPrice = priceValidation.price;
     const packageName = priceValidation.packageData?.name || name || 'eSIM Plan';
@@ -453,7 +453,7 @@ export async function POST(request) {
           userAgent
         }
       });
-      
+
       await logPaymentAttempt({
         packageId: order,
         email,
@@ -498,21 +498,21 @@ export async function POST(request) {
     const finalDomain = domain || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
     const stripeMode = process.env.STRIPE_MODE || 'live';
     const isTestMode = stripeMode === 'test' || stripeMode === 'sandbox';
-    
+
     const getLocalizedUrl = (path) => {
       if (language === 'en') {
         return `${finalDomain}${path}`;
       }
       return `${finalDomain}/${language}${path}`;
     };
-    
+
     // Extract country information from package data
     const packageData = priceValidation.packageData || {};
     const countryCode = packageData.country_code || null;
     const countryName = packageData.country_region || null;
     const countryCodes = packageData.country_codes || (countryCode ? [countryCode] : []);
     const isRegional = packageData.is_regional || false;
-    
+
     const pendingOrderData = {
       orderId: order,
       packageId: order,
@@ -572,15 +572,15 @@ export async function POST(request) {
     // Generate UNIQUE document ID for this order (timestamp + random string)
     // This prevents duplicate package purchases from overwriting each other
     const uniqueOrderId = `${order}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     // Update orderData with unique ID
     pendingOrderData.uniqueOrderId = uniqueOrderId;
     pendingOrderData.originalOrderId = order;
-    
+
     // Save to orders collection with UNIQUE ID
     const globalOrderRef = doc(db, 'orders', uniqueOrderId);
     await setDoc(globalOrderRef, pendingOrderData);
-    
+
     // Save to user's collection if userId is provided
     if (userId) {
       const userOrderRef = doc(db, 'users', userId, 'esims', uniqueOrderId);
@@ -605,7 +605,7 @@ export async function POST(request) {
     // 9. CREATE STRIPE SESSION
     // ============================================
     const isMobileRequest = isMobile || platform === 'ios' || platform === 'android';
-    
+
     if (isMobileRequest) {
       // Create Payment Intent for mobile
       const paymentIntentConfig = {
@@ -639,6 +639,9 @@ export async function POST(request) {
         clientSecret: paymentIntent.client_secret,
         paymentIntentId: paymentIntent.id,
         id: paymentIntent.id,
+        // CRITICAL: Return uniqueOrderId so mobile can poll for correct order
+        orderId: uniqueOrderId,
+        uniqueOrderId: uniqueOrderId,
         total: validatedPrice,
         currency: currency,
         status: 'success'
@@ -695,10 +698,10 @@ export async function POST(request) {
         status: 'success'
       });
     }
-    
+
   } catch (error) {
     console.error('❌ Payment error:', error);
-    
+
     // Log error for audit
     try {
       await addDoc(collection(db, 'payment_errors'), {
@@ -711,7 +714,7 @@ export async function POST(request) {
     } catch {
       // Ignore logging errors
     }
-    
+
     return NextResponse.json(
       { error: 'Payment processing failed. Please try again.', code: 'INTERNAL_ERROR' },
       { status: 500 }
