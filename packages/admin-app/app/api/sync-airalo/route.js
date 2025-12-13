@@ -366,10 +366,12 @@ export async function POST(request) {
       }
       
       // Use slug as the package ID (this is how existing data is stored)
+      // Exclude topups - they should not be in the database
       const apiPackageIds = new Set(apiPackages
+        .filter(pkg => pkg.type !== 'topup')
         .map(pkg => pkg.slug || pkg.id?.toString())
         .filter(Boolean));
-      console.log(`✅ Found ${apiPackageIds.size} unique package IDs from API`);
+      console.log(`✅ Found ${apiPackageIds.size} unique package IDs from API (no topups)`);
       
       // Get all existing packages from Firebase
       console.log('🔄 Fetching existing packages from Firebase...');
@@ -431,8 +433,11 @@ export async function POST(request) {
       // Prepare package operations
       const packageOperations = [];
       
-      // Add/Update packages from API
+      // Add/Update packages from API - SKIP TOPUPS
       for (const pkg of apiPackages) {
+        // Skip topup packages entirely - they break the app
+        if (pkg.type === 'topup') continue;
+        
         // Use slug as primary ID (matches existing Firebase document IDs)
         const packageId = pkg.slug || pkg.id?.toString();
         if (packageId && pkg.title) {
@@ -475,6 +480,9 @@ export async function POST(request) {
             countryCodes = [countrySlug];
           }
           
+          // Check if this is a topup package
+          const isTopup = pkg.type === 'topup';
+          
           // Build comprehensive package data
           const packageData = {
             // Identifiers
@@ -485,21 +493,22 @@ export async function POST(request) {
             // country_code: ISO 2-letter (e.g., "US") - for display/Airalo API
             // country_slug: slug (e.g., "united-states") - for reference  
             // country_codes: array of SLUGS - for Firestore queries (CRITICAL!)
+            // TOPUPS: Do NOT set country_codes so they don't appear in country queries
             country_code: isoCode,
             country_slug: countrySlug,
             country_title: pkg.country?.title || '',
             country_region: pkg.country?.title || '', // Also set country_region for compatibility
             country_image: pkg.country?.image?.url || '',
-            country_codes: countryCodes,
-            is_regional: countryCodes.length > 1 || pkg.type === 'global',
-            region_type: countryCodes.length > 1 ? (pkg.type || 'regional') : 'local',
+            country_codes: isTopup ? [] : countryCodes, // Empty for topups!
+            is_regional: isTopup ? false : (countryCodes.length > 1 || pkg.type === 'global'),
+            region_type: isTopup ? 'topup' : (countryCodes.length > 1 ? (pkg.type || 'regional') : 'local'),
             
             // Package details
             title: pkg.title,
             name: pkg.title,
             short_info: pkg.short_info || '',
             type: pkg.type || 'sim',
-            is_topup: pkg.type === 'topup',
+            is_topup: isTopup,
             
             // Data & Usage
             data: pkg.data || (pkg.amount && pkg.amount_unit ? `${pkg.amount} ${pkg.amount_unit}` : 'Unlimited'),
