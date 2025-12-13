@@ -297,6 +297,12 @@ export async function POST(request) {
             const isNewCountry = !existingCountry.exists;
             const existingData = existingCountry.exists ? existingCountry.data() : {};
             
+            // Extract photo URL - ensure it's always a string, not an object
+            const existingPhoto = typeof existingData.photo === 'string' 
+              ? existingData.photo 
+              : existingData.photo?.url || '';
+            const newPhoto = country.image?.url || '';
+            
             operations.push({
               type: 'set',
               ref: countryRef,
@@ -311,7 +317,7 @@ export async function POST(request) {
                 updated_by: 'airalo_sync',
                 provider: 'airalo',
                 translations: existingData.translations || {},
-                photo: existingData.photo || country.image?.url || '',
+                photo: existingPhoto || newPhoto,
                 description: existingData.description || '',
                 isActive: existingData.isActive !== false
               },
@@ -388,6 +394,12 @@ export async function POST(request) {
           const isNewCountry = !existingCountry.exists;
           const existingData = existingCountry.exists ? existingCountry.data() : {};
           
+          // Extract photo URL - ensure it's always a string, not an object
+          const existingPhoto = typeof existingData.photo === 'string' 
+            ? existingData.photo 
+            : existingData.photo?.url || '';
+          const newPhoto = country.image?.url || '';
+          
           countryOperations.push({
             type: 'set',
             ref: countryRef,
@@ -402,7 +414,7 @@ export async function POST(request) {
               updated_by: 'airalo_sync',
               provider: 'airalo',
               translations: existingData.translations || {},
-              photo: existingData.photo || country.image?.url || '',
+              photo: existingPhoto || newPhoto,
               description: existingData.description || '',
               isActive: existingData.isActive !== false
             },
