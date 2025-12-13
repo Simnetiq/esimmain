@@ -542,33 +542,18 @@ export async function POST(request) {
             status: 'active',
             enabled: true,
             provider: 'airalo',
-            updated_at: admin.firestore.FieldValue.serverTimestamp(),
+            // NOTE: updated_at is added AFTER cleaning to preserve FieldValue sentinel
             updated_by: 'airalo_sync',
             synced_at: new Date().toISOString()
           };
           
           // Remove any undefined values to prevent Firestore errors
-          // But preserve Firestore FieldValue sentinels (serverTimestamp, increment, etc.)
-          const isFirestoreSpecialValue = (obj) => {
-            if (!obj || typeof obj !== 'object') return false;
-            // Check for Timestamp objects
-            if (obj._seconds !== undefined) return true;
-            // Check for FieldValue sentinels (serverTimestamp, increment, arrayUnion, etc.)
-            if (obj._methodName !== undefined) return true;
-            // Check for constructor name patterns used by Firebase Admin SDK
-            const constructorName = obj.constructor?.name || '';
-            if (constructorName.includes('FieldValue') || 
-                constructorName.includes('Timestamp') ||
-                constructorName === 'Transform') return true;
-            return false;
-          };
-          
           const cleanUndefined = (obj) => {
             if (obj === null || obj === undefined) return null;
             if (Array.isArray(obj)) return obj.filter(v => v !== undefined).map(cleanUndefined);
-            // Preserve Firestore special values (Timestamps, FieldValues)
-            if (isFirestoreSpecialValue(obj)) return obj;
             if (typeof obj === 'object' && !(obj instanceof Date)) {
+              // Skip objects with special Firestore-like properties
+              if (obj._seconds !== undefined || obj._methodName !== undefined) return obj;
               return Object.fromEntries(
                 Object.entries(obj)
                   .filter(([_, v]) => v !== undefined)
@@ -578,6 +563,9 @@ export async function POST(request) {
             return obj;
           };
           const cleanedData = cleanUndefined(packageData);
+          
+          // Add updated_at AFTER cleaning to preserve FieldValue sentinel
+          cleanedData.updated_at = admin.firestore.FieldValue.serverTimestamp();
           
           packageOperations.push({
             type: 'set',
