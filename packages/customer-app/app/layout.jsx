@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
 import Script from 'next/script'
+import { Analytics as VercelAnalytics } from '@vercel/analytics/next'
 import { Heebo, IBM_Plex_Sans_Arabic, Rubik, DM_Sans } from 'next/font/google'
 import Providers from '../src/components/Providers'
 import ConditionalNavbar from '../src/components/ConditionalNavbar'
@@ -210,6 +211,7 @@ export default function RootLayout({ children }) {
             </div>
           </LanguageWrapper>
         </Providers>
+        <VercelAnalytics />
         {/* Stripe.js loaded with lazyOnload for better performance */}
         <Script
           src="https://js.stripe.com/v3/"
