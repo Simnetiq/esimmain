@@ -12,7 +12,12 @@ import {
   Trash2,
   Search,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  RefreshCw,
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  Download
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
@@ -85,6 +90,12 @@ const PlansManagement = () => {
   
   // Data source toggle
   const [dataSource, setDataSource] = useState('firebase'); // 'firebase' or 'airalo'
+  
+  // Sync state
+  const [syncStatus, setSyncStatus] = useState(null);
+  const [syncing, setSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState(null);
+  const [showSyncModal, setShowSyncModal] = useState(false);
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -197,6 +208,65 @@ const PlansManagement = () => {
     }
   };
 
+  // Load sync status
+  const loadSyncStatus = useCallback(async () => {
+    try {
+      const response = await fetch('/api/sync-airalo');
+      const result = await response.json();
+      
+      if (result.success) {
+        setSyncStatus(result.currentStatus);
+      }
+    } catch (error) {
+      console.error('Failed to load sync status:', error);
+    }
+  }, []);
+
+  // Run sync with Airalo API
+  const runSync = async (options = {}) => {
+    const { dryRun = false, removeDeprecated = true } = options;
+    
+    try {
+      setSyncing(true);
+      setSyncResult(null);
+      
+      const params = new URLSearchParams();
+      if (dryRun) params.append('dry_run', 'true');
+      if (!removeDeprecated) params.append('remove_deprecated', 'false');
+      
+      const response = await fetch(`/api/sync-airalo?${params.toString()}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      const result = await response.json();
+      setSyncResult(result);
+      
+      if (result.success) {
+        toast.success(result.message);
+        if (!dryRun) {
+          // Reload plans after successful sync
+          await loadAllPlans();
+          await loadSyncStatus();
+        }
+      } else {
+        toast.error(result.error || 'Sync failed');
+      }
+    } catch (error) {
+      toast.error('Failed to sync with Airalo');
+      setSyncResult({ success: false, error: error.message });
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  // Load sync status on mount
+  useEffect(() => {
+    if (currentUser) {
+      loadSyncStatus();
+    }
+  }, [currentUser, loadSyncStatus]);
+
   // Calculate discounted prices
   const calculateDiscountedPrice = (originalPrice, discountType = 'regular') => {
     if (!originalPrice || originalPrice <= 0) return originalPrice;
@@ -295,10 +365,171 @@ const PlansManagement = () => {
   return (
     <div className="space-y-8" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">Plans Management</h2>
-        <p className="text-gray-600 mt-1">View and manage all eSIM data plans</p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Plans Management</h2>
+          <p className="text-gray-600 mt-1">View and manage all eSIM data plans</p>
+        </div>
+        <button
+          onClick={() => setShowSyncModal(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <RefreshCw className="w-4 h-4" />
+          Sync with Airalo
+        </button>
       </div>
+
+      {/* Sync Status Banner */}
+      {syncStatus && (
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Smartphone className="w-5 h-5 text-blue-600" />
+                <span className="font-medium text-gray-900">
+                  {syncStatus.activePlans?.toLocaleString() || allPlans.length} Active Plans
+                </span>
+              </div>
+              {syncStatus.lastSync && (
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Clock className="w-4 h-4" />
+                  Last synced: {new Date(syncStatus.lastSync.timestamp).toLocaleString()}
+                  {syncStatus.lastSync.status === 'success' ? (
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                  ) : (
+                    <AlertTriangle className="w-4 h-4 text-red-500" />
+                  )}
+                </div>
+              )}
+            </div>
+            <button
+              onClick={loadSyncStatus}
+              className="text-sm text-blue-600 hover:text-blue-800"
+            >
+              Refresh Status
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Sync Modal */}
+      {showSyncModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <RefreshCw className="w-5 h-5 text-blue-600" />
+                Sync Plans with Airalo API
+              </h3>
+              <p className="text-gray-600 mt-1">
+                Fetch the latest packages from Airalo and update your Firebase database
+              </p>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              {/* Current Status */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="font-medium text-gray-900 mb-2">Current Status</h4>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-500">Plans in Firebase:</span>
+                    <span className="ml-2 font-medium">{allPlans.length.toLocaleString()}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Active Plans:</span>
+                    <span className="ml-2 font-medium">{syncStatus?.activePlans?.toLocaleString() || 'N/A'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Warning */}
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <div className="flex gap-3">
+                  <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="font-medium text-amber-800">Important Notice</h4>
+                    <p className="text-sm text-amber-700 mt-1">
+                      Full sync will remove plans that are no longer available in the Airalo catalog. 
+                      Run a dry run first to see what will be changed.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Sync Result */}
+              {syncResult && (
+                <div className={`rounded-lg p-4 ${syncResult.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+                  <h4 className={`font-medium ${syncResult.success ? 'text-green-800' : 'text-red-800'}`}>
+                    {syncResult.dryRun ? 'Dry Run Result' : 'Sync Result'}
+                  </h4>
+                  <p className={`text-sm mt-1 ${syncResult.success ? 'text-green-700' : 'text-red-700'}`}>
+                    {syncResult.message || syncResult.error}
+                  </p>
+                  {syncResult.details && (
+                    <div className="mt-3 text-sm space-y-1">
+                      <p>• From Airalo API: <strong>{syncResult.details.from_airalo_api?.toLocaleString()}</strong> packages</p>
+                      <p>• Currently in Firebase: <strong>{syncResult.details.existing_in_firebase?.toLocaleString()}</strong> packages</p>
+                      <p>• New packages: <strong>{syncResult.details.packages?.added || 0}</strong></p>
+                      <p>• Updated packages: <strong>{syncResult.details.packages?.updated || 0}</strong></p>
+                      <p className="text-amber-700">• To be removed: <strong>{syncResult.details.total_deprecated || 0}</strong></p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => runSync({ dryRun: true })}
+                  disabled={syncing}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {syncing ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      Running...
+                    </>
+                  ) : (
+                    <>
+                      <Search className="w-4 h-4" />
+                      Dry Run (Preview)
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => runSync({ dryRun: false, removeDeprecated: true })}
+                  disabled={syncing}
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {syncing ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      Syncing...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4" />
+                      Full Sync (Update All)
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+              <button
+                onClick={() => {
+                  setShowSyncModal(false);
+                  setSyncResult(null);
+                }}
+                className="w-full px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Data Source Toggle and Controls */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">

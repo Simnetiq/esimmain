@@ -1,8 +1,6 @@
-import { db } from '../firebase/config';
+import { db, storage } from '../firebase/config';
 import { collection, addDoc, serverTimestamp, getDocs, query, orderBy } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-
-const storage = getStorage();
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 // Create a new job application
 export const createJobApplication = async (applicationData) => {
