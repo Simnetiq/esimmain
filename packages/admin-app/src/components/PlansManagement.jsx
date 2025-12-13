@@ -113,12 +113,14 @@ const PlansManagement = () => {
       
       setAllPlans(plansData);
 
-      // Extract unique countries from plans
+      // Extract unique countries from plans (excluding topups)
       const countries = new Set();
-      plansData.forEach(plan => {
-        (plan.country_codes || []).forEach(code => countries.add(code));
-        (plan.country_ids || []).forEach(code => countries.add(code));
-      });
+      plansData
+        .filter(plan => plan.type !== 'topup' && plan.is_topup !== true)
+        .forEach(plan => {
+          (plan.country_codes || []).forEach(code => countries.add(code));
+          (plan.country_ids || []).forEach(code => countries.add(code));
+        });
       
       const sortedCountries = Array.from(countries).sort();
       setAvailableCountries(sortedCountries);
@@ -159,6 +161,11 @@ const PlansManagement = () => {
   useEffect(() => {
     const plansToFilter = dataSource === 'airalo' ? airaloPlans : allPlans;
     let filtered = [...plansToFilter];
+
+    // ALWAYS filter out topups - they should not be displayed
+    filtered = filtered.filter(plan => 
+      plan.type !== 'topup' && plan.is_topup !== true
+    );
 
     // Filter by search term
     if (searchTerm.trim()) {
