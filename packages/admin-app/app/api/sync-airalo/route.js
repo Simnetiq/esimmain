@@ -366,11 +366,12 @@ export async function POST(request) {
       }
       
       // Use slug as the package ID (this is how existing data is stored)
-      const apiPackageIds = new Set(apiPackages.map(pkg => {
-        // Prefer slug, fallback to id
-        return pkg.slug || pkg.id?.toString();
-      }).filter(Boolean));
-      console.log(`✅ Found ${apiPackageIds.size} unique package IDs from API`);
+      // EXCLUDE topups from the ID set - they should not be in the database
+      const apiPackageIds = new Set(apiPackages
+        .filter(pkg => pkg.type !== 'topup' && pkg.is_topup !== true)
+        .map(pkg => pkg.slug || pkg.id?.toString())
+        .filter(Boolean));
+      console.log(`✅ Found ${apiPackageIds.size} unique package IDs from API (excluding topups)`);
       
       // Get all existing packages from Firebase
       console.log('🔄 Fetching existing packages from Firebase...');
@@ -432,8 +433,13 @@ export async function POST(request) {
       // Prepare package operations
       const packageOperations = [];
       
-      // Add/Update packages from API
+      // Add/Update packages from API (SKIP TOPUPS - they should not be shown to customers)
       for (const pkg of apiPackages) {
+        // SKIP topup packages - they are for existing eSIM recharge only
+        if (pkg.type === 'topup' || pkg.is_topup === true) {
+          continue;
+        }
+        
         // Use slug as primary ID (matches existing Firebase document IDs)
         const packageId = pkg.slug || pkg.id?.toString();
         if (packageId && pkg.title) {
