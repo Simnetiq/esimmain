@@ -26,7 +26,12 @@ import {
   ChevronDown,
   ChevronUp,
   Upload,
-  Download
+  Download,
+  Languages,
+  FileText,
+  MoreVertical,
+  Info,
+  X
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
@@ -35,7 +40,6 @@ import { formatPrice } from '@esim/shared/utils/priceUtils';
 import { usePathname } from 'next/navigation';
 import CountryEditModal from './CountryEditModal';
 import TariffManagement from './TariffManagement';
-import Image from 'next/image';
 import FlagIcon from '@esim/shared/components/FlagIcon';
 
 const CountryManagement = () => {
@@ -77,6 +81,13 @@ const CountryManagement = () => {
   // Tariff management view
   const [showTariffManagement, setShowTariffManagement] = useState(false);
   const [selectedCountryForTariffs, setSelectedCountryForTariffs] = useState(null);
+  
+  // Translation states
+  const [translatingCountries, setTranslatingCountries] = useState(false);
+  const [translationProgress, setTranslationProgress] = useState({ current: 0, total: 0 });
+  
+  // Dropdown state for translations menu
+  const [showTranslationsMenu, setShowTranslationsMenu] = useState(false);
 
   // Load countries on component mount
   useEffect(() => {
@@ -133,29 +144,41 @@ const CountryManagement = () => {
       
       // Read file
       const fileContent = await file.text();
-      const countriesData = JSON.parse(fileContent);
+      const parsedData = JSON.parse(fileContent);
 
-      if (!Array.isArray(countriesData)) {
-        throw new Error('JSON must be an array of countries');
+      // Support both formats: 
+      // 1. Array of countries (old format)
+      // 2. Object with 'countries' key (new format with _README)
+      let countriesData;
+      if (Array.isArray(parsedData)) {
+        countriesData = parsedData;
+      } else if (parsedData.countries && Array.isArray(parsedData.countries)) {
+        countriesData = parsedData.countries;
+      } else {
+        throw new Error('JSON must be an array of countries or have a "countries" array property');
       }
 
       // Validate and upload each country
       let successCount = 0;
       let errorCount = 0;
+      let skippedCount = 0;
 
       for (const country of countriesData) {
         try {
+          // Validate required fields
           if (!country.code || !country.name) {
-            errorCount++;
+            skippedCount++;
             continue;
           }
+          
+          // Normalize country code to uppercase
+          const normalizedCode = country.code.toUpperCase();
 
-          const countryRef = doc(db, 'countries', country.code);
+          const countryRef = doc(db, 'countries', normalizedCode);
           await setDoc(countryRef, {
-            code: country.code,
+            code: normalizedCode,
             name: country.name,
             translations: country.translations || {},
-            photo: country.photo || '',
             description: country.description || '',
             isActive: country.isActive !== false,
             status: 'active',
@@ -165,12 +188,18 @@ const CountryManagement = () => {
           }, { merge: true });
 
           successCount++;
-        } catch {
+        } catch (err) {
+          console.error(`Error uploading country ${country.code}:`, err);
           errorCount++;
         }
       }
 
-      toast.success(`✅ Uploaded ${successCount} countries successfully!${errorCount > 0 ? ` (${errorCount} errors)` : ''}`);
+      const message = [];
+      if (successCount > 0) message.push(`${successCount} uploaded`);
+      if (skippedCount > 0) message.push(`${skippedCount} skipped (missing code/name)`);
+      if (errorCount > 0) message.push(`${errorCount} errors`);
+      
+      toast.success(`✅ ${message.join(', ')}`);
       
       // Reload countries
       await loadCountries();
@@ -178,8 +207,9 @@ const CountryManagement = () => {
       // Reset file input
       event.target.value = '';
       
-    } catch {
-      toast.error('Failed to process JSON');
+    } catch (err) {
+      console.error('Error processing JSON:', err);
+      toast.error(`Failed to process JSON: ${err.message}`);
     } finally {
       setUploadingJSON(false);
     }
@@ -187,6 +217,8 @@ const CountryManagement = () => {
 
   // Download template JSON
   const downloadTemplate = () => {
+    // Template with examples - code must be ISO 3166-1 alpha-2 (lowercase works too)
+    // Flag SVGs are served from /flags/4x3/{code}.svg
     const template = [
       {
         code: "US",
@@ -213,10 +245,41 @@ const CountryManagement = () => {
           he: "הממלכה המאוחדת",
           ru: "Великобритания"
         }
+      },
+      {
+        code: "DE",
+        name: "Germany",
+        translations: {
+          en: "Germany",
+          es: "Alemania",
+          fr: "Allemagne",
+          de: "Deutschland",
+          ar: "ألمانيا",
+          he: "גרמניה",
+          ru: "Германия"
+        }
       }
     ];
 
-    const blob = new Blob([JSON.stringify(template, null, 2)], { type: 'application/json' });
+    // Add comment explaining the format
+    const templateWithComments = {
+      _README: {
+        description: "Countries template for Simnetiq",
+        fields: {
+          code: "ISO 3166-1 alpha-2 country code (e.g., US, GB, DE). Used for flag display (/flags/4x3/{code}.svg)",
+          name: "English name of the country (used as fallback)",
+          translations: "Object with language codes as keys (en, es, fr, de, ar, he, ru)"
+        },
+        notes: [
+          "Flag SVGs must exist in /public/flags/4x3/ folder",
+          "Translations are for UI display only - do not affect Stripe payments",
+          "Use 'Translate All' button to auto-translate missing languages with AI"
+        ]
+      },
+      countries: template
+    };
+
+    const blob = new Blob([JSON.stringify(templateWithComments, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -226,13 +289,13 @@ const CountryManagement = () => {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     
-    toast.success('Template downloaded! Edit and upload it back.');
+    toast.success('Template downloaded! Check the _README section for instructions.');
   };
 
-  // Sync prices from Airalo for specific country
-  // This function reads existing plans from Firebase and updates country stats
-  // Note: To fetch fresh data from Airalo, use "Sync All Prices" button
-  const syncCountryPricesFromAiralo = async (countryCode) => {
+  // Recalculate stats for a specific country from Firebase data
+  // NOTE: This does NOT call Airalo API - it reads from Firebase dataplans collection
+  // To fetch fresh data from Airalo, go to Plans Management > Sync with Airalo
+  const recalculateCountryStats = async (countryCode) => {
     try {
       setSyncingCountry(countryCode);
       
@@ -296,7 +359,8 @@ const CountryManagement = () => {
   };
 
   // Recalculate stats for all countries from existing Firebase data
-  const syncAllCountriesFromAiralo = async () => {
+  // NOTE: This does NOT call Airalo API - it only reads from Firebase dataplans collection
+  const recalculateAllCountryStats = async () => {
     try {
       setSyncingPrices(true);
       
@@ -363,6 +427,43 @@ const CountryManagement = () => {
     }
   };
 
+  // Translate all countries to all supported languages
+  const translateAllCountries = async () => {
+    try {
+      setTranslatingCountries(true);
+      setTranslationProgress({ current: 0, total: countries.length });
+      
+      toast.loading('Translating countries to all languages...', { id: 'translate-countries' });
+      
+      const response = await fetch('/api/translate-countries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ translateAll: true })
+      });
+      
+      const result = await response.json();
+      
+      if (!result.success) {
+        throw new Error(result.error || 'Translation failed');
+      }
+      
+      toast.success(
+        `✅ Translation complete! ${result.summary.translated} countries translated, ${result.summary.skipped} skipped`,
+        { id: 'translate-countries', duration: 5000 }
+      );
+      
+      // Reload countries to show updated translations
+      await loadCountries();
+      
+    } catch (error) {
+      console.error('Error translating countries:', error);
+      toast.error(`Translation failed: ${error.message}`, { id: 'translate-countries' });
+    } finally {
+      setTranslatingCountries(false);
+      setTranslationProgress({ current: 0, total: 0 });
+    }
+  };
+
   // Delete country
   const deleteCountry = async (countryCode, countryName) => {
     if (!window.confirm(`Are you sure you want to delete "${countryName}" (${countryCode})? This will also delete all associated plans.`)) {
@@ -416,7 +517,7 @@ const CountryManagement = () => {
         countryCode={selectedCountryForTariffs.code}
         countryName={selectedCountryForTariffs.name}
         onBack={closeTariffManagement}
-        onSyncPrices={syncCountryPricesFromAiralo}
+        onSyncPrices={recalculateCountryStats}
       />
     );
   }
@@ -429,61 +530,181 @@ const CountryManagement = () => {
         <p className="text-gray-600 mt-1">Manage countries, translations, photos, and pricing</p>
         <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
           <p className="text-sm text-blue-800">
-            <strong>Note:</strong> To fetch fresh data from RoamJet API, go to <strong>API Config</strong> tab and use the sync buttons there. The buttons here recalculate stats from existing data in Firebase.
+            <strong>Note:</strong> To fetch fresh data from Airalo API, go to <strong>Data Synchronization</strong> tab and use the sync buttons there. The buttons here recalculate stats from existing data in Firebase.
           </p>
         </div>
       </div>
 
-      {/* Actions */}
-      <div className={`flex gap-3 flex-wrap ${isRTL ? 'flex-row-reverse' : ''}`}>
-        <button
-          onClick={downloadTemplate}
-          className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm"
-          title="Download JSON template"
-        >
-          <Download className="w-4 h-4" />
-          <span>Download Template</span>
-        </button>
-        
-        <label className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm cursor-pointer">
-          <input
-            type="file"
-            accept=".json"
-            onChange={handleJSONUpload}
-            disabled={uploadingJSON}
-            className="hidden"
-          />
-          {uploadingJSON ? (
+      {/* Actions Row */}
+      <div className={`flex gap-3 flex-wrap items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+        {/* Update Stats Button */}
+        <div className="relative group">
+          <button
+            onClick={recalculateAllCountryStats}
+            disabled={syncingPrices}
+            className="flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:bg-gray-400 transition-colors text-sm"
+          >
+            {syncingPrices ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <span>Updating...</span>
+              </>
+            ) : (
+              <>
+                <RefreshCw className="w-4 h-4" />
+                <span>Update All Stats</span>
+              </>
+            )}
+          </button>
+          {/* Tooltip */}
+          <div className="absolute bottom-full left-full -ml-4 mb-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none w-72 z-10 shadow-lg p-3">
+            <p className="font-semibold mb-1 text-white">No API calls - Firebase only</p>
+            <p className="text-white">Recalculates plan counts &amp; min prices from existing dataplans collection. Does not fetch from Airalo API.</p>
+            <div className="absolute top-full left-3 transform translate-y-0 border-4 border-transparent border-t-gray-900"></div>
+          </div>
+        </div>
+
+        {/* Translations Dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => setShowTranslationsMenu(!showTranslationsMenu)}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-colors text-sm ${
+              showTranslationsMenu 
+                ? 'bg-tufts-blue text-white' 
+                : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <Languages className="w-4 h-4" />
+            <span>Translations</span>
+            <ChevronDown className={`w-4 h-4 transition-transform ${showTranslationsMenu ? 'rotate-180' : ''}`} />
+          </button>
+          
+          {/* Dropdown Menu */}
+          {showTranslationsMenu && (
             <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
-              <span>Uploading...</span>
-            </>
-          ) : (
-            <>
-              <Upload className="w-4 h-4" />
-              <span>Upload JSON</span>
+              {/* Backdrop */}
+              <div 
+                className="fixed inset-0 z-40" 
+                onClick={() => setShowTranslationsMenu(false)}
+              />
+              {/* Menu */}
+              <div className="absolute top-full left-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden">
+                {/* Header */}
+                <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-semibold text-gray-900 text-sm">Translation Tools</h4>
+                    <button 
+                      onClick={() => setShowTranslationsMenu(false)}
+                      className="p-1 hover:bg-gray-200 rounded"
+                    >
+                      <X className="w-4 h-4 text-gray-500" />
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Manage country name translations for UI display
+                  </p>
+                </div>
+                
+                {/* Menu Items */}
+                <div className="p-2">
+                  {/* Translate All */}
+                  <button
+                    onClick={() => {
+                      setShowTranslationsMenu(false);
+                      translateAllCountries();
+                    }}
+                    disabled={translatingCountries}
+                    className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-blue-50 transition-colors text-left disabled:opacity-50"
+                  >
+                    <div className="w-9 h-9 rounded-lg bg-tufts-blue/10 flex items-center justify-center flex-shrink-0">
+                      {translatingCountries ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-tufts-blue"></div>
+                      ) : (
+                        <Languages className="w-5 h-5 text-tufts-blue" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900 text-sm">
+                        {translatingCountries ? 'Translating...' : 'Translate Missing Languages'}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        Uses AI to translate <strong>only missing</strong> languages. Existing translations are preserved.
+                      </p>
+                      <p className="text-xs text-green-600 mt-1">
+                        ✓ Safe to run multiple times
+                      </p>
+                    </div>
+                  </button>
+                  
+                  <div className="border-t border-gray-100 my-2"></div>
+                  
+                  {/* Download Template */}
+                  <button
+                    onClick={() => {
+                      setShowTranslationsMenu(false);
+                      downloadTemplate();
+                    }}
+                    className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors text-left"
+                  >
+                    <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                      <Download className="w-5 h-5 text-gray-600" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900 text-sm">Download Template</p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        Get a JSON template with example countries and translations structure
+                      </p>
+                    </div>
+                  </button>
+                  
+                  {/* Upload JSON */}
+                  <label className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors text-left cursor-pointer">
+                    <input
+                      type="file"
+                      accept=".json"
+                      onChange={(e) => {
+                        setShowTranslationsMenu(false);
+                        handleJSONUpload(e);
+                      }}
+                      disabled={uploadingJSON}
+                      className="hidden"
+                    />
+                    <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                      {uploadingJSON ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600"></div>
+                      ) : (
+                        <Upload className="w-5 h-5 text-gray-600" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900 text-sm">
+                        {uploadingJSON ? 'Uploading...' : 'Upload JSON File'}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        Import countries with translations. Uses merge mode - <strong>overwrites</strong> matching fields but keeps other data.
+                      </p>
+                    </div>
+                  </label>
+                </div>
+                
+                {/* Info Footer */}
+                <div className="px-4 py-3 bg-amber-50 border-t border-amber-100">
+                  <div className="flex items-start gap-2">
+                    <Info className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs text-amber-700">
+                      <strong>Note:</strong> Translations are UI-only and don&apos;t affect Stripe payments. Country codes (US, GB) are used for checkout.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </>
           )}
-        </label>
+        </div>
         
-        <button
-          onClick={syncAllCountriesFromAiralo}
-          disabled={syncingPrices}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:bg-gray-400 transition-colors text-sm"
-          title="Recalculate stats for all countries from existing plans in Firebase"
-        >
-          {syncingPrices ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              <span>Updating...</span>
-            </>
-          ) : (
-            <>
-              <RefreshCw className="w-4 h-4" />
-              <span>Update All Stats</span>
-            </>
-          )}
-        </button>
+        {/* Countries Count */}
+        <div className="ml-auto text-sm text-gray-500">
+          {filteredCountries.length} {filteredCountries.length === 1 ? 'country' : 'countries'}
+        </div>
       </div>
 
       {/* Search Bar */}
@@ -513,33 +734,13 @@ const CountryManagement = () => {
               <div className={`flex items-center justify-between mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
                 <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <div className="flex-shrink-0">
-                    {country.photo ? (
-                      <div className="relative w-12 h-12 rounded-lg overflow-hidden border-2 border-gray-200">
-                        <Image 
-                          src={country.photo} 
-                          alt={country.name}
-                          fill
-                          className="object-cover"
-                          sizes="48px"
-                        />
-                        {/* Flag badge overlay */}
-                        <div className="absolute bottom-0 right-0 w-5 h-5 bg-white rounded-tl border-l border-t border-gray-200">
-                          <FlagIcon 
-                            countryCode={country.code} 
-                            size="xs" 
-                            squared={true}
-                          />
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="w-12 h-12 rounded-lg border-2 border-gray-200 overflow-hidden flex items-center justify-center bg-gray-50">
-                        <FlagIcon 
-                          countryCode={country.code} 
-                          size="lg" 
-                          squared={false}
-                        />
-                      </div>
-                    )}
+                    <div className="w-12 h-12 rounded-lg border-2 border-gray-200 overflow-hidden flex items-center justify-center bg-gray-50">
+                      <FlagIcon 
+                        countryCode={country.code} 
+                        size="lg" 
+                        squared={false}
+                      />
+                    </div>
                   </div>
                   <div>
                     <h3 className={`text-base font-semibold text-gray-900 ${isRTL ? 'text-right' : 'text-left'}`}>
@@ -637,7 +838,7 @@ const CountryManagement = () => {
               {/* Action Buttons */}
               <div className="flex gap-2">
                 <button
-                  onClick={() => syncCountryPricesFromAiralo(country.code)}
+                  onClick={() => recalculateCountryStats(country.code)}
                   disabled={syncingCountry === country.code}
                   className="flex-1 px-2 py-1.5 bg-tufts-blue text-white rounded-full flex items-center justify-center gap-2 text-xs"
                   title="Recalculate stats from existing plans in Firebase"

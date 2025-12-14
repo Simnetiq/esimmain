@@ -23,6 +23,8 @@ import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils
 import { getProviderFromPlanData } from '@esim/shared/utils/providerUtils';
 import { getISOCode } from '@esim/shared/utils/countryCodeMap';
 import { formatPrice, formatPriceNumber, calculateDiscountedPrice, parsePrice } from '@esim/shared/utils/priceUtils';
+import FraudBlockedModal from '../../../src/components/FraudBlockedModal';
+import { useFraudCheck } from '../../../src/hooks/useFraudCheck';
 
 
 const SharePackagePage = () => {
@@ -74,6 +76,16 @@ const SharePackagePage = () => {
   const [countryTranslations, setCountryTranslations] = useState({});
   const [translationsLoaded, setTranslationsLoaded] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  
+  // Fraud detection hook
+  const { 
+    isBlocked, 
+    blockData, 
+    checkFraudStatus, 
+    clearBlockedState,
+    handlePaymentError,
+    loading: fraudCheckLoading 
+  } = useFraudCheck();
 
   const loadFromAiraloAPI = useCallback(async () => {
     try {
@@ -340,6 +352,23 @@ const SharePackagePage = () => {
     setProcessingPayment(true);
 
     try {
+      // Check fraud status before proceeding
+      const fraudStatus = await checkFraudStatus(currentUser.uid, currentUser.email);
+      
+      if (fraudStatus.blocked) {
+        setProcessingPayment(false);
+        // Modal will be shown automatically by the hook
+        return;
+      }
+
+      // Show warning if approaching limit
+      if (fraudStatus.warning) {
+        toast(fraudStatus.warning.message, {
+          icon: '⚠️',
+          duration: 5000
+        });
+      }
+
       const checkoutData = prepareCheckoutData();
       
       // Track purchase initiation
@@ -414,6 +443,13 @@ const SharePackagePage = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
+        
+        // Check if this is a fraud block error
+        if (handlePaymentError(errorData)) {
+          setProcessingPayment(false);
+          return; // Modal will be shown
+        }
+        
         throw new Error(errorData.error || 'Failed to create payment session');
       }
 
@@ -552,14 +588,30 @@ const SharePackagePage = () => {
 
   return (
     <div className="bg-white min-h-screen flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
+        {/* Fraud Blocked Modal */}
+        <FraudBlockedModal
+          isOpen={isBlocked}
+          onClose={clearBlockedState}
+          blockType={blockData?.blockType}
+          message={blockData?.message}
+          expiresAt={blockData?.expiresAt}
+          remainingHours={blockData?.remainingHours}
+          canContactSupport={blockData?.canContactSupport}
+          userId={currentUser?.uid}
+          email={currentUser?.email}
+        />
+
         {/* Processing Overlay */}
-        {processingPayment && (
+        {(processingPayment || fraudCheckLoading) && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white rounded-lg p-6 max-w-sm mx-4">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tufts-blue mx-auto mb-4"></div>
               <p className="text-gray-900 font-semibold">
-                {t('sharePackage.redirectingPayment', 'Redirecting to payment...')}
+                {fraudCheckLoading 
+                  ? t('sharePackage.verifyingAccount', 'Verifying your account...')
+                  : t('sharePackage.redirectingPayment', 'Redirecting to payment...')
+                }
               </p>
               <p className="text-gray-600 text-sm mt-2">{t('sharePackage.pleaseWait', 'Please wait while we redirect you')}</p>
             </div>

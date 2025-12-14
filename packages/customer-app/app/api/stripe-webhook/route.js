@@ -6,6 +6,10 @@ import {
   trackCompletedPurchase,
   trackFailedPurchase
 } from '@esim/shared/services/fraudDetectionService';
+import {
+  recordBlockedPayment,
+  syncToStripeRadar
+} from '@esim/shared/services/fraudSignalsService';
 
 // Get Stripe secret key based on mode (test or live)
 const getStripeSecretKey = () => {
@@ -104,6 +108,21 @@ export async function POST(request) {
 
       case 'charge.succeeded':
         await handleChargeSucceeded(event.data.object);
+        break;
+
+      // NEW: Handle Radar blocked payments
+      case 'charge.blocked':
+        await handleChargeBlocked(event.data.object);
+        break;
+
+      // NEW: Handle early fraud warnings
+      case 'radar.early_fraud_warning.created':
+        await handleEarlyFraudWarning(event.data.object);
+        break;
+
+      // NEW: Handle payment intent requires action (for 3DS failures that might be fraud)
+      case 'payment_intent.requires_action':
+        await handlePaymentRequiresAction(event.data.object);
         break;
 
       default:
@@ -810,11 +829,67 @@ async function handlePaymentIntentSucceeded(paymentIntent) {
 
 /**
  * Handle failed payment intent
+ * Also tracks Radar blocks that come through as failures
  */
 async function handlePaymentIntentFailed(paymentIntent) {
   try {
 
     const orderId = paymentIntent.metadata?.order_id;
+    const email = paymentIntent.receipt_email || paymentIntent.metadata?.email;
+    const userId = paymentIntent.metadata?.userId;
+
+    // Check if this was blocked by Radar
+    const wasBlockedByRadar = paymentIntent.last_payment_error?.type === 'card_error' &&
+      (paymentIntent.last_payment_error?.decline_code === 'fraudulent' ||
+       paymentIntent.last_payment_error?.decline_code === 'merchant_blacklist' ||
+       paymentIntent.charges?.data?.[0]?.outcome?.type === 'blocked');
+
+    // Extract payment method details for fraud tracking
+    let cardFingerprint = null;
+    let cardLast4 = null;
+    let cardBrand = null;
+
+    if (paymentIntent.last_payment_error?.payment_method?.card) {
+      cardFingerprint = paymentIntent.last_payment_error.payment_method.card.fingerprint;
+      cardLast4 = paymentIntent.last_payment_error.payment_method.card.last4;
+      cardBrand = paymentIntent.last_payment_error.payment_method.card.brand;
+    } else if (paymentIntent.payment_method) {
+      try {
+        const pm = await stripe.paymentMethods.retrieve(paymentIntent.payment_method);
+        if (pm.card) {
+          cardFingerprint = pm.card.fingerprint;
+          cardLast4 = pm.card.last4;
+          cardBrand = pm.card.brand;
+        }
+      } catch (e) {
+        console.error('Failed to retrieve payment method:', e);
+      }
+    }
+
+    // If blocked by Radar or high-risk decline, record in fraud signals
+    if (wasBlockedByRadar || paymentIntent.last_payment_error?.decline_code === 'do_not_honor') {
+      console.log('🚨 Payment blocked/declined (high risk):', paymentIntent.id);
+
+      await recordBlockedPayment(db, {
+        userId,
+        email,
+        cardFingerprint,
+        cardLast4,
+        cardBrand,
+        stripePaymentIntentId: paymentIntent.id,
+        blockReason: paymentIntent.last_payment_error?.decline_code || 'payment_failed',
+        riskLevel: wasBlockedByRadar ? 'highest' : 'high',
+        riskScore: wasBlockedByRadar ? 100 : 70,
+        metadata: {
+          orderId,
+          errorType: paymentIntent.last_payment_error?.type,
+          errorCode: paymentIntent.last_payment_error?.code,
+          declineCode: paymentIntent.last_payment_error?.decline_code,
+          errorMessage: paymentIntent.last_payment_error?.message
+        }
+      });
+    }
+
     if (!orderId) {
       console.warn('No order_id in payment intent metadata');
       return;
@@ -830,12 +905,15 @@ async function handlePaymentIntentFailed(paymentIntent) {
 
     const orderData = orderDoc.data();
 
-    // Update order status
+    // Update order status with more details
     await updateDoc(orderRef, {
-      status: 'failed',
-      paymentStatus: 'failed',
+      status: wasBlockedByRadar ? 'blocked' : 'failed',
+      paymentStatus: wasBlockedByRadar ? 'blocked' : 'failed',
       failureReason: paymentIntent.last_payment_error?.message || 'Payment failed',
       failureCode: paymentIntent.last_payment_error?.code,
+      declineCode: paymentIntent.last_payment_error?.decline_code,
+      wasBlockedByRadar,
+      blockedCard: cardFingerprint ? `${cardBrand} ****${cardLast4}` : null,
       updatedAt: serverTimestamp()
     });
 
@@ -846,7 +924,9 @@ async function handlePaymentIntentFailed(paymentIntent) {
       metadata: {
         orderId,
         stripePaymentIntentId: paymentIntent.id,
-        failureCode: paymentIntent.last_payment_error?.code
+        failureCode: paymentIntent.last_payment_error?.code,
+        wasBlockedByRadar,
+        cardFingerprint
       }
     });
 
@@ -959,6 +1039,223 @@ async function handleDisputeCreated(dispute) {
 
   } catch (error) {
     console.error('Error handling dispute created:', error);
+  }
+}
+
+/**
+ * Handle Stripe Radar blocked charge
+ * This is triggered when Radar blocks a payment before it reaches the network
+ */
+async function handleChargeBlocked(charge) {
+  try {
+    console.log('🚨 CHARGE BLOCKED BY RADAR:', charge.id);
+
+    const orderId = charge.metadata?.order_id;
+    const email = charge.receipt_email || charge.billing_details?.email || charge.metadata?.email;
+    const userId = charge.metadata?.userId;
+
+    // Extract payment method details
+    let cardFingerprint = null;
+    let cardLast4 = null;
+    let cardBrand = null;
+
+    if (charge.payment_method_details?.card) {
+      cardFingerprint = charge.payment_method_details.card.fingerprint;
+      cardLast4 = charge.payment_method_details.card.last4;
+      cardBrand = charge.payment_method_details.card.brand;
+    }
+
+    // Get IP and device info from charge
+    const ipAddress = charge.billing_details?.address?.country || null;
+    const countryCode = charge.payment_method_details?.card?.country;
+
+    // Record the blocked payment in our fraud signals system
+    await recordBlockedPayment(db, {
+      userId,
+      email,
+      cardFingerprint,
+      cardLast4,
+      cardBrand,
+      ipAddress,
+      stripePaymentIntentId: charge.payment_intent,
+      stripeChargeId: charge.id,
+      blockReason: charge.outcome?.reason || 'highest_risk_level',
+      riskLevel: charge.outcome?.risk_level || 'highest',
+      riskScore: charge.outcome?.risk_score || 100,
+      countryCode,
+      metadata: {
+        orderId,
+        outcomeType: charge.outcome?.type,
+        sellerMessage: charge.outcome?.seller_message,
+        networkStatus: charge.outcome?.network_status
+      }
+    });
+
+    // Update order status if we have an order ID
+    if (orderId) {
+      const orderRef = doc(db, 'orders', orderId);
+      const orderDoc = await getDoc(orderRef);
+
+      if (orderDoc.exists()) {
+        await updateDoc(orderRef, {
+          status: 'blocked',
+          paymentStatus: 'blocked',
+          blockedAt: serverTimestamp(),
+          blockedReason: charge.outcome?.seller_message || 'Blocked by Radar',
+          blockedCard: cardFingerprint ? `${cardBrand} ****${cardLast4}` : null,
+          riskLevel: charge.outcome?.risk_level,
+          updatedAt: serverTimestamp()
+        });
+      }
+    }
+
+    console.log(`🚨 Blocked payment recorded: ${email || userId}, Card: ${cardBrand} ****${cardLast4}`);
+
+  } catch (error) {
+    console.error('Error handling charge blocked:', error);
+  }
+}
+
+/**
+ * Handle early fraud warning from Stripe Radar
+ * This is triggered when Radar detects a potentially fraudulent payment after it succeeded
+ */
+async function handleEarlyFraudWarning(warning) {
+  try {
+    console.log('⚠️ EARLY FRAUD WARNING:', warning.id);
+
+    const chargeId = warning.charge;
+    
+    // Get the charge details
+    const charge = await stripe.charges.retrieve(chargeId);
+    const orderId = charge.metadata?.order_id;
+    const email = charge.receipt_email || charge.billing_details?.email || charge.metadata?.email;
+    const userId = charge.metadata?.userId;
+
+    // Extract payment method details
+    let cardFingerprint = null;
+    let cardLast4 = null;
+    let cardBrand = null;
+
+    if (charge.payment_method_details?.card) {
+      cardFingerprint = charge.payment_method_details.card.fingerprint;
+      cardLast4 = charge.payment_method_details.card.last4;
+      cardBrand = charge.payment_method_details.card.brand;
+    }
+
+    // Record the fraud warning
+    await recordBlockedPayment(db, {
+      userId,
+      email,
+      cardFingerprint,
+      cardLast4,
+      cardBrand,
+      stripePaymentIntentId: charge.payment_intent,
+      stripeChargeId: charge.id,
+      blockReason: 'early_fraud_warning',
+      riskLevel: 'highest',
+      riskScore: 100,
+      metadata: {
+        orderId,
+        fraudType: warning.fraud_type,
+        actionable: warning.actionable,
+        warningId: warning.id
+      }
+    });
+
+    // Update order status
+    if (orderId) {
+      const orderRef = doc(db, 'orders', orderId);
+      const orderDoc = await getDoc(orderRef);
+
+      if (orderDoc.exists()) {
+        await updateDoc(orderRef, {
+          'fraudWarning.id': warning.id,
+          'fraudWarning.fraudType': warning.fraud_type,
+          'fraudWarning.createdAt': serverTimestamp(),
+          'fraudWarning.actionable': warning.actionable,
+          updatedAt: serverTimestamp()
+        });
+      }
+    }
+
+    // Consider auto-refunding if actionable
+    if (warning.actionable) {
+      console.log(`⚠️ Actionable fraud warning for order ${orderId} - consider refunding`);
+      
+      // Log for manual review
+      await setDoc(doc(db, 'fraud_warnings', warning.id), {
+        warningId: warning.id,
+        chargeId,
+        orderId,
+        userId,
+        email,
+        cardFingerprint,
+        cardLast4,
+        cardBrand,
+        fraudType: warning.fraud_type,
+        actionable: warning.actionable,
+        createdAt: serverTimestamp(),
+        reviewed: false,
+        action: null
+      });
+    }
+
+    console.log(`⚠️ Early fraud warning recorded for: ${email || userId}`);
+
+  } catch (error) {
+    console.error('Error handling early fraud warning:', error);
+  }
+}
+
+/**
+ * Handle payment intent requires action (3DS challenges)
+ * Track failed 3DS as potential fraud signal
+ */
+async function handlePaymentRequiresAction(paymentIntent) {
+  try {
+    // Only log if this is a repeated 3DS challenge (potential fraud pattern)
+    const orderId = paymentIntent.metadata?.order_id;
+    const email = paymentIntent.receipt_email || paymentIntent.metadata?.email;
+    const userId = paymentIntent.metadata?.userId;
+
+    // Get the order to check how many times 3DS has been triggered
+    if (orderId) {
+      const orderRef = doc(db, 'orders', orderId);
+      const orderDoc = await getDoc(orderRef);
+
+      if (orderDoc.exists()) {
+        const orderData = orderDoc.data();
+        const threeDSAttempts = (orderData.threeDSAttempts || 0) + 1;
+
+        await updateDoc(orderRef, {
+          threeDSAttempts,
+          lastThreeDSAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        });
+
+        // If multiple 3DS failures, this is suspicious
+        if (threeDSAttempts >= 3) {
+          console.log(`⚠️ Multiple 3DS attempts (${threeDSAttempts}) for order ${orderId}`);
+          
+          await recordBlockedPayment(db, {
+            userId,
+            email,
+            stripePaymentIntentId: paymentIntent.id,
+            blockReason: 'repeated_3ds_failures',
+            riskLevel: 'high',
+            riskScore: 60,
+            metadata: {
+              orderId,
+              threeDSAttempts
+            }
+          });
+        }
+      }
+    }
+
+  } catch (error) {
+    console.error('Error handling payment requires action:', error);
   }
 }
 

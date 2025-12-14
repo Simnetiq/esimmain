@@ -1,12 +1,13 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import { getISOCode } from '@esim/shared/utils/countryCodeMap';
 
 /**
  * FlagIcon component using local SVG flags
  * Based on flag-icons library: https://github.com/lipis/flag-icons
+ * 
+ * Uses regular img tag for local SVGs (Next.js Image optimization has issues with local SVGs)
  * 
  * @param {string} countryCode - Country code (ISO or slug, e.g., "us", "united-states")
  * @param {string} size - Size variant: "sm", "md", "lg", "xl"
@@ -59,11 +60,11 @@ const FlagIcon = ({
       className={`inline-flex items-center justify-center overflow-hidden rounded-sm ${sizeClass} ${className}`}
       title={countryCode.toUpperCase()}
     >
-      <Image
+      {/* Using regular img tag for local SVGs - more reliable than Next.js Image */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         src={flagPath}
         alt={`${countryCode.toUpperCase()} flag`}
-        width={squared ? 32 : 32}
-        height={squared ? 32 : 24}
         className="w-full h-full object-cover"
         loading="lazy"
       />

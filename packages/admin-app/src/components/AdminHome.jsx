@@ -243,7 +243,7 @@ const AdminHome = ({ onNavigate }) => {
         </button>
 
         <button
-          onClick={() => onNavigate('finances')}
+          onClick={() => onNavigate('fraud')}
           className="bg-white rounded-lg p-5 hover:shadow-lg transition-all text-left"
           style={{ border: '2px solid #ef4444' }}
         >
