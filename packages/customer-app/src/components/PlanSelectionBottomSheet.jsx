@@ -23,16 +23,19 @@ const PlanCard = ({ plan, onClick, badge }) => {
   const badgeConfig = {
     cheapest: {
       color: '#47C97E',
+      bgColor: 'bg-green-50',
       icon: DollarSign,
       text: t('planBadge.cheapest', 'Cheapest')
     },
     bestDeal: {
       color: '#E09445',
+      bgColor: 'bg-amber-50',
       icon: Zap,
       text: t('planBadge.bestDeal', 'Best Deal')
     },
     unlimited: {
       color: '#6B5DD4',
+      bgColor: 'bg-purple-50',
       icon: Infinity,
       text: t('planBadge.unlimited', 'Unlimited')
     }
@@ -40,71 +43,57 @@ const PlanCard = ({ plan, onClick, badge }) => {
 
   const currentBadge = badge ? badgeConfig[badge] : null;
   const BadgeIcon = currentBadge?.icon;
-  const borderColor = currentBadge ? currentBadge.color : '#e5e7eb'; // gray-200
 
   return (
     <button 
-      className="w-full relative bg-white hover:shadow-lg transition-all duration-300 text-left overflow-visible group rounded-lg"
-      style={{ 
-        border: `2px solid ${borderColor}`,
-      }}
+      className={`group w-full relative ${currentBadge?.bgColor || 'bg-gray-50'} hover:bg-white rounded-lg transition-all duration-300 text-left overflow-hidden`}
       onClick={onClick}
     >
-      {/* Badge Notch - Rectangle with triangle underneath */}
+      {/* Badge - Top */}
       {currentBadge && (
-        <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center">
-          {/* Rectangle Badge */}
-          <div 
-            className="flex items-center gap-1 px-3 py-1 text-white text-xs font-medium"
-            style={{ 
-              backgroundColor: currentBadge.color,
-            }}
-          >
-            {BadgeIcon && <BadgeIcon className="w-3 h-3" />}
-            <span>{currentBadge.text}</span>
-          </div>
-          {/* Triangle pointing down */}
-          <div 
-            style={{
-              width: 0,
-              height: 0,
-              borderLeft: '6px solid transparent',
-              borderRight: '6px solid transparent',
-              borderTop: `6px solid ${currentBadge.color}`,
-            }}
-          />
+        <div 
+          className="flex items-center justify-center gap-1 py-1.5 text-white text-xs font-medium"
+          style={{ backgroundColor: currentBadge.color }}
+        >
+          {BadgeIcon && <BadgeIcon className="w-3 h-3" />}
+          <span>{currentBadge.text}</span>
         </div>
       )}
 
-      <div className="p-3 space-y-2">
-        {/* Row 1: Data Amount + Days (same row) */}
-        <div className={`flex items-baseline justify-between gap-2 ${currentBadge ? 'mt-2' : 'mt-1'}`}>
-          <div className="text-lg font-bold text-gray-900">
+      <div className="p-4 space-y-3">
+        {/* Row 1: Data Amount + Days */}
+        <div className="flex items-baseline justify-between gap-2">
+          <div className="text-lg font-bold text-eerie-black">
             {plan.data}
           </div>
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-gray-500">
             {plan.period || plan.duration || 'N/A'} {t('planSelection.days', 'days')}
           </div>
         </div>
 
         {/* Row 2: Provider */}
         {provider && (
-          <div className="text-xs text-gray-500 truncate">
+          <div className="text-xs text-gray-400 truncate">
             {provider}
           </div>
         )}
 
         {/* Row 3: Price */}
-        <div className="text-xl font-bold text-tufts-blue">
-          {formatPrice(originalPrice)}
+        <div className="flex items-center justify-between">
+          <div className="text-xl font-bold text-tufts-blue">
+            {formatPrice(originalPrice)}
+          </div>
+          {/* Arrow indicator on hover */}
+          <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 ring-1 ring-black/5">
+            <svg className="w-4 h-4 text-tufts-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
         </div>
-
-        {/* Hover indicator */}
-        <div 
-          className="absolute bottom-0 left-0 right-0 h-1 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"
-          style={{ backgroundColor: borderColor }}
-        ></div>
       </div>
+
+      {/* Border ring */}
+      <div className="pointer-events-none absolute inset-px rounded-lg ring-1 ring-black/5 group-hover:ring-tufts-blue/30 transition-all duration-300" />
     </button>
   );
 };
@@ -393,41 +382,49 @@ const PlanSelectionBottomSheet = ({
       maxHeight="85vh"
       variant="center"
     >
-      <div className="p-4 lg:p-6 min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="p-4 lg:p-6" dir={isRTL ? 'rtl' : 'ltr'}>
 
         {/* Available Plans or Countries */}
         {loadingPlans ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full bg-gray-100/10 h-14 w-14 border border-gray-200/70 mx-auto"></div>
-            <p className={`text-eerie-black font-medium ${isRTL ? 'text-right' : 'text-left'}`}>{t('planSelection.loadingPlans', 'Loading available plans...')}</p>
-            <p className={`text-sm text-eerie-black mt-2 ${isRTL ? 'text-right' : 'text-left'}`}>{t('planSelection.pleaseWait', 'Please wait while we fetch the best options for you')}</p>
+          <div className="py-8">
+            <div className="grid grid-cols-2 gap-3">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="bg-gray-50 rounded-lg p-4 animate-pulse">
+                  <div className="h-5 bg-gray-200 rounded w-3/4 mb-3" />
+                  <div className="h-4 bg-gray-200 rounded w-1/2 mb-3" />
+                  <div className="h-6 bg-gray-200 rounded w-1/3" />
+                </div>
+              ))}
+            </div>
+            <p className="text-center text-sm text-gray-500 mt-4">{t('planSelection.loadingPlans', 'Loading available plans...')}</p>
           </div>
         ) : availablePlans.length > 0 ? (
           <div className="space-y-4">
             {/* Header with Sort */}
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Smartphone className="w-5 h-5 text-tufts-blue" />
-                <h4 className="font-semibold text-eerie-black text-base">
-                  {t('planSelection.availablePlans', 'Available Plans ({{count}})', { count: availablePlans.length })}
+                <div className="w-8 h-8 rounded-lg bg-tufts-blue/10 flex items-center justify-center">
+                  <Smartphone className="w-4 h-4 text-tufts-blue" />
+                </div>
+                <h4 className="font-semibold text-eerie-black text-sm sm:text-base">
+                  {t('planSelection.availablePlans', 'Available Plans')} <span className="text-gray-400 font-normal">({availablePlans.length})</span>
                 </h4>
               </div>
               <div className="flex items-center gap-2">
-                <ArrowUpDown className="w-4 h-4 text-tufts-blue" />
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="text-xs sm:text-sm border border-gray-300 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-tufts-blue"
+                  className="text-xs sm:text-sm border-0 bg-gray-50 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-tufts-blue/20"
                 >
-                  <option value="price">{t('planSort.price', 'Price up to low')}</option>
-                  <option value="data">{t('planSort.data', 'Data down to high')}</option>
-                  <option value="days">{t('planSort.days', 'Days down to high')}</option>
+                  <option value="price">{t('planSort.price', 'Price ↑')}</option>
+                  <option value="data">{t('planSort.data', 'Data ↓')}</option>
+                  <option value="days">{t('planSort.days', 'Days ↓')}</option>
                 </select>
               </div>
             </div>
             
-            {/* Plans Grid - 2 per row */}
-            <div className="grid grid-cols-2 gap-3">
+            {/* Plans Grid - 2 per row on mobile, 3 on desktop */}
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
               {sortPlans.map((plan) => (
                 <PlanCard
                   key={plan.id}
@@ -440,17 +437,16 @@ const PlanSelectionBottomSheet = ({
           </div>
         ) : filteredCountries && filteredCountries.length > 0 ? (
           <div className="space-y-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Smartphone className="w-5 h-5 text-tufts-blue" />
-                <h4 className="font-semibold text-gray-900 text-base">
+                <div className="w-8 h-8 rounded-lg bg-tufts-blue/10 flex items-center justify-center">
+                  <Smartphone className="w-4 h-4 text-tufts-blue" />
+                </div>
+                <h4 className="font-semibold text-eerie-black text-sm sm:text-base">
                   {t('planSelection.availablePlans', 'Available Plans')}
                 </h4>
               </div>
-              <div className="flex items-center text-sm text-gray-500 gap-1">
-                <ArrowUpDown className="w-4 h-4 text-tufts-blue" />
-                <span>{t('planSelection.sortedByCheapest', 'Sorted by cheapest first')}</span>
-              </div>
+              <span className="text-xs text-gray-400">{t('planSelection.sortedByCheapest', 'Cheapest first')}</span>
             </div>
             
             {/* Auto-grouped Display by Days */}
@@ -466,23 +462,20 @@ const PlanSelectionBottomSheet = ({
                   <div key={days} className="space-y-4">
                     {/* Divider and Header */}
                     {groupIndex > 0 && (
-                      <div className="border-t border-gray-200 my-6"></div>
+                      <div className="w-full h-px bg-gray-100 my-4" />
                     )}
                     
-                    <div className="text-center">
-                      <h5 className="text-base font-bold text-gray-900">
+                    <div className="flex items-center justify-between">
+                      <h5 className="text-sm font-semibold text-eerie-black">
                         {t('planSelection.dayPlans', '{{days}} Day{{plural}} Plans', { days, plural: days !== 1 ? 's' : '' })}
                       </h5>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {t('planSelection.countriesAvailable', '{{count}} countr{{plural}} available', { 
-                          count: countries.length, 
-                          plural: countries.length === 1 ? 'y' : 'ies' 
-                        })}
-                      </p>
+                      <span className="text-xs text-gray-400">
+                        {countries.length} {countries.length === 1 ? 'option' : 'options'}
+                      </span>
                     </div>
                     
-                    {/* Countries Grid - 2 per row */}
-                    <div className="grid grid-cols-2 gap-3">
+                    {/* Countries Grid - 2 per row on mobile, 3 on desktop */}
+                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                       {countries.map((country) => {
                         // Get the cheapest plan for this duration
                         const dayPlans = country.plans?.filter(p => (p.period || p.duration) === days) || [];
@@ -500,27 +493,15 @@ const PlanSelectionBottomSheet = ({
                         return (
                           <button
                             key={`${days}-${country.id}`}
-                            className="w-full relative border border-gray-200 bg-white hover:border-tufts-blue hover:shadow-md transition-all duration-300 text-left overflow-hidden group rounded-lg"
+                            className="group w-full relative bg-gray-50 hover:bg-white rounded-lg transition-all duration-300 text-left overflow-hidden"
                             onClick={() => {
                               // Navigate to plan or country
                             }}
                           >
-                            <div className="p-3 space-y-2">
-                              {/* Region Badge - Top Right */}
-                              {region && (
-                                <div className="absolute top-2 right-2 z-10">
-                                  <span 
-                                    className="px-2 py-0.5 text-white text-xs font-medium rounded-full"
-                                    style={{ backgroundColor: regionColor }}
-                                  >
-                                    {regionNames[region] || region}
-                                  </span>
-                                </div>
-                              )}
-
+                            <div className="p-4 space-y-3">
                               {/* Row 1: Flag + Country Name */}
                               <div className="flex items-center gap-2">
-                                <div className="flex-shrink-0 w-8 h-6 overflow-hidden border border-gray-200">
+                                <div className="flex-shrink-0 w-8 h-6 overflow-hidden rounded bg-white">
                                   <Image
                                     src={`/flags/4x3/${getISOCode(countryCode)}.svg`}
                                     alt={`${countryName} flag`}
@@ -531,31 +512,39 @@ const PlanSelectionBottomSheet = ({
                                     unoptimized
                                   />
                                 </div>
-                                <h3 className="text-xs font-semibold text-gray-900 truncate flex-1">
+                                <h3 className="text-sm font-semibold text-eerie-black truncate flex-1">
                                   {countryName}
                                 </h3>
                               </div>
 
                               {/* Row 2: Data + Price */}
                               <div className="flex items-center justify-between gap-2">
-                                <div className="text-base font-bold text-gray-900">
+                                <div className="text-base font-bold text-eerie-black">
                                   {cheapestPlan.data}
                                 </div>
-                                <div className="flex-shrink-0 text-right">
-                                  <div className="text-base font-bold text-tufts-blue">
-                                    {formatPrice(cheapestPlan.price)}
-                                  </div>
+                                <div className="text-base font-bold text-tufts-blue">
+                                  {formatPrice(cheapestPlan.price)}
                                 </div>
                               </div>
 
-                              {/* Row 3: Duration (centered) */}
-                              <div className="text-center text-xs text-gray-600">
-                                {days} {t('planSelection.days', 'days')}
+                              {/* Row 3: Duration + Region */}
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs text-gray-400">
+                                  {days} {t('planSelection.days', 'days')}
+                                </span>
+                                {region && (
+                                  <span 
+                                    className="px-2 py-0.5 text-white text-xs font-medium rounded-full"
+                                    style={{ backgroundColor: regionColor }}
+                                  >
+                                    {regionNames[region] || region}
+                                  </span>
+                                )}
                               </div>
-
-                              {/* Hover indicator */}
-                              <div className="absolute bottom-0 left-0 right-0 h-1 bg-tufts-blue transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
                             </div>
+                            
+                            {/* Border ring */}
+                            <div className="pointer-events-none absolute inset-px rounded-lg ring-1 ring-black/5 group-hover:ring-tufts-blue/30 transition-all duration-300" />
                           </button>
                         );
                       })}
@@ -566,22 +555,22 @@ const PlanSelectionBottomSheet = ({
             })()}
           </div>
         ) : (
-          <div className="text-center py-6">
-            <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="text-center py-8">
+            <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
               <Globe size={24} className="text-gray-400" />
             </div>
-            <h3 className="text-base font-semibold text-gray-900 mb-2">{t('planSelection.noPlansAvailable', 'No Plans Available')}</h3>
-            <p className="text-xs text-gray-600 mb-4">
+            <h3 className="text-base font-semibold text-eerie-black mb-2">{t('planSelection.noPlansAvailable', 'No Plans Available')}</h3>
+            <p className="text-sm text-gray-500 mb-2">
               {t('planSelection.couldNotFind', 'We couldn\'t find any plans for your current selection')}
             </p>
-            <p className="text-xs text-gray-500 mb-4">
+            <p className="text-xs text-gray-400">
               {t('planSelection.tryAdjusting', 'Try adjusting your filters or selecting a different country')}
             </p>
           </div>
         )}
 
         {/* Bottom Spacing */}
-        <div className="h-6" />
+        <div className="h-4" />
       </div>
     </BottomSheet>
   );

@@ -1,9 +1,10 @@
 import React from 'react';
+import Link from 'next/link';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { getLanguageDirection, detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
 import { usePathname } from 'next/navigation';
-import { ShoppingBag, Wifi, DollarSign } from 'lucide-react';
+import { ShoppingBag, Wifi, DollarSign, Store, Settings, ArrowRight } from 'lucide-react';
 
 const DashboardHeader = ({ currentUser, orders = [] }) => {
   const { t, locale } = useI18n();
@@ -21,6 +22,14 @@ const DashboardHeader = ({ currentUser, orders = [] }) => {
 
   const currentLanguage = getCurrentLanguage();
   const isRTL = getLanguageDirection(currentLanguage) === 'rtl';
+
+  // Generate localized URLs
+  const getLocalizedUrl = (path) => {
+    if (currentLanguage === 'en') {
+      return path;
+    }
+    return `/${currentLanguage}${path}`;
+  };
 
   // Calculate stats
   const totalOrders = orders.length;
@@ -83,6 +92,30 @@ const DashboardHeader = ({ currentUser, orders = [] }) => {
                   <p className="text-xs text-gray-500">{t('dashboard.totalSpent', 'Total Spent')}</p>
                   <p className="text-sm font-semibold text-gray-900">{formatPrice(totalSpent)}</p>
                 </div>
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="mt-6">
+              <div className={`flex flex-wrap gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                {/* Browse eSIMs */}
+                <Link 
+                  href={getLocalizedUrl('/esim-plans')}
+                  className={`inline-flex items-center gap-2 px-4 py-2.5 bg-tufts-blue text-white text-sm font-medium rounded-lg hover:bg-tufts-blue/90 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
+                >
+                  <Store className="w-4 h-4" />
+                  {t('dashboard.browseEsims', 'Browse eSIMs')}
+                  <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
+                </Link>
+                
+                {/* Account Settings */}
+                <Link 
+                  href={getLocalizedUrl('/settings')}
+                  className={`inline-flex items-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
+                >
+                  <Settings className="w-4 h-4" />
+                  {t('dashboard.accountSettings', 'Account Settings')}
+                </Link>
               </div>
             </div>
           </div>

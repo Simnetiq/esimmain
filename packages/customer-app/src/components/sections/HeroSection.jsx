@@ -1,116 +1,119 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
 import CountrySearchBar from '../CountrySearchBar';
-import { Download } from 'lucide-react';
-
+import { Globe, Zap, Shield, ArrowRight } from 'lucide-react';
 
 export default function HeroSection({ onCountrySelect }) {
   const { t, translations } = useI18n();
+  const [isVisible, setIsVisible] = useState(false);
+  
+  // Trigger animations on mount
+  useEffect(() => {
+    const timer = setTimeout(() => setIsVisible(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
   
   const handleDownloadApp = () => {
     // Track with Facebook Pixel - Download App CTA
     trackCustomFacebookEvent('DownloadAppCTA', {
       source: 'hero_section',
       content_type: 'download_button',
-      button_location: 'hero_cta',
+      button_location: 'hero_badge',
       event_category: 'engagement',
       timestamp: new Date().toISOString()
     });
-    
-    // Placeholder - no app store link
-    // Button disabled or shows coming soon message
   };
 
   // Check if translations are loaded
-  // For SSR and initial client render, translations will be empty
   const hasTranslations = translations && Object.keys(translations).length > 0 && translations.hero;
   
-  // Show skeleton while translations are loading
-  // Skeleton matches exact dimensions of final content to prevent CLS
+  // Trust indicators data
+  const trustIndicators = [
+    { icon: Globe, label: t('hero.countries', '200+ Countries'), key: 'countries' },
+    { icon: Zap, label: t('hero.instantActivation', 'Instant Activation'), key: 'activation' },
+    { icon: Shield, label: t('hero.securePayment', 'Secure Payment'), key: 'secure' },
+  ];
+  
+  // Grid pattern style (matching FeaturesSection)
+  const gridPatternStyle = {
+    backgroundSize: '10px 10px',
+    backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
+  };
+  
+  // Skeleton loader
   if (!hasTranslations) {
     return (
-      <div className="bg-white lg:min-h-screen flex flex-col">
-        <div className="relative isolate flex-1 flex flex-col">
-          {/* Horizontal Line - Top */}
-          <div className="hidden lg:block absolute top-20 left-0 right-0 h-px bg-gray-200/70"></div>
-          
-          {/* Horizontal Line - Bottom */}
-          <div className="hidden sm:block absolute bottom-0 left-0 right-0 h-px bg-gray-200/70"></div>
-
+      <div className="hero-section relative min-h-[85vh] flex flex-col" style={{ background: 'linear-gradient(to bottom right, rgba(83, 116, 205, 0.25), rgba(240, 249, 255, 0.4), rgba(239, 246, 255, 1))' }}>
+        {/* Gradient Orbs - Using #5374CD - Large to bleed into navbar and features */}
+        <div className="absolute top-0 left-0 w-[800px] h-[800px] rounded-full blur-[120px] -translate-x-1/3 -translate-y-1/3" style={{ backgroundColor: 'rgba(83, 116, 205, 0.25)' }} />
+        <div className="absolute bottom-0 right-0 w-[700px] h-[700px] rounded-full blur-[100px] translate-x-1/4 translate-y-1/4" style={{ backgroundColor: 'rgba(83, 116, 205, 0.2)' }} />
+        <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] rounded-full blur-[80px]" style={{ backgroundColor: 'rgba(83, 116, 205, 0.15)' }} />
+        
+        <div className="relative flex-1 flex flex-col">
           {/* Grid Pattern - Left Side */}
           <div 
             className="hidden xl:block absolute left-0 top-0 bottom-0 w-32"
-            style={{
-              backgroundSize: '10px 10px',
-              backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-            }}
-          ></div>
-
+            style={gridPatternStyle}
+          />
+          
           {/* Grid Pattern - Right Side */}
           <div 
             className="hidden xl:block absolute right-0 top-0 bottom-0 w-32"
-            style={{
-              backgroundSize: '10px 10px',
-              backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-            }}
-          ></div>
+            style={gridPatternStyle}
+          />
           
-          {/* Hero Section Skeleton - Fixed dimensions to match content */}
-          <div className="mx-auto w-full max-w-9xl">
-            <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-6">
-              <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-                {/* Description skeleton - matches hidden sm:block mt-10 */}
-                <div className="hidden sm:block mt-10 h-5 bg-gray-100 rounded w-3/4 max-w-3xl"></div>
-                {/* Title skeleton - matches mt-4 text sizes */}
-                <div className="mt-4 h-10 sm:h-10 lg:h-12 xl:h-14 bg-gray-100 rounded w-full max-w-4xl"></div>
-              </div>
-            </div>
-            <div className="w-full h-px bg-gray-100"></div>
-          </div>
-
-          {/* Download Section Skeleton - Fixed height */}
-          <div className="mx-auto w-full max-w-9xl">
+          <div className="relative flex-1 flex flex-col items-center justify-center px-4 py-16 lg:py-20">
             <div className="mx-auto w-full max-w-7xl">
-              <div className="px-4 py-6 items-start mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-                <div className="flex flex-col sm:flex-row items-end gap-4">
-                  <div className="h-12 bg-gray-100 rounded w-full sm:w-48"></div>
+              <div className="px-4 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl text-center">
+                
+                {/* Badge skeleton */}
+                <div className="flex justify-center mb-6">
+                  <div className="h-10 w-52 bg-white/60 rounded-full animate-pulse shadow-sm" />
                 </div>
+                
+                {/* Headline skeleton */}
+                <div className="space-y-3 mb-8">
+                  <div className="h-12 sm:h-16 lg:h-20 w-full max-w-2xl bg-gray-200/70 rounded-lg mx-auto animate-pulse" />
+                </div>
+                
+                {/* Search bar skeleton */}
+                <div className="max-w-2xl mx-auto mb-10">
+                  <div className="p-1 bg-gradient-to-r from-tufts-blue/40 via-tufts-blue/30 to-amber-400/40 rounded-2xl">
+                    <div className="bg-white rounded-xl p-4">
+                      <div className="h-12 w-full bg-gray-100 rounded-lg animate-pulse" />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Subtitle skeleton */}
+                <div className="space-y-2 mb-8 max-w-2xl mx-auto">
+                  <div className="h-5 w-full bg-gray-100/80 rounded animate-pulse" />
+                  <div className="h-5 w-3/4 bg-gray-100/80 rounded mx-auto animate-pulse" />
+                </div>
+                
+                {/* Trust indicators skeleton */}
+                <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 bg-tufts-blue/20 rounded animate-pulse" />
+                    <div className="h-4 w-24 bg-gray-100 rounded animate-pulse" />
+                  </div>
+                  <div className="hidden sm:block w-px h-4 bg-gray-200" />
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 bg-tufts-blue/20 rounded animate-pulse" />
+                    <div className="h-4 w-28 bg-gray-100 rounded animate-pulse" />
+                  </div>
+                  <div className="hidden sm:block w-px h-4 bg-gray-200" />
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 bg-tufts-blue/20 rounded animate-pulse" />
+                    <div className="h-4 w-26 bg-gray-100 rounded animate-pulse" />
+                  </div>
+                </div>
+                
               </div>
             </div>
-            <div className="w-full h-px bg-gray-100"></div>
-          </div>
-
-          {/* Search Section Skeleton - Fixed height */}
-          <div className="mx-auto w-full max-w-9xl">
-            <div className="mx-auto w-full max-w-7xl">
-              <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-8">
-                  <div className="flex-1 w-full h-12 bg-gray-100 rounded"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom Gradient Blob - Fixed position */}
-          <div 
-            aria-hidden="true" 
-            className="absolute inset-x-0 -z-10 opacity-30 transform-gpu overflow-hidden blur-2xl pointer-events-none"
-            style={{ 
-              top: 'calc(100% - 3rem)',
-              contain: 'layout paint',
-            }}
-          >
-            <div 
-              style={{ 
-                clipPath: 'polygon(72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-                background: 'linear-gradient(to top right, #4975D4, #D4BD49 )',
-                willChange: 'transform',
-              }} 
-              className="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 opacity-45 sm:left-[calc(50%+16rem)] sm:w-[72.1875rem]"
-            ></div>
           </div>
         </div>
       </div>
@@ -118,101 +121,83 @@ export default function HeroSection({ onCountrySelect }) {
   }
 
   return (
-    <div className="bg-white lg:min-h-screen flex flex-col">
-      <div className="relative isolate flex-1 flex flex-col">
-        {/* Horizontal Line - Top */}
-        <div className="hidden lg:block absolute top-20 left-0 right-0 h-px bg-gray-200/70 "></div>
-        
-        {/* Horizontal Line - Bottom */}
-        <div className="hidden sm:block absolute bottom-0 left-0 right-0 h-px bg-gray-200/70 "></div>
+    <div className="hero-section relative min-h-[85vh] flex flex-col" >
+      {/* Gradient Orbs - Using #5374CD - Large to bleed into navbar and features */}
 
+      <div className="absolute bottom-0 right-0 w-[700px] h-[700px] rounded-full blur-[100px] translate-x-1/4 translate-y-1/4" style={{ backgroundColor: 'rgba(83, 116, 205, 0.2)' }} />
+      <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] rounded-full blur-[80px]" style={{ backgroundColor: 'rgba(83, 116, 205, 0.15)' }} />
+      <div className="absolute top-1/2 left-1/2 w-[600px] h-[600px] bg-white/50 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2" />
+      
+      <div className="relative flex-1 flex flex-col">
+        
         {/* Grid Pattern - Left Side */}
         <div 
           className="hidden xl:block absolute left-0 top-0 bottom-0 w-32"
-          style={{
-            backgroundSize: '10px 10px',
-            backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-          }}
-        ></div>
-
+          style={gridPatternStyle}
+        />
+        
         {/* Grid Pattern - Right Side */}
         <div 
           className="hidden xl:block absolute right-0 top-0 bottom-0 w-32"
-          style={{
-            backgroundSize: '10px 10px',
-            backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-          }}
-        ></div>
-        {/* Hero Section */}
-        <div className="mx-auto w-full max-w-9xl">
-          <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-6">
-            <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              <p className="hidden sm:block mt-10 text-sm max-w-3xl sm:text-base font-light tracking-widest uppercase text-cool-black rtl:font-light rtl:tracking-tight">
-                {t('hero.description')}
-              </p>
-              <h1 className="mt-4 text-3xl sm:text-3xl lg:text-4xl xl:text-5xl tracking-tight font-semibold text-pretty text-eerie-black max-w-4xl">
-                {t('hero.stayConnected')}
-                <span className="text-tufts-blue ml-2 sm:ml-3 font-light tracking-widest">{t('hero.Online')}</span>
+          style={gridPatternStyle}
+        />
+        
+        {/* Main Content */}
+        <div className="relative flex-1 flex flex-col items-center justify-center px-4 py-16 lg:py-20">
+          <div className="mx-auto w-full max-w-7xl">
+            <div className="px-4 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl text-center">
+              
+              {/* Badge - Links to App Store */}
+              <a
+                href="https://apps.apple.com/gb/app/simnetiq-global-esim/id6755963262"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={handleDownloadApp}
+                className={`inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full shadow-sm mb-6 hover:border-tufts-blue hover:shadow-md transition-all group transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'} duration-700 ease-out`}
+              >
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                <span className="text-sm font-medium text-gray-700 group-hover:text-tufts-blue transition-colors">
+                  {t('hero.badge', 'Now available on iOS')}
+                </span>
+                <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-tufts-blue group-hover:translate-x-0.5 transition-all" />
+              </a>
+              
+              {/* Headline */}
+              <h1 className={`text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-eerie-black mb-8 transform transition-all duration-700 delay-100 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                {t('hero.stayConnected', 'Stay Connected')}{' '}
+                <span className="text-tufts-blue">{t('hero.worldwide', 'Worldwide.')}</span>
               </h1>
-            </div>
-          </div>
-          {/* Full width gray line */}
-          <div className="w-full h-px bg-gray-100"></div>
-        </div>
-
-        {/* Download Section */}
-        <div className="mx-auto w-full max-w-9xl">
-          <div className="mx-auto w-full max-w-7xl">
-            <div className="px-4 py-6 items-start mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              <div className="flex flex-col sm:flex-row items-end gap-4">
-                <button
-                  onClick={handleDownloadApp}
-                  className="btn-primary flex items-center justify-center gap-3 w-full sm:w-auto"
-                >
-                  <Download className="w-4 h-4 sm:w-5 sm:h-5" />
-                  {t('hero.downloadApp')}
-                </button>
-              </div>
-            </div>
-          </div>
-          {/* Full width gray line */}
-          <div className="w-full h-px bg-gray-100"></div>
-        </div>
-
-        {/* Search Section */}
-        <div className="mx-auto w-full max-w-9xl">
-          <div className="mx-auto w-full max-w-7xl">
-            <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-8">
-                {/* Search Bar */}
-                <div className="flex-1 w-full">
+              
+              {/* Search Bar - Main CTA - Right under headline */}
+              <div className={`relative z-50 max-w-2xl mx-auto mb-10 p-1 bg-gradient-to-r from-tufts-blue via-tufts-blue/80 to-white rounded-2xl shadow-xl transform transition-all duration-700 delay-200 ${isVisible ? 'opacity-80 scale-100' : 'opacity-0 scale-95'}`}>
+                <div className="bg-white rounded-xl p-2">
                   <CountrySearchBar showCountryCount={true} onCountrySelect={onCountrySelect} />
                 </div>
-
-                
               </div>
+              
+              {/* Subtitle - Now under search */}
+              <p className={`text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto mb-8 transform transition-all duration-700 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+                {t('hero.subtitle', 'Get instant mobile data in 200+ countries. No physical SIM needed. Activate your eSIM in seconds.')}
+              </p>
+              
+              {/* Trust Indicators - At bottom */}
+              <div className={`flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-sm text-gray-500 transform transition-all duration-700 delay-400 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                {trustIndicators.map(({ icon: Icon, label, key }, index) => (
+                  <React.Fragment key={key}>
+                    <div className="flex items-center gap-2 text-eerie-black">
+                      <Icon className="w-5 h-5 text-eerie-black" />
+                      <span className="text-eerie-black">{label}</span>
+                    </div>
+                    {/* Vertical separator between items */}
+                    {index < trustIndicators.length - 1 && (
+                      <div className="hidden sm:block w-px h-4 bg-gray-300" />
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
+              
             </div>
           </div>
-        </div>
-        
-
-        {/* Bottom Gradient Blob - Fixed position to prevent CLS */}
-        <div 
-          aria-hidden="true" 
-          className="absolute inset-x-0 -z-10 opacity-30 transform-gpu overflow-hidden blur-2xl pointer-events-none"
-          style={{ 
-            top: 'calc(100% - 3rem)',
-            contain: 'layout paint',
-          }}
-        >
-          <div 
-            style={{ 
-              clipPath: 'polygon(72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-              background: 'linear-gradient(to top right, #4975D4, #D4BD49 )',
-              willChange: 'transform',
-            }} 
-            className="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 opacity-45 sm:left-[calc(50%+16rem)] sm:w-[72.1875rem]"
-          ></div>
         </div>
       </div>
     </div>

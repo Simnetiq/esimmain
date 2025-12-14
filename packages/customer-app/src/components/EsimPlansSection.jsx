@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@esim/shared/firebase/config';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ChevronDown, ArrowRight } from 'lucide-react';
 import { detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
 
@@ -23,6 +23,26 @@ const EsimPlansSection = ({ selectedCountryFromHero }) => {
   useAuth(); // Keep for future use
   const router = useRouter();
   const pathname = usePathname();
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef(null);
+  
+  // Intersection Observer for scroll animations
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
   
   // Detect current language from URL with fallback
   const currentLanguage = useMemo(() => {
@@ -116,32 +136,29 @@ const EsimPlansSection = ({ selectedCountryFromHero }) => {
   }, [currentLanguage, router]);
 
   return (
-    <div className="w-full">
+    <div ref={sectionRef} className="w-full">
       {/* Countries Grid Section - Main page version */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={showAllCountries ? 'all' : 'limited'}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.4, ease: 'easeInOut' }}
-          className="mb-6"
-        >
-          <CountriesGrid
-            countries={displayedCountries}
-            isPlansPage={isPlansPage}
-            searchTerm={searchTerm}
-            onCountrySelect={handleCountrySelect}
-            isLoading={countriesLoading}
-            selectedRegion={selectedRegion}
-            showAllOverride={showAllCountries}
-          />
-        </motion.div>
-      </AnimatePresence>
+      <motion.div
+        layout
+        initial={false}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, ease: 'easeOut' }}
+        className={`mb-6 transform transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+      >
+        <CountriesGrid
+          countries={displayedCountries}
+          isPlansPage={isPlansPage}
+          searchTerm={searchTerm}
+          onCountrySelect={handleCountrySelect}
+          isLoading={countriesLoading}
+          selectedRegion={selectedRegion}
+          showAllOverride={showAllCountries}
+        />
+      </motion.div>
 
       {/* Show More / See All Plans Buttons */}
       {!countriesLoading && filteredCountries.length > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8 mb-8">
+        <div className={`flex flex-col sm:flex-row items-center justify-center gap-4 mt-8 mb-8 transform transition-all duration-700 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           {/* Show More Button - Only show if not showing all and has more countries */}
           {!showAllCountries && hasMoreCountries && (
             <motion.button
@@ -149,10 +166,10 @@ const EsimPlansSection = ({ selectedCountryFromHero }) => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
               onClick={() => setShowAllCountries(true)}
-              className="btn-secondary flex items-center gap-2 px-3 py-2 rounded-md font-semibold transition-all duration-200 hover:scale-105 w-full max-w-md"
+              className="btn-secondary flex items-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105 w-full max-w-md"
             >
               <span>{t('plans.showMore', 'Show More')}</span>
-              <ChevronDown className="w-5 h-5 " />
+              <ChevronDown className="w-5 h-5" />
             </motion.button>
           )}
           
@@ -162,7 +179,7 @@ const EsimPlansSection = ({ selectedCountryFromHero }) => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3, delay: 0.1 }}
             onClick={handleNavigateToPlans}
-            className="btn-primary inline-flex items-center justify-center w-full max-w-md"
+            className="btn-primary inline-flex items-center justify-center gap-2 w-full max-w-md py-3 rounded-lg"
           >
             <span>{t('plans.seeAllPlans', 'See All Plans')}</span>
             <ArrowRight className="w-5 h-5" />

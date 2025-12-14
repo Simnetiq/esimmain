@@ -1,6 +1,32 @@
 import BlogPost from '../../../../src/components/BlogPost';
 import blogServiceSeparate from '@esim/shared/services/blogServiceSeparate';
 
+// Supported languages for hreflang
+const SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'ar', 'he', 'ru'];
+
+// Generate hreflang alternates for blog posts
+function generateBlogAlternates(baseUrl, slug, currentLang, availableLanguages = []) {
+  const alternates = {
+    canonical: `${baseUrl}/${currentLang}/blog/${slug}`,
+    languages: {}
+  };
+
+  // x-default points to English version
+  alternates.languages['x-default'] = `${baseUrl}/blog/${slug}`;
+  alternates.languages['en'] = `${baseUrl}/blog/${slug}`;
+
+  // Add all available translations
+  SUPPORTED_LANGUAGES.forEach(lang => {
+    if (lang !== 'en') {
+      if (availableLanguages.length === 0 || availableLanguages.includes(lang)) {
+        alternates.languages[lang] = `${baseUrl}/${lang}/blog/${slug}`;
+      }
+    }
+  });
+
+  return alternates;
+}
+
 export async function generateMetadata({ params }) {
   try {
     // Fetch the actual blog post data for German
@@ -13,11 +39,14 @@ export async function generateMetadata({ params }) {
       }
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.simnetiq.shop';
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.simnetiq.store';
     const postUrl = `${baseUrl}/de/blog/${params.id}`;
     const imageUrl = post.featuredImage ? 
       (post.featuredImage.startsWith('http') ? post.featuredImage : `${baseUrl}${post.featuredImage}`) :
       `${baseUrl}/images/og-image.svg`;
+
+    // Get available languages for this post
+    const availableLanguages = post.availableLanguages || [];
 
     return {
       title: `${post.title} | Simnetiq Blog`,
@@ -62,10 +91,8 @@ export async function generateMetadata({ params }) {
         site: '@Simnetiq',
       },
       
-      // Additional meta tags
-      alternates: {
-        canonical: postUrl,
-      },
+      // Hreflang alternates for multilingual SEO
+      alternates: generateBlogAlternates(baseUrl, params.id, 'de', availableLanguages),
       
       // Robots
       robots: {

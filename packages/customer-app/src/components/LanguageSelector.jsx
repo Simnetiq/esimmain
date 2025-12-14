@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
-import { getLanguageName, getLanguageFlag, getLocalizedBlogUrl, getLocalizedBlogListUrl } from '@esim/shared/utils/languageUtils';
+import { getNativeLanguageName, getLanguageFlag, getLocalizedBlogUrl, getLocalizedBlogListUrl } from '@esim/shared/utils/languageUtils';
+import { Globe, ChevronDown, Check } from 'lucide-react';
 
 const LanguageSelector = () => {
   const pathname = usePathname();
@@ -11,14 +12,24 @@ const LanguageSelector = () => {
   const { locale, changeLanguage } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
 
+  // Listen for navbar hide event to close dropdown
+  useEffect(() => {
+    const handleCloseDropdowns = () => {
+      setIsOpen(false);
+    };
+
+    window.addEventListener('closeNavbarDropdowns', handleCloseDropdowns);
+    return () => window.removeEventListener('closeNavbarDropdowns', handleCloseDropdowns);
+  }, []);
+
   const languages = [
-    { code: 'en', name: getLanguageName('en'), flag: getLanguageFlag('en'), route: '/' },
-    { code: 'he', name: getLanguageName('he'), flag: getLanguageFlag('he'), route: '/he' },
-    { code: 'ru', name: getLanguageName('ru'), flag: getLanguageFlag('ru'), route: '/ru' },
-    { code: 'ar', name: getLanguageName('ar'), flag: getLanguageFlag('ar'), route: '/ar' },
-    { code: 'de', name: getLanguageName('de'), flag: getLanguageFlag('de'), route: '/de' },
-    { code: 'fr', name: getLanguageName('fr'), flag: getLanguageFlag('fr'), route: '/fr' },
-    { code: 'es', name: getLanguageName('es'), flag: getLanguageFlag('es'), route: '/es' }
+    { code: 'en', name: getNativeLanguageName('en'), flag: getLanguageFlag('en'), route: '/' },
+    { code: 'he', name: getNativeLanguageName('he'), flag: getLanguageFlag('he'), route: '/he' },
+    { code: 'ru', name: getNativeLanguageName('ru'), flag: getLanguageFlag('ru'), route: '/ru' },
+    { code: 'ar', name: getNativeLanguageName('ar'), flag: getLanguageFlag('ar'), route: '/ar' },
+    { code: 'de', name: getNativeLanguageName('de'), flag: getLanguageFlag('de'), route: '/de' },
+    { code: 'fr', name: getNativeLanguageName('fr'), flag: getLanguageFlag('fr'), route: '/fr' },
+    { code: 'es', name: getNativeLanguageName('es'), flag: getLanguageFlag('es'), route: '/es' }
   ];
 
   // Determine current language from multiple sources
@@ -160,43 +171,47 @@ const LanguageSelector = () => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-tufts-blue transition-colors rounded-md hover:bg-gray-100"
+        className="flex items-center gap-1.5 py-2 px-2 lg:px-3 text-sm font-medium text-eerie-black hover:text-tufts-blue transition-colors rounded-md"
         aria-label="Select Language"
       >
-        <span>{currentLanguage.flag}</span>
-        <span className="hidden lg:inline text-xs">{currentLanguage.code.toUpperCase()}</span>
-        <svg 
-          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} 
-          fill="none" 
-          stroke="currentColor" 
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
+        {/* Mobile: Globe icon only */}
+        <Globe className="w-5 h-5 lg:hidden" />
+        {/* Desktop: Language name + chevron */}
+        <span className="hidden lg:inline text-sm">{currentLanguage.name}</span>
+        <ChevronDown 
+          className={`w-4 h-4 hidden lg:block transition-transform ${isOpen ? 'rotate-180' : ''}`} 
+          aria-hidden="true"
+        />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
-          <div className="py-1">
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 z-40" 
+            onClick={() => setIsOpen(false)}
+          />
+          {/* Dropdown menu */}
+          <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200  shadow-xl shadow-gray-100/30 z-50">
+            <ul className="p-2 text-sm font-medium text-gray-700">
             {languages.map((language) => (
+                <li key={language.code}>
               <button
-                key={language.code}
                 onClick={() => handleLanguageChange(language)}
-                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition-colors flex items-center space-x-3 ${
-                  language.code === locale ? 'bg-tufts-blue text-white hover:bg-tufts-blue' : 'text-gray-700'
+                    className={`inline-flex items-center justify-between w-full p-2 rounded hover:bg-gray-100 hover:text-eerie-black transition-colors ${
+                      language.code === locale ? 'bg-tufts-blue/10 text-tufts-blue' : ''
                 }`}
               >
-                <span className="text-lg">{language.flag}</span>
                 <span>{language.name}</span>
                 {language.code === locale && (
-                  <svg className="w-4 h-4 ml-auto" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
+                      <Check className="w-4 h-4" />
                 )}
               </button>
+                </li>
             ))}
+            </ul>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

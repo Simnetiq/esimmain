@@ -49,91 +49,102 @@ export default function PlansSection({ selectedCountry }) {
   
   if (isLoading) {
     return (
-      <section className="py-12 lg:py-16 bg-white lg:mt-20 mt-10 relative overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="animate-pulse space-y-8">
-            <div className="text-center">
-              <div className="h-8 bg-gray-200 rounded w-1/3 mx-auto mb-4"></div>
-              <div className="h-6 bg-gray-200 rounded w-1/2 mx-auto mb-8"></div>
+      <div className="bg-white flex flex-col overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="relative flex-1 flex flex-col">
+          <div className="mx-auto w-full max-w-9xl">
+            <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
+              <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
+                <div className="h-5 w-32 bg-gray-200 rounded animate-pulse mb-4" />
+                <div className="h-10 w-96 bg-gray-200 rounded animate-pulse" />
+              </div>
             </div>
-            <div className="h-96 bg-gray-200 rounded"></div>
+            <div className="w-full h-px bg-gray-100" />
+          </div>
+          <div className="mx-auto w-full max-w-9xl">
+            <div className="mx-auto w-full max-w-7xl">
+              <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {[...Array(8)].map((_, i) => (
+                    <div key={i} className="bg-gray-50 rounded-lg p-4 animate-pulse">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-14 sm:w-16 aspect-[4/3] bg-gray-200 rounded-lg" />
+                        <div className="flex-1">
+                          <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
+                          <div className="h-3 bg-gray-200 rounded w-1/2" />
+                        </div>
+                      </div>
+                      <div className="h-5 bg-gray-200 rounded w-1/3" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </section>
+      </div>
     );
   }
   
-  return (
-    <div className="bg-white lg:min-h-screen flex flex-col">
-      <div className="relative isolate flex-1 flex flex-col">
-        {/* Horizontal Line - Top */}
-        <div className="hidden sm:block absolute top-0 left-0 right-0 h-px bg-gray-200"></div>
-        
-        {/* Horizontal Line - Bottom */}
-        <div className="hidden sm:block absolute bottom-0 left-0 right-0 h-px bg-gray-200"></div>
+  // Grid pattern style
+  const gridPatternStyle = {
+    backgroundSize: '10px 10px',
+    backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
+  };
 
+  return (
+    <div className="bg-white flex flex-col overflow-hidden">
+      <div className="relative flex-1 flex flex-col">
         {/* Grid Pattern - Left Side */}
         <div 
-          className="hidden xl:block absolute left-0 top-0 bottom-0 w-32 "
-          style={{
-            backgroundSize: '10px 10px',
-            backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-          }}
-        ></div>
+          className="hidden xl:block absolute left-0 top-0 bottom-0 w-32"
+          style={gridPatternStyle}
+        />
 
         {/* Grid Pattern - Right Side */}
         <div 
-          className="hidden xl:block absolute right-0 top-0 bottom-0 w-32 "
-          style={{
-            backgroundSize: '10px 10px',
-            backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-          }}
-        ></div>
+          className="hidden xl:block absolute right-0 top-0 bottom-0 w-32"
+          style={gridPatternStyle}
+        />
 
         {/* Header Section */}
         <div className="mx-auto w-full max-w-9xl">
-          <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-6">
+          <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
             <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              <p className="font-mono text-sm max-w-2xl sm:text-base font-medium tracking-widest uppercase text-gray-500 rtl:font-bold rtl:tracking-tight">
-                  {t('plans.title')}
+              <p className="text-sm max-w-2xl sm:text-base font-medium tracking-widest uppercase text-gray-500 rtl:font-semibold rtl:tracking-tight">
+                {t('plans.title')}
               </p>
-              <h2 className="mt-4 text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-pretty text-eerie-black max-w-5xl">{t('plans.subtitle')}</h2>
+              <h2 className="mt-4 text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-pretty text-eerie-black max-w-5xl">
+                {t('plans.subtitle')}
+              </h2>
             </div>
           </div>
-          {/* Full width gray line */}
-          <div className="w-full h-px bg-gray-100"></div>
+          <div className="w-full h-px bg-gray-100" />
         </div>
 
         {/* Plans Component */}
         <div className="mx-auto w-full max-w-9xl">
-          <div className="mx-auto w-full max-w-7xl ">
+          <div className="mx-auto w-full max-w-7xl">
             <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
               <Suspense fallback={
-                <div className="text-center py-16">
-                  <div className="animate-spin rounded-full bg-gray-100/10 h-14 w-14 border border-gray-200/70 mx-auto"></div>                                                                                         
-                  <p className={`mt-4 text-eerie-black ${isRTL ? 'text-right' : 'text-left'}`} style={{
-                    fontSize: '16px',
-                    fontWeight: '400',
-                    lineHeight: '160%',
-                    letterSpacing: '0px'
-                  }}>{t('plans.loadingPlans')}</p>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {[...Array(8)].map((_, i) => (
+                    <div key={i} className="bg-gray-50 rounded-lg p-4 animate-pulse">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-14 aspect-[4/3] bg-gray-200 rounded-lg" />
+                        <div className="flex-1">
+                          <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
+                          <div className="h-3 bg-gray-200 rounded w-1/2" />
+                        </div>
+                      </div>
+                      <div className="h-5 bg-gray-200 rounded w-1/3" />
+                    </div>
+                  ))}
                 </div>
               }>
                 <EsimPlansSection selectedCountryFromHero={selectedCountry} />
               </Suspense>
             </div>
           </div>
-        </div>
-
-        {/* Bottom Gradient Blob */}
-        <div aria-hidden="true" className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]">                                                           
-          <div 
-            style={{ 
-              clipPath: 'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',                                                                                         
-              background: 'linear-gradient(to top right, #1A5798, #93BFEE)'
-            }} 
-            className="relative right-[calc(50%-36rem)] aspect-[1155/678] w-[12.125rem] translate-x-1/2 opacity-30 sm:right-[calc(50%+36rem)] sm:w-[72.1875rem]"                                                        
-          ></div>
         </div>
       </div>
     </div>

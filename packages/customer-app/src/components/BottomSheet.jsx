@@ -13,10 +13,10 @@ const BottomSheet = ({
   children, 
   title = "Select Plan",
   maxHeight = "90vh",
-
   variant = "bottom" // "bottom" or "center"
 }) => {
   const sheetRef = useRef(null);
+  const backdropRef = useRef(null);
   const { locale } = useI18n();
   const pathname = usePathname();
   
@@ -51,6 +51,13 @@ const BottomSheet = ({
     };
   }, [isOpen, onClose]);
 
+  // Close on backdrop click
+  const handleBackdropClick = useCallback((e) => {
+    if (e.target === backdropRef.current) {
+      onClose();
+    }
+  }, [onClose]);
+
   // Close on drag down (only for bottom variant) - Memoized
   const handleDragEnd = useCallback((event, info) => {
     if (variant === "bottom" && info.offset.y > 100) {
@@ -63,12 +70,19 @@ const BottomSheet = ({
       {isOpen && (
         <>
           {/* Backdrop */}
-          
+          <motion.div
+            ref={backdropRef}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+            onClick={handleBackdropClick}
+          />
 
           {variant === "center" ? (
             /* Centered Modal */
-            
-            <div className="fixed inset-0 mt-10 z-50 flex items-center justify-center p-4 pointer-events-none">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
               <motion.div
                 ref={sheetRef}
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -79,26 +93,26 @@ const BottomSheet = ({
                   damping: 25, 
                   stiffness: 300
                 }}
-                className="w-full max-w-4xl bg-white rounded-md shadow-2xl max-h-[90vh] flex flex-col pointer-events-auto"
+                className="w-full max-w-4xl bg-white rounded-xl shadow-2xl max-h-[85vh] flex flex-col pointer-events-auto overflow-hidden"
               >
                 {/* Header */}
-                <div className="px-4 pt-4 border-b border-gray-200/50 flex-shrink-0" dir={isRTL ? 'rtl' : 'ltr'}>
+                <div className="px-5 py-4 border-b border-gray-100 flex-shrink-0 bg-gray-50" dir={isRTL ? 'rtl' : 'ltr'}>
                   <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
                     <h2 className={`text-lg font-semibold text-eerie-black tracking-tight ${isRTL ? 'text-right' : 'text-left'}`}>
                       {title}
                     </h2>
                     <button
                       onClick={onClose}
-                      className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
+                      className="w-9 h-9 flex items-center justify-center text-gray-400 hover:text-gray-600 rounded-full bg-white hover:bg-gray-100 transition-all duration-200 ring-1 ring-black/5"
                     >
-                      <X size={20} />
+                      <X size={18} />
                     </button>
                   </div>
                 </div>
 
                 {/* Content */}
                 <div 
-                  className="overflow-y-auto flex-1" 
+                  className="overflow-y-auto flex-1 bg-white" 
                   dir={isRTL ? 'rtl' : 'ltr'}
                 >
                   {children}
@@ -121,33 +135,33 @@ const BottomSheet = ({
               dragConstraints={{ top: 0, bottom: 0 }}
               dragElastic={0.1}
               onDragEnd={handleDragEnd}
-              className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl shadow-2xl"
+              className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl shadow-2xl overflow-hidden"
               style={{ maxHeight }}
             >
               {/* Drag Handle */}
-              <div className="flex justify-center pt-3 pb-2">
-                <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
+              <div className="flex justify-center pt-3 pb-2 bg-gray-50">
+                <div className="w-10 h-1 bg-gray-300 rounded-full" />
               </div>
 
               {/* Header */}
-              <div className="px-6 pb-4 border-b border-gray-200/50" dir={isRTL ? 'rtl' : 'ltr'}>
+              <div className="px-5 pb-4 pt-2 border-b border-gray-100 bg-gray-50" dir={isRTL ? 'rtl' : 'ltr'}>
                 <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
-                  <h2 className={`text-xl font-semibold text-eerie-black tracking-tight ${isRTL ? 'text-right' : 'text-left'}`}>
+                  <h2 className={`text-lg font-semibold text-eerie-black tracking-tight ${isRTL ? 'text-right' : 'text-left'}`}>
                     {title}
                   </h2>
                   <button
                     onClick={onClose}
-                    className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
+                    className="w-9 h-9 flex items-center justify-center text-gray-400 hover:text-gray-600 rounded-full bg-white hover:bg-gray-100 transition-all duration-200 ring-1 ring-black/5"
                   >
-                    <X size={20} />
+                    <X size={18} />
                   </button>
                 </div>
               </div>
 
               {/* Content */}
               <div 
-                className="overflow-y-auto" 
-                style={{ maxHeight: `calc(${maxHeight} - 120px)` }}
+                className="overflow-y-auto bg-white" 
+                style={{ maxHeight: `calc(${maxHeight} - 100px)` }}
                 dir={isRTL ? 'rtl' : 'ltr'}
               >
                 {children}

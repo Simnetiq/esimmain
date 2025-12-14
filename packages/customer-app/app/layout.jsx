@@ -199,9 +199,9 @@ export default function RootLayout({ children }) {
             <Suspense fallback={null}>
               <Analytics />
             </Suspense>
-            <div className="bg-white min-h-screen">
+            <div className="bg-white min-h-screen overflow-x-hidden max-w-full">
               <ConditionalNavbar />
-              <main className="pt-12">  
+              <main className="pt-12 overflow-x-hidden">  
                 {children}
               </main>
               <ConditionalFooter/>
