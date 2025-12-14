@@ -1,14 +1,24 @@
 // Language detection and utilities for blog localization
 
 export const supportedLanguages = [
-  { code: 'en', name: 'English', flag: '🇺🇸' },
-  { code: 'es', name: 'Spanish', flag: '🇪🇸' },
-  { code: 'fr', name: 'French', flag: '🇫🇷' },
-  { code: 'de', name: 'German', flag: '🇩🇪' },
-  { code: 'ar', name: 'Arabic', flag: '🇸🇦' },
-  { code: 'he', name: 'Hebrew', flag: '🇮🇱' },
-  { code: 'ru', name: 'Russian', flag: '🇷🇺' }
+  { code: 'en', name: 'English', nativeName: 'English', flag: '🇺🇸' },
+  { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸' },
+  { code: 'fr', name: 'French', nativeName: 'Français', flag: '🇫🇷' },
+  { code: 'de', name: 'German', nativeName: 'Deutsch', flag: '🇩🇪' },
+  { code: 'ar', name: 'Arabic', nativeName: 'العربية', flag: '🇸🇦' },
+  { code: 'he', name: 'Hebrew', nativeName: 'עברית', flag: '🇮🇱' },
+  { code: 'ru', name: 'Russian', nativeName: 'Русский', flag: '🇷🇺' }
 ];
+
+/**
+ * Get native language name from code (e.g., 'Русский' for Russian)
+ * @param {string} code - Language code
+ * @returns {string} - Native language name
+ */
+export const getNativeLanguageName = (code) => {
+  const language = supportedLanguages.find(lang => lang.code === code);
+  return language ? language.nativeName : 'English';
+};
 
 export const supportedLanguageCodes = supportedLanguages.map(lang => lang.code);
 
