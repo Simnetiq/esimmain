@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { useAdmin } from '@esim/shared/contexts/AdminContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { 
   MapPin,
@@ -17,6 +17,7 @@ import {
   ChevronDown,
   User,
   Shield,
+  ShieldX,
   Users,
   DollarSign
 } from 'lucide-react';
@@ -32,6 +33,7 @@ import NewsletterManagement from './NewsletterManagement';
 import JobApplicationsManagement from './JobApplicationsManagement';
 import UserManagement from './UserManagement';
 import RegionManagement from './RegionManagement';
+import FraudManagement from './FraudManagement';
 
 
 
@@ -40,11 +42,31 @@ const AdminDashboard = () => {
   const { currentUser, logout } = useAuth();
   const { canManageCountries, canManagePlans, canManageConfig, canManageContactRequests, canManageNewsletter, canManageBlog } = useAdmin();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
+  // Get initial tab from URL or default to 'home'
+  const tabFromUrl = searchParams.get('tab') || 'home';
+  
   // State Management
-  const [activeTab, setActiveTab] = useState('home');
+  const [activeTab, setActiveTabState] = useState(tabFromUrl);
   const [showAdminDropdown, setShowAdminDropdown] = useState(false);
   const [showUserInfo, setShowUserInfo] = useState(false);
+  
+  // Sync tab with URL - update state when URL changes (back/forward buttons)
+  useEffect(() => {
+    const urlTab = searchParams.get('tab') || 'home';
+    if (urlTab !== activeTab) {
+      setActiveTabState(urlTab);
+    }
+  }, [searchParams, activeTab]);
+  
+  // Custom setActiveTab that also updates URL
+  const setActiveTab = (newTab) => {
+    setActiveTabState(newTab);
+    // Update URL without full page reload
+    const url = newTab === 'home' ? '/' : `/?tab=${newTab}`;
+    router.push(url, { scroll: false });
+  };
   
   // Close user info when clicking outside
   useEffect(() => {
@@ -175,6 +197,7 @@ const AdminDashboard = () => {
               {[
                 { id: 'home', label: 'Home', icon: Database, permission: true },
                 { id: 'users', label: 'Users', icon: Users, permission: true },
+                { id: 'fraud', label: 'Fraud', icon: ShieldX, permission: canManageConfig },
                 { id: 'finances', label: 'Finances', icon: DollarSign, permission: canManageConfig },
                 { id: 'regions', label: 'Regions', icon: MapPin, permission: canManageConfig },
                 { id: 'country-management', label: 'Countries', icon: MapPin, permission: canManageCountries },
@@ -265,6 +288,11 @@ const AdminDashboard = () => {
             {/* Home Tab */}
             {activeTab === 'home' && (
               <AdminHome onNavigate={setActiveTab} />
+            )}
+
+            {/* Fraud Management Tab */}
+            {activeTab === 'fraud' && canManageConfig && (
+              <FraudManagement />
             )}
 
             {/* Finances Tab */}

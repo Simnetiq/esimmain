@@ -4,6 +4,7 @@ export * from './contexts/AuthContext';
 export * from './contexts/AdminContext';
 export * from './services/adminService';
 export * from './services/fraudDetectionService';
+export * from './services/fraudSignalsService';
 export * from './services/promoCodeService';
 
 // Utils

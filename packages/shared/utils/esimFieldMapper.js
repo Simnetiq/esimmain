@@ -107,6 +107,36 @@ export function mapPackageCountryData(packageData) {
 }
 
 /**
+ * Format data amount to human readable format
+ * Handles the broken capacity values (stored in KB instead of MB)
+ * @param {number} amount - Data amount (might be in KB, MB, or GB depending on source)
+ * @param {string} unit - Unit hint ('MB', 'GB', etc.)
+ * @returns {string} Formatted data string (e.g., "1 GB", "500 MB")
+ */
+export function formatDataAmount(amount, unit = 'MB') {
+  if (!amount || amount <= 0) return 'Unlimited';
+  if (amount === 999999 || amount === -1) return 'Unlimited';
+  
+  // Detect if amount is incorrectly stored (Airalo's amount is in MB, but sync was converting wrongly)
+  // If amount > 1024*1024, it's likely in KB (broken old sync logic)
+  // If amount is like 1024, 2048, 3072, etc., it's in MB
+  let amountInMB = amount;
+  
+  if (amount >= 1048576) {
+    // This is likely KB from broken sync (e.g., 2097152 KB = 2048 MB = 2 GB)
+    amountInMB = amount / 1024;
+  }
+  
+  // Now convert to appropriate display unit
+  if (amountInMB >= 1024) {
+    const gb = amountInMB / 1024;
+    return `${Number.isInteger(gb) ? gb : gb.toFixed(1)} GB`;
+  }
+  
+  return `${Math.round(amountInMB)} MB`;
+}
+
+/**
  * Map plan details to standard format
  * @param {Object} planData - Plan data from order or API
  * @returns {Object} Standardized plan details
@@ -114,11 +144,17 @@ export function mapPackageCountryData(packageData) {
 export function mapPlanDetails(planData) {
   if (!planData) return {};
   
+  // Get raw data amount for calculation (prefer data_amount_mb, fallback to capacity)
+  const rawDataAmount = planData.data_amount_mb || planData.dataAmountMb || planData.capacity || 0;
+  
+  // Use the pre-formatted 'data' field if available (e.g., "1 GB"), otherwise format from amount
+  const dataDisplay = planData.data || formatDataAmount(rawDataAmount);
+  
   return {
-    // Data
-    data: planData.data || `${planData.data_amount_mb || planData.dataAmountMb || 0} MB`,
-    data_amount_mb: planData.data_amount_mb || planData.dataAmountMb || planData.capacity || 0,
-    dataAmountMb: planData.data_amount_mb || planData.dataAmountMb || planData.capacity || 0,
+    // Data - use pre-formatted 'data' field if available
+    data: dataDisplay,
+    data_amount_mb: rawDataAmount,
+    dataAmountMb: rawDataAmount,
     
     // Validity
     validity: planData.validity || planData.period || planData.day || 0,
@@ -335,6 +371,7 @@ export function buildQrCodeData(order) {
 }
 
 export default {
+  formatDataAmount,
   mapAiraloSimData,
   mapPackageCountryData,
   mapPlanDetails,
@@ -346,6 +383,7 @@ export default {
   buildOrderDetailsForQrCode,
   buildQrCodeData
 };
+
 
 
 

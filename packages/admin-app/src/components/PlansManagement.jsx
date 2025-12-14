@@ -5,7 +5,6 @@ import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { collection, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@esim/shared/firebase/config';
 import { esimService } from '@esim/shared/services/esimService';
-import {  getReferralSettings, getRegularSettings } from '@esim/shared/services/settingsService';
 
 import { 
   Smartphone,
@@ -78,12 +77,6 @@ const PlansManagement = () => {
   const [airaloCountries, setAiraloCountries] = useState([]);
   const [loadingAiralo, setLoadingAiralo] = useState(false);
   
-  // Discount settings state
-  const [discountSettings, setDiscountSettings] = useState({
-    referral: { discountPercentage: 35, minimumPrice: 0.5, transactionCommissionPercentage: 15 },
-    regular: { discountPercentage: 25, minimumPrice: 0.5 }
-  });
-  
   // Price editing state
   const [editingPrices, setEditingPrices] = useState({});
   const [pendingPriceChanges, setPendingPriceChanges] = useState({});
@@ -131,31 +124,12 @@ const PlansManagement = () => {
     }
   }, [t]);
 
-  // Load discount settings from Firebase
-  const loadDiscountSettings = useCallback(async () => {
-    try {
-      const [referralSettings, regularSettings] = await Promise.all([
-        getReferralSettings(),
-        getRegularSettings()
-      ]);
-      
-      setDiscountSettings({
-        referral: referralSettings,
-        regular: regularSettings
-      });
-      
-    } catch {
-      toast.error('Error loading discount settings');
-    }
-  }, []);
-
   // Load plans on component mount
   useEffect(() => {
     if (currentUser) {
       loadAllPlans();
-      loadDiscountSettings();
     }
-  }, [currentUser, loadAllPlans, loadDiscountSettings]);
+  }, [currentUser, loadAllPlans]);
 
   // Filter plans based on search and country
   useEffect(() => {
@@ -273,18 +247,6 @@ const PlansManagement = () => {
       loadSyncStatus();
     }
   }, [currentUser, loadSyncStatus]);
-
-  // Calculate discounted prices
-  const calculateDiscountedPrice = (originalPrice, discountType = 'regular') => {
-    if (!originalPrice || originalPrice <= 0) return originalPrice;
-    
-    const settings = discountSettings[discountType] || discountSettings.regular;
-    const discountPercentage = settings.discountPercentage || 0;
-    const minimumPrice = settings.minimumPrice || 0.5;
-    
-    const discountedPrice = Math.max(minimumPrice, originalPrice * (100 - discountPercentage) / 100);
-    return discountedPrice;
-  };
 
   const updatePlanPrice = async (planId, newPrice) => {
     try {
@@ -568,19 +530,6 @@ const PlansManagement = () => {
                 </button>
               </div>
             </div>
-            
-            {/* Discount Settings Display */}
-            <div className={`flex items-center gap-4 text-sm ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <div className="bg-blue-50 px-3 py-1 rounded-full">
-                <span className="text-blue-700 font-medium">Referral: {discountSettings.referral.discountPercentage}%</span>
-              </div>
-              <div className="bg-green-50 px-3 py-1 rounded-full">
-                <span className="text-green-700 font-medium">Regular: {discountSettings.regular.discountPercentage}%</span>
-              </div>
-              <div className="bg-purple-50 px-3 py-1 rounded-full">
-                <span className="text-purple-700 font-medium">Commission: {discountSettings.referral.transactionCommissionPercentage || 15}%</span>
-              </div>
-            </div>
           </div>
 
           {/* Load Airalo Button */}
@@ -713,14 +662,13 @@ const PlansManagement = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className={`text-sm text-gray-900 ${isRTL ? 'text-right' : 'text-left'}`}>
-                        {dataSource === 'airalo' ? (
-                          plan.data === 'Unlimited' || plan.data === -1 ? 
+                        {/* Use the 'data' field which is already formatted correctly (e.g., "1 GB", "500 MB") */}
+                        {plan.data ? (
+                          plan.data === 'Unlimited' || plan.is_unlimited ? 
                             t('plansManagement.unlimited', 'Unlimited') : 
-                            `${plan.data} ${plan.data_unit || 'GB'}`
+                            plan.data
                         ) : (
-                          (plan.capacity === -1 || plan.capacity === 0 || plan.capacity === 'Unlimited') ? 
-                            t('plansManagement.unlimited', 'Unlimited') : 
-                            `${plan.capacity} GB`
+                          t('plansManagement.unlimited', 'Unlimited')
                         )}
                       </div>
                       <div className={`text-sm text-gray-500 ${isRTL ? 'text-right' : 'text-left'}`}>
@@ -767,21 +715,10 @@ const PlansManagement = () => {
                     </td>
                               <td className="px-6 py-4 whitespace-nowrap">
                                 {dataSource === 'airalo' ? (
-                                  // Airalo pricing with discounts
-                                  <div className="space-y-1">
-                                    <div className="text-sm font-medium text-gray-900">
-                                      {formatPrice(plan.price || 0)} <span className="text-xs text-gray-500">(Original)</span>
-                                    </div>
-                                    <div className="text-xs space-y-1">
-                                      <div className="text-green-600">
-                                        Regular: {formatPrice(calculateDiscountedPrice(plan.price, 'regular'))} 
-                                        <span className="text-gray-500 ml-1">(-{discountSettings.regular.discountPercentage}%)</span>
-                                      </div>
-                                      <div className="text-blue-600">
-                                        Referral: {formatPrice(calculateDiscountedPrice(plan.price, 'referral'))} 
-                                        <span className="text-gray-500 ml-1">(-{discountSettings.referral.discountPercentage}%)</span>
-                                      </div>
-                                    </div>
+                                  // Airalo pricing - wholesale price from Airalo API
+                                  <div className="text-sm font-medium text-gray-900">
+                                    {formatPrice(plan.price || 0)}
+                                    <span className="text-xs text-gray-500 ml-1">(wholesale)</span>
                                   </div>
                                 ) : (
                                   // Firebase pricing (editable)

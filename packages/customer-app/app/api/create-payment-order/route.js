@@ -8,6 +8,11 @@ import {
   checkBlocklist,
   logPriceManipulationAttempt
 } from '@esim/shared/services/fraudDetectionService';
+import {
+  checkUserBlocked,
+  analyzeIpRisk,
+  FRAUD_SIGNALS_CONFIG
+} from '@esim/shared/services/fraudSignalsService';
 
 // ============================================
 // SECURITY CONFIGURATION
@@ -340,7 +345,7 @@ export async function POST(request) {
     }
 
     // ============================================
-    // 4. BLOCKLIST CHECK
+    // 4. BLOCKLIST CHECK (Legacy)
     // ============================================
     const blocklistCheck = await checkBlocklist(db, userId, email);
     if (blocklistCheck.blocked) {
@@ -360,6 +365,46 @@ export async function POST(request) {
         { error: blocklistCheck.reason, code: 'BLOCKED' },
         { status: 403 }
       );
+    }
+
+    // ============================================
+    // 4b. ENHANCED FRAUD SIGNALS CHECK
+    // ============================================
+    const ipCountryCode = request.headers.get('cf-ipcountry') || null;
+    const fraudSignalsCheck = await checkUserBlocked(db, userId, email, null, ip);
+    
+    if (fraudSignalsCheck.blocked) {
+      await logPaymentAttempt({
+        packageId: order,
+        email,
+        userId,
+        ip,
+        userAgent,
+        submittedPrice: total,
+        status: 'fraud_blocked',
+        blocked: true,
+        blockReason: fraudSignalsCheck.reason
+      });
+
+      // Return user-friendly message with support option
+      return NextResponse.json(
+        { 
+          error: fraudSignalsCheck.reason,
+          code: 'FRAUD_BLOCKED',
+          blockType: fraudSignalsCheck.blockType,
+          canContactSupport: fraudSignalsCheck.canContactSupport,
+          supportMessage: fraudSignalsCheck.supportMessage,
+          expiresAt: fraudSignalsCheck.expiresAt,
+          remainingHours: fraudSignalsCheck.remainingHours
+        },
+        { status: 403 }
+      );
+    }
+
+    // Check if from high-risk region and log it
+    const ipRisk = analyzeIpRisk(ip, ipCountryCode);
+    if (ipRisk.isHighRisk) {
+      console.log(`⚠️ High-risk checkout: ${ipCountryCode} | IP: ${ip} | User: ${userId || email} | Risk: ${ipRisk.riskScore}`);
     }
 
     // ============================================

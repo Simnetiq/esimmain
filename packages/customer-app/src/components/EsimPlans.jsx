@@ -84,8 +84,12 @@ const EsimPlans = () => {
         ...doc.data()
       }));
       
-      // Filter out disabled plans
-      const enabledPlans = plans.filter(plan => plan.enabled !== false);
+      // Filter out disabled plans and top-ups (top-ups are only for existing eSIMs)
+      const enabledPlans = plans.filter(plan => 
+        plan.enabled !== false && 
+        plan.is_topup !== true && 
+        plan.type !== 'topup'
+      );
       
       setAvailablePlans(enabledPlans);
     } catch {
@@ -105,10 +109,13 @@ const EsimPlans = () => {
       );
       const querySnapshot = await getDocs(plansQuery);
       
-      const plans = querySnapshot.docs.map(doc => ({
+      let plans = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
+      
+      // Filter out top-ups
+      plans = plans.filter(plan => plan.is_topup !== true && plan.type !== 'topup');
       
       // Filter out disabled plans
       const enabledPlans = plans.filter(plan => plan.enabled !== false);

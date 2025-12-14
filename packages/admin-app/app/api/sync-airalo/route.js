@@ -445,13 +445,14 @@ export async function POST(request) {
           const isNew = !existingPackageIds.has(packageId);
           
           // Parse data amount
+          // NOTE: Airalo's 'amount' is always in MB regardless of 'amount_unit'
+          // The 'amount_unit' field describes the display format (e.g., "GB" for "1 GB"), 
+          // but the numeric 'amount' value is in MB (e.g., 1024 for 1 GB, 2048 for 2 GB)
           let dataAmountMB = 0;
           if (pkg.is_unlimited) {
             dataAmountMB = 999999;
           } else {
-            const amount = parseFloat(pkg.amount) || 0;
-            const unit = pkg.amount_unit || 'GB';
-            dataAmountMB = unit.toUpperCase() === 'GB' ? amount * 1024 : amount;
+            dataAmountMB = parseFloat(pkg.amount) || 0;
           }
           
           const validityDays = parseInt(pkg.validity) || pkg.day || 30;
