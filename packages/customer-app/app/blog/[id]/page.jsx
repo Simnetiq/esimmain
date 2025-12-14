@@ -3,6 +3,33 @@ import BlogPost from '../../../src/components/BlogPost'
 import Loading from '../../../src/components/Loading'
 import blogServiceSeparate from '@esim/shared/services/blogServiceSeparate'
 
+// Supported languages for hreflang
+const SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'ar', 'he', 'ru'];
+
+// Generate hreflang alternates for blog posts
+function generateBlogAlternates(baseUrl, slug, availableLanguages = []) {
+  const alternates = {
+    canonical: `${baseUrl}/blog/${slug}`,
+    languages: {}
+  };
+
+  // Always add x-default and en pointing to English version
+  alternates.languages['x-default'] = `${baseUrl}/blog/${slug}`;
+  alternates.languages['en'] = `${baseUrl}/blog/${slug}`;
+
+  // Add all available translations
+  SUPPORTED_LANGUAGES.forEach(lang => {
+    if (lang !== 'en') {
+      // Only add if translation exists, otherwise still add for discoverability
+      if (availableLanguages.length === 0 || availableLanguages.includes(lang)) {
+        alternates.languages[lang] = `${baseUrl}/${lang}/blog/${slug}`;
+      }
+    }
+  });
+
+  return alternates;
+}
+
 export async function generateMetadata({ params }) {
   try {
     // Fetch the actual blog post data
@@ -15,11 +42,14 @@ export async function generateMetadata({ params }) {
       }
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.Simnetiq.net';
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.simnetiq.store';
     const postUrl = `${baseUrl}/blog/${params.id}`;
     const imageUrl = post.featuredImage ? 
       (post.featuredImage.startsWith('http') ? post.featuredImage : `${baseUrl}${post.featuredImage}`) :
       `${baseUrl}/images/og-image.svg`;
+
+    // Get available languages for this post
+    const availableLanguages = post.availableLanguages || [];
 
     return {
       title: `${post.title} | Simnetiq Blog`,
@@ -64,10 +94,8 @@ export async function generateMetadata({ params }) {
         site: '@Simnetiq',
       },
       
-      // Additional meta tags
-      alternates: {
-        canonical: postUrl,
-      },
+      // Hreflang alternates for multilingual SEO
+      alternates: generateBlogAlternates(baseUrl, params.id, availableLanguages),
       
       // Robots
       robots: {

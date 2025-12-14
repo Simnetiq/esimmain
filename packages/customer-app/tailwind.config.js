@@ -10,6 +10,9 @@ module.exports = {
   // Tailwind will purge unused classes automatically
   theme: {
     extend: {
+      maxWidth: {
+        '9xl': '100%', // Full width, constrained by parent
+      },
       // Use CSS variables for custom colors (already defined in globals.css)
       colors: {
         'jordy-blue': 'var(--jordy-blue)',

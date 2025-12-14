@@ -23,7 +23,6 @@ import toast from 'react-hot-toast';
 import AccessDeniedAlert from './dashboard/AccessDeniedAlert';
 import DashboardHeader from './dashboard/DashboardHeader';
 import RecentOrders from './dashboard/RecentOrders';
-import AccountSettings from './dashboard/AccountSettings';
 import QRCodeModal from './dashboard/QRCodeModal';
 import ReferralBottomSheet from './ReferralBottomSheet';
 
@@ -949,13 +948,6 @@ const Dashboard = () => {
           onViewQRCode={handleViewQRCode}
           usageCache={usageCache}
           loadingUsageMap={loadingUsageMap}
-        />
-
-        {/* Account Settings */}
-        <AccountSettings 
-          currentUser={currentUser}
-          userProfile={userProfile}
-          onLoadUserProfile={loadUserProfile}
         />
       </div>
 

@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
+import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { HeroSection } from '../src/components/sections';
 
@@ -22,13 +23,23 @@ const ActivationSection = dynamic(() => import('../src/components/sections').the
 
 export default function HomePage() {
   const pathname = usePathname();
+  const router = useRouter();
   const { locale } = useI18n();
+  const { currentUser, loading: authLoading } = useAuth();
   const [selectedCountryFromHero, setSelectedCountryFromHero] = useState(null);
   const plansRef = useRef(null);
 
   // Detect current language (default to 'en' for root pages)
   const currentLanguage = locale || detectLanguageFromPath(pathname) || 'en';
   const isRTL = getLanguageDirection(currentLanguage) === 'rtl';
+
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (!authLoading && currentUser) {
+      const dashboardUrl = currentLanguage === 'en' ? '/dashboard' : `/${currentLanguage}/dashboard`;
+      router.push(dashboardUrl);
+    }
+  }, [authLoading, currentUser, currentLanguage, router]);
 
   const handleCountrySelect = (country) => {
     setSelectedCountryFromHero(country);
@@ -38,11 +49,20 @@ export default function HomePage() {
     }
   };
 
+  // Show nothing while checking auth or redirecting
+  if (authLoading || currentUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-tufts-blue"></div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div dir={isRTL ? 'rtl' : 'ltr'} lang={currentLanguage}>
-        <main className="min-h-screen bg-white">
-          {/* Hero Section */}
+        <main className="min-h-screen bg-white overflow-x-hidden">
+          {/* Hero Section - Only for non-authenticated users */}
           <HeroSection onCountrySelect={handleCountrySelect} />
 
           {/* Features Section */}

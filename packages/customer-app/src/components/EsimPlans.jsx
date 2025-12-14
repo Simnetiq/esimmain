@@ -60,11 +60,17 @@ const EsimPlans = () => {
     filteredCountries,
   } = useCountryFilters(countries);
 
-  // Sync search term with URL params
+  // Sync search term and region with URL params
   useEffect(() => {
     const urlSearch = searchParams.get('search') || '';
     if (urlSearch !== searchTerm) {
       setSearchTerm(urlSearch);
+    }
+    
+    // Sync region from URL
+    const urlRegion = searchParams.get('region');
+    if (urlRegion && urlRegion !== selectedRegion) {
+      setSelectedRegion(urlRegion);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);

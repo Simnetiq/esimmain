@@ -1,8 +1,9 @@
 'use client';
 
+import { useEffect, useState, useRef } from 'react';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import Image from 'next/image'; 
-import { ArrowRight } from 'lucide-react';
+import { Zap, Shield, Globe, Smartphone } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export const handleCopyDiscountCode = async (t) => {
@@ -17,148 +18,206 @@ export const handleCopyDiscountCode = async (t) => {
     toast.error(t('discount.copyFailed', 'Failed to copy code. Please try again.'));
   }
 };
+
 export default function FeaturesSection() {
-  const { t, locale } = useI18n();  
+  const { t, locale } = useI18n();
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef(null);
+
+  // Intersection Observer for scroll animations
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Grid pattern style
+  const gridPatternStyle = {
+    backgroundSize: '10px 10px',
+    backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
+  };
 
   if (locale === 'he' || locale === 'ar') {
     return null;
   }
+
+  // Features data - 4 cards with visual images
+  const features = [
+    {
+      icon: Zap,
+      tag: t('features.instantActivation.tag', 'INSTANT ACTIVATION'),
+      title: t('features.instantActivation.title', 'Ready in seconds'),
+      description: t('features.instantActivation.description', 'Get connected instantly with our digital eSIM. No waiting for delivery, no physical SIM cards needed.'),
+      image: '/images/logo_icon/features.avif',
+      delay: 'delay-100',
+    },
+    {
+      icon: Globe,
+      tag: t('features.globalCoverage.tag', 'GLOBAL COVERAGE'),
+      title: t('features.globalCoverage.title', '200+ countries'),
+      description: t('features.globalCoverage.description', 'Stay connected anywhere in the world with our extensive network of partner carriers.'),
+      image: '/images/logo_icon/features.avif',
+      delay: 'delay-200',
+    },
+    {
+      icon: Shield,
+      tag: t('features.securePayment.tag', 'SECURE PAYMENT'),
+      title: t('features.securePayment.title', 'Protected transactions'),
+      description: t('features.securePayment.description', 'Your payment data is secured with industry-leading encryption and trusted payment providers.'),
+      image: '/images/logo_icon/features.avif',
+      delay: 'delay-300',
+    },
+    {
+      icon: Smartphone,
+      tag: t('features.easySetup.tag', 'EASY SETUP'),
+      title: t('features.easySetup.title', 'Simple QR activation'),
+      description: t('features.easySetup.description', 'Scan a QR code, follow the steps, and you\'re connected. It takes less than 2 minutes.'),
+      image: '/images/logo_icon/features.avif',
+      delay: 'delay-400',
+    },
+  ];
+
   return (
-    <div className="features-section bg-white lg:min-h-screen flex flex-col">
-      <div className="relative isolate flex-1 flex flex-col">        
+    <div ref={sectionRef} className="features-section bg-white flex flex-col overflow-hidden">
+      <div className="relative flex-1 flex flex-col">
         {/* Grid Pattern - Left Side */}
         <div 
-          className="hidden xl:block absolute left-0 top-0 bottom-0 w-32 "
-          style={{
-            backgroundSize: '10px 10px',
-            backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-          }}
-        ></div>
+          className="hidden xl:block absolute left-0 top-0 bottom-0 w-32"
+          style={gridPatternStyle}
+        />
 
         {/* Grid Pattern - Right Side */}
         <div 
-          className="hidden xl:block absolute right-0 top-0 bottom-0 w-32 "
-          style={{
-            backgroundSize: '10px 10px',
-            backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-          }}
-        ></div>
+          className="hidden xl:block absolute right-0 top-0 bottom-0 w-32"
+          style={gridPatternStyle}
+        />
 
         {/* Header Section */}
         <div className="mx-auto w-full max-w-9xl">
-          <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-6">
+          <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
             <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              <p className="text-sm max-w-2xl sm:text-base font-medium tracking-widest uppercase text-gray-500 rtl:font-semibold rtl:tracking-tight">
-                {t('features.title')}
+              <p className={`text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 mb-4 transform transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                {t('features.title', 'Why Choose Us')}
               </p>
-              <h2 className="mt-4 text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-pretty text-eerie-black max-w-5xl">{t('features.subtitle')}</h2>
+              <h2 className={`text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-eerie-black max-w-5xl transform transition-all duration-700 delay-100 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                {t('features.subtitle', 'Everything you need to stay connected abroad')}
+              </h2>
             </div>
           </div>
           {/* Full width gray line */}
-          <div className="w-full h-px bg-gray-100"></div>
+          <div className="w-full h-px bg-gray-100" />
         </div>
 
         {/* Features Grid Section */}
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl">
             <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              <div className="grid gap-4 lg:grid-cols-2 lg:grid-rows-2">
-          {/* Global Coverage - Large left card with Static Image */}
-          <div className="relative lg:row-span-2 ">
-            <div className="absolute inset-0 overflow-hidden flex items-center justify-center ">
-              <Image
-                src="/images/logo_icon/features.avif"
-                alt="Global Coverage Network"
-                className="w-full h-full object-cover"
-                width={800}
-                height={800}
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                priority
-                unoptimized
-              />
-            </div>
-            <div className="relative flex h-full min-h-[20rem] sm:min-h-[26rem] lg:min-h-[30rem] flex-col justify-between p-6">
-              <div>
-                {/* Optional: Add title/description overlay if needed */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {features.map((feature, index) => {
+                  const Icon = feature.icon;
+                  return (
+                    <div
+                      key={index}
+                      className={`group relative bg-gray-50 rounded-lg overflow-hidden hover:bg-white transition-all duration-500 transform ${isVisible ? `opacity-100 translate-y-0 ${feature.delay}` : 'opacity-0 translate-y-8'}`}
+                    >
+                      {/* Visual/Image Area */}
+                      <div className="relative h-44 sm:h-52 lg:h-60 overflow-hidden">
+                        <Image
+                          src={feature.image}
+                          alt={feature.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-700"
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                        />
+                        {/* Light overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-white/60 via-transparent to-transparent" />
+                        
+                        {/* Floating icon */}
+                        <div className="absolute top-4 right-4 w-11 h-11 rounded-lg bg-white/95 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                          <Icon className="w-5 h-5 text-tufts-blue" />
+                        </div>
+                      </div>
+                      
+                      {/* Content Area */}
+                      <div className="p-5 lg:p-6">
+                        {/* Description first */}
+                        <p className="text-gray-500 text-sm leading-relaxed mb-3">
+                          {feature.description}
+                        </p>
+                        
+                        {/* Title */}
+                        <h3 className="text-lg lg:text-xl font-semibold text-eerie-black mb-3">
+                          {feature.title}
+                        </h3>
+                        
+                        {/* Tag/Badge */}
+                        <div className="inline-flex items-center px-2.5 py-1 bg-gray-100 rounded transition-colors duration-300">
+                          <span className="text-xs font-medium tracking-wider text-gray-400 uppercase">
+                            {feature.tag}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {/* Border ring */}
+                      <div className="pointer-events-none absolute inset-px rounded-lg ring-1 ring-black/5" />
+                    </div>
+                  );
+                })}
               </div>
             </div>
-            <div className="pointer-events-none absolute inset-px shadow-sm ring-1 ring-black/5"></div>
           </div>
+        </div>
 
-          {/* Instant Activation - Top right */}
-          <div className="relative max-lg:row-start-1">
-            <div className="absolute inset-px bg-white"></div>
-            <div className="relative flex h-full flex-col overflow-hidden">
-              <div className="px-4 py-4 ">
-                <p className="mt-2 text-base sm:text-lg lg:text-xl font-medium tracking-tight text-gray-950 text-start flex items-center gap-2">
-                  <ArrowRight className="w-6 h-6 text-jordy-blue transform -rotate-45" />{t('features.instantActivation.title')}
-                </p>
-                <p className="mt-2 max-w-lg text-sm/6 lg:text-base font-light text-cool-black text-start">
-                {t('features.instantActivation.description')} 
-                </p>
-              </div>
-              
-            </div>
-            <div className="pointer-events-none absolute inset-px shadow-sm ring-1 ring-black/5"></div>
-          </div>
-
-          {/* Secure Payment - Bottom middle */}
-          <div className="relative max-lg:row-start-3 lg:col-start-2 lg:row-start-2">
-            <div className="absolute inset-px bg-white"></div>
-            <div className="relative flex h-full flex-col overflow-hidden">
-                  <div className="px-4 py-4">
-                <p className="mt-2 text-base sm:text-lg font-medium tracking-tight text-cool-black text-start flex items-center gap-2">
-                  <ArrowRight className="w-6 h-6 text-jordy-blue transform -rotate-45" />
-                  {t('features.securePayment.title')}
-                </p>
-                <p className="mt-2 max-w-lg text-sm/6 lg:text-base font-light text-cool-black text-start">
-                  {t('features.securePayment.description')}
-                </p>
-              </div>
-                <div className="flex flex-1 items-center justify-center">
-                {/* Payment Icons - Mobile Responsive */}
-                <div className="flex items-center space-x-2 sm:space-x-3 flex-wrap justify-center gap-2">
-                  <Image 
-                    src="/images/frontend/home/visa.png" 
-                    alt="Visa" 
-                    width={48}
-                    height={48}
-                    className="h-8 sm:h-10 lg:h-12 w-auto"
-                    loading="lazy"
-                    quality={75}
-                  />
-                  <Image 
-                    src="/images/frontend/home/card.png" 
-                    alt="Mastercard" 
-                    width={48}
-                    height={48}
-                    className="h-8 sm:h-10 lg:h-12 w-auto"
-                    loading="lazy"
-                    quality={75}
-                  />
-                  <Image 
-                    src="/images/frontend/home/paypal.png" 
-                    alt="PayPal" 
-                    width={48}
-                    height={48}
-                    className="h-8 sm:h-10 lg:h-12 w-auto"
-                    loading="lazy"
-                    quality={75}
-                  />
-                  <Image 
-                    src="/images/frontend/home/apple-pay.png" 
-                    alt="Apple Pay" 
-                    width={48}
-                    height={48}
-                    className="h-8 sm:h-10 lg:h-12 w-auto"
-                    loading="lazy"
-                    quality={75}
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="pointer-events-none absolute inset-px shadow-sm ring-1 ring-black/5"></div>
-          </div>
+        {/* Payment Methods Section */}
+        <div className="mx-auto w-full max-w-9xl">
+          <div className="w-full h-px bg-gray-100" />
+          <div className="mx-auto w-full max-w-7xl">
+            <div className={`px-4 py-10 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl text-center transform transition-all duration-700 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+              <p className="text-sm text-gray-400 mb-6">{t('features.paymentMethods', 'Trusted payment methods')}</p>
+              <div className="flex items-center justify-center gap-4 sm:gap-6 flex-wrap">
+                <Image 
+                  src="/images/frontend/home/visa.png" 
+                  alt="Visa" 
+                  width={48}
+                  height={32}
+                  className="h-8 sm:h-10 w-auto opacity-50 hover:opacity-100 transition-opacity duration-300"
+                  loading="lazy"
+                />
+                <Image 
+                  src="/images/frontend/home/card.png" 
+                  alt="Mastercard" 
+                  width={48}
+                  height={32}
+                  className="h-8 sm:h-10 w-auto opacity-50 hover:opacity-100 transition-opacity duration-300"
+                  loading="lazy"
+                />
+                <Image 
+                  src="/images/frontend/home/paypal.png" 
+                  alt="PayPal" 
+                  width={48}
+                  height={32}
+                  className="h-8 sm:h-10 w-auto opacity-50 hover:opacity-100 transition-opacity duration-300"
+                  loading="lazy"
+                />
+                <Image 
+                  src="/images/frontend/home/apple-pay.png" 
+                  alt="Apple Pay" 
+                  width={48}
+                  height={32}
+                  className="h-8 sm:h-10 w-auto opacity-50 hover:opacity-100 transition-opacity duration-300"
+                  loading="lazy"
+                />
               </div>
             </div>
           </div>
