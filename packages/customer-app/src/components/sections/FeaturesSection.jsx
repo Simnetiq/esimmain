@@ -59,7 +59,7 @@ export default function FeaturesSection() {
       tag: t('features.instantActivation.tag', 'INSTANT ACTIVATION'),
       title: t('features.instantActivation.title', 'Ready in seconds'),
       description: t('features.instantActivation.description', 'Get connected instantly with our digital eSIM. No waiting for delivery, no physical SIM cards needed.'),
-      image: '/images/logo_icon/features.avif',
+      image: '/images/instant.avif',
       delay: 'delay-100',
     },
     {
@@ -67,7 +67,7 @@ export default function FeaturesSection() {
       tag: t('features.globalCoverage.tag', 'GLOBAL COVERAGE'),
       title: t('features.globalCoverage.title', '200+ countries'),
       description: t('features.globalCoverage.description', 'Stay connected anywhere in the world with our extensive network of partner carriers.'),
-      image: '/images/logo_icon/features.avif',
+      image: '/images/global.avif',
       delay: 'delay-200',
     },
     {
@@ -75,7 +75,7 @@ export default function FeaturesSection() {
       tag: t('features.securePayment.tag', 'SECURE PAYMENT'),
       title: t('features.securePayment.title', 'Protected transactions'),
       description: t('features.securePayment.description', 'Your payment data is secured with industry-leading encryption and trusted payment providers.'),
-      image: '/images/logo_icon/features.avif',
+      image: '/images/secure.avif',
       delay: 'delay-300',
     },
     {
@@ -83,7 +83,7 @@ export default function FeaturesSection() {
       tag: t('features.easySetup.tag', 'EASY SETUP'),
       title: t('features.easySetup.title', 'Simple QR activation'),
       description: t('features.easySetup.description', 'Scan a QR code, follow the steps, and you\'re connected. It takes less than 2 minutes.'),
-      image: '/images/logo_icon/features.avif',
+      image: '/images/easy.avif',
       delay: 'delay-400',
     },
   ];
@@ -129,7 +129,7 @@ export default function FeaturesSection() {
                   return (
                     <div
                       key={index}
-                      className={`group relative bg-gray-50 rounded-lg overflow-hidden hover:bg-white transition-all duration-500 transform ${isVisible ? `opacity-100 translate-y-0 ${feature.delay}` : 'opacity-0 translate-y-8'}`}
+                      className={`group relative bg-gray-50  overflow-hidden hover:bg-white transition-all duration-500 transform ${isVisible ? `opacity-100 translate-y-0 ${feature.delay}` : 'opacity-0 translate-y-8'}`}
                     >
                       {/* Visual/Image Area */}
                       <div className="relative h-44 sm:h-52 lg:h-60 overflow-hidden">
@@ -140,19 +140,18 @@ export default function FeaturesSection() {
                           className="object-cover group-hover:scale-105 transition-transform duration-700"
                           sizes="(max-width: 768px) 100vw, 50vw"
                         />
-                        {/* Light overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-white/60 via-transparent to-transparent" />
+                       
                         
                         {/* Floating icon */}
-                        <div className="absolute top-4 right-4 w-11 h-11 rounded-lg bg-white/95 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                          <Icon className="w-5 h-5 text-tufts-blue" />
+                        <div className="absolute top-4 right-4 w-11 h-11 rounded-lg bg-white/75 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                          <Icon className="w-5 h-5 text-eerie-black" />
                         </div>
                       </div>
                       
                       {/* Content Area */}
                       <div className="p-5 lg:p-6">
                         {/* Description first */}
-                        <p className="text-gray-500 text-sm leading-relaxed mb-3">
+                        <p className="text-gray-500 text-sm leading-relaxed mb-3 ">
                           {feature.description}
                         </p>
                         
@@ -161,16 +160,9 @@ export default function FeaturesSection() {
                           {feature.title}
                         </h3>
                         
-                        {/* Tag/Badge */}
-                        <div className="inline-flex items-center px-2.5 py-1 bg-gray-100 rounded transition-colors duration-300">
-                          <span className="text-xs font-medium tracking-wider text-gray-400 uppercase">
-                            {feature.tag}
-                          </span>
-                        </div>
+                   
                       </div>
-                      
-                      {/* Border ring */}
-                      <div className="pointer-events-none absolute inset-px rounded-lg ring-1 ring-black/5" />
+              
                     </div>
                   );
                 })}
@@ -179,49 +171,7 @@ export default function FeaturesSection() {
           </div>
         </div>
 
-        {/* Payment Methods Section */}
-        <div className="mx-auto w-full max-w-9xl">
-          <div className="w-full h-px bg-gray-100" />
-          <div className="mx-auto w-full max-w-7xl">
-            <div className={`px-4 py-10 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl text-center transform transition-all duration-700 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-              <p className="text-sm text-gray-400 mb-6">{t('features.paymentMethods', 'Trusted payment methods')}</p>
-              <div className="flex items-center justify-center gap-4 sm:gap-6 flex-wrap">
-                <Image 
-                  src="/images/frontend/home/visa.png" 
-                  alt="Visa" 
-                  width={48}
-                  height={32}
-                  className="h-8 sm:h-10 w-auto opacity-50 hover:opacity-100 transition-opacity duration-300"
-                  loading="lazy"
-                />
-                <Image 
-                  src="/images/frontend/home/card.png" 
-                  alt="Mastercard" 
-                  width={48}
-                  height={32}
-                  className="h-8 sm:h-10 w-auto opacity-50 hover:opacity-100 transition-opacity duration-300"
-                  loading="lazy"
-                />
-                <Image 
-                  src="/images/frontend/home/paypal.png" 
-                  alt="PayPal" 
-                  width={48}
-                  height={32}
-                  className="h-8 sm:h-10 w-auto opacity-50 hover:opacity-100 transition-opacity duration-300"
-                  loading="lazy"
-                />
-                <Image 
-                  src="/images/frontend/home/apple-pay.png" 
-                  alt="Apple Pay" 
-                  width={48}
-                  height={32}
-                  className="h-8 sm:h-10 w-auto opacity-50 hover:opacity-100 transition-opacity duration-300"
-                  loading="lazy"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+        
       </div>
     </div>
   );
