@@ -236,39 +236,10 @@
     }
   },
   "auth": {
-    "login": {
-      "title": "Connectez-vous à votre compte",
-      "subtitle": "Ou",
-      "createAccount": "créez un nouveau compte",
-      "emailLabel": "Adresse e-mail",
-      "emailPlaceholder": "Entrez votre e-mail",
-      "passwordLabel": "Mot de passe",
-      "passwordPlaceholder": "Entrez votre mot de passe",
-      "forgotPassword": "Mot de passe oublié ?",
-      "signInButton": "Se connecter",
-      "orContinueWith": "Ou continuer avec",
-      "signInWithGoogle": "Se connecter avec Google",
-      "fillAllFields": "Veuillez remplir tous les champs",
-      "loginSuccessful": "Connexion réussie !",
-      "loginFailed": "Échec de la connexion",
-      "googleSignInSuccessful": "Connexion avec Google réussie !",
-      "googleSignInFailed": "Échec de la connexion avec Google"
-    },
-    "register": {
-      "title": "Créez votre compte",
-      "subtitle": "Ou",
-      "signInExisting": "connectez-vous à votre compte existant",
-      "fullNameLabel": "Nom complet",
-      "fullNamePlaceholder": "Entrez votre nom complet",
-      "emailLabel": "Adresse e-mail",
-      "emailPlaceholder": "Entrez votre e-mail",
-      "passwordLabel": "Mot de passe",
-      "passwordPlaceholder": "Entrez votre mot de passe",
-      "createAccountButton": "Créer un compte",
-      "fillAllFields": "Veuillez remplir tous les champs",
-      "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
-      "accountCreated": "Compte créé ! Veuillez vérifier votre e-mail pour le code de vérification.",
-      "registrationFailed": "Échec de l'envoi du code de vérification"
+    "login": {  
+      "title": "Explorez le monde avec Simnetiq",
+      "quickAccess": "Accès rapide et sécurisé avec votre compte Google ou Apple",
+      "welcome": "Bienvenue de retour"
     },
     "welcomeMessage": "Bienvenue sur Simnetiq - Votre solution eSIM mondiale",
     "trustedByThousands": "Fait confiance par des milliers de voyageurs dans le monde"
@@ -446,7 +417,7 @@
     "chooseYourPlan": "Choisissez votre plan",
     "loadingPlans": "Chargement des plans disponibles...",
     "pleaseWait": "Veuillez patienter pendant que nous récupérons les meilleures options pour vous",
-    "availablePlans": "Plans disponibles ({{count}})",
+    "availablePlans": "Plans disponibles ",
     "sortedByCheapest": "Trié par le moins cher en premier",
     "dayPlans": "Plans de {{days}} jour{{plural}}",
     "countriesAvailable": "{{count}} pay{{plural}} disponibles",

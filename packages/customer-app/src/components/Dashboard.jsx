@@ -26,6 +26,89 @@ import RecentOrders from './dashboard/RecentOrders';
 import QRCodeModal from './dashboard/QRCodeModal';
 import ReferralBottomSheet from './ReferralBottomSheet';
 
+// Dashboard Skeleton Component for loading state
+const DashboardSkeleton = () => (
+  <div className="min-h-screen bg-white flex flex-col">
+    <div className="relative isolate flex-1 flex flex-col">
+      {/* Background pattern skeleton */}
+      <div className="hidden sm:block absolute top-0 left-0 right-0 h-px bg-gray-200/70"></div>
+      <div className="hidden sm:block absolute bottom-0 left-0 right-0 h-px bg-gray-200/70"></div>
+      
+      {/* Header Section Skeleton */}
+      <div className="py-8 sm:py-12 lg:py-16 px-4">
+        <div className="max-w-6xl mx-auto">
+          {/* Welcome text skeleton */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+            <div>
+              <div className="h-4 w-24 bg-gray-200 rounded animate-pulse mb-3"></div>
+              <div className="h-8 w-64 bg-gray-200 rounded animate-pulse mb-2"></div>
+              <div className="h-4 w-48 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+            <div className="h-12 w-32 bg-gray-100 rounded-full animate-pulse"></div>
+          </div>
+          
+          {/* Stats Cards Skeleton */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-gray-50 rounded-2xl p-4 sm:p-6">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-gray-200 rounded-xl animate-pulse"></div>
+                  <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+                <div className="h-8 w-12 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      
+      {/* Recent Orders Section Skeleton */}
+      <div className="flex-1 px-4 pb-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center justify-between mb-6">
+            <div className="h-6 w-32 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
+          </div>
+          
+          {/* Order Cards Skeleton */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                {/* Card Header */}
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gray-200 rounded-xl animate-pulse"></div>
+                    <div>
+                      <div className="h-5 w-24 bg-gray-200 rounded animate-pulse mb-2"></div>
+                      <div className="h-3 w-16 bg-gray-200 rounded animate-pulse"></div>
+                    </div>
+                  </div>
+                  <div className="h-6 w-16 bg-gray-200 rounded-full animate-pulse"></div>
+                </div>
+                
+                {/* Card Content */}
+                <div className="space-y-3 mb-4">
+                  <div className="flex items-center justify-between">
+                    <div className="h-4 w-12 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
+                  </div>
+                </div>
+                
+                {/* Card Footer */}
+                <div className="h-10 w-full bg-gray-200 rounded-xl animate-pulse"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
 const Dashboard = () => {
   const { currentUser, userProfile, loadUserProfile, loading: authLoading } = useAuth();
   const { t, locale } = useI18n();
@@ -558,21 +641,14 @@ const Dashboard = () => {
   }, [orders, usageCache]);
   */
 
-  // Show loading spinner while auth is loading
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tufts-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('dashboard.loadingDashboard', 'Loading dashboard...')}</p>
-        </div>
-      </div>
-    );
+  // Show skeleton while auth is loading or data is loading
+  if (authLoading || loading) {
+    return <DashboardSkeleton />;
   }
 
-  // Show nothing while redirecting
+  // Show skeleton while redirecting (prevents empty flash)
   if (!currentUser) {
-    return null;
+    return <DashboardSkeleton />;
   }
 
   // Active orders count (used for future stats display)

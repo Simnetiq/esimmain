@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Globe, ArrowUpDown, Smartphone, Zap, DollarSign, Infinity } from 'lucide-react';
 import BottomSheet from './BottomSheet';
 import { useRouter, usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
@@ -13,87 +12,107 @@ import { getISOCode } from '@esim/shared/utils/countryCodeMap';
 import { db } from '@esim/shared/firebase/config';
 import { collection, getDocs } from 'firebase/firestore';
 
+// Inline SVG icons to avoid lucide-react bundle overhead
+const GlobeIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>
+  </svg>
+);
+
+const SmartphoneIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/>
+  </svg>
+);
+
+const DollarSignIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+  </svg>
+);
+
+const ZapIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>
+  </svg>
+);
+
+const InfinityIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 12c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4Zm0 0c2 2.67 4 4 6 4a4 4 0 0 0 0-8c-2 0-4 1.33-6 4Z"/>
+  </svg>
+);
+
+const ArrowRightIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+  </svg>
+);
+
 const PlanCard = ({ plan, onClick, badge }) => {
   const { t } = useI18n();
   
   const originalPrice = parsePrice(plan.price);
-  const provider = plan.operator || plan.provider || '';
 
-  // Badge configurations
+  // Badge configurations matching RegionalDealCard
   const badgeConfig = {
     cheapest: {
-      color: '#47C97E',
       bgColor: 'bg-green-50',
-      icon: DollarSign,
-      text: t('planBadge.cheapest', 'Cheapest')
+      iconBg: 'bg-green-50',
+      Icon: DollarSignIcon,
+      iconColor: 'text-green-600',
+      label: t('deals.bestPrice', 'Best price')
     },
     bestDeal: {
-      color: '#E09445',
       bgColor: 'bg-amber-50',
-      icon: Zap,
-      text: t('planBadge.bestDeal', 'Best Deal')
+      iconBg: 'bg-amber-50',
+      Icon: ZapIcon,
+      iconColor: 'text-amber-600',
+      label: t('deals.bestValue', 'Best value')
     },
     unlimited: {
-      color: '#6B5DD4',
       bgColor: 'bg-purple-50',
-      icon: Infinity,
-      text: t('planBadge.unlimited', 'Unlimited')
+      iconBg: 'bg-purple-50',
+      Icon: InfinityIcon,
+      iconColor: 'text-purple-600',
+      label: t('deals.unlimited', 'Unlimited data')
     }
   };
 
   const currentBadge = badge ? badgeConfig[badge] : null;
-  const BadgeIcon = currentBadge?.icon;
+  const BadgeIcon = currentBadge?.Icon;
 
   return (
     <button 
-      className={`group w-full relative ${currentBadge?.bgColor || 'bg-gray-50'} hover:bg-white rounded-lg transition-all duration-300 text-left overflow-hidden`}
+      className="group/plan w-full bg-white hover:bg-gray-50 rounded-lg p-3 text-left transition-all duration-200 hover:shadow-sm border border-gray-100"
       onClick={onClick}
     >
-      {/* Badge - Top */}
-      {currentBadge && (
-        <div 
-          className="flex items-center justify-center gap-1 py-1.5 text-white text-xs font-medium"
-          style={{ backgroundColor: currentBadge.color }}
-        >
-          {BadgeIcon && <BadgeIcon className="w-3 h-3" />}
-          <span>{currentBadge.text}</span>
-        </div>
-      )}
-
-      <div className="p-4 space-y-3">
-        {/* Row 1: Data Amount + Days */}
-        <div className="flex items-baseline justify-between gap-2">
-          <div className="text-lg font-bold text-eerie-black">
-            {plan.data}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          {/* Icon */}
+          <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${currentBadge?.iconBg || 'bg-gray-100'}`}>
+            {BadgeIcon ? (
+              <BadgeIcon className={`w-4 h-4 ${currentBadge?.iconColor || 'text-gray-600'}`} />
+            ) : (
+              <SmartphoneIcon className="w-4 h-4 text-gray-600" />
+            )}
           </div>
-          <div className="text-sm text-gray-500">
-            {plan.period || plan.duration || 'N/A'} {t('planSelection.days', 'days')}
+          <div>
+            <p className="text-sm font-medium text-eerie-black">
+              {plan.data} · {plan.period || plan.duration || 'N/A'}d
+            </p>
+            <p className="text-[11px] text-gray-500">
+              {currentBadge?.label || plan.operator || plan.provider || t('deals.esimPlan', 'eSIM Plan')}
+            </p>
           </div>
         </div>
-
-        {/* Row 2: Provider */}
-        {provider && (
-          <div className="text-xs text-gray-400 truncate">
-            {provider}
-          </div>
-        )}
-
-        {/* Row 3: Price */}
-        <div className="flex items-center justify-between">
-          <div className="text-xl font-bold text-tufts-blue">
+        <div className="flex items-center gap-2">
+          <span className="text-base font-bold text-tufts-blue">
             {formatPrice(originalPrice)}
-          </div>
-          {/* Arrow indicator on hover */}
-          <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 ring-1 ring-black/5">
-            <svg className="w-4 h-4 text-tufts-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </div>
+          </span>
+          <ArrowRightIcon className="w-4 h-4 text-gray-300 group-hover/plan:text-tufts-blue group-hover/plan:translate-x-0.5 transition-all" />
         </div>
       </div>
-
-      {/* Border ring */}
-      <div className="pointer-events-none absolute inset-px rounded-lg ring-1 ring-black/5 group-hover:ring-tufts-blue/30 transition-all duration-300" />
     </button>
   );
 };
@@ -404,7 +423,7 @@ const PlanSelectionBottomSheet = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-tufts-blue/10 flex items-center justify-center">
-                  <Smartphone className="w-4 h-4 text-tufts-blue" />
+                  <SmartphoneIcon className="w-4 h-4 text-tufts-blue" />
                 </div>
                 <h4 className="font-semibold text-eerie-black text-sm sm:text-base">
                   {t('planSelection.availablePlans', 'Available Plans')} <span className="text-gray-400 font-normal">({availablePlans.length})</span>
@@ -440,7 +459,7 @@ const PlanSelectionBottomSheet = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-tufts-blue/10 flex items-center justify-center">
-                  <Smartphone className="w-4 h-4 text-tufts-blue" />
+                  <SmartphoneIcon className="w-4 h-4 text-tufts-blue" />
                 </div>
                 <h4 className="font-semibold text-eerie-black text-sm sm:text-base">
                   {t('planSelection.availablePlans', 'Available Plans')}
@@ -557,7 +576,7 @@ const PlanSelectionBottomSheet = ({
         ) : (
           <div className="text-center py-8">
             <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Globe size={24} className="text-gray-400" />
+              <GlobeIcon className="w-6 h-6 text-gray-400" />
             </div>
             <h3 className="text-base font-semibold text-eerie-black mb-2">{t('planSelection.noPlansAvailable', 'No Plans Available')}</h3>
             <p className="text-sm text-gray-500 mb-2">

@@ -488,7 +488,7 @@
     "chooseYourPlan": "اختر خطتك",
     "loadingPlans": "تحميل الخطط المتاحة...",
     "pleaseWait": "يرجى الانتظار بينما نجلب أفضل الخيارات لك",
-    "availablePlans": "الخطط المتاحة ({{count}})",
+    "availablePlans": "الخطط المتاحة ",
     "sortedByCheapest": "مرتبة حسب الأرخص أولاً",
     "dayPlans": "خطط {{days}} يوم{{plural}}",
     "countriesAvailable": "{{count}} بلد{{plural}} متاحة",

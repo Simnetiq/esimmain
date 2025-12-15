@@ -1,34 +1,80 @@
 'use client';
 
 import React from 'react';
-import { Globe, QrCode, Wifi, Phone, MessageSquare, Clock, Signal, ChevronRight, Zap } from 'lucide-react';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { getISOCode } from '@esim/shared/utils/countryCodeMap';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
 import { mapPackageCountryData, mapPlanDetails } from '@esim/shared/utils/esimFieldMapper';
-// Using native img for flags due to Next.js Image optimization issues with SVGs
 
-// Regional flag mapping - maps region names to actual flag files that exist
-// Available: eu.svg, un.svg, arab.svg, asean.svg, eac.svg, cefta.svg
+// Inline SVG icons to avoid lucide-react bundle overhead
+const GlobeIcon = ({ className = "w-7 h-7" }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>
+  </svg>
+);
+
+const QrCodeIcon = ({ className = "w-4 h-4" }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/>
+    <path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/>
+  </svg>
+);
+
+const WifiIcon = ({ className = "w-5 h-5" }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/><path d="M5 12.859a10 10 0 0 1 14 0"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/>
+  </svg>
+);
+
+const ClockIcon = ({ className = "w-3.5 h-3.5" }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+  </svg>
+);
+
+const PhoneIcon = ({ className = "w-3 h-3" }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+  </svg>
+);
+
+const MessageIcon = ({ className = "w-3 h-3" }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>
+  </svg>
+);
+
+const SignalIcon = ({ className = "w-3 h-3" }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/>
+  </svg>
+);
+
+const ArrowRightIcon = ({ className = "w-4 h-4" }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+  </svg>
+);
+
+// Regional flag mapping
 const REGION_FLAGS = {
-  'EUROPE': 'eu',         // EU flag - perfect match
+  'EUROPE': 'eu',
   'EU': 'eu',
-  'GLOBAL': 'un',         // UN flag for Global coverage
+  'GLOBAL': 'un',
   'WORLDWIDE': 'un',
-  'MIDDLEEAST': 'arab',   // Arab League flag
+  'MIDDLEEAST': 'arab',
   'ARAB': 'arab',
-  // These will show a styled globe icon (more accurate than wrong flags)
-  'ASIA': null,           // ASEAN flag doesn't represent all of Asia
+  'ASIA': null,
   'ASIALINK': null,
-  'AFRICA': null,         // EAC only represents East Africa
+  'AFRICA': null,
   'AMERICAS': null,
   'OCEANIA': null,
   'CARIBBEAN': null,
   'LATINAMERICA': null
 };
 
-// Circular Progress Ring Component (Untitled UI style)
-const CircularProgress = ({ percentage, size = 48, strokeWidth = 4, isExpired = false }) => {
+// Circular Progress Ring Component
+const CircularProgress = ({ percentage, size = 40, strokeWidth = 3, isExpired = false }) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const offset = circumference - (percentage / 100) * circumference;
@@ -36,7 +82,6 @@ const CircularProgress = ({ percentage, size = 48, strokeWidth = 4, isExpired = 
   return (
     <div className="relative" style={{ width: size, height: size }}>
       <svg className="transform -rotate-90" width={size} height={size}>
-        {/* Background circle */}
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -44,9 +89,8 @@ const CircularProgress = ({ percentage, size = 48, strokeWidth = 4, isExpired = 
           fill="none"
           stroke="currentColor"
           strokeWidth={strokeWidth}
-          className="text-gray-100"
+          className="text-gray-200"
         />
-        {/* Progress circle */}
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -61,7 +105,7 @@ const CircularProgress = ({ percentage, size = 48, strokeWidth = 4, isExpired = 
         />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className={`text-xs font-bold ${isExpired ? 'text-gray-500' : 'text-gray-700'}`}>
+        <span className={`text-[10px] font-bold ${isExpired ? 'text-gray-500' : 'text-gray-700'}`}>
           {percentage}%
         </span>
       </div>
@@ -74,16 +118,13 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
 
   // Format data usage with progress
   const formatDataUsage = (remaining, total, isUnlimited) => {
-    if (isUnlimited) return { text: t('dashboard.unlimited', 'Unlimited'), percentage: 0 };
+    if (isUnlimited) return { text: t('dashboard.unlimited', 'Unlimited'), percentage: 0, isUnlimited: true };
     if (remaining == null || total == null) return null;
     
-    // Determine unit based on total (more consistent than using remaining)
     const useGB = total >= 1024;
     const unit = useGB ? 'GB' : 'MB';
-    
     const remainingFormatted = useGB ? (remaining / 1024).toFixed(1) : Math.round(remaining);
     const totalFormatted = useGB ? (total / 1024).toFixed(1) : Math.round(total);
-    
     const usedPercentage = total > 0 ? Math.round(((total - remaining) / total) * 100) : 0;
     
     return {
@@ -96,68 +137,58 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
     };
   };
 
-  // Get flag path - handles both countries and regions
+  // Get flag path
   const getFlagPath = (code, isRegional) => {
     if (!code) return null;
     
     const upperCode = code.toUpperCase().replace(/\s+/g, '');
     
-    // Check if it's a known region with a flag
     if (isRegional || upperCode in REGION_FLAGS) {
       const regionFlag = REGION_FLAGS[upperCode];
       if (regionFlag) {
         return `/flags/4x3/${regionFlag}.svg`;
       }
-      // Region without specific flag - will show globe icon
       return null;
     }
     
-    // For countries: If it's already a 2-letter ISO code, use it directly (lowercase)
-    // Otherwise, try to get the ISO code from the mapping
     if (code.length === 2) {
       return `/flags/4x3/${code.toLowerCase()}.svg`;
     }
     
-    // For longer codes like "netherlands", use the ISO code mapper
     const isoCode = getISOCode(code);
     return `/flags/4x3/${isoCode}.svg`;
   };
 
-  // Check if eSIM is expired based on usage data from Airalo API
+  // Check if eSIM is expired
   const isExpired = usageData ? (
-    // Check API status field (EXPIRED, RECYCLED, FINISHED are considered expired)
     usageData.status === 'EXPIRED' || 
     usageData.status === 'RECYCLED' || 
     usageData.status === 'FINISHED' ||
-    // Check expired_at timestamp if available
     (usageData.expired_at && new Date(usageData.expired_at) < new Date())
   ) : false;
 
-  // Get status color and label
+  // Get status info
   const getStatusInfo = (status, isExpired) => {
-    // If we have usage data indicating expiration, use that
     if (isExpired) {
-      return { color: 'bg-gray-400', textColor: 'text-gray-500', bgColor: 'bg-gray-100', label: t('dashboard.status.expired', 'Expired') };
+      return { color: 'bg-gray-400', textColor: 'text-gray-600', bgColor: 'bg-gray-100', label: t('dashboard.status.expired', 'Expired') };
     }
     
-    // Otherwise use the order status
     switch (status?.toLowerCase()) {
       case 'active':
-        return { color: 'bg-emerald-500', textColor: 'text-emerald-600', bgColor: 'bg-emerald-50', label: t('dashboard.status.active', 'Active') };
       case 'completed':
-        return { color: 'bg-emerald-500', textColor: 'text-emerald-600', bgColor: 'bg-emerald-50', label: t('dashboard.status.completed', 'Active') };
+        return { color: 'bg-emerald-500', textColor: 'text-emerald-700', bgColor: 'bg-emerald-50', label: t('dashboard.status.active', 'Active') };
       case 'pending':
-        return { color: 'bg-amber-500', textColor: 'text-amber-600', bgColor: 'bg-amber-50', label: t('dashboard.status.pending', 'Pending') };
+        return { color: 'bg-amber-500', textColor: 'text-amber-700', bgColor: 'bg-amber-50', label: t('dashboard.status.pending', 'Pending') };
       case 'expired':
-        return { color: 'bg-gray-400', textColor: 'text-gray-500', bgColor: 'bg-gray-100', label: t('dashboard.status.expired', 'Expired') };
+        return { color: 'bg-gray-400', textColor: 'text-gray-600', bgColor: 'bg-gray-100', label: t('dashboard.status.expired', 'Expired') };
       default:
-        return { color: 'bg-gray-400', textColor: 'text-gray-500', bgColor: 'bg-gray-100', label: status || t('dashboard.unknown', 'Unknown') };
+        return { color: 'bg-gray-400', textColor: 'text-gray-600', bgColor: 'bg-gray-100', label: status || t('dashboard.unknown', 'Unknown') };
     }
   };
 
   const statusInfo = getStatusInfo(order.status, isExpired);
   
-  // Use shared utility to get consistent country data (handles both formats)
+  // Get country data
   const countryData = mapPackageCountryData(order);
   const countryCode = countryData?.countryCode || null;
   const countryName = countryData?.countryName || null;
@@ -166,61 +197,39 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
   const flagPath = getFlagPath(countryCode, isRegional);
   const usage = usageData ? formatDataUsage(usageData.remaining, usageData.total, usageData.is_unlimited) : null;
   
-  // Debug logging
-  console.log('🎌 EsimCard country data:', { 
-    orderId: order.id,
-    countryCode,
-    countryName,
-    isRegional,
-    flagPath,
-    // Raw order fields for debugging
-    rawCountryCode: order.countryCode,
-    rawCountry_code: order.country_code,
-    rawCountryName: order.countryName,
-    rawCountry_region: order.country_region
-  });
-  
-  // Use shared utility for plan details (handles both formats)
+  // Get plan details
   const rawPlanDetails = order.planDetails || {};
   const mappedPlanDetails = mapPlanDetails(rawPlanDetails);
-  const planDetails = {
-    ...rawPlanDetails,
-    ...mappedPlanDetails
-  };
+  const planDetails = { ...rawPlanDetails, ...mappedPlanDetails };
   const dataDisplay = planDetails.data || `${planDetails.dataAmountMb || 0} MB`;
-  const validityDisplay = planDetails.validity ? `${planDetails.validity} ${t('dashboard.days', 'days')}` : null;
+  const validityDisplay = planDetails.validity ? `${planDetails.validity}d` : null;
   
-  // Country/Region name - check multiple possible field names
+  // Display name
   const fullName = countryName || countryCode || '';
-  const displayName = fullName.length > 16 ? fullName.substring(0, 16) + '...' : fullName;
+  const displayName = fullName.length > 20 ? fullName.substring(0, 20) + '...' : fullName;
 
   return (
     <div
-      className={`group relative bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden cursor-pointer h-full ${
-        isExpired 
-          ? 'border border-gray-200 opacity-80 hover:opacity-100' 
-          : 'border border-gray-200 hover:border-tufts-blue/30'
+      className={`group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 cursor-pointer h-full flex flex-col ${
+        isExpired ? 'opacity-75 hover:opacity-100' : ''
       }`}
       title={fullName}
       onClick={() => onViewQRCode(order)}
     >
-      {/* Card Header with Status */}
-      <div className={`relative px-4 sm:px-5 pt-4 sm:pt-5 pb-3 ${isRTL ? 'text-right' : 'text-left'}`}>
-        {/* Status Badge - Absolute positioned */}
-        <div className={`absolute top-3 ${isRTL ? 'left-3' : 'right-3'}`}>
-          <div className={`inline-flex items-center gap-1.5 ${statusInfo.bgColor} px-2.5 py-1 rounded-full ${isRTL ? 'flex-row-reverse' : ''}`}>
-            <div className={`w-1.5 h-1.5 rounded-full ${statusInfo.color} animate-pulse`}></div>
-            <span className={`text-xs font-medium ${statusInfo.textColor}`}>
-              {statusInfo.label}
-            </span>
-          </div>
+      {/* Visual Header Area - Flag/Globe Display */}
+      <div className="relative h-28 sm:h-32 lg:h-36 overflow-hidden bg-gray-100">
+        {/* Subtle pattern overlay */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute inset-0" style={{
+            backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(0,0,0,0.05) 1px, transparent 0)',
+            backgroundSize: '20px 20px'
+          }} />
         </div>
-
-        {/* Country/Region Header */}
-        <div className={`flex items-center gap-3.5 ${isRTL ? 'flex-row-reverse' : ''}`}>
-          {/* Flag Container - Featured Icon Style (Untitled UI) */}
-          <div className="flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center border border-gray-200 overflow-hidden shadow-sm">
-            {flagPath ? (
+        
+        {/* Main Flag/Globe Display - Centered */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          {flagPath ? (
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden shadow-lg group-hover:scale-110 transition-transform duration-500 border-4 border-white/80">
               <img
                 src={flagPath}
                 alt={`${fullName} flag`}
@@ -231,138 +240,142 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
                   if (e.currentTarget.parentElement) {
                     e.currentTarget.parentElement.innerHTML = `
                       <div class="w-full h-full bg-gradient-to-br from-tufts-blue to-blue-600 flex items-center justify-center">
-                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                          <circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>
                         </svg>
                       </div>
                     `;
                   }
                 }}
               />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-tufts-blue to-blue-600 flex items-center justify-center">
-                <Globe className="w-7 h-7 text-white" />
-              </div>
-            )}
-          </div>
-          
-          <div className={`flex-1 min-w-0 ${isRTL ? 'text-right' : 'text-left'}`}>
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate leading-tight">
-              {displayName}
-            </h3>
-            <p className="text-xs sm:text-sm text-gray-500 truncate mt-0.5">
-              {order.planName || t('dashboard.unknownPlan', 'Unknown Plan')}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Metrics Section - Untitled UI Card Style */}
-      <div className="px-4 sm:px-5 py-3 bg-gray-50/50 border-y border-gray-100">
-        <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
-          {/* Data Usage with Circular Progress */}
-          <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
-            {loadingUsage ? (
-              <div className="w-12 h-12 rounded-full bg-gray-200 animate-pulse"></div>
-            ) : usage ? (
-              <CircularProgress 
-                percentage={usage.remainingPercentage} 
-                size={48} 
-                strokeWidth={4}
-                isExpired={isExpired}
-              />
-            ) : (
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                isExpired ? 'bg-gray-100' : 'bg-tufts-blue/10'
-              }`}>
-                <Wifi className={`w-5 h-5 ${isExpired ? 'text-gray-400' : 'text-tufts-blue'}`} />
-              </div>
-            )}
-            
-            <div className={`${isRTL ? 'text-right' : 'text-left'}`}>
-              <p className="text-xs text-gray-500 mb-0.5">
-                {isExpired ? t('dashboard.dataUsed', 'Data Used') : t('dashboard.dataRemaining', 'Remaining')}
-              </p>
-              {loadingUsage ? (
-                <div className="animate-pulse bg-gray-200 h-4 w-20 rounded"></div>
-              ) : (
-                <p className={`text-sm font-semibold ${isExpired ? 'text-gray-600' : 'text-gray-900'}`}>
-                  {usage ? usage.text : dataDisplay}
-                </p>
-              )}
             </div>
-          </div>
-
-          {/* Validity Badge */}
-          {validityDisplay && (
-            <div className={`flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-gray-200 ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <Clock className="w-3.5 h-3.5 text-gray-400" />
-              <span className="text-xs font-medium text-gray-600">{validityDisplay}</span>
+          ) : (
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-tufts-blue to-blue-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500 border-4 border-white/80">
+              <GlobeIcon className="w-10 h-10 text-white" />
             </div>
           )}
         </div>
         
+        {/* Status Badge - Top Right */}
+        <div className={`absolute top-3 ${isRTL ? 'left-3' : 'right-3'}`}>
+          <div className={`inline-flex items-center gap-1.5 ${statusInfo.bgColor} px-2.5 py-1 rounded-full shadow-sm ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`w-1.5 h-1.5 rounded-full ${statusInfo.color} ${!isExpired ? 'animate-pulse' : ''}`} />
+            <span className={`text-xs font-semibold ${statusInfo.textColor}`}>
+              {statusInfo.label}
+            </span>
+          </div>
+        </div>
+        
+        {/* Data Usage Badge - Bottom Left */}
+        <div className={`absolute bottom-3 ${isRTL ? 'right-3' : 'left-3'}`}>
+          <div className="px-2.5 py-1.5 bg-white/90 backdrop-blur-sm rounded-lg flex items-center gap-2 shadow-sm">
+            {loadingUsage ? (
+              <div className="w-16 h-4 bg-gray-200 rounded animate-pulse" />
+            ) : usage ? (
+              <>
+                <CircularProgress 
+                  percentage={usage.remainingPercentage} 
+                  size={24} 
+                  strokeWidth={2.5}
+                  isExpired={isExpired}
+                />
+                <span className="text-xs font-semibold text-eerie-black">
+                  {usage.isUnlimited ? '∞' : `${usage.remaining} ${usage.unit}`}
+                </span>
+              </>
+            ) : (
+              <>
+                <WifiIcon className="w-4 h-4 text-tufts-blue" />
+                <span className="text-xs font-semibold text-eerie-black">{dataDisplay}</span>
+              </>
+            )}
+          </div>
+        </div>
+        
+        {/* Validity Badge - Bottom Right */}
+        {validityDisplay && (
+          <div className={`absolute bottom-3 ${isRTL ? 'left-3' : 'right-3'}`}>
+            <div className="px-2.5 py-1.5 bg-white/90 backdrop-blur-sm rounded-lg flex items-center gap-1.5 shadow-sm">
+              <ClockIcon className="w-3.5 h-3.5 text-gray-500" />
+              <span className="text-xs font-semibold text-eerie-black">{validityDisplay}</span>
+            </div>
+          </div>
+        )}
+      </div>
+      
+      {/* Content Area */}
+      <div className="p-4 lg:p-5 flex-1 flex flex-col">
+        {/* Plan name as description */}
+        <p className="text-gray-500 text-sm leading-relaxed mb-1 truncate">
+          {order.planName || t('dashboard.unknownPlan', 'Unknown Plan')}
+        </p>
+        
+        {/* Country/Region as title */}
+        <h3 className={`text-lg lg:text-xl font-semibold text-eerie-black mb-3 ${isRTL ? 'text-right' : ''}`}>
+          {displayName}
+        </h3>
+
+        {/* Plan Features Tags */}
+        {(planDetails.voice > 0 || planDetails.sms > 0 || (planDetails.operator && planDetails.operator !== 'Airalo Partner Network')) && (
+          <div className={`flex flex-wrap gap-1.5 mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            {planDetails.voice > 0 && (
+              <span className={`inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded text-[11px] font-medium ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <PhoneIcon />
+                <span>{planDetails.voice} min</span>
+              </span>
+            )}
+            
+            {planDetails.sms > 0 && (
+              <span className={`inline-flex items-center gap-1 bg-purple-50 text-purple-700 px-2 py-0.5 rounded text-[11px] font-medium ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <MessageIcon />
+                <span>{planDetails.sms} SMS</span>
+              </span>
+            )}
+            
+            {planDetails.operator && planDetails.operator !== 'Airalo Partner Network' && (
+              <span className={`inline-flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-[11px] font-medium ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <SignalIcon />
+                <span className="truncate max-w-[80px]">{planDetails.operator}</span>
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Expiration notice */}
         {isExpired && usageData?.expired_at && (
-          <div className={`flex items-center gap-1.5 mt-2 pt-2 border-t border-gray-200 ${isRTL ? 'flex-row-reverse' : ''}`}>
-            <Clock className="w-3 h-3 text-amber-500" />
+          <div className={`flex items-center gap-1.5 mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <ClockIcon className="w-3 h-3 text-amber-500" />
             <span className="text-xs text-amber-600">
               {t('dashboard.expiredOn', 'Expired on')} {new Date(usageData.expired_at).toLocaleDateString()}
             </span>
           </div>
         )}
-      </div>
 
-      {/* Plan Features - Tag Style */}
-      {(planDetails.voice > 0 || planDetails.sms > 0 || (planDetails.operator && planDetails.operator !== 'Airalo Partner Network')) && (
-        <div className={`px-4 sm:px-5 py-2.5 flex flex-wrap gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
-          {planDetails.voice > 0 && (
-            <div className={`inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2 py-1 rounded-md text-xs font-medium ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <Phone className="w-3 h-3" />
-              <span>{planDetails.voice} {t('dashboard.min', 'min')}</span>
-            </div>
-          )}
-          
-          {planDetails.sms > 0 && (
-            <div className={`inline-flex items-center gap-1 bg-purple-50 text-purple-700 px-2 py-1 rounded-md text-xs font-medium ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <MessageSquare className="w-3 h-3" />
-              <span>{planDetails.sms} SMS</span>
-            </div>
-          )}
-          
-          {planDetails.operator && planDetails.operator !== 'Airalo Partner Network' && (
-            <div className={`inline-flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-1 rounded-md text-xs font-medium ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <Signal className="w-3 h-3" />
-              <span className="truncate max-w-[100px]">{planDetails.operator}</span>
-            </div>
-          )}
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* Footer - Price & CTA */}
+        <div className={`flex items-center justify-between pt-3 border-t border-gray-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <div>
+            <p className="text-[11px] text-gray-500 mb-0.5">{t('dashboard.price', 'Price')}</p>
+            <p className="text-lg font-bold text-eerie-black">
+              {formatPrice(order.amount || 0)}
+            </p>
+          </div>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onViewQRCode(order);
+            }}
+            className={`group/btn inline-flex items-center gap-2 px-4 py-2.5 bg-tufts-blue text-white rounded-full font-medium hover:bg-tufts-blue/90 active:scale-[0.98] transition-all duration-200 shadow-sm hover:shadow ${isRTL ? 'flex-row-reverse' : ''}`}
+          >
+            <QrCodeIcon className="w-4 h-4" />
+            <span className="text-sm">{t('dashboard.viewQR', 'View QR')}</span>
+            <ArrowRightIcon className="w-3.5 h-3.5 opacity-60 group-hover/btn:translate-x-0.5 transition-transform" />
+          </button>
         </div>
-      )}
-
-      {/* Footer - Price & CTA */}
-      <div className={`px-4 sm:px-5 py-3.5 border-t border-gray-100 flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
-        <div>
-          <p className="text-xs text-gray-500 mb-0.5">{t('dashboard.price', 'Price')}</p>
-          <p className="text-lg font-bold text-gray-900">
-            {formatPrice(order.amount || 0)}
-          </p>
-        </div>
-
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onViewQRCode(order);
-          }}
-          className={`group/btn inline-flex items-center gap-2 px-4 py-2.5 bg-tufts-blue text-white rounded-lg font-medium hover:bg-tufts-blue/90 active:scale-[0.98] transition-all duration-200 shadow-sm hover:shadow ${isRTL ? 'flex-row-reverse' : ''}`}
-        >
-          <QrCode className="w-4 h-4" />
-          <span className="text-sm">{t('dashboard.viewQR', 'View QR')}</span>
-          <ChevronRight className="w-4 h-4 opacity-60 group-hover/btn:translate-x-0.5 transition-transform" />
-        </button>
       </div>
-
-      {/* Subtle Hover Glow Effect */}
-      <div className="absolute inset-0 rounded-xl ring-2 ring-tufts-blue/0 group-hover:ring-tufts-blue/20 transition-all duration-300 pointer-events-none"></div>
     </div>
   );
 };

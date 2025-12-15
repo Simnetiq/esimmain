@@ -234,39 +234,10 @@
     }
   },
   "auth": {
-    "login": {
-      "title": "Войдите в свой аккаунт",
-      "subtitle": "Или",
-      "createAccount": "создайте новый аккаунт",
-      "emailLabel": "Адрес электронной почты",
-      "emailPlaceholder": "Введите ваш email",
-      "passwordLabel": "Пароль",
-      "passwordPlaceholder": "Введите ваш пароль",
-      "forgotPassword": "Забыли пароль?",
-      "signInButton": "Войти",
-      "orContinueWith": "Или продолжить с",
-      "signInWithGoogle": "Войти через Google",
-      "fillAllFields": "Пожалуйста, заполните все поля",
-      "loginSuccessful": "Вход выполнен успешно!",
-      "loginFailed": "Ошибка входа",
-      "googleSignInSuccessful": "Вход через Google выполнен успешно!",
-      "googleSignInFailed": "Ошибка входа через Google"
-    },
-    "register": {
-      "title": "Создайте свой аккаунт",
-      "subtitle": "Или",
-      "signInExisting": "войдите в существующий аккаунт",
-      "fullNameLabel": "Полное имя",
-      "fullNamePlaceholder": "Введите ваше полное имя",
-      "emailLabel": "Адрес электронной почты",
-      "emailPlaceholder": "Введите ваш email",
-      "passwordLabel": "Пароль",
-      "passwordPlaceholder": "Введите ваш пароль",
-      "createAccountButton": "Создать аккаунт",
-      "fillAllFields": "Пожалуйста, заполните все поля",
-      "passwordTooShort": "Пароль должен содержать не менее 6 символов",
-      "accountCreated": "Аккаунт создан! Проверьте вашу электронную почту для получения кода подтверждения.",
-      "registrationFailed": "Ошибка отправки кода подтверждения"
+    "login": {  
+      "title": "Откройте для себя мир с Simnetiq",
+      "quickAccess": "Быстрый и безопасный доступ с вашим аккаунтом Google или Apple",
+      "welcome": "Добро пожаловать обратно"
     },
     "welcomeMessage": "Добро пожаловать в Simnetiq - ваше глобальное решение eSIM",
     "trustedByThousands": "Доверяют тысячи путешественников по всему миру"
@@ -444,7 +415,7 @@
     "chooseYourPlan": "Выберите ваш план",
     "loadingPlans": "Загрузка доступных тарифов...",
     "pleaseWait": "Пожалуйста, подождите, пока мы получаем лучшие варианты для вас",
-    "availablePlans": "Доступные тарифы ({{count}})",
+      "availablePlans": "Доступные тарифы ",
     "sortedByCheapest": "Отсортировано по самым дешевым сначала",
     "dayPlans": "Тарифы на {{days}} дн{{plural}}",
     "countriesAvailable": "{{count}} стран{{plural}} доступно",

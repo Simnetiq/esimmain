@@ -1,52 +1,240 @@
 'use client';
 
-import { Suspense } from 'react';
-import dynamic from 'next/dynamic';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { getLanguageDirection, detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
-import { usePathname } from 'next/navigation';
-import toast from 'react-hot-toast';
+import { usePathname, useRouter } from 'next/navigation';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '@esim/shared/firebase/config';
+import { parsePrice } from '@esim/shared/utils/priceUtils';
+import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
+import { useCountries } from '@esim/shared/hooks/useCountries';
 
-const EsimPlansSection = dynamic(() => import('../EsimPlansSection'), {
-  loading: () => (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-      {[...Array(8)].map((_, i) => (
-        <div key={i} className="bg-gray-100 rounded-md h-32 animate-pulse" />
-      ))}
-    </div>
-  ),
-});
-
-export const handleCopyDiscountCode = async (t) => {
-  const discountCode = 'OCTOBER35';
-  try {
-    await navigator.clipboard.writeText(discountCode);
-    toast.success(t('discount.copied', 'Discount code OCTOBER35 copied! 35% off your purchase!'), {
-      duration: 4000,
-      icon: '🎉',
-    });
-  } catch {
-    toast.error(t('discount.copyFailed', 'Failed to copy code. Please try again.'));
-  }
-};
+// Components
+import PlanSelectionBottomSheet from '../PlanSelectionBottomSheet';
+import { 
+  GlobalPlanCard, 
+  RegionSection,
+  GlobeIcon, 
+  ArrowRightIcon, 
+  ChevronDownIcon,
+  REGION_SLUGS,
+  countCountriesFromPlans 
+} from './plans';
 
 export default function PlansSection({ selectedCountry }) {
-  const { t, locale, isLoading } = useI18n();
+  const { t, locale, isLoading: i18nLoading } = useI18n();
   const pathname = usePathname();
+  const router = useRouter();
   
-  // Get current language for RTL detection
-  const getCurrentLanguage = () => {
+  // State
+  const [globalPlans, setGlobalPlans] = useState([]);
+  const [globalLoading, setGlobalLoading] = useState(true);
+  const [globalCountriesCount, setGlobalCountriesCount] = useState(0);
+  const [regionData, setRegionData] = useState({});
+  const [regionLoading, setRegionLoading] = useState({});
+  const [showMoreRegions, setShowMoreRegions] = useState(false);
+  
+  // Bottom sheet state
+  const [showPlanSheet, setShowPlanSheet] = useState(false);
+  const [selectedPlans, setSelectedPlans] = useState([]);
+  const [loadingSheetPlans, setLoadingSheetPlans] = useState(false);
+  
+  const getCurrentLanguage = useCallback(() => {
     if (locale) return locale;
     if (typeof window !== 'undefined') {
       const savedLanguage = localStorage.getItem('Simnetiq-language');
       if (savedLanguage) return savedLanguage;
     }
     return detectLanguageFromPath(pathname);
-  };
+  }, [locale, pathname]);
 
-  const currentLanguage = getCurrentLanguage();
-  const isRTL = getLanguageDirection(currentLanguage) === 'rtl';
+  const currentLanguage = useMemo(() => getCurrentLanguage(), [getCurrentLanguage]);
+  const isRTL = useMemo(() => getLanguageDirection(currentLanguage) === 'rtl', [currentLanguage]);
   
+  const { countries, isLoading: countriesLoading } = useCountries(currentLanguage);
+
+  // Fetch Discover Global plans
+  useEffect(() => {
+    const fetchGlobalPlans = async () => {
+      try {
+        setGlobalLoading(true);
+        
+        const globalQuery = query(
+          collection(db, 'dataplans'),
+          where('country_title', '==', 'Discover Global')
+        );
+        const snapshot = await getDocs(globalQuery);
+        let plans = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Filter enabled, non-topup
+        plans = plans.filter(p => 
+          p.enabled !== false && 
+          p.is_topup !== true && 
+          p.type !== 'topup'
+        );
+        
+        // Count countries from first plan's operator_coverages
+        if (plans.length > 0) {
+          const count = countCountriesFromPlans([plans[0]]);
+          setGlobalCountriesCount(count);
+        }
+        
+        if (plans.length > 0) {
+          const regularPlans = plans.filter(p => !(p.data || '').toLowerCase().includes('unlimited') && !p.is_unlimited);
+          const unlimitedPlans = plans.filter(p => (p.data || '').toLowerCase().includes('unlimited') || p.is_unlimited);
+          
+          regularPlans.sort((a, b) => (parsePrice(a.price) || 999) - (parsePrice(b.price) || 999));
+          unlimitedPlans.sort((a, b) => (parsePrice(a.price) || 999) - (parsePrice(b.price) || 999));
+          
+          // Get 2 cheapest regular + 2 cheapest unlimited
+          const selected = [...regularPlans.slice(0, 2), ...unlimitedPlans.slice(0, 2)].slice(0, 4);
+          setGlobalPlans(selected);
+        }
+      } catch (error) {
+        console.error('Error fetching global plans:', error);
+      } finally {
+        setGlobalLoading(false);
+      }
+    };
+
+    fetchGlobalPlans();
+  }, []);
+
+  // Fetch regional plans
+  const fetchRegionPlans = useCallback(async (region) => {
+    setRegionLoading(prev => ({ ...prev, [region]: true }));
+    
+    try {
+      const slugs = REGION_SLUGS[region] || [region];
+      let allPlans = [];
+      
+      for (const slug of slugs) {
+        const regionQuery = query(
+          collection(db, 'dataplans'),
+          where('country_slug', '==', slug)
+        );
+        const snapshot = await getDocs(regionQuery);
+        const plans = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        allPlans = [...allPlans, ...plans];
+      }
+      
+      allPlans = allPlans.filter(p => 
+        p.enabled !== false && 
+        p.is_topup !== true && 
+        p.type !== 'topup'
+      );
+      
+      const countriesCount = countCountriesFromPlans(allPlans);
+      
+      setRegionData(prev => ({
+        ...prev,
+        [region]: { plans: allPlans, countriesCount }
+      }));
+    } catch (error) {
+      console.error(`Error fetching ${region} plans:`, error);
+      setRegionData(prev => ({
+        ...prev,
+        [region]: { plans: [], countriesCount: 0 }
+      }));
+    } finally {
+      setRegionLoading(prev => ({ ...prev, [region]: false }));
+    }
+  }, []);
+
+  // Fetch initial regions
+  useEffect(() => {
+    fetchRegionPlans('europe');
+    fetchRegionPlans('asia');
+  }, [fetchRegionPlans]);
+
+  // Fetch more regions when expanded
+  useEffect(() => {
+    if (showMoreRegions) {
+      fetchRegionPlans('americas');
+      fetchRegionPlans('africa');
+      fetchRegionPlans('oceania');
+    }
+  }, [showMoreRegions, fetchRegionPlans]);
+
+  // Handle country selection
+  const handleCountrySelect = useCallback(async (country) => {
+    setLoadingSheetPlans(true);
+    setShowPlanSheet(true);
+    
+    try {
+      const plansQuery = query(
+        collection(db, 'dataplans'),
+        where('country_codes', 'array-contains', country.code)
+      );
+      const snapshot = await getDocs(plansQuery);
+      
+      let plans = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      plans = plans.filter(p => 
+        p.enabled !== false && 
+        p.is_topup !== true && 
+        p.type !== 'topup'
+      );
+      
+      setSelectedPlans(plans);
+    } catch (error) {
+      console.error('Error loading plans:', error);
+      setSelectedPlans([]);
+    } finally {
+      setLoadingSheetPlans(false);
+    }
+  }, []);
+
+  // Handle plan click
+  const handlePlanClick = useCallback((plan, region, openFullSheet = false) => {
+    if (openFullSheet || !plan) {
+      setSelectedPlans(regionData[region]?.plans || []);
+      setShowPlanSheet(true);
+    } else {
+      trackCustomFacebookEvent('PlanClicked', {
+        plan_id: plan.id,
+        plan_price: plan.price,
+        region: region,
+        source: 'home_plans_section',
+        timestamp: new Date().toISOString()
+      });
+      
+      const planUrl = currentLanguage === 'en' 
+        ? `/share-package/${plan.id}?country=${plan.country_slug || region}`
+        : `/${currentLanguage}/share-package/${plan.id}?country=${plan.country_slug || region}`;
+      router.push(planUrl);
+    }
+  }, [regionData, currentLanguage, router]);
+
+  // Handle global plan click
+  const handleGlobalPlanClick = useCallback((plan) => {
+    trackCustomFacebookEvent('GlobalPlanClicked', {
+      plan_id: plan.id,
+      plan_price: plan.price,
+      source: 'home_global_section',
+      timestamp: new Date().toISOString()
+    });
+    
+    const planUrl = currentLanguage === 'en' 
+      ? `/share-package/${plan.id}?country=discover-global`
+      : `/${currentLanguage}/share-package/${plan.id}?country=discover-global`;
+    router.push(planUrl);
+  }, [currentLanguage, router]);
+
+  // Navigate to all plans
+  const handleNavigateToPlans = useCallback(() => {
+    const plansUrl = currentLanguage === 'en' ? '/esim-plans' : `/${currentLanguage}/esim-plans`;
+    router.push(plansUrl);
+  }, [currentLanguage, router]);
+  
+  const gridPatternStyle = useMemo(() => ({
+    backgroundSize: '10px 10px',
+    backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
+  }), []);
+
+  const isLoading = i18nLoading || countriesLoading;
+
+  // Loading skeleton
   if (isLoading) {
     return (
       <div className="bg-white flex flex-col overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -58,95 +246,172 @@ export default function PlansSection({ selectedCountry }) {
                 <div className="h-10 w-96 bg-gray-200 rounded animate-pulse" />
               </div>
             </div>
-            <div className="w-full h-px bg-gray-100" />
-          </div>
-          <div className="mx-auto w-full max-w-9xl">
-            <div className="mx-auto w-full max-w-7xl">
-              <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {[...Array(8)].map((_, i) => (
-                    <div key={i} className="bg-gray-50 rounded-lg p-4 animate-pulse">
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="w-14 sm:w-16 aspect-[4/3] bg-gray-200 rounded-lg" />
-                        <div className="flex-1">
-                          <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-                          <div className="h-3 bg-gray-200 rounded w-1/2" />
-                        </div>
-                      </div>
-                      <div className="h-5 bg-gray-200 rounded w-1/3" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
     );
   }
-  
-  // Grid pattern style
-  const gridPatternStyle = {
-    backgroundSize: '10px 10px',
-    backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-  };
 
   return (
     <div className="bg-white flex flex-col overflow-hidden">
       <div className="relative flex-1 flex flex-col">
-        {/* Grid Pattern - Left Side */}
-        <div 
-          className="hidden xl:block absolute left-0 top-0 bottom-0 w-32"
-          style={gridPatternStyle}
-        />
+        <div className="hidden xl:block absolute left-0 top-0 bottom-0 w-32" style={gridPatternStyle} />
+        <div className="hidden xl:block absolute right-0 top-0 bottom-0 w-32" style={gridPatternStyle} />
 
-        {/* Grid Pattern - Right Side */}
-        <div 
-          className="hidden xl:block absolute right-0 top-0 bottom-0 w-32"
-          style={gridPatternStyle}
-        />
-
-        {/* Header Section */}
+        {/* Header */}
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
             <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              <p className="text-sm max-w-2xl sm:text-base font-medium tracking-widest uppercase text-gray-500 rtl:font-semibold rtl:tracking-tight">
-                {t('plans.title')}
+              <p className="text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500">
+                {t('plans.title', 'eSIM Plans')}
               </p>
-              <h2 className="mt-4 text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-pretty text-eerie-black max-w-5xl">
-                {t('plans.subtitle')}
+              <h2 className="mt-4 text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-eerie-black max-w-5xl">
+                {t('plans.subtitle', 'Stay connected worldwide')}
               </h2>
             </div>
           </div>
           <div className="w-full h-px bg-gray-100" />
         </div>
 
-        {/* Plans Component */}
+        {/* Main Content */}
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl">
-            <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              <Suspense fallback={
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {[...Array(8)].map((_, i) => (
-                    <div key={i} className="bg-gray-50 rounded-lg p-4 animate-pulse">
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="w-14 aspect-[4/3] bg-gray-200 rounded-lg" />
-                        <div className="flex-1">
-                          <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-                          <div className="h-3 bg-gray-200 rounded w-1/2" />
-                        </div>
-                      </div>
-                      <div className="h-5 bg-gray-200 rounded w-1/3" />
-                    </div>
-                  ))}
+            <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl space-y-8">
+              
+              {/* Discover Global Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-tufts-blue to-blue-600 flex items-center justify-center">
+                    <GlobeIcon className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-eerie-black">
+                      {t('deals.discoverGlobal', 'Discover Global')}
+                    </h3>
+                    <p className="text-xs text-gray-500">
+                      {globalCountriesCount > 0 ? `${globalCountriesCount}+ ${t('deals.countries', 'countries')}` : '130+ countries'} · {t('deals.oneEsim', 'One eSIM, worldwide coverage')}
+                    </p>
+                  </div>
                 </div>
-              }>
-                <EsimPlansSection selectedCountryFromHero={selectedCountry} />
-              </Suspense>
+                
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  {globalLoading ? (
+                    [...Array(4)].map((_, i) => (
+                      <div key={i} className="bg-gray-50 rounded-xl p-4 h-32 animate-pulse" />
+                    ))
+                  ) : globalPlans.length > 0 ? (
+                    globalPlans.map((plan) => (
+                      <GlobalPlanCard
+                        key={plan.id}
+                        plan={plan}
+                        onClick={() => handleGlobalPlanClick(plan)}
+                        t={t}
+                      />
+                    ))
+                  ) : (
+                    <div className="col-span-full text-center py-8 text-gray-400 text-sm">
+                      {t('deals.noGlobalPlans', 'Global plans coming soon')}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div className="w-full h-px bg-gray-100" />
+
+              {/* Regional Sections */}
+              <RegionSection
+                region="europe"
+                countries={countries}
+                plans={regionData.europe?.plans || []}
+                countriesCount={regionData.europe?.countriesCount || 0}
+                plansLoading={regionLoading.europe}
+                onCountrySelect={handleCountrySelect}
+                onPlanClick={(plan, openFull) => handlePlanClick(plan, 'europe', openFull)}
+                t={t}
+              />
+
+              <RegionSection
+                region="asia"
+                countries={countries}
+                plans={regionData.asia?.plans || []}
+                countriesCount={regionData.asia?.countriesCount || 0}
+                plansLoading={regionLoading.asia}
+                onCountrySelect={handleCountrySelect}
+                onPlanClick={(plan, openFull) => handlePlanClick(plan, 'asia', openFull)}
+                t={t}
+              />
+
+              {/* Expanded Regions */}
+              {showMoreRegions && (
+                <>
+                  <RegionSection
+                    region="americas"
+                    countries={countries}
+                    plans={regionData.americas?.plans || []}
+                    countriesCount={regionData.americas?.countriesCount || 0}
+                    plansLoading={regionLoading.americas}
+                    onCountrySelect={handleCountrySelect}
+                    onPlanClick={(plan, openFull) => handlePlanClick(plan, 'americas', openFull)}
+                    t={t}
+                  />
+                  <RegionSection
+                    region="africa"
+                    countries={countries}
+                    plans={regionData.africa?.plans || []}
+                    countriesCount={regionData.africa?.countriesCount || 0}
+                    plansLoading={regionLoading.africa}
+                    onCountrySelect={handleCountrySelect}
+                    onPlanClick={(plan, openFull) => handlePlanClick(plan, 'africa', openFull)}
+                    t={t}
+                  />
+                  <RegionSection
+                    region="oceania"
+                    countries={countries}
+                    plans={regionData.oceania?.plans || []}
+                    countriesCount={regionData.oceania?.countriesCount || 0}
+                    plansLoading={regionLoading.oceania}
+                    onCountrySelect={handleCountrySelect}
+                    onPlanClick={(plan, openFull) => handlePlanClick(plan, 'oceania', openFull)}
+                    t={t}
+                  />
+                </>
+              )}
+
+              {/* Buttons */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                {!showMoreRegions && (
+                  <button
+                    onClick={() => setShowMoreRegions(true)}
+                    className="btn-secondary flex items-center gap-2 px-6 py-3 rounded-full font-semibold  w-full sm:w-auto"
+                  >
+                    <span>{t('plans.showMoreRegions', 'Show More Regions')}</span>
+                    <ChevronDownIcon className="w-5 h-5" />
+                  </button>
+                )}
+                
+                <button
+                  onClick={handleNavigateToPlans}
+                  className="btn-primary inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full w-full sm:w-auto"
+                >
+                  <span>{t('plans.seeAllPlans', 'See All Plans')}</span>
+                  <ArrowRightIcon className="w-5 h-5" />
+                </button>
+              </div>
+
             </div>
           </div>
         </div>
       </div>
+
+      {/* Bottom Sheet */}
+      <PlanSelectionBottomSheet
+        isOpen={showPlanSheet}
+        onClose={() => setShowPlanSheet(false)}
+        availablePlans={selectedPlans}
+        loadingPlans={loadingSheetPlans}
+        filteredCountries={[]}
+      />
     </div>
   );
 }

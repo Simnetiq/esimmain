@@ -136,6 +136,18 @@ const Navbar = ({ hideLanguageSelector = false }) => {
     setMounted(true);
   }, []);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMenuOpen]);
+
   // Close all dropdowns when navbar hides (scrolling down)
   useEffect(() => {
     if (!isVisible) {
@@ -443,7 +455,13 @@ const Navbar = ({ hideLanguageSelector = false }) => {
 
       {/* Mobile menu using Portal */}
       {isMenuOpen && mounted && createPortal(
-        <div className="lg:hidden" style={{ zIndex: 99999, position: 'fixed', inset: 0 }} dir={isRTL ? 'rtl' : 'ltr'}>
+        <div 
+          className="lg:hidden" 
+          style={{ zIndex: 99999, position: 'fixed', inset: 0 }} 
+          dir={isRTL ? 'rtl' : 'ltr'}
+          onClick={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
+        >
           <div 
             className="fixed inset-0 w-full h-full overflow-y-auto bg-white/80 backdrop-blur-xl" 
             style={{ zIndex: 99999 }}
@@ -479,20 +497,17 @@ const Navbar = ({ hideLanguageSelector = false }) => {
               <div className="space-y-2">
                 {/* User info - only show when logged in */}
                 {currentUser && (
-                  <>
-                    <div className="flex flex-col items-center justify-center py-4 px-4">
-                      <div className="w-16 h-16 rounded-full bg-tufts-blue text-white text-xl font-semibold flex items-center justify-center mb-2">
-                        {getUserInitials()}
-                      </div>
-                      <p className="text-base font-medium text-eerie-black">
-                        {currentUser.displayName || t('navbar.user', 'User')}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {currentUser.email}
-                      </p>
+                  <div className="flex flex-col items-center justify-center py-4 px-4 mb-4">
+                    <div className="w-16 h-16 rounded-full bg-tufts-blue text-white text-xl font-semibold flex items-center justify-center mb-2">
+                      {getUserInitials()}
                     </div>
-                    <div className="border-t border-gray-200 my-4 mx-8" />
-                  </>
+                    <p className="text-base font-medium text-eerie-black">
+                      {currentUser.displayName || t('navbar.user', 'User')}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {currentUser.email}
+                    </p>
+                  </div>
                 )}
                 
                 {/* Store */}
@@ -515,9 +530,6 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                   </Link>
                 )}
                 
-                {/* Divider */}
-                <div className="border-t border-gray-200 my-4 mx-8" />
-                
                 {/* More section items */}
                 <Link
                   href={getLocalizedBlogListUrl(currentLanguage)}
@@ -535,47 +547,20 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                   {t('navbar.contactUs', 'Contact Us')}
                 </Link>
                 
-                {/* Divider */}
-                <div className="border-t border-gray-200 my-4 mx-8" />
-                
-                {/* Download App - with specific links for authenticated users */}
-                {currentUser ? (
-                  <>
-                    <span className="flex items-center justify-center text-xs text-gray-400 uppercase tracking-wider py-2">
-                      {t('navbar.getTheApp', 'Get the App')}
-                    </span>
-                    <a
-                      href="https://apps.apple.com/gb/app/simnetiq-global-esim/id6755963262"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4 ${isRTL ? 'flex-row-reverse' : ''}`}
-                      onClick={() => {
-                        handleDownloadApp();
-                        setIsMenuOpen(false);
-                      }}
-                    >
-                      <Smartphone className="w-5 h-5" />
-                      {t('navbar.iosApp', 'iOS App')}
-                    </a>
-                    <span className={`flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-gray-400 py-3 px-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                      <Smartphone className="w-5 h-5" />
-                      {t('navbar.androidApp', 'Android')} <span className="text-sm">({t('navbar.comingSoon', 'Soon')})</span>
-                    </span>
-                  </>
-                ) : (
-                  <button
-                    onClick={() => {
-                      handleDownloadApp();
-                      setIsMenuOpen(false);
-                    }}
-                    className="flex items-center justify-center text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4 w-full bg-transparent border-none cursor-pointer"
-                  >
-                    {t('navbar.downloadApp', 'Download App')} 
-                  </button>
-                )}
-                
-                {/* Divider before auth section */}
-                <div className="border-t border-gray-200 my-4 mx-8" />
+                {/* Download App */}
+                <a
+                  href="https://apps.apple.com/gb/app/simnetiq-global-esim/id6755963262"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4 ${isRTL ? 'flex-row-reverse' : ''}`}
+                  onClick={() => {
+                    handleDownloadApp();
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  <Smartphone className="w-5 h-5" />
+                  {t('navbar.getApp', 'Get App')}
+                </a>
                 
                 {/* Auth/Settings section */}
                 {currentUser ? (
@@ -587,15 +572,6 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                     >
                       <Settings className="w-5 h-5" />
                       {t('navbar.settings', 'Settings')}
-                    </Link>
-                    
-                    <Link
-                      href={getLocalizedUrl('/contact')}
-                      className={`flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4 ${isRTL ? 'flex-row-reverse' : ''}`}
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <HeadphonesIcon className="w-5 h-5" />
-                      {t('navbar.support', 'Support')}
                     </Link>
                     
                     <button
@@ -617,13 +593,6 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                       {t('navbar.login', 'Login')}
                     </Link>
                     
-                    <Link
-                      href={getLocalizedUrl('/register')}
-                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {t('navbar.register', 'Register')}
-                    </Link>
                   </>
                 )}
               </div>
