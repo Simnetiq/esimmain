@@ -46,25 +46,24 @@ if (firebaseConfig.apiKey && firebaseConfig.projectId) {
   storage = getStorage(app);
 }
 
-// Lazy auth singleton - only initialized when first accessed
-// This removes Firebase Auth from the critical path, improving LCP
-let _authInstance = null;
+// Initialize Auth - only on client side
+let auth = null;
+if (typeof window !== 'undefined' && app) {
+  auth = getAuth(app);
+}
 
 /**
- * Get Firebase Auth instance lazily.
- * Auth is only initialized when this function is first called.
- * For even better performance, consider using useLazyAuth hook.
+ * Get Firebase Auth instance.
+ * For backward compatibility and lazy access patterns.
  */
 const getAuthInstance = () => {
-  if (!_authInstance && app) {
-    _authInstance = getAuth(app);
+  if (typeof window === 'undefined') return null;
+  if (!app) return null;
+  if (!auth) {
+    auth = getAuth(app);
   }
-  return _authInstance;
+  return auth;
 };
-
-// For backward compatibility, initialize auth on client-side only
-// Use getAuthInstance() for new code to benefit from lazy initialization
-const auth = typeof window !== 'undefined' && app ? getAuthInstance() : null;
 
 // Initialize Analytics lazily - only if supported and app is initialized
 let analytics = null;

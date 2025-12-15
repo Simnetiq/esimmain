@@ -1,7 +1,7 @@
-// Placeholder app store links (blank/generic)
+// App store links
 export const appStoreLinks = {
-  ios: '#',
-  android: '#'
+  ios: 'https://apps.apple.com/gb/app/simnetiq-global-esim/id6755963262',
+  android: '#' // Coming soon
 };
 
 // Helper function to get app store link based on platform
