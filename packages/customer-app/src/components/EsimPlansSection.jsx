@@ -6,8 +6,6 @@ import { db } from '@esim/shared/firebase/config';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
-import { motion } from 'framer-motion';
-import { ChevronDown, ArrowRight } from 'lucide-react';
 import { detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
 
 // Import components
@@ -17,6 +15,19 @@ import PlanSelectionBottomSheet from './PlanSelectionBottomSheet';
 // Import hooks
 import { useCountries } from '@esim/shared/hooks/useCountries';
 import { useCountryFilters } from '@esim/shared/hooks/useCountryFilters';
+
+// Inline SVG icons to avoid lucide-react bundle overhead
+const ChevronDownIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m6 9 6 6 6-6"/>
+  </svg>
+);
+
+const ArrowRightIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+  </svg>
+);
 
 const EsimPlansSection = ({ selectedCountryFromHero }) => {
   const { t, locale } = useI18n();
@@ -137,13 +148,9 @@ const EsimPlansSection = ({ selectedCountryFromHero }) => {
 
   return (
     <div ref={sectionRef} className="w-full">
-      {/* Countries Grid Section - Main page version */}
-      <motion.div
-        layout
-        initial={false}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3, ease: 'easeOut' }}
-        className={`mb-6 transform transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+      {/* Countries Grid Section - Main page version - CSS animations instead of framer-motion */}
+      <div
+        className={`mb-6 transition-all duration-500 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
       >
         <CountriesGrid
           countries={displayedCountries}
@@ -154,36 +161,30 @@ const EsimPlansSection = ({ selectedCountryFromHero }) => {
           selectedRegion={selectedRegion}
           showAllOverride={showAllCountries}
         />
-      </motion.div>
+      </div>
 
-      {/* Show More / See All Plans Buttons */}
+      {/* Show More / See All Plans Buttons - CSS animations instead of framer-motion */}
       {!countriesLoading && filteredCountries.length > 0 && (
-        <div className={`flex flex-col sm:flex-row items-center justify-center gap-4 mt-8 mb-8 transform transition-all duration-700 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <div className={`flex flex-col sm:flex-row items-center justify-center gap-4 mt-8 mb-8 transition-all duration-500 ease-out delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           {/* Show More Button - Only show if not showing all and has more countries */}
           {!showAllCountries && hasMoreCountries && (
-            <motion.button
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3 }}
+            <button
               onClick={() => setShowAllCountries(true)}
-              className="btn-secondary flex items-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105 w-full max-w-md"
+              className="btn-secondary flex items-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105 w-full max-w-md animate-fade-in"
             >
               <span>{t('plans.showMore', 'Show More')}</span>
-              <ChevronDown className="w-5 h-5" />
-            </motion.button>
+              <ChevronDownIcon className="w-5 h-5" />
+            </button>
           )}
           
           {/* See All Plans Button - Always show */}
-          <motion.button
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3, delay: 0.1 }}
+          <button
             onClick={handleNavigateToPlans}
-            className="btn-primary inline-flex items-center justify-center gap-2 w-full max-w-md py-3 rounded-lg"
+            className="btn-primary inline-flex items-center justify-center gap-2 w-full max-w-md py-3 rounded-lg animate-fade-in animation-delay-100"
           >
             <span>{t('plans.seeAllPlans', 'See All Plans')}</span>
-            <ArrowRight className="w-5 h-5" />
-          </motion.button>
+            <ArrowRightIcon className="w-5 h-5" />
+          </button>
         </div>
       )}
 
