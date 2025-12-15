@@ -22,7 +22,7 @@ const CountryCard = ({
   return (
     <div
       onClick={onClick}
-      className="group relative bg-gray-50 rounded-lg overflow-hidden hover:bg-white transition-all duration-300 cursor-pointer"
+      className="group relative bg-gray-50  overflow-hidden hover:bg-white transition-all duration-300 cursor-pointer"
       title={fullName}
       data-country-name={fullName}
       data-country-code={country.code}
@@ -41,7 +41,7 @@ const CountryCard = ({
         {/* Country Flag & Name */}
         <div className="flex items-center gap-3 mb-3">
           {/* 4:3 Flag Container */}
-          <div className="flex-shrink-0 w-14 sm:w-16 aspect-[4/3] bg-white rounded-lg flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-300">
+          <div className="flex-shrink-0 w-14 sm:w-16 aspect-[4/3] bg-white  flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-300">
             {country.photo && country.photo.includes('firebasestorage') ? (
               <div className="relative w-full h-full">
                 <Image 
@@ -102,8 +102,7 @@ const CountryCard = ({
         </div>
       </div>
 
-      {/* Border ring */}
-      <div className="pointer-events-none absolute inset-px rounded-lg ring-1 ring-black/5 group-hover:ring-tufts-blue/30 transition-all duration-300" />
+      
     </div>
   );
 };

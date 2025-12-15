@@ -235,22 +235,9 @@
   },
   "auth": {
     "login": {
-      "title": "Inicia sesión en tu cuenta",
-      "subtitle": "O",
-      "createAccount": "crea una nueva cuenta",
-      "emailLabel": "Dirección de correo electrónico",
-      "emailPlaceholder": "Ingresa tu correo electrónico",
-      "passwordLabel": "Contraseña",
-      "passwordPlaceholder": "Ingresa tu contraseña",
-      "forgotPassword": "¿Olvidaste tu contraseña?",
-      "signInButton": "Iniciar sesión",
-      "orContinueWith": "O continúa con",
-      "signInWithGoogle": "Iniciar sesión con Google",
-      "fillAllFields": "Por favor completa todos los campos",
-      "loginSuccessful": "¡Inicio de sesión exitoso!",
-      "loginFailed": "Error al iniciar sesión",
-      "googleSignInSuccessful": "¡Inicio de sesión con Google exitoso!",
-      "googleSignInFailed": "Error al iniciar sesión con Google"
+      "title": "Explora el mundo con Simnetiq",
+      "quickAccess": "Acceso rápido y seguro con tu cuenta de Google o Apple",
+      "welcome": "Bienvenido de vuelta"
     },
     "register": {
       "title": "Crea tu cuenta",
@@ -458,7 +445,7 @@
     "chooseYourPlan": "Elige tu plan",
     "loadingPlans": "Cargando planes disponibles...",
     "pleaseWait": "Por favor espera mientras obtenemos las mejores opciones para ti",
-    "availablePlans": "Planes disponibles ({{count}})",
+    "availablePlans": "Planes disponibles ",
     "sortedByCheapest": "Ordenado por más barato primero",
     "dayPlans": "Planes de {{days}} día{{plural}}",
     "countriesAvailable": "{{count}} país{{plural}} disponibles",

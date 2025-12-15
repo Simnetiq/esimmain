@@ -210,7 +210,7 @@ export default function ActivationSection() {
                   return (
                     <div 
                       key={index} 
-                      className="group relative bg-gray-50 rounded-lg overflow-hidden hover:bg-white transition-all duration-300"
+                      className="group relative bg-white overflow-hidden border border-white transition-all duration-300"
                     >
                       <button
                         onClick={() => toggleFaq(index)}
@@ -240,7 +240,7 @@ export default function ActivationSection() {
                         </div>
                       </div>
                       
-                      <div className="pointer-events-none absolute inset-px rounded-lg ring-1 ring-black/5" />
+                      <div className="pointer-events-none absolute inset-px ring-1 ring-black/5" />
                     </div>
                   );
                 })}
