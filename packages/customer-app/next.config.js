@@ -122,13 +122,39 @@ const nextConfig = {
     ];
   },
 
-  // Webpack optimizations - simplified to avoid build errors
-  webpack: (config) => {
+  // Webpack optimizations for smaller bundles and better code splitting
+  webpack: (config, { isServer }) => {
     // Ensure consistent module IDs between builds
     config.optimization = {
       ...config.optimization,
       moduleIds: 'deterministic',
     };
+
+    // Better code splitting for client-side bundles
+    if (!isServer) {
+      config.optimization.splitChunks = {
+        ...config.optimization.splitChunks,
+        cacheGroups: {
+          ...config.optimization.splitChunks?.cacheGroups,
+          // Separate Firebase into its own chunk (loaded only when needed)
+          firebase: {
+            test: /[\\/]node_modules[\\/](firebase|@firebase)[\\/]/,
+            name: 'firebase',
+            chunks: 'async',
+            priority: 20,
+            reuseExistingChunk: true,
+          },
+          // Separate large UI libraries
+          ui: {
+            test: /[\\/]node_modules[\\/](framer-motion|react-hot-toast)[\\/]/,
+            name: 'ui-libs',
+            chunks: 'async',
+            priority: 15,
+            reuseExistingChunk: true,
+          },
+        },
+      };
+    }
 
     return config;
   },
