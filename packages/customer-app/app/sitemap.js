@@ -135,35 +135,109 @@ export default async function sitemap() {
     }
   });
 
-  // Fetch blog posts dynamically
+  // Fetch blog posts dynamically from BOTH collections for maximum coverage
   let blogPosts = [];
+  const addedSlugs = new Set(); // Track added slugs to avoid duplicates
+  
   try {
-    const blogsRef = collection(db, 'blogs_separate');
-    const q = query(
-      blogsRef,
-      where('status', '==', 'published'),
-      orderBy('publishedAt', 'desc')
-    );
-    
-    const querySnapshot = await getDocs(q);
-    
-    querySnapshot.forEach((doc) => {
-      const post = doc.data();
-      const slug = post.slug;
-      const language = post.language || 'en';
-      const lastModified = post.updatedAt?.toDate() || post.publishedAt?.toDate() || new Date();
+    // Method 1: Query blog_posts_translations (new structure with separate translations)
+    try {
+      const translationsRef = collection(db, 'blog_posts_translations');
+      const translationsQuery = query(translationsRef);
+      const translationsSnapshot = await getDocs(translationsQuery);
       
-      const blogUrl = language === 'en' 
-        ? `${baseUrl}/blog/${slug}`
-        : `${baseUrl}/${language}/blog/${slug}`;
-      
-      blogPosts.push({
-        url: blogUrl,
-        lastModified: lastModified,
-        changeFrequency: 'weekly',
-        priority: 0.7,
+      translationsSnapshot.forEach((doc) => {
+        const translation = doc.data();
+        const slug = translation.slug;
+        const language = translation.language || 'en';
+        const lastModified = translation.updatedAt?.toDate() || translation.createdAt?.toDate() || new Date();
+        
+        if (slug && !addedSlugs.has(`${language}:${slug}`)) {
+          const blogUrl = language === 'en' 
+            ? `${baseUrl}/blog/${slug}`
+            : `${baseUrl}/${language}/blog/${slug}`;
+          
+          blogPosts.push({
+            url: blogUrl,
+            lastModified: lastModified,
+            changeFrequency: 'weekly',
+            priority: 0.7,
+          });
+          addedSlugs.add(`${language}:${slug}`);
+        }
       });
-    });
+      
+      console.log(`[Sitemap] Found ${translationsSnapshot.size} blog translations`);
+    } catch (e) {
+      console.log('[Sitemap] blog_posts_translations collection not found or error:', e.message);
+    }
+    
+    // Method 2: Query blog_posts (legacy structure with embedded translations)
+    try {
+      const blogsRef = collection(db, 'blog_posts');
+      const blogsQuery = query(
+        blogsRef,
+        where('status', '==', 'published'),
+        orderBy('publishedAt', 'desc')
+      );
+      const blogsSnapshot = await getDocs(blogsQuery);
+      
+      blogsSnapshot.forEach((doc) => {
+        const post = doc.data();
+        const baseSlug = post.baseSlug || post.slug;
+        const lastModified = post.updatedAt?.toDate() || post.publishedAt?.toDate() || new Date();
+        
+        // Add English version
+        if (baseSlug && !addedSlugs.has(`en:${baseSlug}`)) {
+          blogPosts.push({
+            url: `${baseUrl}/blog/${baseSlug}`,
+            lastModified: lastModified,
+            changeFrequency: 'weekly',
+            priority: 0.7,
+          });
+          addedSlugs.add(`en:${baseSlug}`);
+        }
+        
+        // Add translations if they exist in the post
+        if (post.translations) {
+          Object.entries(post.translations).forEach(([lang, translation]) => {
+            if (lang !== 'en' && translation?.slug && !addedSlugs.has(`${lang}:${translation.slug}`)) {
+              blogPosts.push({
+                url: `${baseUrl}/${lang}/blog/${translation.slug}`,
+                lastModified: lastModified,
+                changeFrequency: 'weekly',
+                priority: 0.7,
+              });
+              addedSlugs.add(`${lang}:${translation.slug}`);
+            }
+          });
+        }
+        
+        // Also check availableLanguages array
+        if (post.availableLanguages && Array.isArray(post.availableLanguages)) {
+          post.availableLanguages.forEach(lang => {
+            if (lang !== 'en' && baseSlug) {
+              const langSlug = `${baseSlug}-${lang}`;
+              if (!addedSlugs.has(`${lang}:${langSlug}`)) {
+                blogPosts.push({
+                  url: `${baseUrl}/${lang}/blog/${langSlug}`,
+                  lastModified: lastModified,
+                  changeFrequency: 'weekly',
+                  priority: 0.7,
+                });
+                addedSlugs.add(`${lang}:${langSlug}`);
+              }
+            }
+          });
+        }
+      });
+      
+      console.log(`[Sitemap] Found ${blogsSnapshot.size} blog posts`);
+    } catch (e) {
+      console.log('[Sitemap] blog_posts collection error:', e.message);
+    }
+    
+    console.log(`[Sitemap] Total blog URLs: ${blogPosts.length}`);
   } catch (error) {
     console.error('Error fetching blog posts for sitemap:', error);
   }
