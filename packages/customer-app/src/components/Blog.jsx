@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -8,25 +8,35 @@ import { useI18n } from '@esim/shared/contexts/I18nContext';
 import blogServiceSeparate from '@esim/shared/services/blogServiceSeparate';
 import { detectLanguageFromPath, getLocalizedBlogUrl, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { formatBlogDate } from '@esim/shared/utils/blogUtils';
-import BlogAppDownload from './BlogAppDownload';
-import { trackBlogListView, trackBlogPostClick, trackBlogCategoryFilter } from '@esim/shared/utils/trackingPixels';
 
-// Category color mapping
-const getCategoryStyle = (category) => {
-  const styles = {
-    'Travel': 'bg-blue-100/60 text-blue-800',
-    'Technology': 'bg-purple-100/60 text-purple-800',
-    'Guide': 'bg-green-100/60 text-green-800',
-    'News': 'bg-orange-100/60 text-orange-800',
-    'Tips': 'bg-teal-100/60 text-teal-800',
-    'Tutorial': 'bg-indigo-100/60 text-indigo-800',
-    'default': 'bg-gray-100/60 text-gray-800'
-  };
-  return styles[category] || styles.default;
+// Lazy load non-critical components
+import dynamic from 'next/dynamic';
+const BlogAppDownload = dynamic(() => import('./BlogAppDownload'), { ssr: false });
+
+// Lazy load tracking (not needed for initial render)
+let trackingLoaded = false;
+const loadTracking = async () => {
+  if (trackingLoaded) return;
+  trackingLoaded = true;
+  const tracking = await import('@esim/shared/utils/trackingPixels');
+  return tracking;
 };
 
-// Large Featured Card (1 in the 1:2 layout - image fills height of both small cards)
-const LargeFeaturedCard = ({ post, language, isRTL, onPostClick }) => {
+// Category color mapping
+const CATEGORY_STYLES = {
+  'Travel': 'bg-blue-100/60 text-blue-800',
+  'Technology': 'bg-purple-100/60 text-purple-800',
+  'Guide': 'bg-green-100/60 text-green-800',
+  'News': 'bg-orange-100/60 text-orange-800',
+  'Tips': 'bg-teal-100/60 text-teal-800',
+  'Tutorial': 'bg-indigo-100/60 text-indigo-800',
+  'default': 'bg-gray-100/60 text-gray-800'
+};
+
+const getCategoryStyle = (category) => CATEGORY_STYLES[category] || CATEGORY_STYLES.default;
+
+// Large Featured Card (memoized)
+const LargeFeaturedCard = memo(({ post, language, isRTL, onPostClick }) => {
   if (!post) return null;
   
   return (
@@ -35,7 +45,6 @@ const LargeFeaturedCard = ({ post, language, isRTL, onPostClick }) => {
       onClick={() => onPostClick(post, 0)}
       className="group/article-preview flex flex-col h-full"
     >
-      {/* Image - fills the height to match both small cards */}
       <div className="flex-1 w-full shadow-lg shadow-gray-100 min-h-[200px]">
         <div className="relative w-full h-full min-h-[200px] lg:min-h-[300px]">
           {post.featuredImage ? (
@@ -45,7 +54,7 @@ const LargeFeaturedCard = ({ post, language, isRTL, onPostClick }) => {
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
               className="absolute inset-0 size-full scale-[1.01] object-cover transition-all duration-300 ease-out group-hover/article-preview:scale-[1.03]"
-              quality={85}
+              quality={80}
               priority
             />
           ) : (
@@ -55,7 +64,6 @@ const LargeFeaturedCard = ({ post, language, isRTL, onPostClick }) => {
           )}
         </div>
       </div>
-      {/* Text content - below image */}
       <div className="pt-4">
         <div className="pb-2">
           <span className={`inline-flex items-center rounded-full h-6 px-2.5 text-xs font-medium ${getCategoryStyle(post.category)}`}>
@@ -71,10 +79,11 @@ const LargeFeaturedCard = ({ post, language, isRTL, onPostClick }) => {
       </div>
     </Link>
   );
-};
+});
+LargeFeaturedCard.displayName = 'LargeFeaturedCard';
 
-// Small Featured Card (2 in the 1:2 layout - horizontal layout)
-const SmallFeaturedCard = ({ post, language, isRTL, onPostClick, index }) => {
+// Small Featured Card (memoized)
+const SmallFeaturedCard = memo(({ post, language, isRTL, onPostClick, index }) => {
   if (!post) return null;
   
   return (
@@ -90,9 +99,9 @@ const SmallFeaturedCard = ({ post, language, isRTL, onPostClick, index }) => {
               src={post.featuredImage}
               alt={post.title}
               fill
-              sizes="(max-width: 768px) 33vw, (max-width: 1024px) 20vw, 15vw"
+              sizes="(max-width: 768px) 33vw, 15vw"
               className="absolute inset-0 size-full scale-[1.01] object-cover transition-all duration-300 ease-out group-hover/article-preview:scale-[1.07]"
-              quality={75}
+              quality={70}
               loading="lazy"
             />
           ) : (
@@ -117,10 +126,11 @@ const SmallFeaturedCard = ({ post, language, isRTL, onPostClick, index }) => {
       </div>
     </Link>
   );
-};
+});
+SmallFeaturedCard.displayName = 'SmallFeaturedCard';
 
-// Grid Article Card
-const GridArticleCard = ({ post, language, isRTL, onPostClick, index }) => {
+// Grid Article Card (memoized)
+const GridArticleCard = memo(({ post, language, isRTL, onPostClick, index }) => {
   if (!post) return null;
   
   return (
@@ -136,9 +146,9 @@ const GridArticleCard = ({ post, language, isRTL, onPostClick, index }) => {
               src={post.featuredImage}
               alt={post.title}
               fill
-              sizes="(max-width: 768px) 25vw, (max-width: 1024px) 50vw, 33vw"
+              sizes="(max-width: 768px) 25vw, 33vw"
               className="absolute inset-0 size-full scale-[1.01] object-cover transition-all duration-300 ease-out group-hover/article-preview:scale-[1.07]"
-              quality={75}
+              quality={70}
               loading="lazy"
             />
           ) : (
@@ -163,113 +173,142 @@ const GridArticleCard = ({ post, language, isRTL, onPostClick, index }) => {
       </div>
     </Link>
   );
-};
+});
+GridArticleCard.displayName = 'GridArticleCard';
 
-// Category Filter Button
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const CategoryButton = ({ category, isSelected, onClick, isRTL }) => {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`flex h-8 w-fit shrink-0 cursor-pointer items-center rounded-full px-3 transition-all duration-200 ${
-        isSelected
-          ? 'bg-gray-900 text-white shadow-sm'
-          : 'shadow-[inset_0_0_0_1px_rgba(0,0,0,0.15)] hover:bg-gray-100 text-gray-700'
-      }`}
-    >
-      <span className="font-medium text-sm tracking-wide">
-        {category}
-      </span>
-    </button>
-  );
-};
+// Category Filter Button (memoized)
+const CategoryButton = memo(({ category, isSelected, onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className={`flex h-8 w-fit shrink-0 cursor-pointer items-center rounded-full px-3 transition-all duration-200 ${
+      isSelected
+        ? 'bg-gray-900 text-white shadow-sm'
+        : 'shadow-[inset_0_0_0_1px_rgba(0,0,0,0.15)] hover:bg-gray-100 text-gray-700'
+    }`}
+  >
+    <span className="font-medium text-sm tracking-wide">{category}</span>
+  </button>
+));
+CategoryButton.displayName = 'CategoryButton';
+
+// Pagination Button (memoized)
+const PaginationButton = memo(({ page, currentPage, onClick }) => (
+  <button
+    onClick={() => onClick(page)}
+    className={`w-10 h-10 text-sm font-medium rounded-full transition-colors ${
+      currentPage === page
+        ? 'bg-gray-900 text-white'
+        : 'text-gray-700 hover:bg-gray-100'
+    }`}
+  >
+    {page}
+  </button>
+));
+PaginationButton.displayName = 'PaginationButton';
 
 const Blog = () => {
   const pathname = usePathname();
   const { locale, t } = useI18n();
   
-  const urlLanguage = detectLanguageFromPath(pathname);
-  const detectedLanguage = urlLanguage || locale || 'en';
+  const detectedLanguage = useMemo(() => {
+    const urlLanguage = detectLanguageFromPath(pathname);
+    return urlLanguage || locale || 'en';
+  }, [pathname, locale]);
   
   const [blogPosts, setBlogPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filteredPosts, setFilteredPosts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const isRTL = getLanguageDirection(detectedLanguage) === 'rtl';
-  
   const [currentPage, setCurrentPage] = useState(1);
+  
+  const isRTL = useMemo(() => getLanguageDirection(detectedLanguage) === 'rtl', [detectedLanguage]);
   const postsPerPage = 12;
 
-  useEffect(() => {
-    loadBlogPosts();
-    loadCategories();
-    trackBlogListView(detectedLanguage, selectedCategory);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [detectedLanguage, pathname, locale]);
-
-  useEffect(() => {
-    filterPosts();
-    setCurrentPage(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCategory, blogPosts]);
-
-  const loadBlogPosts = async () => {
+  // Load blog posts
+  const loadBlogPosts = useCallback(async () => {
     try {
       setLoading(true);
       const result = await blogServiceSeparate.getPublishedPosts(50, null, detectedLanguage);
       setBlogPosts(result.posts);
+      
+      // Track view after loading (non-blocking)
+      loadTracking().then(tracking => {
+        tracking?.trackBlogListView?.(detectedLanguage, selectedCategory);
+      });
     } catch {
       setBlogPosts([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [detectedLanguage, selectedCategory]);
 
-  const loadCategories = async () => {
+  // Load categories
+  const loadCategories = useCallback(async () => {
     try {
       const cats = await blogServiceSeparate.getCategories();
       setCategories(cats);
     } catch {
       // silently fail
     }
-  };
+  }, []);
 
-  const filterPosts = () => {
-    let filtered = blogPosts;
+  useEffect(() => {
+    loadBlogPosts();
+    loadCategories();
+  }, [loadBlogPosts, loadCategories]);
 
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(post => post.category === selectedCategory);
-      trackBlogCategoryFilter(selectedCategory, filtered.length);
-    }
+  // Filter posts (memoized)
+  const filteredPosts = useMemo(() => {
+    if (selectedCategory === 'all') return blogPosts;
+    return blogPosts.filter(post => post.category === selectedCategory);
+  }, [selectedCategory, blogPosts]);
 
-    setFilteredPosts(filtered);
-  };
+  // Reset page when category changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory]);
 
-  const handleCategoryClick = (category) => {
+  const handleCategoryClick = useCallback((category) => {
     setSelectedCategory(category);
-  };
+    // Track category filter (non-blocking)
+    if (category !== 'all') {
+      loadTracking().then(tracking => {
+        const filtered = blogPosts.filter(p => p.category === category);
+        tracking?.trackBlogCategoryFilter?.(category, filtered.length);
+      });
+    }
+  }, [blogPosts]);
 
-  const handlePostClick = (post, index) => {
-    trackBlogPostClick(post, index + 1);
-  };
+  const handlePostClick = useCallback((post, index) => {
+    loadTracking().then(tracking => {
+      tracking?.trackBlogPostClick?.(post, index + 1);
+    });
+  }, []);
 
-  // Featured posts (first 3) and remaining grid posts
-  const featuredPost = filteredPosts[0];
-  const secondaryPosts = filteredPosts.slice(1, 3);
-  const gridPosts = filteredPosts.slice(3);
+  const handlePageChange = useCallback((page) => {
+    setCurrentPage(page);
+  }, []);
 
-  // Paginated grid posts (excluding the first 3 featured)
-  const paginatedGridPosts = gridPosts.slice(
-    (currentPage - 1) * postsPerPage,
-    currentPage * postsPerPage
-  );
-  const totalPages = Math.ceil(gridPosts.length / postsPerPage);
+  // Computed values (memoized)
+  const { featuredPost, secondaryPosts, paginatedGridPosts, totalPages } = useMemo(() => {
+    const featured = filteredPosts[0];
+    const secondary = filteredPosts.slice(1, 3);
+    const gridPosts = filteredPosts.slice(3);
+    const paginated = gridPosts.slice((currentPage - 1) * postsPerPage, currentPage * postsPerPage);
+    const pages = Math.ceil(gridPosts.length / postsPerPage);
+    
+    return {
+      featuredPost: featured,
+      secondaryPosts: secondary,
+      paginatedGridPosts: paginated,
+      totalPages: pages
+    };
+  }, [filteredPosts, currentPage, postsPerPage]);
 
   return (
     <div className="min-h-screen bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Header Section - Same structure as Contact */}
+      {/* Header Section */}
       <div className="mx-auto w-full max-w-9xl">
         <div className="mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl w-full lg:mt-20 mt-10">
           <div className="px-4 pt-6 lg:pt-0 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
@@ -294,7 +333,6 @@ const Blog = () => {
                   category={t('blog.allCategories', 'All')}
                   isSelected={selectedCategory === 'all'}
                   onClick={() => handleCategoryClick('all')}
-                  isRTL={isRTL}
                 />
                 {categories.map(category => (
                   <CategoryButton
@@ -302,7 +340,6 @@ const Blog = () => {
                     category={category}
                     isSelected={selectedCategory === category}
                     onClick={() => handleCategoryClick(category)}
-                    isRTL={isRTL}
                   />
                 ))}
               </div>
@@ -311,34 +348,29 @@ const Blog = () => {
             {/* Loading State */}
             {loading ? (
               <div className="flex items-center justify-center py-20">
-                <div className="animate-pulse text-gray-500">
-                  {t('blog.loadingPosts', 'Loading blog posts...')}
-        </div>
-            </div>
-          ) : filteredPosts.length === 0 ? (
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-tufts-blue" />
+              </div>
+            ) : filteredPosts.length === 0 ? (
               <div className="flex items-center justify-center py-20">
                 <p className="text-gray-500 text-base">
                   {selectedCategory !== 'all'
-                  ? t('blog.noPostsFound', 'No blog posts found matching your criteria')
-                  : t('blog.noPostsAvailable', 'No blog posts available yet')
-                }
-              </p>
-            </div>
-          ) : (
+                    ? t('blog.noPostsFound', 'No blog posts found matching your criteria')
+                    : t('blog.noPostsAvailable', 'No blog posts available yet')
+                  }
+                </p>
+              </div>
+            ) : (
               <>
                 {/* Newest Section */}
                 {featuredPost && (
                   <>
-                    {/* Section Label - Newest */}
                     <div className="mb-6">
                       <h3 className={`text-lg font-semibold text-eerie-black ${isRTL ? 'text-right' : 'text-left'}`}>
                         {t('blog.newest', 'Newest')}
                       </h3>
                     </div>
                     
-                    {/* Featured Section: 1:2 Layout (1 large + 2 small) */}
                     <div className="grid gap-6 md:gap-8 lg:grid-cols-2 mb-12 md:mb-16 pb-10 md:pb-14 border-b border-gray-200">
-                      {/* Large Featured Post (Left) */}
                       <LargeFeaturedCard 
                         post={featuredPost}
                         language={detectedLanguage}
@@ -346,14 +378,13 @@ const Blog = () => {
                         onPostClick={handlePostClick}
                       />
                       
-                      {/* Two Small Posts (Right) - Stacked Vertically */}
                       {secondaryPosts.length > 0 && (
                         <div className="flex flex-col gap-6 md:gap-8">
                           {secondaryPosts.map((post, index) => (
                             <SmallFeaturedCard
                               key={post.id}
                               post={post}
-                      language={detectedLanguage}
+                              language={detectedLanguage}
                               isRTL={isRTL}
                               onPostClick={handlePostClick}
                               index={index + 1}
@@ -368,92 +399,85 @@ const Blog = () => {
                 {/* All Posts Section */}
                 {paginatedGridPosts.length > 0 && (
                   <>
-                    {/* Section Label - All */}
                     <div className="mb-6">
                       <h3 className={`text-lg font-semibold text-eerie-black ${isRTL ? 'text-right' : 'text-left'}`}>
                         {t('blog.allPosts', 'All Posts')}
                       </h3>
                     </div>
                     
-                    {/* Posts Grid - 3 columns on large screens */}
                     <div className="grid gap-x-6 gap-y-8 md:grid-cols-2 md:gap-x-8 md:gap-y-10 lg:grid-cols-3">
                       {paginatedGridPosts.map((post, index) => (
                         <GridArticleCard
                           key={post.id}
                           post={post}
-                        language={detectedLanguage}
-                        isRTL={isRTL}
+                          language={detectedLanguage}
+                          isRTL={isRTL}
                           onPostClick={handlePostClick}
                           index={index + 3}
                         />
                       ))}
                     </div>
                   </>
-          )}
+                )}
 
-          {/* Pagination */}
+                {/* Pagination */}
                 {totalPages > 1 && (
                   <div className="mt-12 flex justify-center items-center gap-2">
-              <button
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
+                    <button
+                      onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+                      disabled={currentPage === 1}
                       className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${
-                  currentPage === 1
+                        currentPage === 1
                           ? 'text-gray-300 cursor-not-allowed'
                           : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                {t('blog.pagination.previous', 'Previous')}
-              </button>
-              
+                      }`}
+                    >
+                      {t('blog.pagination.previous', 'Previous')}
+                    </button>
+                    
                     <div className="flex gap-1">
                       {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                          className={`w-10 h-10 text-sm font-medium rounded-full transition-colors ${
-                      currentPage === page
-                              ? 'bg-gray-900 text-white'
-                              : 'text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ))}
-              </div>
-              
-              <button
-                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        <PaginationButton
+                          key={page}
+                          page={page}
+                          currentPage={currentPage}
+                          onClick={handlePageChange}
+                        />
+                      ))}
+                    </div>
+                    
+                    <button
+                      onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
                       disabled={currentPage === totalPages}
                       className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${
                         currentPage === totalPages
                           ? 'text-gray-300 cursor-not-allowed'
                           : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                {t('blog.pagination.next', 'Next')}
-              </button>
-            </div>
+                      }`}
+                    >
+                      {t('blog.pagination.next', 'Next')}
+                    </button>
+                  </div>
                 )}
               </>
-          )}
+            )}
 
-          {/* Download App Widget */}
-          {!loading && filteredPosts.length > 0 && (
-            <BlogAppDownload 
-              language={detectedLanguage}
-              isRTL={isRTL}
-              location="blog_list"
-              context={{
-                page: 'blog_list',
-                posts_shown: filteredPosts.length,
-                category: selectedCategory
-              }}
-            />
-          )}
+            {/* Download App Widget - Lazy loaded */}
+            {!loading && filteredPosts.length > 0 && (
+              <BlogAppDownload 
+                language={detectedLanguage}
+                isRTL={isRTL}
+                location="blog_list"
+                context={{
+                  page: 'blog_list',
+                  posts_shown: filteredPosts.length,
+                  category: selectedCategory
+                }}
+              />
+            )}
           </div>
         </div>
-    </div>
+      </div>
     </div>
   );
 };
