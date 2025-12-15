@@ -9,7 +9,8 @@ import {
   updateProfile,
   sendPasswordResetEmail,
   signInWithPopup,
-  GoogleAuthProvider
+  GoogleAuthProvider,
+  OAuthProvider
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../firebase/config';
@@ -164,6 +165,48 @@ export function AuthProvider({ children }) {
     }
   }
 
+  async function signInWithApple() {
+    try {
+      const provider = new OAuthProvider('apple.com');
+      provider.addScope('email');
+      provider.addScope('name');
+      
+      const { user } = await signInWithPopup(auth, provider);
+      
+      // Check if user profile exists, if not create it
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (!userDoc.exists()) {
+        // Get current language preference from localStorage
+        const preferredLanguage = typeof window !== 'undefined' ? 
+          localStorage.getItem('Simnetiq-language') || 'en' : 'en';
+        
+        // Create user profile directly
+        await setDoc(doc(db, 'users', user.uid), {
+          email: user.email,
+          displayName: user.displayName || 'Apple User',
+          createdAt: new Date(),
+          role: 'customer',
+          emailVerified: true,
+          referredBy: null,
+          referralCodeUsed: false,
+          preferredLanguage: preferredLanguage,
+          authProvider: 'apple'
+        });
+
+        // Automatically add user to newsletter collection
+        try {
+          await addToNewsletter(user.email, user.displayName || 'Apple User', 'web_dashboard');
+        } catch {
+          // Don't fail the signup if newsletter addition fails
+        }
+      }
+      
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async function completeGoogleSignup() {
     try {
       const pendingUserData = localStorage.getItem('pendingUserData');
@@ -172,7 +215,7 @@ export function AuthProvider({ children }) {
       }
 
       const userData = JSON.parse(pendingUserData);
-      const currentUser = auth.currentUser;
+      const currentUser = auth?.currentUser;
       
       if (!currentUser) {
         throw new Error('No authenticated user found');
@@ -346,17 +389,19 @@ export function AuthProvider({ children }) {
   }, [currentUser]);
 
   useEffect(() => {
-    if (!auth) {
+    const authInstance = auth;
+    if (!authInstance) {
       setLoading(false);
       return;
     }
     
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(authInstance, async (user) => {
       setCurrentUser(user);
       if (user) {
         try {
           await loadUserProfile();
         } catch {
+          // Silent error
         }
       } else {
         setUserProfile(null);
@@ -376,6 +421,7 @@ export function AuthProvider({ children }) {
     logout,
     resetPassword,
     signInWithGoogle,
+    signInWithApple,
     completeGoogleSignup,
     verifyEmailOTP,
     updateUserProfile,
