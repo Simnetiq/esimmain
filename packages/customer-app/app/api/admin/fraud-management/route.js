@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@esim/shared/firebase/config';
-import { collection, query, where, getDocs, doc, getDoc, updateDoc, deleteDoc, orderBy, limit as firestoreLimit, serverTimestamp } from 'firebase/firestore';
-import { blockUser, unblockUser, getFraudStats } from '@esim/shared/services/fraudSignalsService';
+import { collection, query, where, getDocs, doc, getDoc, updateDoc, limit as firestoreLimit, serverTimestamp } from 'firebase/firestore';
+import { blockUser, unblockUser } from '@esim/shared/services/fraudSignalsService';
 
 export const dynamic = 'force-dynamic';
 
@@ -145,10 +145,6 @@ export async function GET(request) {
 
     // Get statistics
     if (type === 'all' || type === 'stats') {
-      const now = new Date();
-      const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-      const last7d = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-
       // Count blocked users
       const blockedCountQuery = query(
         collection(db, 'fraudSignals'),

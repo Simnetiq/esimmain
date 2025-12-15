@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import Image from 'next/image';
 import { useParams, useRouter, usePathname } from 'next/navigation';
 import { 
   Globe, 
@@ -22,7 +23,7 @@ import { appStoreLinks } from '@esim/shared/utils/appStoreLinks';
 import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { getProviderFromPlanData } from '@esim/shared/utils/providerUtils';
 import { getISOCode } from '@esim/shared/utils/countryCodeMap';
-import { formatPrice, formatPriceNumber, calculateDiscountedPrice, parsePrice } from '@esim/shared/utils/priceUtils';
+import { formatPrice, calculateDiscountedPrice } from '@esim/shared/utils/priceUtils';
 import FraudBlockedModal from '../../../src/components/FraudBlockedModal';
 import { useFraudCheck } from '../../../src/hooks/useFraudCheck';
 
@@ -544,7 +545,7 @@ const SharePackagePage = () => {
       ogDescription: metaDescription,
       ogImage: '/images/logo_icon/logo.png'
     };
-  }, [packageData, urlCountryName, urlCountryCode, providerInfo, t, getFullCountryName, formatPrice, formatData]);
+  }, [packageData, urlCountryName, urlCountryCode, providerInfo, t, getFullCountryName, formatData]);
 
   // Set page title dynamically using useEffect - MUST be called before any conditional returns
   useEffect(() => {
@@ -656,14 +657,14 @@ const SharePackagePage = () => {
                 <div className="mt-4 max-w-5xl share-package-header">
                   <div className="flex justify-start items-center gap-4">
                     {/* Country Flag */}
-                    <div className="flex-shrink-0 w-20 sm:w-24 lg:w-28 aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg flex items-center justify-center border-2 border-gray-200 overflow-hidden">
-                      <img
+                    <div className="flex-shrink-0 w-20 sm:w-24 lg:w-28 aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg flex items-center justify-center border-2 border-gray-200 overflow-hidden relative">
+                      <Image
                         src={`/flags/4x3/${getISOCode(urlCountryCode || packageData.country_code)}.svg`}
                         alt={`${capitalizeWords(urlCountryName) || getFullCountryName(urlCountryCode || packageData.country_code)} flag`}
-                        width="112"
-                        height="84"
-                        className="w-full h-full object-cover"
-                        loading="eager"
+                        fill
+                        sizes="(max-width: 640px) 80px, (max-width: 1024px) 96px, 112px"
+                        className="object-cover"
+                        priority
                       />
                     </div>
                     {/* Country Info */}

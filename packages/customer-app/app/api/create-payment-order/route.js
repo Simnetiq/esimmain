@@ -10,8 +10,7 @@ import {
 } from '@esim/shared/services/fraudDetectionService';
 import {
   checkUserBlocked,
-  analyzeIpRisk,
-  FRAUD_SIGNALS_CONFIG
+  analyzeIpRisk
 } from '@esim/shared/services/fraudSignalsService';
 
 // ============================================
