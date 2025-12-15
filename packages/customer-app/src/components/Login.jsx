@@ -140,10 +140,10 @@ const Login = () => {
     <div 
       className="min-h-screen relative overflow-hidden" 
       dir={isRTL ? 'rtl' : 'ltr'}
-      style={{ background: 'linear-gradient(to bottom right, rgba(83, 116, 205, 0.25), rgba(240, 249, 255, 0.4), rgba(239, 246, 255, 1))' }}
+ 
     >
       {/* Gradient Orbs */}
-      <div className="absolute top-0 left-0 w-[600px] h-[600px] rounded-full blur-[120px] -translate-x-1/3 -translate-y-1/3" style={{ backgroundColor: 'rgba(83, 116, 205, 0.2)' }} />
+
       <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full blur-[100px] translate-x-1/4 translate-y-1/4" style={{ backgroundColor: 'rgba(83, 116, 205, 0.15)' }} />
       <div className="absolute top-1/2 right-1/3 w-[400px] h-[400px] rounded-full blur-[80px]" style={{ backgroundColor: 'rgba(83, 116, 205, 0.1)' }} />
       
@@ -163,7 +163,7 @@ const Login = () => {
       <div className="relative min-h-screen flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           {/* Card */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 sm:p-10">
+          <div className="bg-white/80 backdrop-blur-sm shadow-2xl shadow-gray-200/40 p-8 sm:p-10">
             {/* Header */}
             <div className="text-center mb-8">
               <p className="text-sm font-medium tracking-widest uppercase text-gray-500 mb-3">

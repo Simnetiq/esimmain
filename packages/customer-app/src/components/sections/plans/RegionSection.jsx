@@ -14,14 +14,13 @@ const RegionSection = memo(function RegionSection({
   onPlanClick, 
   t 
 }) {
-  const regionCountryCodes = REGION_COUNTRIES[region] || [];
-  
   const regionCountries = useMemo(() => {
+    const regionCountryCodes = REGION_COUNTRIES[region] || [];
     return regionCountryCodes
       .map(code => countries.find(c => c.code === code || c.slug === code))
       .filter(Boolean)
       .slice(0, 8);
-  }, [countries, regionCountryCodes]);
+  }, [countries, region]);
 
   return (
     <div>

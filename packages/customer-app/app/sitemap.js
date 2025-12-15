@@ -7,7 +7,7 @@ export default async function sitemap() {
   // Supported languages
   const languages = ['en', 'es', 'fr', 'de', 'ar', 'he', 'ru'];
   
-  // Static pages - Main
+  // Static pages - Main (high priority, indexed)
   const staticPages = [
     {
       url: baseUrl,
@@ -34,6 +34,12 @@ export default async function sitemap() {
       priority: 0.7,
     },
     {
+      url: `${baseUrl}/about`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
       url: `${baseUrl}/affiliate-program`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
@@ -47,31 +53,13 @@ export default async function sitemap() {
     },
   ];
 
-  // User pages (lower priority, no index)
-  const userPages = [
+  // Login page (lower priority - users find via navigation)
+  const authPages = [
     {
       url: `${baseUrl}/login`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.4,
-    },
-    {
-      url: `${baseUrl}/register`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.4,
-    },
-    {
-      url: `${baseUrl}/dashboard`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.3,
-    },
-    {
-      url: `${baseUrl}/forgot-password`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.2,
     },
   ];
 
@@ -103,31 +91,46 @@ export default async function sitemap() {
     },
   ];
 
-  // Multilingual pages
+  // Multilingual pages - generate for all non-English languages
   const multilingualPages = [];
-  const mainPages = ['', '/blog', '/contact', '/esim-plans', '/affiliate-program', '/jobs'];
-  const userPagesMultilang = ['/dashboard', '/login', '/register'];
+  const mainPages = ['', '/blog', '/contact', '/esim-plans', '/affiliate-program', '/jobs', '/about'];
+  const legalPagesMultilang = ['/privacy-policy', '/terms-of-service', '/cookie-policy', '/return-policy'];
   
   languages.forEach(lang => {
-    if (lang !== 'en') { // English is the default, no prefix needed
+    if (lang !== 'en') {
       // Main pages with higher priority
       mainPages.forEach(page => {
+        const priority = page === '' ? 0.9 
+          : page === '/esim-plans' ? 0.85 
+          : page === '/blog' ? 0.8 
+          : 0.6;
+        
+        const changeFreq = (page === '' || page === '/blog' || page === '/esim-plans') ? 'daily' : 'weekly';
+        
         multilingualPages.push({
           url: `${baseUrl}/${lang}${page}`,
           lastModified: new Date(),
-          changeFrequency: page === '/blog' ? 'daily' : page === '' ? 'daily' : page === '/esim-plans' ? 'daily' : 'weekly',
-          priority: page === '' ? 0.9 : page === '/blog' ? 0.8 : page === '/esim-plans' ? 0.85 : 0.6,
+          changeFrequency: changeFreq,
+          priority: priority,
         });
       });
       
-      // User pages with lower priority
-      userPagesMultilang.forEach(page => {
+      // Legal pages in other languages
+      legalPagesMultilang.forEach(page => {
         multilingualPages.push({
           url: `${baseUrl}/${lang}${page}`,
           lastModified: new Date(),
-          changeFrequency: 'monthly',
+          changeFrequency: 'yearly',
           priority: 0.3,
         });
+      });
+      
+      // Login page in other languages
+      multilingualPages.push({
+        url: `${baseUrl}/${lang}/login`,
+        lastModified: new Date(),
+        changeFrequency: 'monthly',
+        priority: 0.4,
       });
     }
   });
@@ -135,7 +138,6 @@ export default async function sitemap() {
   // Fetch blog posts dynamically
   let blogPosts = [];
   try {
-    // Fetch all published blog posts
     const blogsRef = collection(db, 'blogs_separate');
     const q = query(
       blogsRef,
@@ -151,7 +153,6 @@ export default async function sitemap() {
       const language = post.language || 'en';
       const lastModified = post.updatedAt?.toDate() || post.publishedAt?.toDate() || new Date();
       
-      // Add blog post URL
       const blogUrl = language === 'en' 
         ? `${baseUrl}/blog/${slug}`
         : `${baseUrl}/${language}/blog/${slug}`;
@@ -197,7 +198,7 @@ export default async function sitemap() {
   // Combine all URLs
   return [
     ...staticPages,
-    ...userPages,
+    ...authPages,
     ...legalPages,
     ...multilingualPages,
     ...blogPosts,

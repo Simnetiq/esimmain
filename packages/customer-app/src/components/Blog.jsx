@@ -166,6 +166,7 @@ const GridArticleCard = ({ post, language, isRTL, onPostClick, index }) => {
 };
 
 // Category Filter Button
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const CategoryButton = ({ category, isSelected, onClick, isRTL }) => {
   return (
     <button

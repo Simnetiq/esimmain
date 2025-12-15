@@ -1,7 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import Image from 'next/image';
 import { useParams, useRouter, usePathname } from 'next/navigation';
 import { 
   Globe, 
@@ -26,6 +26,7 @@ import { getISOCode } from '@esim/shared/utils/countryCodeMap';
 import { formatPrice, calculateDiscountedPrice } from '@esim/shared/utils/priceUtils';
 import FraudBlockedModal from '../../../src/components/FraudBlockedModal';
 import { useFraudCheck } from '../../../src/hooks/useFraudCheck';
+import Image from 'next/image';
 
 
 const SharePackagePage = () => {
@@ -857,7 +858,7 @@ const SharePackagePage = () => {
                 {/* iOS Instructions */}
                 <div className="border border-gray-200 p-6">
                   <div className={`flex justify-start items-center gap-3 mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                    <img 
+                    <img  
                       src="/images/logo_icon/apple.svg" 
                       alt="iOS" 
                       width="32"

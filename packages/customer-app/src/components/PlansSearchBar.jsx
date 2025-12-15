@@ -1,11 +1,12 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, MapPin, X } from 'lucide-react';
-import Image from 'next/image';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { useCountries } from '@esim/shared/hooks/useCountries';
 import { getISOCode } from '@esim/shared/utils/countryCodeMap';
+import Image from 'next/image';
 
 const PlansSearchBar = ({ searchTerm, onSearchChange, onCountrySelect }) => {
   const { t, locale } = useI18n();

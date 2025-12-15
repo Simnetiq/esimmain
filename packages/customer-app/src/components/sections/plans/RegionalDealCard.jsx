@@ -2,7 +2,6 @@ import { memo, useMemo } from 'react';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
 import { 
   GlobeIcon, 
-  MapPinIcon, 
   DollarSignIcon, 
   InfinityIcon,
   ArrowRightIcon 
