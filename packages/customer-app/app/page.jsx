@@ -21,6 +21,10 @@ const ActivationSection = dynamic(() => import('../src/components/sections').the
   loading: () => <div className="h-96 bg-gray-50 animate-pulse" />,
 });
 
+const TravelBlogsSection = dynamic(() => import('../src/components/sections').then(mod => ({ default: mod.TravelBlogsSection })), {
+  loading: () => <div className="h-96 bg-white animate-pulse" />,
+});
+
 export default function HomePage() {
   const pathname = usePathname();
   const router = useRouter();
@@ -75,6 +79,9 @@ export default function HomePage() {
 
           {/* How It Works & Mobile Apps Section (Combined) */}
           <ActivationSection />
+
+          {/* Travel Blogs Section - Top 3 Travel Articles */}
+          <TravelBlogsSection />
         </main>
       </div>
       

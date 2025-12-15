@@ -1,20 +1,37 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
 import CountrySearchBar from '../CountrySearchBar';
-import { Globe, Zap, Shield, ArrowRight } from 'lucide-react';
+
+// Inline SVG icons to avoid lucide-react bundle overhead
+const GlobeIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>
+  </svg>
+);
+
+const ZapIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>
+  </svg>
+);
+
+const ShieldIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
+  </svg>
+);
+
+const ArrowRightIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+  </svg>
+);
 
 export default function HeroSection({ onCountrySelect }) {
   const { t, translations } = useI18n();
-  const [isVisible, setIsVisible] = useState(false);
-  
-  // Trigger animations on mount
-  useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
   
   const handleDownloadApp = () => {
     // Track with Facebook Pixel - Download App CTA
@@ -30,11 +47,11 @@ export default function HeroSection({ onCountrySelect }) {
   // Check if translations are loaded
   const hasTranslations = translations && Object.keys(translations).length > 0 && translations.hero;
   
-  // Trust indicators data
+  // Trust indicators data - using inline SVG icons
   const trustIndicators = [
-    { icon: Globe, label: t('hero.countries', '200+ Countries'), key: 'countries' },
-    { icon: Zap, label: t('hero.instantActivation', 'Instant Activation'), key: 'activation' },
-    { icon: Shield, label: t('hero.securePayment', 'Secure Payment'), key: 'secure' },
+    { Icon: GlobeIcon, label: t('hero.countries', '200+ Countries'), key: 'countries' },
+    { Icon: ZapIcon, label: t('hero.instantActivation', 'Instant Activation'), key: 'activation' },
+    { Icon: ShieldIcon, label: t('hero.securePayment', 'Secure Payment'), key: 'secure' },
   ];
   
   // Grid pattern style (matching FeaturesSection)
@@ -147,42 +164,42 @@ export default function HeroSection({ onCountrySelect }) {
           <div className="mx-auto w-full max-w-7xl">
             <div className="px-4 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl text-center">
               
-              {/* Badge - Links to App Store */}
+              {/* Badge - Links to App Store - CSS animation instead of JS */}
               <a
                 href="https://apps.apple.com/gb/app/simnetiq-global-esim/id6755963262"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={handleDownloadApp}
-                className={`inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full shadow-sm mb-6 hover:border-tufts-blue hover:shadow-md transition-all group transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'} duration-700 ease-out`}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full shadow-sm mb-6 hover:border-tufts-blue hover:shadow-md transition-all group animate-fade-in-down"
               >
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                 <span className="text-sm font-medium text-gray-700 group-hover:text-tufts-blue transition-colors">
                   {t('hero.badge', 'Now available on iOS')}
                 </span>
-                <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-tufts-blue group-hover:translate-x-0.5 transition-all" />
+                <ArrowRightIcon className="w-4 h-4 text-gray-400 group-hover:text-tufts-blue group-hover:translate-x-0.5 transition-all" />
               </a>
               
-              {/* Headline */}
-              <h1 className={`text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-eerie-black mb-8 transform transition-all duration-700 delay-100 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+              {/* Headline - CSS animation */}
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-eerie-black mb-8 animate-fade-in-up animation-delay-100">
                 {t('hero.stayConnected', 'Stay Connected')}{' '}
                 <span className="text-tufts-blue">{t('hero.worldwide', 'Worldwide.')}</span>
               </h1>
               
               {/* Search Bar - Main CTA - Right under headline */}
-              <div className={`relative z-50 max-w-2xl mx-auto mb-10 p-1 bg-gradient-to-r from-tufts-blue via-tufts-blue/80 to-white rounded-2xl shadow-xl transform transition-all duration-700 delay-200 ${isVisible ? 'opacity-80 scale-100' : 'opacity-0 scale-95'}`}>
+              <div className="relative z-50 max-w-2xl mx-auto mb-10 p-1 bg-gradient-to-r from-tufts-blue via-tufts-blue/80 to-white rounded-2xl shadow-xl animate-fade-in-up animation-delay-200">
                 <div className="bg-white rounded-xl p-2">
                   <CountrySearchBar showCountryCount={true} onCountrySelect={onCountrySelect} />
                 </div>
               </div>
               
               {/* Subtitle - Now under search */}
-              <p className={`text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto mb-8 transform transition-all duration-700 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+              <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto mb-8 animate-fade-in-up animation-delay-300">
                 {t('hero.subtitle', 'Get instant mobile data in 200+ countries. No physical SIM needed. Activate your eSIM in seconds.')}
               </p>
               
               {/* Trust Indicators - At bottom */}
-              <div className={`flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-sm text-gray-500 transform transition-all duration-700 delay-400 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-                {trustIndicators.map(({ icon: Icon, label, key }, index) => (
+              <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-sm text-gray-500 animate-fade-in-up animation-delay-400">
+                {trustIndicators.map(({ Icon, label, key }, index) => (
                   <React.Fragment key={key}>
                     <div className="flex items-center gap-2 text-eerie-black">
                       <Icon className="w-5 h-5 text-eerie-black" />
