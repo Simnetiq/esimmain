@@ -14,38 +14,44 @@ import { metadata as metadataConfig, generateAlternates } from '../src/config/me
 import './globals.css'
 import './rtl.css'
 
-// Configure main font - DM Sans (reduced weights for performance)
+// Configure main font - DM Sans (optimized for LCP)
+// Using variable font for better performance and smaller bundle
 const dmSans = DM_Sans({
   subsets: ['latin'],
   weight: ['400', '600', '700'],
   variable: '--font-dm-sans',
   display: 'swap',
   preload: true,
+  fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
 })
 
-// Configure fonts for RTL languages (reduced weights for performance)
+// RTL fonts - use 'optional' display to prevent layout shift and reduce LCP
+// These fonts only load when actually needed (RTL language detected)
 const heebo = Heebo({
   subsets: ['hebrew'],
   weight: ['400', '600', '700'],
   variable: '--font-heebo',
-  display: 'swap',
-  preload: false, // Only preload when needed
+  display: 'optional', // Prevents blocking render if font fails to load
+  preload: false,
+  fallback: ['system-ui', 'sans-serif'],
 })
 
 const ibmPlexArabic = IBM_Plex_Sans_Arabic({
   subsets: ['arabic'],
   weight: ['400', '600', '700'],
   variable: '--font-ibm-plex-arabic',
-  display: 'swap',
-  preload: false, // Only preload when needed
+  display: 'optional',
+  preload: false,
+  fallback: ['system-ui', 'sans-serif'],
 })
 
 const rubik = Rubik({
   subsets: ['hebrew'],
   weight: ['400', '600', '700'],
   variable: '--font-rubik',
-  display: 'swap',
-  preload: false, // Only preload when needed
+  display: 'optional',
+  preload: false,
+  fallback: ['system-ui', 'sans-serif'],
 })
 
 // Use English metadata as default
@@ -125,11 +131,18 @@ export default function RootLayout({ children }) {
   return (
     <html suppressHydrationWarning>
       <head>
-        {/* Preconnect to Google Fonts for faster loading */}
+        {/* Preconnect to critical domains to reduce latency */}
+        {/* Firebase Auth - reduces the 1,517ms auth iframe load time */}
+        <link rel="preconnect" href="https://apis.google.com" />
+        <link rel="preconnect" href="https://www.googleapis.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://securetoken.googleapis.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossOrigin="anonymous" />
+        
+        {/* Google Fonts - for font loading */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         
-        {/* Preload critical translation file with high priority */}
+        {/* Preload critical translation file */}
         <link 
           rel="preload" 
           href="/locales/en/common.json" 
@@ -138,10 +151,11 @@ export default function RootLayout({ children }) {
           crossOrigin="anonymous"
         />
         
-        {/* DNS prefetch for non-critical third-party domains (deferred loading) */}
+        {/* DNS prefetch for non-critical third-party domains */}
         <link rel="dns-prefetch" href="https://firebasestorage.googleapis.com" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
+        <link rel="dns-prefetch" href="https://esimcreator-f00dd.firebaseapp.com" />
         
         {/* Scroll to top on page load/refresh */}
         <script
