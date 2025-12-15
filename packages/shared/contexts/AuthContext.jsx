@@ -167,11 +167,23 @@ export function AuthProvider({ children }) {
 
   async function signInWithApple() {
     try {
+      // Ensure auth is initialized
+      if (!auth) {
+        throw new Error('Firebase Auth is not initialized. Please refresh the page and try again.');
+      }
+      
       const provider = new OAuthProvider('apple.com');
       provider.addScope('email');
       provider.addScope('name');
       
-      const { user } = await signInWithPopup(auth, provider);
+      // Debug logging
+      if (typeof window !== 'undefined') {
+        console.log('[Apple Sign-In] Auth initialized:', !!auth);
+        console.log('[Apple Sign-In] Provider created:', provider.providerId);
+      }
+      
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
       
       // Check if user profile exists, if not create it
       const userDoc = await getDoc(doc(db, 'users', user.uid));
@@ -203,6 +215,8 @@ export function AuthProvider({ children }) {
       
       return user;
     } catch (error) {
+      // Enhanced error logging for debugging
+      console.error('[Apple Sign-In] Error:', error.code, error.message);
       throw error;
     }
   }
