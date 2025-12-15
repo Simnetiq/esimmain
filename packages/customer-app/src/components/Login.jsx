@@ -3,19 +3,17 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import dynamic from 'next/dynamic';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
-import toast from 'react-hot-toast';
 import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 
-// Lazy load Lottie to reduce initial bundle size
-const Lottie = dynamic(() => import('lottie-react'), {
-  ssr: false,
-  loading: () => <div className="animate-pulse w-full h-full bg-gray-100 rounded-lg" />
-});
+// Lazy load toast to reduce initial bundle
+const showToast = async (type, message) => {
+  const toast = (await import('react-hot-toast')).default;
+  type === 'success' ? toast.success(message) : toast.error(message);
+};
 
-// Inline SVG icons to avoid lucide-react bundle overhead
+// Inline SVG icons
 const GoogleIcon = () => (
   <svg className="h-5 w-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -37,31 +35,26 @@ const SmartphoneIcon = ({ className }) => (
   </svg>
 );
 
+// Grid pattern style
+const gridPatternStyle = {
+  backgroundSize: '10px 10px',
+  backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
+};
+
 const Login = () => {
   const [loading, setLoading] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState(null);
   const [redirecting, setRedirecting] = useState(false);
-  const [animationData, setAnimationData] = useState(null);
   const [mounted, setMounted] = useState(false);
   const { signInWithGoogle, signInWithApple } = useAuth();
   const { t, locale, isLoading: i18nLoading } = useI18n();
   const router = useRouter();
   const pathname = usePathname();
 
-  // Prevent hydration issues
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Load Lottie animation
-  useEffect(() => {
-    fetch('/images/logo_icon/LoginCharacterAnimation.json')
-      .then(response => response.json())
-      .then(data => setAnimationData(data))
-      .catch(() => {});
-  }, []);
-
-  // Get current language for localized URLs
   const currentLanguage = useMemo(() => {
     try {
       if (i18nLoading) {
@@ -77,13 +70,10 @@ const Login = () => {
     }
   }, [locale, pathname, i18nLoading]);
 
-  // Only calculate RTL after mount to prevent hydration mismatch
   const isRTL = mounted ? getLanguageDirection(currentLanguage) === 'rtl' : false;
 
   const getLocalizedUrl = useCallback((path) => {
-    if (currentLanguage === 'en') {
-      return path;
-    }
+    if (currentLanguage === 'en') return path;
     return `/${currentLanguage}${path}`;
   }, [currentLanguage]);
 
@@ -92,15 +82,13 @@ const Login = () => {
       setLoading(true);
       setLoadingProvider('google');
       await signInWithGoogle();
-      toast.success(t('auth.login.signInSuccessful', 'Signed in successfully!'));
+      showToast('success', t('auth.login.signInSuccessful', 'Signed in successfully!'));
       setRedirecting(true);
       const dashboardUrl = currentLanguage === 'en' ? '/dashboard' : `/${currentLanguage}/dashboard`;
       router.push(dashboardUrl);
-      // Don't reset loading - let the redirect happen with loading state
-      return;
     } catch (error) {
       console.error('Google sign-in error:', error);
-      toast.error(t('auth.login.signInFailed', 'Failed to sign in. Please try again.'));
+      showToast('error', t('auth.login.signInFailed', 'Failed to sign in. Please try again.'));
       setLoading(false);
       setLoadingProvider(null);
     }
@@ -111,15 +99,13 @@ const Login = () => {
       setLoading(true);
       setLoadingProvider('apple');
       await signInWithApple();
-      toast.success(t('auth.login.signInSuccessful', 'Signed in successfully!'));
+      showToast('success', t('auth.login.signInSuccessful', 'Signed in successfully!'));
       setRedirecting(true);
       const dashboardUrl = currentLanguage === 'en' ? '/dashboard' : `/${currentLanguage}/dashboard`;
       router.push(dashboardUrl);
-      // Don't reset loading - let the redirect happen with loading state
-      return;
     } catch (error) {
       console.error('Apple sign-in error:', error);
-      toast.error(t('auth.login.signInFailed', 'Failed to sign in. Please try again.'));
+      showToast('error', t('auth.login.signInFailed', 'Failed to sign in. Please try again.'));
       setLoading(false);
       setLoadingProvider(null);
     }
@@ -128,16 +114,16 @@ const Login = () => {
   // Loading skeleton
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(to bottom right, rgba(83, 116, 205, 0.25), rgba(240, 249, 255, 0.4), rgba(239, 246, 255, 1))' }}>
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-tufts-blue" />
       </div>
     );
   }
 
-  // Full-screen redirecting state to prevent empty flash
+  // Redirecting state
   if (redirecting) {
     return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center">
+      <div className="min-h-screen flex flex-col items-center justify-center" style={{ background: 'linear-gradient(to bottom right, rgba(83, 116, 205, 0.25), rgba(240, 249, 255, 0.4), rgba(239, 246, 255, 1))' }}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tufts-blue mx-auto mb-4" />
           <p className="text-gray-600 font-medium">{t('auth.login.redirecting', 'Taking you to your dashboard...')}</p>
@@ -147,121 +133,124 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className="max-w-7xl mx-auto px-4">
-        <div className={`flex flex-col ${isRTL ? 'lg:flex-row-reverse' : 'lg:flex-row'} min-h-screen`}>
-          {/* Left Side - Content */}
-          <div className={`w-full flex flex-col justify-center py-12 lg:py-0 ${isRTL ? 'lg:w-full' : 'lg:w-1/2'}`}>
-            <div className="max-w-md mx-auto w-full">
-              {/* Header */}
-              <div className="mb-8">
-                <p className="text-sm font-medium tracking-widest uppercase text-gray-500 mb-4">
-                  {t('auth.login.welcome', 'Welcome Back')}
-                </p>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-eerie-black tracking-tight mb-4">
-                  {t('auth.login.title', 'Sign in to your account')}
-                </h1>
-                <p className="text-gray-600">
-                  {t('auth.login.quickAccess', 'Quick and secure access with your Google or Apple account')}
-                </p>
-              </div>
+    <div 
+      className="min-h-screen relative overflow-hidden" 
+      dir={isRTL ? 'rtl' : 'ltr'}
+      style={{ background: 'linear-gradient(to bottom right, rgba(83, 116, 205, 0.25), rgba(240, 249, 255, 0.4), rgba(239, 246, 255, 1))' }}
+    >
+      {/* Gradient Orbs */}
+      <div className="absolute top-0 left-0 w-[600px] h-[600px] rounded-full blur-[120px] -translate-x-1/3 -translate-y-1/3" style={{ backgroundColor: 'rgba(83, 116, 205, 0.2)' }} />
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full blur-[100px] translate-x-1/4 translate-y-1/4" style={{ backgroundColor: 'rgba(83, 116, 205, 0.15)' }} />
+      <div className="absolute top-1/2 right-1/3 w-[400px] h-[400px] rounded-full blur-[80px]" style={{ backgroundColor: 'rgba(83, 116, 205, 0.1)' }} />
+      
+      {/* Grid Pattern - Left Side */}
+      <div 
+        className="hidden xl:block absolute left-0 top-0 bottom-0 w-32"
+        style={gridPatternStyle}
+      />
+      
+      {/* Grid Pattern - Right Side */}
+      <div 
+        className="hidden xl:block absolute right-0 top-0 bottom-0 w-32"
+        style={gridPatternStyle}
+      />
 
-              {/* Divider */}
-              <div className="w-full h-px bg-gray-100 mb-8" />
-
-              {/* Sign In Buttons */}
-              <div className="space-y-4">
-                {/* Continue with Google */}
-                <button
-                  type="button"
-                  onClick={handleGoogleSignIn}
-                  disabled={loading}
-                  className="group w-full flex items-center justify-center gap-3 px-6 py-4 bg-white border border-gray-200 rounded-full hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loadingProvider === 'google' ? (
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-600" />
-                  ) : (
-                    <GoogleIcon />
-                  )}
-                  <span className="text-base font-medium text-eerie-black">
-                    {t('auth.login.continueWithGoogle', 'Continue with Google')}
-                  </span>
-                </button>
-
-                {/* Continue with Apple */}
-                <button
-                  type="button"
-                  onClick={handleAppleSignIn}
-                  disabled={loading}
-                  className="group w-full flex items-center justify-center gap-3 px-6 py-4 bg-eerie-black text-white rounded-full hover:bg-gray-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loadingProvider === 'apple' ? (
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
-                  ) : (
-                    <AppleIcon />
-                  )}
-                  <span className="text-base font-medium">
-                    {t('auth.login.continueWithApple', 'Continue with Apple')}
-                  </span>
-                </button>
-              </div>
-
-              {/* Info Card */}
-              <div className="mt-8 p-4 bg-gray-50 rounded-xl">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-tufts-blue/10 flex items-center justify-center">
-                    <SmartphoneIcon className="w-5 h-5 text-tufts-blue" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-eerie-black mb-1">
-                      {t('auth.login.downloadApp', 'Download our app')}
-                    </h3>
-                    <p className="text-xs text-gray-500 mb-2">
-                      {t('auth.login.appDescription', 'Get instant eSIM activation and manage your plans on the go.')}
-                    </p>
-                    <a
-                      href="https://apps.apple.com/gb/app/simnetiq-global-esim/id6755963262"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs font-medium text-tufts-blue hover:text-cobalt-blue transition-colors"
-                    >
-                      {t('auth.login.getOnAppStore', 'Get on App Store')}
-                      <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
-                      </svg>
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-              {/* Terms */}
-              <p className="mt-6 text-xs text-gray-500 text-center">
-                {t('auth.login.termsNotice', 'By continuing, you agree to our')}{' '}
-                <Link href={getLocalizedUrl('/terms-of-service')} className="text-tufts-blue hover:underline">
-                  {t('auth.login.termsOfService', 'Terms of Service')}
-                </Link>{' '}
-                {t('auth.login.and', 'and')}{' '}
-                <Link href={getLocalizedUrl('/privacy-policy')} className="text-tufts-blue hover:underline">
-                  {t('auth.login.privacyPolicy', 'Privacy Policy')}
-                </Link>
+      {/* Content - Centered */}
+      <div className="relative min-h-screen flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md">
+          {/* Card */}
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 sm:p-10">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <p className="text-sm font-medium tracking-widest uppercase text-gray-500 mb-3">
+                {t('auth.login.welcome', 'Welcome Back')}
+              </p>
+              <h1 className="text-2xl sm:text-3xl font-semibold text-eerie-black tracking-tight mb-3">
+                {t('auth.login.title', 'Sign in to your account')}
+              </h1>
+              <p className="text-gray-600 text-sm">
+                {t('auth.login.quickAccess', 'Quick and secure access with your Google or Apple account')}
               </p>
             </div>
-          </div>
 
-          {/* Right Side - Lottie Animation (hidden on mobile and RTL) */}
-          {!isRTL && (
-            <div className="hidden lg:flex lg:w-1/2 items-center justify-center">
-              <div className="w-full max-w-lg">
-                {animationData && (
-                  <Lottie 
-                    animationData={animationData}
-                    loop={true}
-                    className="w-full h-auto"
-                  />
+            {/* Divider */}
+            <div className="w-full h-px bg-gray-200 mb-8" />
+
+            {/* Sign In Buttons */}
+            <div className="space-y-4">
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={loading}
+                className="group w-full flex items-center justify-center gap-3 px-6 py-4 bg-white border border-gray-200 rounded-full hover:bg-gray-50 hover:border-gray-300 hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loadingProvider === 'google' ? (
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-600" />
+                ) : (
+                  <GoogleIcon />
                 )}
+                <span className="text-base font-medium text-eerie-black">
+                  {t('auth.login.continueWithGoogle', 'Continue with Google')}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleAppleSignIn}
+                disabled={loading}
+                className="group w-full flex items-center justify-center gap-3 px-6 py-4 bg-eerie-black text-white rounded-full hover:bg-gray-800 hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loadingProvider === 'apple' ? (
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+                ) : (
+                  <AppleIcon />
+                )}
+                <span className="text-base font-medium">
+                  {t('auth.login.continueWithApple', 'Continue with Apple')}
+                </span>
+              </button>
+            </div>
+
+            {/* Info Card */}
+            <div className="mt-8 p-4 bg-gray-50 rounded-xl">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-tufts-blue/10 flex items-center justify-center">
+                  <SmartphoneIcon className="w-5 h-5 text-tufts-blue" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-eerie-black mb-1">
+                    {t('auth.login.downloadApp', 'Download our app')}
+                  </h3>
+                  <p className="text-xs text-gray-500 mb-2">
+                    {t('auth.login.appDescription', 'Get instant eSIM activation and manage your plans on the go.')}
+                  </p>
+                  <a
+                    href="https://apps.apple.com/gb/app/simnetiq-global-esim/id6755963262"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-tufts-blue hover:text-cobalt-blue transition-colors"
+                  >
+                    {t('auth.login.getOnAppStore', 'Get on App Store')}
+                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                    </svg>
+                  </a>
+                </div>
               </div>
             </div>
-          )}
+
+            {/* Terms */}
+            <p className="mt-6 text-xs text-gray-500 text-center">
+              {t('auth.login.termsNotice', 'By continuing, you agree to our')}{' '}
+              <Link href={getLocalizedUrl('/terms-of-service')} className="text-tufts-blue hover:underline">
+                {t('auth.login.termsOfService', 'Terms of Service')}
+              </Link>{' '}
+              {t('auth.login.and', 'and')}{' '}
+              <Link href={getLocalizedUrl('/privacy-policy')} className="text-tufts-blue hover:underline">
+                {t('auth.login.privacyPolicy', 'Privacy Policy')}
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

@@ -1,30 +1,54 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
-import { collection, query, getDocs, doc, setDoc, getDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { esimService } from '@esim/shared/services/esimService';
-import { getReferralStats, createReferralCode } from '@esim/shared/services/referralService';
 import { getLanguageDirection, detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
 import { 
   mapAiraloSimData, 
   mapPackageCountryData, 
   mapPlanDetails,
-  getQrCodeValue,
-  getAppleInstallUrl,
-  getIccid
 } from '@esim/shared/utils/esimFieldMapper';
-import toast from 'react-hot-toast';
 
-// Dashboard Components
+// Lazy load toast for bundle optimization
+const showToast = async (type, message, options = {}) => {
+  const toast = (await import('react-hot-toast')).default;
+  type === 'success' ? toast.success(message, options) : toast.error(message, options);
+};
+
+// Firebase imports - lazy loaded on first use
+let firestoreModule = null;
+const getFirestore = async () => {
+  if (!firestoreModule) {
+    const [firestore, config] = await Promise.all([
+      import('firebase/firestore'),
+      import('@esim/shared/firebase/config')
+    ]);
+    firestoreModule = { ...firestore, db: config.db };
+  }
+  return firestoreModule;
+};
+
+// Lazy load heavy services
+const getEsimService = async () => (await import('@esim/shared/services/esimService')).esimService;
+const getReferralService = async () => await import('@esim/shared/services/referralService');
+
+// Dashboard Components - critical path
 import AccessDeniedAlert from './dashboard/AccessDeniedAlert';
 import DashboardHeader from './dashboard/DashboardHeader';
 import RecentOrders from './dashboard/RecentOrders';
-import QRCodeModal from './dashboard/QRCodeModal';
-import ReferralBottomSheet from './ReferralBottomSheet';
+
+// Lazy load modals - not needed for initial render
+const QRCodeModal = dynamic(() => import('./dashboard/QRCodeModal'), {
+  ssr: false,
+  loading: () => null
+});
+const ReferralBottomSheet = dynamic(() => import('./ReferralBottomSheet'), {
+  ssr: false,
+  loading: () => null
+});
 
 // Dashboard Skeleton Component for loading state
 const DashboardSkeleton = () => (
