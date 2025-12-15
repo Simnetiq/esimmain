@@ -131,31 +131,28 @@ export default function RootLayout({ children }) {
   return (
     <html suppressHydrationWarning>
       <head>
-        {/* Preconnect to critical domains to reduce latency */}
-        {/* Firebase Auth - reduces the 1,517ms auth iframe load time */}
-        <link rel="preconnect" href="https://apis.google.com" />
-        <link rel="preconnect" href="https://www.googleapis.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://securetoken.googleapis.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossOrigin="anonymous" />
-        
-        {/* Google Fonts - for font loading */}
+        {/* 
+          PERFORMANCE: Preconnect to critical domains
+          Note: Firebase Auth iframe is now deferred via requestIdleCallback
+          These preconnects help when auth IS eventually needed
+        */}
+        {/* Google Fonts - highest priority for LCP */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         
-        {/* Preload critical translation file */}
-        <link 
-          rel="preload" 
-          href="/locales/en/common.json" 
-          as="fetch" 
-          type="application/json"
-          crossOrigin="anonymous"
-        />
+        {/* Firebase Auth domain - preconnect for when auth is initialized */}
+        <link rel="preconnect" href="https://esimcreator-f00dd.firebaseapp.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://apis.google.com" crossOrigin="anonymous" />
         
-        {/* DNS prefetch for non-critical third-party domains */}
+        {/* DNS prefetch for secondary Firebase services (not render-blocking) */}
+        <link rel="dns-prefetch" href="https://www.googleapis.com" />
+        <link rel="dns-prefetch" href="https://securetoken.googleapis.com" />
+        <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com" />
         <link rel="dns-prefetch" href="https://firebasestorage.googleapis.com" />
+        
+        {/* DNS prefetch for analytics/tracking (loaded after page interactive) */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
-        <link rel="dns-prefetch" href="https://esimcreator-f00dd.firebaseapp.com" />
         
         {/* Scroll to top on page load/refresh */}
         <script

@@ -29,7 +29,9 @@ const nextConfig = {
 
   // Experimental features for better performance
   experimental: {
+    // Enable CSS optimization (critters for critical CSS inlining)
     optimizeCss: true,
+    // Tree-shake package imports for smaller bundles
     optimizePackageImports: [
       'lucide-react',
       'framer-motion',
@@ -37,7 +39,23 @@ const nextConfig = {
       '@tanstack/react-query',
       'react-hot-toast',
       'firebase',
+      'firebase/auth',
+      'firebase/firestore',
+      'firebase/storage',
+      'firebase/analytics',
     ],
+  },
+  
+  // Modular Firebase imports to reduce bundle size
+  modularizeImports: {
+    'firebase/auth': {
+      transform: 'firebase/auth',
+      skipDefaultConversion: true,
+    },
+    'firebase/firestore': {
+      transform: 'firebase/firestore',
+      skipDefaultConversion: true,
+    },
   },
 
   // Headers for caching and security
