@@ -77,7 +77,7 @@ export const metadata = {
         url: '/images/og-image.svg',
         width: 1200,
         height: 630,
-        alt: 'Simnetiq - Best eSIM Plans for Travelers',
+        alt: 'Simnetiq - Global eSIM for Seamless Travel Connectivity',
       },
     ],
   },
