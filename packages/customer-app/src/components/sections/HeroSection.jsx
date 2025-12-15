@@ -141,7 +141,7 @@ export default function HeroSection({ onCountrySelect }) {
     <div className="hero-section relative min-h-[85vh] flex flex-col" >
       {/* Gradient Orbs - Using #5374CD - Large to bleed into navbar and features */}
 
-      <div className="absolute bottom-0 right-0 w-[700px] h-[700px] rounded-full blur-[100px] translate-x-1/4 translate-y-1/4" style={{ backgroundColor: 'rgba(83, 116, 205, 0.2)' }} />
+
       <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] rounded-full blur-[80px]" style={{ backgroundColor: 'rgba(83, 116, 205, 0.15)' }} />
       <div className="absolute top-1/2 left-1/2 w-[600px] h-[600px] bg-white/50 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2" />
       

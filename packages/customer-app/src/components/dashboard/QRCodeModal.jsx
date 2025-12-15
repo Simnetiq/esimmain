@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React, { useState } from 'react';
 import { 
   QrCode, Smartphone, Clock, Wifi, Phone, MessageSquare,
@@ -77,6 +78,7 @@ const QRCodeModal = ({
     ...mappedPlanDetails
   };
   const installation = selectedOrder.installation || {};
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const airaloData = selectedOrder.airaloOrderData || selectedOrder.orderData || {};
   
   // Get QR code data using shared utility functions (handles all formats)

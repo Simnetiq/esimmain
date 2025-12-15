@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useMemo } from 'react';
+import React, { memo, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
@@ -119,9 +119,9 @@ const Footer = () => {
            pathname.startsWith('/blog');
   }, [pathname]);
 
-  const getText = (key, englishText) => {
+  const getText = useCallback((key, englishText) => {
     return shouldTranslate ? t(key, englishText) : englishText;
-  };
+  }, [shouldTranslate, t]);
 
   // Footer data
   const footerSections = useMemo(() => ({
@@ -184,7 +184,7 @@ const Footer = () => {
       {/* Top Border */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gray-200" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 ">
         {/* Main Footer Content */}
         <div className="py-12 lg:py-16">
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 lg:gap-12">

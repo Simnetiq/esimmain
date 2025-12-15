@@ -32,82 +32,99 @@ const ReferralBottomSheet = dynamic(() => import('./ReferralBottomSheet'), {
   loading: () => null
 });
 
-// Dashboard Skeleton Component for loading state
+// Grid pattern style for skeleton
+const gridPatternStyle = {
+  backgroundSize: '10px 10px',
+  backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
+};
+
+// Dashboard Skeleton Component - matches exact DashboardHeader + RecentOrders dimensions
 const DashboardSkeleton = () => (
-  <div className="min-h-screen bg-white flex flex-col">
+  <div className="min-h-screen bg-white flex flex-col relative overflow-hidden">
+    {/* Grid Pattern */}
+    <div className="hidden xl:block absolute left-0 top-0 bottom-0 w-32 pointer-events-none" style={gridPatternStyle} />
+    <div className="hidden xl:block absolute right-0 top-0 bottom-0 w-32 pointer-events-none" style={gridPatternStyle} />
+    
     <div className="relative isolate flex-1 flex flex-col">
-      {/* Background pattern skeleton */}
-      <div className="hidden sm:block absolute top-0 left-0 right-0 h-px bg-gray-200/70"></div>
-      <div className="hidden sm:block absolute bottom-0 left-0 right-0 h-px bg-gray-200/70"></div>
+      {/* Horizontal Lines */}
+      <div className="hidden sm:block absolute top-0 left-0 right-0 h-px bg-gray-200/70" />
+      <div className="hidden sm:block absolute bottom-0 left-0 right-0 h-px bg-gray-200/70" />
       
-      {/* Header Section Skeleton */}
-      <div className="py-8 sm:py-12 lg:py-16 px-4">
-        <div className="max-w-6xl mx-auto">
-          {/* Welcome text skeleton */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-            <div>
-              <div className="h-4 w-24 bg-gray-200 rounded animate-pulse mb-3"></div>
-              <div className="h-8 w-64 bg-gray-200 rounded animate-pulse mb-2"></div>
-              <div className="h-4 w-48 bg-gray-200 rounded animate-pulse"></div>
-            </div>
-            <div className="h-12 w-32 bg-gray-100 rounded-full animate-pulse"></div>
-          </div>
-          
-          {/* Stats Cards Skeleton */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-gray-50 rounded-2xl p-4 sm:p-6">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 bg-gray-200 rounded-xl animate-pulse"></div>
-                  <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
+      {/* Header Section Skeleton - exact match to DashboardHeader */}
+      <div className="bg-white">
+        <div className="mx-auto w-full max-w-9xl">
+          <div className="mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl w-full lg:mt-20 mt-10">
+            <div className="px-4 pt-6 lg:pt-0 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
+              {/* Subtitle skeleton */}
+              <div className="h-4 w-80 max-w-full bg-gray-200 rounded animate-pulse" />
+              
+              {/* Title skeleton */}
+              <div className="h-8 sm:h-9 lg:h-10 w-72 max-w-full bg-gray-200 rounded animate-pulse my-4" />
+              
+              {/* Divider */}
+              <div className="w-full h-px bg-gray-200 my-4" />
+              
+              {/* Stats Line skeleton */}
+              <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+                {/* Stat 1 - Total Orders */}
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-gray-200 rounded animate-pulse" />
+                  <div>
+                    <div className="h-3 w-16 bg-gray-200 rounded animate-pulse mb-1" />
+                    <div className="h-4 w-6 bg-gray-200 rounded animate-pulse" />
+                  </div>
                 </div>
-                <div className="h-8 w-12 bg-gray-200 rounded animate-pulse"></div>
+                
+                <div className="w-px h-8 bg-gray-200 hidden sm:block" />
+                
+                {/* Stat 2 - Active eSIMs */}
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-gray-200 rounded animate-pulse" />
+                  <div>
+                    <div className="h-3 w-16 bg-gray-200 rounded animate-pulse mb-1" />
+                    <div className="h-4 w-6 bg-gray-200 rounded animate-pulse" />
+                  </div>
+                </div>
+                
+                <div className="w-px h-8 bg-gray-200 hidden sm:block" />
+                
+                {/* Stat 3 - Total Spent */}
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-gray-200 rounded animate-pulse" />
+                  <div>
+                    <div className="h-3 w-16 bg-gray-200 rounded animate-pulse mb-1" />
+                    <div className="h-4 w-12 bg-gray-200 rounded animate-pulse" />
+                  </div>
+                </div>
               </div>
-            ))}
+              
+              {/* Quick Actions skeleton */}
+              <div className="mt-6">
+                <div className="flex flex-wrap gap-3">
+                  <div className="h-10 w-32 bg-gray-200 rounded-lg animate-pulse" />
+                  <div className="h-10 w-36 bg-gray-100 rounded-lg animate-pulse" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+        {/* Full width gray line */}
+        <div className="w-full h-px bg-gray-100 mt-6" />
       </div>
       
-      {/* Recent Orders Section Skeleton */}
-      <div className="flex-1 px-4 pb-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
-            <div className="h-6 w-32 bg-gray-200 rounded animate-pulse"></div>
-            <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
-          </div>
-          
-          {/* Order Cards Skeleton */}
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
-                {/* Card Header */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gray-200 rounded-xl animate-pulse"></div>
-                    <div>
-                      <div className="h-5 w-24 bg-gray-200 rounded animate-pulse mb-2"></div>
-                      <div className="h-3 w-16 bg-gray-200 rounded animate-pulse"></div>
-                    </div>
-                  </div>
-                  <div className="h-6 w-16 bg-gray-200 rounded-full animate-pulse"></div>
-                </div>
-                
-                {/* Card Content */}
-                <div className="space-y-3 mb-4">
-                  <div className="flex items-center justify-between">
-                    <div className="h-4 w-12 bg-gray-200 rounded animate-pulse"></div>
-                    <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
-                    <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
-                  </div>
-                </div>
-                
-                {/* Card Footer */}
-                <div className="h-10 w-full bg-gray-200 rounded-xl animate-pulse"></div>
+      {/* Recent Orders Section Skeleton - exact match to RecentOrders */}
+      <div className="bg-white flex-1">
+        <div className="mx-auto w-full max-w-9xl">
+          <div className="mx-auto w-full max-w-7xl">
+            <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
+              {/* Section title skeleton */}
+              <div className="h-7 w-36 bg-gray-200 rounded animate-pulse mb-6" />
+              
+              {/* Empty state / Loading indicator */}
+              <div className="flex justify-center items-center py-12">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-tufts-blue" />
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </div>
