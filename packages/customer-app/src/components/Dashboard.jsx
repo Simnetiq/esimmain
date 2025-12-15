@@ -4,38 +4,20 @@ import React, { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
+import { collection, query, getDocs, doc, setDoc, getDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { db } from '@esim/shared/firebase/config';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { esimService } from '@esim/shared/services/esimService';
+import { getReferralStats, createReferralCode } from '@esim/shared/services/referralService';
 import { getLanguageDirection, detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
 import { 
   mapAiraloSimData, 
   mapPackageCountryData, 
-  mapPlanDetails,
+  mapPlanDetails
 } from '@esim/shared/utils/esimFieldMapper';
+import toast from 'react-hot-toast';
 
-// Lazy load toast for bundle optimization
-const showToast = async (type, message, options = {}) => {
-  const toast = (await import('react-hot-toast')).default;
-  type === 'success' ? toast.success(message, options) : toast.error(message, options);
-};
-
-// Firebase imports - lazy loaded on first use
-let firestoreModule = null;
-const getFirestore = async () => {
-  if (!firestoreModule) {
-    const [firestore, config] = await Promise.all([
-      import('firebase/firestore'),
-      import('@esim/shared/firebase/config')
-    ]);
-    firestoreModule = { ...firestore, db: config.db };
-  }
-  return firestoreModule;
-};
-
-// Lazy load heavy services
-const getEsimService = async () => (await import('@esim/shared/services/esimService')).esimService;
-const getReferralService = async () => await import('@esim/shared/services/referralService');
-
-// Dashboard Components - critical path
+// Dashboard Components
 import AccessDeniedAlert from './dashboard/AccessDeniedAlert';
 import DashboardHeader from './dashboard/DashboardHeader';
 import RecentOrders from './dashboard/RecentOrders';
@@ -134,7 +116,7 @@ const DashboardSkeleton = () => (
 );
 
 const Dashboard = () => {
-  const { currentUser, userProfile, loadUserProfile, loading: authLoading } = useAuth();
+  const { currentUser, loadUserProfile, loading: authLoading } = useAuth();
   const { t, locale } = useI18n();
   const pathname = usePathname();
   const [orders, setOrders] = useState([]);
@@ -148,6 +130,7 @@ const Dashboard = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showReferralSheet, setShowReferralSheet] = useState(false);
   const [usageCache, setUsageCache] = useState({});
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loadingUsageMap, setLoadingUsageMap] = useState({});
 
   
@@ -676,7 +659,8 @@ const Dashboard = () => {
   }
 
   // Active orders count (used for future stats display)
-  const _activeOrdersCount = orders.filter(order => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const activeOrdersCount = orders.filter(order => {
     if (!order) return false;
     return order.status === 'active' || 
            order.status === 'completed' || 

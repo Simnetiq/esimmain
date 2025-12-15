@@ -160,12 +160,6 @@ async function handleSync(request, source = 'manual') {
       }, { status: 401 });
     }
     
-    // Get markup percentage from configuration (default to 17%)
-    const markupConfigRef = db.collection('config').doc('pricing');
-    const markupConfig = await markupConfigRef.get();
-    // Force zero markup so dataplans.price stays at the base amount
-    const markupPercentage = 0;
-    
     const headers = {
       'Accept': 'application/json',
       'Authorization': `Bearer ${accessToken}`

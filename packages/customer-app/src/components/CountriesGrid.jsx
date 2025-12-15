@@ -7,6 +7,7 @@ import CountryCard from './CountryCard';
 
 const CountriesGrid = ({ 
   countries, 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   isPlansPage, 
   searchTerm,
   onCountrySelect,
@@ -16,13 +17,11 @@ const CountriesGrid = ({
 }) => {
   const { t } = useI18n();
   const [showAll, setShowAll] = useState(false);
-  const [isExpanding, setIsExpanding] = useState(false);
   const gridRef = useRef(null);
 
   // Reset showAll when region changes
   useEffect(() => {
     setShowAll(false);
-    setIsExpanding(false);
   }, [selectedRegion]);
 
   // Limits for internal slicing (only used when showAllOverride is null)

@@ -10,7 +10,11 @@ import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils
 // Lazy load toast to reduce initial bundle
 const showToast = async (type, message) => {
   const toast = (await import('react-hot-toast')).default;
-  type === 'success' ? toast.success(message) : toast.error(message);
+  if (type === 'success') {
+    toast.success(message);
+  } else {
+    toast.error(message);
+  }
 };
 
 // Inline SVG icons

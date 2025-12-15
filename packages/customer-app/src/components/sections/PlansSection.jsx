@@ -22,6 +22,7 @@ import {
   countCountriesFromPlans 
 } from './plans';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function PlansSection({ selectedCountry }) {
   const { t, locale, isLoading: i18nLoading } = useI18n();
   const pathname = usePathname();
