@@ -15,7 +15,8 @@ import {
   Lock
 } from 'lucide-react';
 import Loading from '../../src/components/Loading';
-import AuthModal from '@esim/shared/components/AuthModal';
+import { AuthModal } from '@esim/shared';
+
 
 const StripeCheckoutContent = () => {
   const router = useRouter();
