@@ -29,9 +29,7 @@ const nextConfig = {
 
   // Experimental features for better performance
   experimental: {
-    // Enable CSS optimization (critters for critical CSS inlining)
     optimizeCss: true,
-    // Tree-shake package imports for smaller bundles
     optimizePackageImports: [
       'lucide-react',
       'framer-motion',
@@ -39,23 +37,7 @@ const nextConfig = {
       '@tanstack/react-query',
       'react-hot-toast',
       'firebase',
-      'firebase/auth',
-      'firebase/firestore',
-      'firebase/storage',
-      'firebase/analytics',
     ],
-  },
-  
-  // Modular Firebase imports to reduce bundle size
-  modularizeImports: {
-    'firebase/auth': {
-      transform: 'firebase/auth',
-      skipDefaultConversion: true,
-    },
-    'firebase/firestore': {
-      transform: 'firebase/firestore',
-      skipDefaultConversion: true,
-    },
   },
 
   // Headers for caching and security
@@ -122,39 +104,13 @@ const nextConfig = {
     ];
   },
 
-  // Webpack optimizations for smaller bundles and better code splitting
-  webpack: (config, { isServer }) => {
+  // Webpack optimizations - simplified to avoid build errors
+  webpack: (config) => {
     // Ensure consistent module IDs between builds
     config.optimization = {
       ...config.optimization,
       moduleIds: 'deterministic',
     };
-
-    // Better code splitting for client-side bundles
-    if (!isServer) {
-      config.optimization.splitChunks = {
-        ...config.optimization.splitChunks,
-        cacheGroups: {
-          ...config.optimization.splitChunks?.cacheGroups,
-          // Separate Firebase into its own chunk (loaded only when needed)
-          firebase: {
-            test: /[\\/]node_modules[\\/](firebase|@firebase)[\\/]/,
-            name: 'firebase',
-            chunks: 'async',
-            priority: 20,
-            reuseExistingChunk: true,
-          },
-          // Separate large UI libraries
-          ui: {
-            test: /[\\/]node_modules[\\/](framer-motion|react-hot-toast)[\\/]/,
-            name: 'ui-libs',
-            chunks: 'async',
-            priority: 15,
-            reuseExistingChunk: true,
-          },
-        },
-      };
-    }
 
     return config;
   },

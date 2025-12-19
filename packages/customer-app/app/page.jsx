@@ -48,9 +48,10 @@ export default function HomePage() {
   const handleCountrySelect = (country) => {
     setSelectedCountryFromHero(country);
     // Scroll to plans section
-    if (plansRef.current) {
-      plansRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    // Scroll to plans section - REMOVED per user request
+    // if (plansRef.current) {
+    //   plansRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // }
   };
 
   // Show nothing while checking auth or redirecting
@@ -84,7 +85,7 @@ export default function HomePage() {
           <TravelBlogsSection />
         </main>
       </div>
-      
+
     </>
   );
 }

@@ -6,8 +6,8 @@ import Image from 'next/image';
 import { getISOCode } from '@esim/shared/utils/countryCodeMap';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
 
-const CountryCard = ({ 
-  country, 
+const CountryCard = ({
+  country,
   onClick
 }) => {
   const { t } = useI18n();
@@ -27,14 +27,7 @@ const CountryCard = ({
       data-country-name={fullName}
       data-country-code={country.code}
     >
-      {/* Regional Badge - Top Right */}
-      {isRegional && (
-        <div className="absolute top-3 right-3 z-10">
-          <span className="px-2 py-1 bg-tufts-blue text-white text-xs font-medium rounded-full">
-            {t('badge.regional', 'Regional')}
-          </span>
-        </div>
-      )}
+
 
       {/* Card Content */}
       <div className="p-4 flex flex-col">
@@ -44,8 +37,8 @@ const CountryCard = ({
           <div className="flex-shrink-0 w-14 sm:w-16 aspect-[4/3] bg-white  flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-300">
             {country.photo && country.photo.includes('firebasestorage') ? (
               <div className="relative w-full h-full">
-                <Image 
-                  src={country.photo} 
+                <Image
+                  src={country.photo}
                   alt={fullName}
                   fill
                   sizes="64px"
@@ -72,7 +65,7 @@ const CountryCard = ({
               {displayName}
             </h3>
             <p className="text-xs text-gray-500 truncate">
-              {planCount > 0 
+              {planCount > 0
                 ? `${planCount} ${planCount === 1 ? t('plans.plan', 'plan') : t('plans.plans', 'plans')}`
                 : t('plans.noPlansAvailable', 'No plans')
               }
@@ -92,7 +85,7 @@ const CountryCard = ({
           ) : (
             <span className="text-xs text-gray-400">{t('plans.priceNotAvailable', 'Price N/A')}</span>
           )}
-          
+
           {/* Arrow indicator on hover */}
           <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <svg className="w-4 h-4 text-tufts-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -102,7 +95,7 @@ const CountryCard = ({
         </div>
       </div>
 
-      
+
     </div>
   );
 };

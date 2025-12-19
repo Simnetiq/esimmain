@@ -1,61 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  <!-- 
-    Static Sitemap Fallback
-    Note: The dynamic sitemap.js is the primary sitemap and includes all blog posts.
-    This static file serves as a fallback for static pages only.
-  -->
-  
-  <!-- Homepage - All Languages -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Homepage -->
   <url>
     <loc>https://www.simnetiq.store</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.simnetiq.store"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://www.simnetiq.store/es"/>
-    <xhtml:link rel="alternate" hreflang="fr" href="https://www.simnetiq.store/fr"/>
-    <xhtml:link rel="alternate" hreflang="de" href="https://www.simnetiq.store/de"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.simnetiq.store/ar"/>
-    <xhtml:link rel="alternate" hreflang="he" href="https://www.simnetiq.store/he"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://www.simnetiq.store/ru"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.simnetiq.store"/>
   </url>
   
-  <!-- eSIM Plans -->
+  <!-- Main Pages -->
   <url>
     <loc>https://www.simnetiq.store/esim-plans</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.simnetiq.store/esim-plans"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://www.simnetiq.store/es/esim-plans"/>
-    <xhtml:link rel="alternate" hreflang="fr" href="https://www.simnetiq.store/fr/esim-plans"/>
-    <xhtml:link rel="alternate" hreflang="de" href="https://www.simnetiq.store/de/esim-plans"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.simnetiq.store/ar/esim-plans"/>
-    <xhtml:link rel="alternate" hreflang="he" href="https://www.simnetiq.store/he/esim-plans"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://www.simnetiq.store/ru/esim-plans"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.simnetiq.store/esim-plans"/>
   </url>
   
-  <!-- Blog Index -->
   <url>
     <loc>https://www.simnetiq.store/blog</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.simnetiq.store/blog"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://www.simnetiq.store/es/blog"/>
-    <xhtml:link rel="alternate" hreflang="fr" href="https://www.simnetiq.store/fr/blog"/>
-    <xhtml:link rel="alternate" hreflang="de" href="https://www.simnetiq.store/de/blog"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.simnetiq.store/ar/blog"/>
-    <xhtml:link rel="alternate" hreflang="he" href="https://www.simnetiq.store/he/blog"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://www.simnetiq.store/ru/blog"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.simnetiq.store/blog"/>
   </url>
   
-  <!-- Contact -->
   <url>
     <loc>https://www.simnetiq.store/contact</loc>
     <lastmod>2025-01-15</lastmod>
@@ -63,28 +30,11 @@
     <priority>0.7</priority>
   </url>
   
-  <!-- About -->
-  <url>
-    <loc>https://www.simnetiq.store/about</loc>
-    <lastmod>2025-01-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <!-- Affiliate Program -->
   <url>
     <loc>https://www.simnetiq.store/affiliate-program</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-  </url>
-  
-  <!-- Jobs -->
-  <url>
-    <loc>https://www.simnetiq.store/jobs</loc>
-    <lastmod>2025-01-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
   </url>
   
   <!-- Legal Pages -->
@@ -116,3 +66,4 @@
     <priority>0.3</priority>
   </url>
 </urlset>
+
