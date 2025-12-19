@@ -27,7 +27,8 @@ import { formatPrice, calculateDiscountedPrice } from '@esim/shared/utils/priceU
 import FraudBlockedModal from '../../../src/components/FraudBlockedModal';
 import { useFraudCheck } from '../../../src/hooks/useFraudCheck';
 import Image from 'next/image';
-import AuthModal from '@esim/shared/components/AuthModal';
+import { AuthModal } from '@esim/shared';
+
 
 
 
