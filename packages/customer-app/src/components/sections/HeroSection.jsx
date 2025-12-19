@@ -4,6 +4,7 @@ import React from 'react';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
 import CountrySearchBar from '../CountrySearchBar';
+import TypingText from '../text/TypingText';
 
 // Inline SVG icons to avoid lucide-react bundle overhead
 const GlobeIcon = ({ className }) => (
@@ -88,44 +89,44 @@ export default function HeroSection({ onCountrySelect }) {
                 
                 {/* Badge skeleton */}
                 <div className="flex justify-center mb-6">
-                  <div className="h-10 w-52 bg-white/60 rounded-full animate-pulse shadow-sm" />
+                  <div className="h-10 w-52 bg-white/60 rounded-full shadow-sm" />
                 </div>
                 
                 {/* Headline skeleton */}
                 <div className="space-y-3 mb-8">
-                  <div className="h-12 sm:h-16 lg:h-20 w-full max-w-2xl bg-gray-200/70 rounded-lg mx-auto animate-pulse" />
+                  <div className="h-12 sm:h-16 lg:h-20 w-full max-w-2xl bg-gray-200/70 rounded-lg mx-auto" />
                 </div>
                 
                 {/* Search bar skeleton */}
                 <div className="max-w-2xl mx-auto mb-10">
                   <div className="p-1 bg-gradient-to-r from-tufts-blue/40 via-tufts-blue/30 to-amber-400/40 rounded-2xl">
                     <div className="bg-white rounded-xl p-4">
-                      <div className="h-12 w-full bg-gray-100 rounded-lg animate-pulse" />
+                      <div className="h-12 w-full bg-gray-100 rounded-lg" />
                     </div>
                   </div>
                 </div>
                 
                 {/* Subtitle skeleton */}
                 <div className="space-y-2 mb-8 max-w-2xl mx-auto">
-                  <div className="h-5 w-full bg-gray-100/80 rounded animate-pulse" />
-                  <div className="h-5 w-3/4 bg-gray-100/80 rounded mx-auto animate-pulse" />
+                  <div className="h-5 w-full bg-gray-100/80 rounded" />
+                  <div className="h-5 w-3/4 bg-gray-100/80 rounded mx-auto" />
                 </div>
                 
                 {/* Trust indicators skeleton */}
                 <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
                   <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 bg-tufts-blue/20 rounded animate-pulse" />
-                    <div className="h-4 w-24 bg-gray-100 rounded animate-pulse" />
+                    <div className="w-5 h-5 bg-tufts-blue/20 rounded" />
+                    <div className="h-4 w-24 bg-gray-100 rounded" />
                   </div>
                   <div className="hidden sm:block w-px h-4 bg-gray-200" />
                   <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 bg-tufts-blue/20 rounded animate-pulse" />
-                    <div className="h-4 w-28 bg-gray-100 rounded animate-pulse" />
+                    <div className="w-5 h-5 bg-tufts-blue/20 rounded" />
+                    <div className="h-4 w-28 bg-gray-100 rounded" />
                   </div>
                   <div className="hidden sm:block w-px h-4 bg-gray-200" />
                   <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 bg-tufts-blue/20 rounded animate-pulse" />
-                    <div className="h-4 w-26 bg-gray-100 rounded animate-pulse" />
+                    <div className="w-5 h-5 bg-tufts-blue/20 rounded" />
+                    <div className="h-4 w-26 bg-gray-100 rounded" />
                   </div>
                 </div>
                 
@@ -138,12 +139,10 @@ export default function HeroSection({ onCountrySelect }) {
   }
 
   return (
-    <div className="hero-section relative min-h-[85vh] flex flex-col" >
-      {/* Gradient Orbs - Using #5374CD - Large to bleed into navbar and features */}
-
-
-      <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] rounded-full blur-[80px]" style={{ backgroundColor: 'rgba(83, 116, 205, 0.15)' }} />
-      <div className="absolute top-1/2 left-1/2 w-[600px] h-[600px] bg-white/50 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2" />
+    <div className="hero-section relative min-h-[85vh] flex flex-col">
+      {/* Gradient Orbs - Simplified and reduced blur */}
+      <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full blur-[50px] opacity-60" style={{ backgroundColor: 'rgba(83, 116, 205, 0.2)' }} />
+      <div className="absolute top-1/2 left-1/2 w-[500px] h-[500px] bg-white/40 rounded-full blur-[60px] -translate-x-1/2 -translate-y-1/2" />
       
       <div className="relative flex-1 flex flex-col">
         
@@ -164,41 +163,41 @@ export default function HeroSection({ onCountrySelect }) {
           <div className="mx-auto w-full max-w-7xl">
             <div className="px-4 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl text-center">
               
-              {/* Badge - Links to App Store - CSS animation instead of JS */}
+              {/* Badge - Links to App Store */}
               <a
                 href="https://apps.apple.com/gb/app/simnetiq-global-esim/id6755963262"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={handleDownloadApp}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full shadow-sm mb-6 hover:border-tufts-blue hover:shadow-md transition-all group animate-fade-in-down"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full shadow-sm mb-6 hover:border-tufts-blue hover:shadow-md transition-all group"
               >
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                <span className="text-sm font-medium text-gray-700 group-hover:text-tufts-blue transition-colors">
+                <div className="w-2 h-2 bg-green-500 rounded-full" />
+                <span className="text-base font-medium text-gray-700 group-hover:text-tufts-blue transition-colors">
                   {t('hero.badge', 'Now available on iOS')}
                 </span>
                 <ArrowRightIcon className="w-4 h-4 text-gray-400 group-hover:text-tufts-blue group-hover:translate-x-0.5 transition-all" />
               </a>
               
-              {/* Headline - CSS animation */}
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-eerie-black mb-8 animate-fade-in-up animation-delay-100">
-                {t('hero.stayConnected', 'Stay Connected')}{' '}
-                <span className="text-tufts-blue">{t('hero.worldwide', 'Worldwide.')}</span>
+              {/* Headline */}
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-eerie-black mb-8">
+                <span className="inline-block">{t('hero.stayConnected', 'The easiest way to get mobile data anywhere in the world')}</span>{' '}
+                
               </h1>
               
-              {/* Search Bar - Main CTA - Right under headline */}
-              <div className="relative z-50 max-w-2xl mx-auto mb-10 p-1 bg-gradient-to-r from-tufts-blue via-tufts-blue/80 to-white rounded-2xl shadow-xl animate-fade-in-up animation-delay-200">
+              {/* Search Bar - Main CTA */}
+              <div className="relative z-50 max-w-2xl mx-auto mb-10 p-1 bg-gradient-to-r from-tufts-blue via-tufts-blue/80 to-white rounded-2xl shadow-xl">
                 <div className="bg-white rounded-xl p-2">
                   <CountrySearchBar showCountryCount={true} onCountrySelect={onCountrySelect} />
                 </div>
               </div>
               
-              {/* Subtitle - Now under search */}
-              <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto mb-8 animate-fade-in-up animation-delay-300">
-                {t('hero.subtitle', 'Get instant mobile data in 200+ countries. No physical SIM needed. Activate your eSIM in seconds.')}
+              {/* Subtitle */}
+              <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+                {t('hero.subtitle', 'Activate your eSIM in minutes and stay connected in 200+ destinations worldwide. Fast 4G/5G networks, simple setup, and plans designed for travelers — not roaming fees.')}
               </p>
               
-              {/* Trust Indicators - At bottom */}
-              <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-sm text-gray-500 animate-fade-in-up animation-delay-400">
+              {/* Trust Indicators */}
+              <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-sm text-gray-500">
                 {trustIndicators.map(({ Icon, label, key }, index) => (
                   <React.Fragment key={key}>
                     <div className="flex items-center gap-2 text-eerie-black">

@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { FileText, Users, CreditCard, Shield, Scale, RefreshCw, Smartphone, Globe, Lock, UserCheck, MessageSquare, Mail } from 'lucide-react';
+import { FileText, Users, CreditCard, Shield, Scale, RefreshCw, Smartphone, Globe, Lock, UserCheck, MessageSquare, Mail, AlertTriangle, Ban, UserX } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
@@ -34,7 +34,8 @@ const TermsOfService = () => {
         "These terms apply to all users of Simnetiq services, including website visitors, app users, and customers",
         "If you do not agree to these terms, you must not use our services",
         "We may update these terms from time to time. Continued use constitutes acceptance of updated terms",
-        "You must be at least 18 years old or have parental consent to use our services"
+        "You must be at least 13 years old to use our services (as required by Stripe and other third-party providers)",
+        "Users under 18 must have parental consent and supervision"
       ]
     },
     {
@@ -44,7 +45,7 @@ const TermsOfService = () => {
         "Simnetiq provides eSIM data plans and mobile connectivity solutions for international travel",
         "Our services include eSIM profile downloads, data plan activation, and customer support",
         "Service availability varies by destination and is subject to local network coverage",
-        "We partner with mobile network operators worldwide to provide connectivity services",
+        "We partner with Airalo and other mobile network operators worldwide to provide connectivity services",
         "Data plans are delivered digitally and activated on compatible eSIM-enabled devices"
       ]
     },
@@ -61,25 +62,32 @@ const TermsOfService = () => {
     },
     {
       icon: CreditCard,
-      title: "4. Pricing, Payments, and Billing",
+      title: "4. Pricing, Payments, and Third-Party Payment Processing",
       content: [
         "All prices are displayed in USD and may include applicable taxes and fees",
         "Payment is required in full before service activation",
-        "We accept major credit cards, debit cards, and other payment methods as displayed",
+        "We use Stripe, Inc. ('Stripe') as our payment processor (https://stripe.com/legal). By using our services, you agree to Stripe's Terms of Service (https://stripe.com/legal/ssa) and Privacy Policy (https://stripe.com/privacy), and authorize data sharing for payment processing",
+        "Stripe processes all payment card details, billing information, and IP addresses. We do not store payment card information",
+        "Payment processing fees may apply and are non-refundable",
         "All sales are final - no refunds or exchanges (see Section 8 for details)",
         "We reserve the right to change prices with 30 days notice to existing customers",
-        "Failed payments may result in service suspension or account termination"
+        "Failed payments may result in service suspension or account termination",
+        "We are not liable for payment processing failures, declined transactions, or issues arising from Stripe's services"
       ]
     },
     {
       icon: Shield,
-      title: "5. Acceptable Use Policy",
+      title: "5. Acceptable Use Policy and Third-Party Service Restrictions",
       content: [
         "You may only use our services for lawful purposes and in compliance with local laws",
         "Prohibited activities include: illegal content, spam, hacking, or network abuse",
         "You may not resell, redistribute, or share eSIM profiles with others",
         "Excessive usage that impacts network performance may result in service limitation",
-        "You are responsible for all activity that occurs under your account"
+        "You are responsible for all activity that occurs under your account",
+        "You agree to comply with Airalo's Terms of Service when using eSIM services provided through their platform",
+        "You agree to comply with Stripe's Acceptable Use Policy for payment processing",
+        "Reverse engineering, decompiling, or attempting to extract API keys or service credentials is strictly prohibited",
+        "You must not violate terms of our third-party providers, including Airalo (https://www.airalo.com/terms-conditions), Stripe (https://stripe.com/legal/ssa), Meta (https://www.facebook.com/legal/terms), and Google (https://policies.google.com/terms)"
       ]
     },
     {
@@ -90,18 +98,25 @@ const TermsOfService = () => {
         "Data speeds are subject to network conditions and local operator limitations",
         "We do not guarantee specific data speeds or uninterrupted service",
         "Service may be temporarily unavailable due to maintenance or technical issues",
-        "Emergency services (911, etc.) may not be available through our eSIM services"
+        "Emergency services (911, etc.) may not be available through our eSIM services",
+        "Service availability is subject to Airalo's network coverage and service terms"
       ]
     },
     {
       icon: Lock,
-      title: "7. Privacy and Data Protection",
+      title: "7. Privacy, Data Protection, and Tracking Consent",
       content: [
         "Your privacy is important to us - see our Privacy Policy for detailed information",
-        "We collect and process personal data necessary to provide our services",
+        "We collect and process personal data necessary to provide our services in compliance with GDPR",
         "We implement appropriate security measures to protect your information",
-        "We may share data with network partners as necessary to provide connectivity",
-        "You have rights regarding your personal data as outlined in our Privacy Policy"
+        "We share data with third-party service providers (Airalo, Stripe, Meta, Google) as necessary to provide services",
+        "You have rights regarding your personal data as outlined in our Privacy Policy",
+        "By using our services, you acknowledge our Privacy Policy, which details use of Meta Pixel and Google Tags for analytics/advertising. These require your explicit opt-in consent (Art. 6(1)(a) GDPR)",
+        "Data shared with Airalo includes profiles/purchase details; with Stripe, payment/billing/IP data; with Meta/Google, event/behavior data for legitimate interests (Art. 6(1)(f) GDPR) where consented",
+        "You may revoke tracking consent at any time through your account settings or cookie preferences",
+        "We require explicit opt-in consent before loading non-essential tracking pixels and tags (GDPR-compliant)",
+        "If you do not consent to tracking, certain features may be limited or unavailable",
+        "Our Privacy Policy expands on processors, transfers (e.g., US via Data Privacy Framework), and your rights"
       ]
     },
     {
@@ -112,7 +127,8 @@ const TermsOfService = () => {
         "Due to the digital nature of eSIM products, all sales are considered final upon purchase",
         "Unused data does not roll over and expires according to plan terms",
         "Technical support is available for activation issues, but no monetary refunds are provided",
-        "In exceptional circumstances, we may provide service credits at our sole discretion"
+        "In exceptional circumstances, we may provide service credits at our sole discretion",
+        "Refund requests related to payment processing issues should be directed to Stripe in accordance with their policies"
       ]
     },
     {
@@ -142,6 +158,23 @@ const TermsOfService = () => {
         "Your email preferences can be managed in your account settings",
         "Even after unsubscribing from marketing emails, we may still send service-related communications"
       ]
+    },
+    {
+      icon: AlertTriangle,
+      title: "11. Limitation of Liability",
+      content: [
+        "We are not liable for third-party service failures (Airalo networks, Stripe payments, Meta/Google tracking)",
+        "Total liability limited to amount paid in last 12 months",
+        "No liability for indirect damages or service interruptions"
+      ]
+    },
+    {
+      icon: UserX,
+      title: "12. Termination",
+      content: [
+        "We may terminate for violations of these terms or provider policies",
+        "You may terminate anytime; no refunds for digital eSIMs"
+      ]
     }
   ];
 
@@ -166,7 +199,7 @@ const TermsOfService = () => {
             <div className="flex items-center justify-center mt-8">
               <FileText className="w-8 h-8 text-tufts-blue mr-2" />
               <p className="text-sm text-cool-black">
-                Effective Date: January 1, 2025 | Last Updated: October 8, 2025
+                Effective Date: August 1, 2025 | Last Updated: December 19, 2025
               </p>
             </div>
           </div>
@@ -185,18 +218,26 @@ const TermsOfService = () => {
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Agreement Overview</h2>
                 <p className="text-cool-black leading-relaxed mb-4">
                   These Terms of Service (&quot;Terms&quot;, &quot;Agreement&quot;) govern your use of the eSIM services, 
-                  website, and mobile applications provided by Holylabs Ltd, a company incorporated in England and Wales 
+                  website, and mobile applications provided by Simnetiq Ltd, a company incorporated in the United Kingdom 
                   (&quot;Simnetiq&quot;, &quot;Company&quot;, &quot;we&quot;, &quot;our&quot;, or &quot;us&quot;).
                 </p>
                 <p className="text-cool-black leading-relaxed mb-4">
-                  By accessing our website at Simnetiq.com, using our mobile application, or purchasing our eSIM services, 
+                  By accessing our website, using our mobile application, or purchasing our eSIM services, 
                   you (&quot;User&quot;, &quot;Customer&quot;, &quot;you&quot;) agree to be bound by these Terms and our Privacy Policy, 
                   which is incorporated herein by reference.
                 </p>
-                <p className="text-cool-black leading-relaxed">
+                <p className="text-cool-black leading-relaxed mb-4">
                   Our services include digital eSIM profiles, international data plans, mobile connectivity solutions, 
                   customer support, and related telecommunications services for travelers and mobile users worldwide.
                 </p>
+                <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-lg mt-4">
+                  <p className="text-blue-800 text-sm">
+                    <strong>Important:</strong> By using our services, you also agree to the terms and conditions 
+                    of our third-party service providers, including but not limited to Airalo (eSIM services), 
+                    Stripe (payment processing), Meta (advertising), and Google (analytics). These providers' 
+                    terms are incorporated by reference.
+                  </p>
+                </div>
               </div>
             </div>
             <div className="pointer-events-none absolute inset-px rounded-xl shadow-sm ring-1 ring-black/5"></div>
@@ -236,21 +277,113 @@ const TermsOfService = () => {
             })}
           </div>
 
+          {/* Third-Party Service Providers */}
+          <div className="relative mb-8">
+            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
+              <div className="px-8 pt-8 pb-8">
+                <div className="flex items-center mb-4">
+                  <Globe className="w-8 h-8 text-tufts-blue mr-3" />
+                  <h2 className="text-2xl font-medium tracking-tight text-eerie-black">11. Third-Party Service Providers</h2>
+                </div>
+                <div className="space-y-4 text-cool-black">
+                  <div>
+                    <p className="font-semibold mb-2">Airalo API Integration</p>
+                    <p className="mb-2">
+                      Our eSIM services are provided through integration with Airalo, a Singapore-based eSIM provider. 
+                      By using our services, you agree to Airalo&apos;s Terms of Service and Privacy Policy. 
+                      We share necessary user data (profiles, purchase details, contact information) with Airalo 
+                      to facilitate eSIM delivery and activation.
+                    </p>
+                    <p>
+                      <strong>Your consent:</strong> By purchasing an eSIM, you consent to this data sharing as 
+                      required for service delivery. Airalo acts as a data processor for eSIM services.
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <p className="font-semibold mb-2">Stripe Payment Processing</p>
+                    <p className="mb-2">
+                      We use Stripe, Inc. as our payment processor. Stripe handles all payment card details, 
+                      billing information, and IP addresses in accordance with their Data Processing Agreement (DPA) 
+                      and Privacy Policy. We do not store payment card information on our servers.
+                    </p>
+                    <p className="mb-2">
+                      <strong>Data Controller/Processor:</strong> We are the data controller, and Stripe is the 
+                      data processor for payment processing. Stripe processes payments in compliance with PCI DSS 
+                      standards and applicable data protection laws.
+                    </p>
+                    <p>
+                      <strong>Links:</strong> Stripe&apos;s DPA: <a href="https://stripe.com/legal/dpa" target="_blank" rel="noopener noreferrer" className="text-tufts-blue underline">https://stripe.com/legal/dpa</a> | 
+                      Privacy Policy: <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer" className="text-tufts-blue underline">https://stripe.com/privacy</a>
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="font-semibold mb-2">Meta Pixel (Facebook/Instagram)</p>
+                    <p className="mb-2">
+                      We use Meta Pixel for advertising and conversion tracking. Meta Pixel collects data about 
+                      page views, purchases, and other events, which is sent to Meta (Ireland/US). 
+                      This data is used for ad targeting, measurement, and optimization.
+                    </p>
+                    <p className="mb-2">
+                      <strong>Consent Required:</strong> We require your explicit opt-in consent before loading 
+                      Meta Pixel. If you do not consent, Meta Pixel will not be loaded (GDPR-compliant). 
+                      You can revoke consent at any time through your cookie preferences.
+                    </p>
+                    <p>
+                      <strong>CCPA Notice:</strong> California residents have the right to opt-out of the 
+                      sale of personal information. Meta Pixel may constitute a sale under CCPA.
+                    </p>
+                  </div>
+
+                  <div>
+                      <p className="font-semibold mb-2">Google Tags (Analytics/Tag Manager)</p>
+                    <p className="mb-2">
+                      We use Google Analytics and Google Tag Manager for website analytics. These services collect 
+                      data including IP addresses, device IDs, and user behavior. Google acts as a data processor.
+                    </p>
+                    <p className="mb-2">
+                      <strong>Consent Required:</strong> Non-essential Google Tags require your consent. 
+                      We enable restricted data processing mode where available. You can manage consent through 
+                      cookie preferences.
+                    </p>
+                    <p>
+                      <strong>Data Processing:</strong> Google processes data in accordance with their Data 
+                      Processing Terms. Some data may be transferred to the United States under appropriate 
+                      safeguards (Data Privacy Framework or Standard Contractual Clauses).
+                    </p>
+                  </div>
+
+                  <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-lg mt-4">
+                    <p className="text-amber-800 text-sm">
+                      <strong>Limitation of Liability:</strong> We are not liable for failures, errors, or 
+                      issues arising from third-party services (Airalo, Stripe, Meta, Google). Your use of 
+                      these services is subject to their respective terms and conditions.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="pointer-events-none absolute inset-px rounded-xl shadow-sm ring-1 ring-black/5"></div>
+          </div>
+
           {/* Intellectual Property */}
           <div className="relative mb-8">
             <div className="absolute inset-px rounded-xl bg-white"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
-                <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Intellectual Property Rights</h2>
+                <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">12. Intellectual Property Rights</h2>
                 <p className="text-cool-black leading-relaxed mb-4">
                   All content, features, and functionality of our services, including but not limited to 
-                  text, graphics, logos, images, and software, are owned by Holylabs Ltd or our licensors 
+                  text, graphics, logos, images, and software, are owned by Simnetiq Ltd or our licensors 
                   and are protected by copyright, trademark, and other intellectual property laws.
                 </p>
                 <ul className="space-y-2 text-cool-black">
                   <li>• You may not reproduce, distribute, or create derivative works without permission</li>
                   <li>• Our trademarks and service marks may not be used without prior written consent</li>
                   <li>• Any feedback or suggestions you provide may be used by us without compensation</li>
+                  <li>• You may not reverse-engineer, decompile, or attempt to extract API keys or credentials from our services</li>
                 </ul>
               </div>
             </div>
@@ -262,7 +395,7 @@ const TermsOfService = () => {
             <div className="absolute inset-px rounded-xl bg-white"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
-                <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">11. Device Compatibility and Technical Requirements</h2>
+                <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">13. Device Compatibility and Technical Requirements</h2>
                 <div className="space-y-4 text-cool-black">
                   <p>
                     Our eSIM services require compatible devices and software. You are responsible for ensuring 
@@ -293,7 +426,7 @@ const TermsOfService = () => {
               <div className="px-8 pt-8 pb-8">
                 <div className="flex items-center mb-4">
                   <Scale className="w-8 h-8 text-tufts-blue mr-3" />
-                  <h2 className="text-2xl font-medium tracking-tight text-eerie-black">12. Limitation of Liability and Disclaimers</h2>
+                  <h2 className="text-2xl font-medium tracking-tight text-eerie-black">14. Limitation of Liability and Disclaimers</h2>
                 </div>
                 <div className="space-y-4 text-cool-black">
                   <p>
@@ -301,12 +434,22 @@ const TermsOfService = () => {
                     We do not guarantee uninterrupted service, specific data speeds, or coverage in all areas.
                   </p>
                   <p>
-                    <strong>Limitation of Liability:</strong> To the maximum extent permitted by law, Holylabs Ltd&apos;s 
+                    <strong>Third-Party Service Disclaimers:</strong> We are not liable for failures, errors, 
+                    data breaches, or issues arising from third-party services including but not limited to Airalo, 
+                    Stripe, Meta, or Google. Your use of these services is at your own risk.
+                  </p>
+                  <p>
+                    <strong>Limitation of Liability:</strong> To the maximum extent permitted by law, Simnetiq Ltd&apos;s 
                     total liability shall not exceed the amount you paid for the specific service giving rise to the claim.
                   </p>
                   <p>
                     <strong>Excluded Damages:</strong> We shall not be liable for indirect, incidental, special, 
                     consequential, or punitive damages, including loss of profits, data, or business opportunities.
+                  </p>
+                  <p>
+                    <strong>Indemnification:</strong> You agree to indemnify and hold harmless Simnetiq Ltd, its 
+                    officers, directors, employees, and agents from any claims, damages, losses, or expenses 
+                    (including legal fees) arising from your violation of these Terms or any third-party service provider terms.
                   </p>
                 </div>
                 <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg mt-4">
@@ -320,20 +463,58 @@ const TermsOfService = () => {
             <div className="pointer-events-none absolute inset-px rounded-xl shadow-sm ring-1 ring-black/5"></div>
           </div>
 
+          {/* Termination */}
+          <div className="relative mb-8">
+            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
+              <div className="px-8 pt-8 pb-8">
+                <div className="flex items-center mb-4">
+                  <Ban className="w-8 h-8 text-tufts-blue mr-3" />
+                  <h2 className="text-2xl font-medium tracking-tight text-eerie-black">15. Termination</h2>
+                </div>
+                <div className="space-y-4 text-cool-black">
+                  <p>
+                    <strong>Termination by You:</strong> You may terminate your account at any time by contacting 
+                    customer support or using account deletion features in your account settings.
+                  </p>
+                  <p>
+                    <strong>Termination by Us:</strong> We reserve the right to suspend or terminate your account 
+                    immediately, without prior notice, if you:
+                  </p>
+                  <ul className="space-y-2 ml-4">
+                    <li>• Violate these Terms of Service or any third-party service provider terms</li>
+                    <li>• Engage in fraudulent, illegal, or abusive activity</li>
+                    <li>• Fail to comply with payment obligations</li>
+                    <li>• Misuse our services or third-party integrations</li>
+                    <li>• Reverse-engineer or attempt to extract API credentials</li>
+                  </ul>
+                  <p>
+                    <strong>Effect of Termination:</strong> Upon termination, your right to use our services 
+                    will immediately cease. We may delete your account data in accordance with our Privacy Policy 
+                    and applicable data retention requirements.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="pointer-events-none absolute inset-px rounded-xl shadow-sm ring-1 ring-black/5"></div>
+          </div>
+
           {/* Governing Law */}
           <div className="relative mb-8">
             <div className="absolute inset-px rounded-xl bg-white"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
-                <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">13. Governing Law and Dispute Resolution</h2>
+                <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">16. Governing Law and Dispute Resolution</h2>
                 <div className="space-y-4 text-cool-black">
                   <p>
                     <strong>Governing Law:</strong> These Terms are governed by and construed in accordance with 
-                    the laws of England and Wales, without regard to conflict of law principles.
+                    the laws of the United Kingdom, without regard to conflict of law principles. As a United Kingdom-based company, 
+                    we are subject to United Kingdom data protection laws including GDPR.
                   </p>
                   <p>
-                    <strong>Jurisdiction:</strong> The courts of England and Wales shall have exclusive jurisdiction 
-                    over any disputes arising from these Terms or our services.
+                    <strong>Jurisdiction:</strong> The courts of the United Kingdom shall have exclusive jurisdiction 
+                    over any disputes arising from these Terms or our services, subject to mandatory consumer 
+                    protection laws in your jurisdiction.
                   </p>
                   <p>
                     <strong>Dispute Resolution:</strong> Before initiating any legal proceedings, you agree to first 
@@ -342,7 +523,11 @@ const TermsOfService = () => {
                   </p>
                   <p>
                     <strong>Consumer Rights:</strong> Nothing in these Terms affects your statutory consumer rights 
-                    under applicable consumer protection laws.
+                    under applicable consumer protection laws, including EU consumer protection directives.
+                  </p>
+                  <p>
+                    <strong>GDPR Rights:</strong> If you are located in the EEA, you have specific rights under GDPR 
+                    regarding your personal data. See our Privacy Policy for details on exercising these rights.
                   </p>
                 </div>
               </div>
@@ -355,7 +540,7 @@ const TermsOfService = () => {
             <div className="absolute inset-px rounded-xl bg-white"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
-                <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">14. Contact Information</h2>
+                <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">17. Contact Information</h2>
                 <div className="space-y-4 text-cool-black">
                   <p>
                     If you have any questions about these Terms of Service or need to contact us regarding 
@@ -364,13 +549,16 @@ const TermsOfService = () => {
                   <div className="bg-gray-50 p-6 rounded-lg">
                     <div className="space-y-3">
                       <div>
-                        <strong>Company:</strong> Holylabs Ltd<br />
-                        <strong>Address:</strong> London, United Kingdom<br />
-                        <strong>Email:</strong> legal@Simnetiq.com<br />
-                        <strong>Customer Support:</strong> support@Simnetiq.com
+                        <strong>Company:</strong> Simnetiq Ltd<br />
+                        <strong>Address:</strong> 2 Frederick Street, Kings Cross<br />
+                                London<br />
+                                WC1X 0ND<br />
+                                United Kingdom <br />
+                        <strong>Email:</strong> support@simnetiq.store<br />
+                        <strong>Customer Support:</strong> support@simnetiq.store
                       </div>
                       <div className="pt-2">
-                        <strong>Business Hours:</strong> Monday - Friday, 9:00 AM - 6:00 PM GMT<br />
+                        <strong>Business Hours:</strong> Monday - Friday, 9:00 AM - 6:00 PM CET<br />
                         <strong>Response Time:</strong> We aim to respond to all inquiries within 24-48 hours
                       </div>
                     </div>

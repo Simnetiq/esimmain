@@ -15,8 +15,13 @@
   "hero": {
     "announcement": "Now available in 200+ countries worldwide.",
     "countriesAvailable": "Now available in 200+ countries",
-    "stayConnected": "Travel Smart. Connect Instantly. Your Journey,",
+    "stayConnected": "The easiest way to get mobile data anywhere in the world",
+    "subtitle": "Activate your eSIM in minutes and stay connected in 200+ destinations worldwide. Fast 4G/5G networks, simple setup, and plans designed for travelers — not roaming fees.",
      "Online": "Always Ońline",
+     "countries": "200+ Countries",
+     "instantActivation": "Instant Activation",
+     "securePayment": "Secure Payment",
+     "badge": "Now available on iOS",
     "description": "Global eSIM for travelers, digital nomads, and backpackers. No roaming fees, no physical SIM cards needed.",
     "downloadApp": "Download App",
     "exploreTariffs": "Explore Tariffs",
@@ -62,6 +67,11 @@
       "description": "Works with all modern smartphones and tablets that support eSIM technology. Compatible with devices used by backpackers and digital nomads globally.",
       "esimCompatible": "eSIM Compatible",
       "operatingSystem": "Android 12+, iOS 15+"
+    },
+    "easySetup": {
+      "title": "Easy Setup",
+      "description": "Simple QR activation. Scan a QR code, follow the steps, and you're connected. It takes less than 2 minutes.",
+      "readyInSeconds": "✓ Ready in seconds"
     }
   },
   "plans": {
@@ -82,7 +92,11 @@
     "showLess": "Show Less",
     "showMore": "Show More",
     "seeAllPlans": "See All Plans",
-    "allRegions": "All Regions"
+    "allRegions": "All Regions",
+    "plan": "plan",
+    "plans": "plans",
+    "from": "From",
+    "priceNotAvailable": "Price N/A"
   },
   "discount": {
     "get35Off": "Get 35% OFF",
@@ -504,8 +518,22 @@
     "needHelp": "Need help?",
     "contactSupport": "Contact our support team"
   },
+  "deals": {
+    "unlimitedBadge": "Unlimited",
+    "globalCoverage": "Coverage in 130+ countries",
+    "countries": "countries",
+    "oneEsimAll": "One eSIM covers all countries in",
+    "regionalEsim": "Regional eSIM",
+    "bestPrice": "Best price",
+    "unlimited": "Unlimited data",
+    "moreData": "More data",
+    "comingSoon": "Coming soon",
+    "viewAllPlans": "View all plans"
+  },
   "common": {
-    "close": "Close"
+    "close": "Close",
+    "days": "days",
+    "from": "From"
   },
   "sharePackage": {
     "title": "Buy eSIM Package",
@@ -630,5 +658,19 @@
     "androidStep4": "Enable Mobile Data and Data Roaming for your eSIM",
     "downloadIOS": "Download on iOS",
     "downloadAndroid": "Download on Android"
+  },
+  "blogApp": {
+    "appTitle": "Stay connected wherever you travel",
+    "appDescription": "Get instant eSIM data plans for 200+ countries. No physical SIM needed, activate in minutes.",
+    "getApp": "App Store",
+    "getAndroidApp": "Google Play",
+    "newsletterTitle": "Get travel tips & exclusive deals",
+    "newsletterDescription": "Subscribe to our newsletter for the latest eSIM news, travel guides, and special offers.",
+    "emailPlaceholder": "Enter your email",
+    "subscribe": "Subscribe",
+    "subscribing": "Subscribing...",
+    "successMessage": "Thanks for subscribing! 🎉",
+    "alreadySubscribed": "You're already subscribed!",
+    "errorMessage": "Something went wrong. Please try again."
   }
 }

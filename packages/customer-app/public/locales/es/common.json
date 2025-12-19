@@ -15,7 +15,11 @@
   "hero": {
     "announcement": "Ahora disponible en más de 200 países en todo el mundo.",
     "countriesAvailable": "Ahora disponible en más de 200 países",
-    "stayConnected": "Mantente conectado",
+    "stayConnected": "Activación instantánea, cobertura global y conexión segura para viajeros y empresas.",
+    "countries": "200+ países",
+    "instantActivation": "Activación instantánea",
+    "securePayment": "Pago seguro",
+    "badge": "Ahora disponible en iOS",
     "Online": "Ońline",
     "with": "estés con Simnetiq",
     "description": "eSIM global para viajeros, nómadas digitales y mochileros. Sin cargos de roaming, sin SIM física necesaria.",
@@ -148,7 +152,13 @@
     "startingFrom": "Desde",
     "averagePrice": "Precio promedio",
     "showAll": "Mostrar todo",
-    "showLess": "Mostrar menos"
+    "showLess": "Mostrar menos",
+    "showMore": "Mostrar más",
+    "seeAllPlans": "Ver todos los planes",
+    "plan": "plan",
+    "plans": "planes",
+    "from": "Desde",
+    "priceNotAvailable": "Precio N/D"
   },
   "discount": {
     "get35Off": "Obtén 35% DE DESCUENTO",
@@ -460,8 +470,22 @@
     "needHelp": "¿Necesitas ayuda?",
     "contactSupport": "Contacta a nuestro equipo de soporte"
   },
+  "deals": {
+    "unlimitedBadge": "Ilimitado",
+    "globalCoverage": "Cobertura en más de 130 países",
+    "countries": "países",
+    "oneEsimAll": "Un eSIM cubre todos los países de",
+    "regionalEsim": "eSIM regional",
+    "bestPrice": "Mejor precio",
+    "unlimited": "Datos ilimitados",
+    "moreData": "Más datos",
+    "comingSoon": "Próximamente",
+    "viewAllPlans": "Ver todos los planes"
+  },
   "common": {
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "days": "días",
+    "from": "Desde"
   },
   "sharePackage": {
     "title": "Comprar paquete eSIM",
@@ -581,5 +605,19 @@
     "downloadIOS": "Descargar en iOS",
     "downloadAndroid": "Descargar en Android",
     "generatingQR": "Generando código QR..."
+  },
+  "blogApp": {
+    "appTitle": "Mantente conectado dondequiera que viajes",
+    "appDescription": "Obtén planes de datos eSIM instantáneos para más de 200 países. Sin SIM física, activa en minutos.",
+    "getApp": "App Store",
+    "getAndroidApp": "Google Play",
+    "newsletterTitle": "Obtén consejos de viaje y ofertas exclusivas",
+    "newsletterDescription": "Suscríbete a nuestro boletín para las últimas noticias de eSIM, guías de viaje y ofertas especiales.",
+    "emailPlaceholder": "Ingresa tu email",
+    "subscribe": "Suscribirse",
+    "subscribing": "Suscribiendo...",
+    "successMessage": "¡Gracias por suscribirte! 🎉",
+    "alreadySubscribed": "¡Ya estás suscrito!",
+    "errorMessage": "Algo salió mal. Por favor intenta de nuevo."
   }
 }

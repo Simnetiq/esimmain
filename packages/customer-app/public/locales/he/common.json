@@ -15,7 +15,11 @@
   "hero": {
     "announcement": "כעת זמין ביותר מ-200 מדינות ברחבי העולם.",
     "countriesAvailable": "כעת זמין ביותר מ-200 מדינות",
-    "stayConnected": "תשארו מחוברים באינטרנט. חברו מיידית. הנסיעה שלכם,",
+    "stayConnected": "הפעלה מיידית, כיסוי גלובלי וחיבור מאובטח למטיילים ועסקים.", 
+    "countries": "200+ מדינות",
+    "instantActivation": "הפעלה מיידית",
+    "securePayment": "תשלום מאובטח",
+    "badge": "כעת זמין על iOS",
     "Online": "תמיד Ońline",
     "description": "eSIM גלובלי למטיילים, נומאדים דיגיטליים ותרמילאים. אין צורך בסים פיזיים. התקן את eSIM המטייל באינטרנט במשך מספר דקות, הפעל בחוץ בשניות.",
     "downloadApp": "הורד אפליקציה",
@@ -60,7 +64,12 @@
       "title": "תאימות מכשירים",
       "description": "עובד עם כל הסמארטפונים והטאבלטים המודרניים התומכים בטכנולוגיית eSIM.",
       "esimCompatible": "תואם eSIM",
-      "operatingSystem": "Android 12+, iOS 15+"
+      "operatingSystem": "Android 12+, iOS 15+"   
+    },
+    "easySetup": {
+      "title": "הגדרה פשוטה",
+      "description": "הגדרה פשוטה. סרוק קוד QR, עקב אחר השלבים, ואתה מחובר. זה מתבצע תוך פחות מ-2 דקות.",
+      "readyInSeconds": "✓ מוכן תוך שניות"
     }
   },
   "activation": {
@@ -140,7 +149,11 @@
     "showAll": "הצג הכל",
     "showLess": "הצג פחות",
     "showMore": "הצג עוד",
-    "seeAllPlans": "צפה בכל התוכניות"
+    "seeAllPlans": "צפה בכל התוכניות",
+    "plan": "תוכנית",
+    "plans": "תוכניות",
+    "from": "מ-",
+    "priceNotAvailable": "מחיר לא זמין"
   },
   "QRCodeModal": {
     "esimQrCode": "eSIM QR Code",
@@ -436,8 +449,22 @@
     "needHelp": "צריך עזרה?",
     "contactSupport": "צור קשר עם צוות התמיכה שלנו"
   },
+  "deals": {
+    "unlimitedBadge": "ללא הגבלה",
+    "globalCoverage": "כיסוי ביותר מ-130 מדינות",
+    "countries": "מדינות",
+    "oneEsimAll": "eSIM אחד מכסה את כל המדינות ב",
+    "regionalEsim": "eSIM אזורי",
+    "bestPrice": "המחיר הטוב ביותר",
+    "unlimited": "נתונים ללא הגבלה",
+    "moreData": "יותר נתונים",
+    "comingSoon": "בקרוב",
+    "viewAllPlans": "צפה בכל התוכניות"
+  },
   "common": {
-    "close": "סגור"
+    "close": "סגור",
+    "days": "ימים",
+    "from": "מ-"
   },
   "sharePackage": {
     "title": "שתף חבילה",
@@ -557,5 +584,19 @@
     "downloadIOS": "הורד ב-iOS",
     "downloadAndroid": "הורד ב-Android",
     "generatingQR": "יוצר קוד QR..."
+  },
+  "blogApp": {
+    "appTitle": "הישאר מחובר לאן שתיסע",
+    "appDescription": "קבל תוכניות נתונים eSIM מיידיות ליותר מ-200 מדינות. לא צריך SIM פיזי, הפעלה בדקות.",
+    "getApp": "App Store",
+    "getAndroidApp": "Google Play",
+    "newsletterTitle": "קבל טיפים לטיולים והצעות בלעדיות",
+    "newsletterDescription": "הירשם לניוזלטר שלנו לחדשות eSIM העדכניות, מדריכי נסיעות והצעות מיוחדות.",
+    "emailPlaceholder": "הכנס את האימייל שלך",
+    "subscribe": "הירשם",
+    "subscribing": "נרשם...",
+    "successMessage": "תודה שנרשמת! 🎉",
+    "alreadySubscribed": "אתה כבר רשום!",
+    "errorMessage": "משהו השתבש. אנא נסה שוב."
   }
 }
