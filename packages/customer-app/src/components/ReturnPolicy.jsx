@@ -155,13 +155,13 @@ const ReturnPolicy = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <h4 className="font-medium text-gray-900 mb-2">Customer Support</h4>
-              <p className="text-gray-600">Email: support@esimplans.com</p>
+              <p className="text-gray-600">Email: support@simnetiq.store</p>
               <p className="text-gray-600">Response Time: Within 24 hours</p>
             </div>
             <div>
               <h4 className="font-medium text-gray-900 mb-2">Business Hours</h4>
-              <p className="text-gray-600">Monday - Friday: 9 AM - 6 PM (GMT)</p>
-              <p className="text-gray-600">Weekend: 10 AM - 4 PM (GMT)</p>
+              <p className="text-gray-600">Monday - Friday: 9 AM - 6 PM (CET)</p>
+              <p className="text-gray-600">Weekend: 10 AM - 4 PM (CET)</p>
             </div>
           </div>
         </div>
@@ -169,11 +169,7 @@ const ReturnPolicy = () => {
         {/* Last Updated */}
         <div className="text-center mt-8">
           <p className="text-gray-500 text-sm">
-            Last updated: {new Date().toLocaleDateString('en-US', { 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}
+            Last updated: January 1, 2025
           </p>
         </div>
       </div>

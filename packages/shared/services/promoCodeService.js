@@ -313,20 +313,6 @@ export const getPromoCodesForCountry = async (countryCode) => {
   }
 };
 
-/**
- * Calculate discounted price
- * @param {number} originalPrice - Original price
- * @param {number} discountPercentage - Discount percentage
- * @param {number} minimumPrice - Minimum price floor (default: 0.50)
- * @returns {number} Discounted price
- */
-export const calculateDiscountedPrice = (originalPrice, discountPercentage, minimumPrice = 0.50) => {
-  const price = parseFloat(originalPrice) || 0;
-  const discount = parseFloat(discountPercentage) || 0;
-  const discounted = price * (100 - discount) / 100;
-  return Math.max(minimumPrice, discounted);
-};
-
 export default {
   getAllPromoCodes,
   getActivePromoCodes,
@@ -337,8 +323,7 @@ export default {
   deletePromoCode,
   togglePromoCode,
   incrementPromoCodeUsage,
-  getPromoCodesForCountry,
-  calculateDiscountedPrice
+  getPromoCodesForCountry
 };
 
 

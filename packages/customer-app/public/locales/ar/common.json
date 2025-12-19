@@ -15,9 +15,12 @@
   "hero": {
     "announcement": "متاح الآن في أكثر من 200 دولة حول العالم.",
     "countriesAvailable": "متاح الآن في أكثر من 200 دولة",
-    "stayConnected": "ابق متصلاً بالإنترنت. قم بالاتصال بشكل فوري. رحلتك،",
+    "stayConnected": "التفعيل الفوري، التغطية العالمية والاتصال الآمن للمسافرين والشركات.",
     "Online": "دائماً متصل",
-    
+    "countries": "200+ دولة",
+      "instantActivation": "التفعيل الفوري",
+    "securePayment": "الدفع الآمن",
+    "badge": "الآن متاح على iOS",
     "description": "eSIM عالمي للمسافرين والمتنقلين الرقميين والرحالة. لا رسوم تجوال، لا حاجة لبطاقات SIM مادية. قم بتثبيت eSIM السفر عبر الإنترنت في دقائق، وفعّلها في الخارج في ثوانٍ.",
     "downloadApp": "تحميل التطبيق",
     "exploreTariffs": "استكشف الخطط",
@@ -61,6 +64,11 @@
       "description": "يعمل مع جميع الهواتف الذكية والأجهزة اللوحية الحديثة التي تدعم تقنية eSIM. متوافق مع الأجهزة المستخدمة من قبل المسافرين والمتنقلين الرقميين عالمياً.",
       "esimCompatible": "متوافق مع eSIM",
       "operatingSystem": "Android 12+, iOS 15+"
+    },
+    "easySetup": {
+      "title": "التفعيل السهل",
+      "description": "التفعيل السهل. قم بمسح رمز QR، اتبع الخطوات، وستكون متصلاً. يتطلب ذلك أقل من 2 دقيقة.",
+      "readyInSeconds": "✓ جاهز في ثوانٍ"
     }
   },
   "activation": {
@@ -140,7 +148,11 @@
     "showAll": "عرض الكل",
     "showLess": "عرض أقل",
     "showMore": "عرض المزيد",
-    "seeAllPlans": "عرض جميع الخطط"
+    "seeAllPlans": "عرض جميع الخطط",
+    "plan": "خطة",
+    "plans": "خطط",
+    "from": "من",
+    "priceNotAvailable": "السعر غير متاح"
   },
   "discount": {
     "get35Off": "احصل على خصم 35%",
@@ -503,8 +515,22 @@
     "needHelp": "تحتاج مساعدة؟",
     "contactSupport": "تواصل مع فريق الدعم"
   },
+  "deals": {
+    "unlimitedBadge": "غير محدود",
+    "globalCoverage": "التغطية في أكثر من 130 دولة",
+    "countries": "دول",
+    "oneEsimAll": "eSIM واحد يغطي جميع الدول في",
+    "regionalEsim": "eSIM إقليمي",
+    "bestPrice": "أفضل سعر",
+    "unlimited": "بيانات غير محدودة",
+    "moreData": "المزيد من البيانات",
+    "comingSoon": "قريباً",
+    "viewAllPlans": "عرض جميع الخطط"
+  },
   "common": {
-    "close": "إغلاق"
+    "close": "إغلاق",
+    "days": "أيام",
+    "from": "من"
   },
   "sharePackage": {
     "title": "مشاركة باقة",
@@ -624,5 +650,19 @@
     "downloadIOS": "تحميل على iOS",
     "downloadAndroid": "تحميل على Android",
     "generatingQR": "جاري إنشاء رمز QR..."
+  },
+  "blogApp": {
+    "appTitle": "ابق على اتصال أينما سافرت",
+    "appDescription": "احصل على خطط بيانات eSIM فورية لأكثر من 200 دولة. لا حاجة لشريحة SIM فعلية، قم بالتفعيل في دقائق.",
+    "getApp": "App Store",
+    "getAndroidApp": "Google Play",
+    "newsletterTitle": "احصل على نصائح السفر والعروض الحصرية",
+    "newsletterDescription": "اشترك في نشرتنا الإخبارية للحصول على أحدث أخبار eSIM وأدلة السفر والعروض الخاصة.",
+    "emailPlaceholder": "أدخل بريدك الإلكتروني",
+    "subscribe": "اشترك",
+    "subscribing": "جارٍ الاشتراك...",
+    "successMessage": "شكراً لاشتراكك! 🎉",
+    "alreadySubscribed": "أنت مشترك بالفعل!",
+    "errorMessage": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
   }
 }

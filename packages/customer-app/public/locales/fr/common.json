@@ -15,7 +15,11 @@
   "hero": {
     "announcement": "Maintenant disponible dans plus de 200 pays dans le monde.",
     "countriesAvailable": "Maintenant disponible dans plus de 200 pays",
-    "stayConnected": "Restez connecté. Connectez-vous instantanément. Votre voyage,",
+    "stayConnected": "Activation instantanée, couverture mondiale et connexion sécurisée pour les voyageurs et les entreprises.",
+    "countries": "200+ pays",
+    "instantActivation": "Activation instantanée",
+    "securePayment": "Paiement sécurisé",
+    "badge": "Maintenant disponible sur iOS",
       "Online": "Always Ońline",
     "with": "êtes avec Simnetiq",
     "description": "eSIM mondial pour les voyageurs, les nomades numériques et les randonneurs. Pas de frais de roaming, pas de SIM physique nécessaire.",
@@ -62,6 +66,11 @@
       "description": "Fonctionne avec tous les smartphones et tablettes modernes qui prennent en charge la technologie eSIM. Compatible avec les appareils utilisés par les randonneurs et nomades numériques dans le monde entier.",
       "esimCompatible": "Compatible eSIM",
       "operatingSystem": "Android 12+, iOS 15+"
+    },
+    "easySetup": {
+      "title": "Configuration facile",
+      "description": "Configuration facile. Scannez un code QR, suivez les étapes, et vous êtes connecté. Cela prend moins de 2 minutes.",
+      "readyInSeconds": "✓ Prêt en quelques secondes"
     }
   },
   "QRCodeModal": {
@@ -150,7 +159,13 @@
     "startingFrom": "À partir de",
     "averagePrice": "Prix moyen",
     "showAll": "Tout afficher",
-    "showLess": "Afficher moins"
+    "showLess": "Afficher moins",
+    "showMore": "Afficher plus",
+    "seeAllPlans": "Voir tous les plans",
+    "plan": "plan",
+    "plans": "plans",
+    "from": "À partir de",
+    "priceNotAvailable": "Prix N/D"
   },
   "discount": {
     "get35Off": "Obtenez 35% DE RÉDUCTION",
@@ -432,8 +447,22 @@
     "needHelp": "Besoin d'aide ?",
     "contactSupport": "Contactez notre équipe de support"
   },
+  "deals": {
+    "unlimitedBadge": "Illimité",
+    "globalCoverage": "Couverture dans plus de 130 pays",
+    "countries": "pays",
+    "oneEsimAll": "Un eSIM couvre tous les pays de",
+    "regionalEsim": "eSIM régional",
+    "bestPrice": "Meilleur prix",
+    "unlimited": "Données illimitées",
+    "moreData": "Plus de données",
+    "comingSoon": "Bientôt disponible",
+    "viewAllPlans": "Voir tous les plans"
+  },
   "common": {
-    "close": "Fermer"
+    "close": "Fermer",
+    "days": "jours",
+    "from": "À partir de"
   },
   "sharePackage": {
     "title": "Acheter forfait eSIM",
@@ -553,5 +582,19 @@
     "downloadIOS": "Télécharger sur iOS",
     "downloadAndroid": "Télécharger sur Android",
     "generatingQR": "Génération du code QR..."
+  },
+  "blogApp": {
+    "appTitle": "Restez connecté où que vous voyagiez",
+    "appDescription": "Obtenez des forfaits eSIM instantanés pour plus de 200 pays. Pas de SIM physique, activation en minutes.",
+    "getApp": "App Store",
+    "getAndroidApp": "Google Play",
+    "newsletterTitle": "Recevez des conseils de voyage et offres exclusives",
+    "newsletterDescription": "Abonnez-vous à notre newsletter pour les dernières nouvelles eSIM, guides de voyage et offres spéciales.",
+    "emailPlaceholder": "Entrez votre email",
+    "subscribe": "S'abonner",
+    "subscribing": "Inscription...",
+    "successMessage": "Merci pour votre inscription ! 🎉",
+    "alreadySubscribed": "Vous êtes déjà inscrit !",
+    "errorMessage": "Une erreur est survenue. Veuillez réessayer."
   }
 }
