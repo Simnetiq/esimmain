@@ -10,7 +10,7 @@ import { db } from '@esim/shared/firebase/config';
 import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
 import { REGION_SLUGS, countCountriesFromPlans } from './sections/plans';
-import { FlagIcon } from '@esim/shared';
+import FlagIcon from '@esim/shared/components/FlagIcon';
 
 
 // Flexible Plan Card Component
