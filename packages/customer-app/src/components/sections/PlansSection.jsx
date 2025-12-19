@@ -87,45 +87,10 @@ export default function PlansSection({ selectedCountry }) {
           regularPlans.sort((a, b) => (parsePrice(a.price) || 999) - (parsePrice(b.price) || 999));
           unlimitedPlans.sort((a, b) => (parsePrice(a.price) || 999) - (parsePrice(b.price) || 999));
 
-          // Prioritize plans with specific data amounts: 200MB, 1GB, 10GB, 20GB
-          const priorityPlans = [];
-          const dataPriorities = [
-            { search: '200 mb', exact: true },
-            { search: '1 gb', exact: true },
-            { search: '10 gb', exact: true },
-            { search: '20 gb', exact: true }
-          ];
-
-          for (const priority of dataPriorities) {
-            const found = regularPlans.find(p => {
-              const data = (p.data || '').toLowerCase().trim();
-              if (priority.exact) {
-                return data === priority.search;
-              } else {
-                return data.includes(priority.search);
-              }
-            });
-            if (found && !priorityPlans.find(p => p.id === found.id)) {
-              priorityPlans.push(found);
-            }
-          }
-
-          // Fill remaining slots with cheapest plans
-          const remainingSlots = 4 - priorityPlans.length;
-          if (remainingSlots > 0) {
-            const remainingPlans = regularPlans.filter(p =>
-              !priorityPlans.find(pp => pp.id === p.id)
-            ).slice(0, remainingSlots);
-            priorityPlans.push(...remainingPlans);
-          }
-
-          // Add unlimited plans if we have space and they exist
-          if (priorityPlans.length < 4 && unlimitedPlans.length > 0) {
-            const unlimitedToAdd = Math.min(4 - priorityPlans.length, unlimitedPlans.length);
-            priorityPlans.push(...unlimitedPlans.slice(0, unlimitedToAdd));
-          }
-
-          setGlobalPlans(priorityPlans.slice(0, 4));
+          // Get 3 cheapest regular + 3 cheapest unlimited (to include the one user asked for)
+          // User requested "one more plan, the unlimited one", so increasing limit
+          const selected = [...regularPlans.slice(0, 3), ...unlimitedPlans.slice(0, 3)].slice(0, 6);
+          setGlobalPlans(selected);
         }
       } catch (error) {
         console.error('Error fetching global plans:', error);
@@ -264,8 +229,8 @@ export default function PlansSection({ selectedCountry }) {
     });
 
     const planUrl = currentLanguage === 'en'
-      ? `/share-package/${encodeURIComponent(plan.id)}?country=discover-global`
-      : `/${currentLanguage}/share-package/${encodeURIComponent(plan.id)}?country=discover-global`;
+      ? `/share-package/${plan.id}?country=discover-global`
+      : `/${currentLanguage}/share-package/${plan.id}?country=discover-global`;
     router.push(planUrl);
   }, [currentLanguage, router]);
 
