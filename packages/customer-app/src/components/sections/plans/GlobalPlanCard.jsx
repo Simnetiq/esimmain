@@ -1,61 +1,59 @@
-import { memo, useMemo } from 'react';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
-import { ArrowRightIcon } from './PlanIcons';
+import { ArrowRightIcon, GlobeIcon, InfinityIcon } from './PlanIcons';
 
-// Representative flags for global coverage display
-const GLOBAL_FLAGS = ['🇺🇸', '🇬🇧', '🇫🇷', '🇩🇪', '🇯🇵', '🇦🇺', '🇧🇷', '🇨🇦'];
+const GlobalPlanCard = ({ plan, onClick, t }) => {
+    const isUnlimited = (plan.data || '').toLowerCase().includes('unlimited') || plan.is_unlimited;
 
-// Global Plan Card - for Discover Global featured plans
-const GlobalPlanCard = memo(function GlobalPlanCard({ plan, onClick, t }) {
-  const isUnlimited = (plan.data || '').toLowerCase().includes('unlimited') || plan.is_unlimited;
-  
-  // Get a subset of flags to display (rotate based on plan data for variety)
-  const displayFlags = useMemo(() => {
-    const startIndex = (plan.data?.length || 0) % 4;
-    return GLOBAL_FLAGS.slice(startIndex, startIndex + 4);
-  }, [plan.data]);
-  
-  return (
-    <button
-      onClick={onClick}
-      className="group relative bg-gradient-to-br from-tufts-blue/5 to-blue-50 hover:from-tufts-blue/10 hover:to-blue-100 rounded-xl p-4 text-left transition-all duration-300"
-    >
-      {/* Header with flags and badge */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-1">
-          {displayFlags.map((flag, i) => (
-            <span 
-              key={i} 
-              className="text-sm"
-              style={{ marginLeft: i > 0 ? '-4px' : 0 }}
-            >
-              {flag}
-            </span>
-          ))}
-          <span className="ml-1 text-[10px] text-gray-400">+130</span>
-        </div>
-        {isUnlimited && (
-          <span className="px-1.5 py-0.5 bg-purple-100 text-purple-600 text-[10px] font-semibold rounded">
-            ∞
-          </span>
-        )}
-      </div>
-      
-      {/* Plan details */}
-      <div className="mb-2">
-        <p className="text-lg font-bold text-eerie-black">{plan.data}</p>
-        <p className="text-xs text-gray-500">{plan.period || plan.validity} {t('planSelection.days', 'days')}</p>
-      </div>
-      
-      {/* Price and action */}
-      <div className="flex items-center justify-between">
-        <span className="text-lg font-bold text-tufts-blue">{formatPrice(plan.price)}</span>
-        <ArrowRightIcon className="w-4 h-4 text-gray-400 group-hover:text-tufts-blue group-hover:translate-x-0.5 transition-all" />
-      </div>
-      
-      <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-black/5 group-hover:ring-tufts-blue/20 transition-all" />
-    </button>
-  );
-});
+    return (
+        <button
+            onClick={onClick}
+            className="group flex flex-col items-start p-4 bg-white border border-gray-100 rounded-xl hover:shadow-lg hover:border-blue-100 transition-all duration-300 text-left h-full"
+        >
+            {/* Icon & Badge */}
+            <div className="flex items-start justify-between w-full mb-4">
+                <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <GlobeIcon className="w-5 h-5 text-blue-600" />
+                </div>
+                {isUnlimited && (
+                    <span className="px-2 py-1 bg-purple-50 text-purple-700 text-[10px] font-bold uppercase tracking-wider rounded-full">
+                        {t('deals.unlimitedBadge', 'Unlimited')}
+                    </span>
+                )}
+            </div>
+
+            {/* Plan Details */}
+            <div className="flex-1 w-full">
+                <div className="flex items-baseline gap-1 mb-1">
+                    <span className="text-xl font-bold text-eerie-black">
+                        {plan.data}
+                    </span>
+                    <span className="text-sm text-gray-500">
+                        / {plan.period || plan.validity} {t('common.days', 'days')}
+                    </span>
+                </div>
+
+                <p className="text-xs text-gray-500 line-clamp-2 mb-3">
+                    {t('deals.globalCoverage', 'Coverage in 130+ countries')}
+                </p>
+            </div>
+
+            {/* Price & Action */}
+            <div className="w-full flex items-center justify-between pt-3 border-t border-gray-50">
+                <div className="flex flex-col">
+                    <span className="text-xs text-gray-400 font-medium">
+                        {t('common.from', 'From')}
+                    </span>
+                    <span className="text-lg font-bold text-tufts-blue">
+                        {formatPrice(plan.price)}
+                    </span>
+                </div>
+
+                <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-tufts-blue group-hover:text-white transition-colors">
+                    <ArrowRightIcon className="w-4 h-4" />
+                </div>
+            </div>
+        </button>
+    );
+};
 
 export default GlobalPlanCard;

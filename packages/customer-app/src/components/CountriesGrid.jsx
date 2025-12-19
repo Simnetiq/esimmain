@@ -5,10 +5,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import CountryCard from './CountryCard';
 
-const CountriesGrid = ({ 
-  countries, 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  isPlansPage, 
+const CountriesGrid = ({
+  countries,
+  isPlansPage,
   searchTerm,
   onCountrySelect,
   isLoading,
@@ -17,31 +16,33 @@ const CountriesGrid = ({
 }) => {
   const { t } = useI18n();
   const [showAll, setShowAll] = useState(false);
+  const [isExpanding, setIsExpanding] = useState(false);
   const gridRef = useRef(null);
 
   // Reset showAll when region changes
   useEffect(() => {
     setShowAll(false);
+    setIsExpanding(false);
   }, [selectedRegion]);
 
   // Limits for internal slicing (only used when showAllOverride is null)
   const desktopLimit = 8;
   const mobileLimit = 4;
-  
+
   // When showAllOverride is provided, parent controls the list - just render what we receive
   // When showAllOverride is null, we handle internal slicing
   const isParentControlled = showAllOverride !== null;
-  
+
   // For parent-controlled mode, just use countries as-is
   // For internal mode, apply slicing based on showAll state
-  const displayedCountriesDesktop = isParentControlled 
-    ? countries 
+  const displayedCountriesDesktop = isParentControlled
+    ? countries
     : (showAll ? countries : countries.slice(0, desktopLimit));
-  
-  const displayedCountriesMobile = isParentControlled 
-    ? countries 
+
+  const displayedCountriesMobile = isParentControlled
+    ? countries
     : (showAll ? countries : countries.slice(0, mobileLimit));
-  
+
   // Only show internal button when not parent-controlled
   const showShowAllButton = !isParentControlled && !showAll && countries.length > desktopLimit;
 
@@ -77,7 +78,7 @@ const CountriesGrid = ({
     return (
       <div className="text-center py-12">
         <p className="text-gray-500 text-sm lg:text-base">
-          {searchTerm 
+          {searchTerm
             ? t('plans.noCountriesFound', 'No countries found matching your search')
             : t('plans.noCountriesAvailable', 'No countries available yet')
           }
@@ -89,20 +90,19 @@ const CountriesGrid = ({
   return (
     <div ref={gridRef}>
       {/* Desktop Grid Layout - 4 columns */}
-      <div 
+      <div
         className="hidden sm:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
       >
         {displayedCountriesDesktop.map((country, index) => (
           <div
             key={country.id}
-            className={`transform transition-all duration-500 ease-out ${
-              !isParentControlled && showAll && index >= desktopLimit 
-                ? 'animate-slide-down' 
-                : ''
-            }`}
+            className={`transform transition-all duration-500 ease-out ${!isParentControlled && showAll && index >= desktopLimit
+              ? 'animate-slide-down'
+              : ''
+              }`}
             style={{
-              animationDelay: !isParentControlled && showAll && index >= desktopLimit 
-                ? `${Math.floor((index - desktopLimit) / 4) * 100}ms` 
+              animationDelay: !isParentControlled && showAll && index >= desktopLimit
+                ? `${Math.floor((index - desktopLimit) / 4) * 100}ms`
                 : '0ms'
             }}
           >
@@ -114,7 +114,7 @@ const CountriesGrid = ({
           </div>
         ))}
       </div>
-      
+
       {/* Show All Button for Desktop - Only when internally controlled */}
       {showShowAllButton && (
         <div className="hidden sm:block text-center mt-8">
@@ -126,22 +126,21 @@ const CountriesGrid = ({
           </button>
         </div>
       )}
-      
+
       {/* Mobile List Layout - 2 columns */}
-      <div 
+      <div
         className="sm:hidden grid grid-cols-2 gap-3"
       >
         {displayedCountriesMobile.map((country, index) => (
           <div
             key={country.id}
-            className={`transform transition-all duration-500 ease-out ${
-              !isParentControlled && showAll && index >= mobileLimit 
-                ? 'animate-slide-down' 
-                : ''
-            }`}
+            className={`transform transition-all duration-500 ease-out ${!isParentControlled && showAll && index >= mobileLimit
+              ? 'animate-slide-down'
+              : ''
+              }`}
             style={{
-              animationDelay: !isParentControlled && showAll && index >= mobileLimit 
-                ? `${Math.floor((index - mobileLimit) / 2) * 100}ms` 
+              animationDelay: !isParentControlled && showAll && index >= mobileLimit
+                ? `${Math.floor((index - mobileLimit) / 2) * 100}ms`
                 : '0ms'
             }}
           >
@@ -153,7 +152,7 @@ const CountriesGrid = ({
           </div>
         ))}
       </div>
-      
+
       {/* Show All Button for Mobile - Only when internally controlled */}
       {showShowAllButton && (
         <div className="sm:hidden text-center mt-6">

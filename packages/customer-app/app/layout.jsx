@@ -1,21 +1,18 @@
 import { Suspense } from 'react'
 import Script from 'next/script'
-import dynamic from 'next/dynamic'
 import { Heebo, IBM_Plex_Sans_Arabic, Rubik, DM_Sans } from 'next/font/google'
 import Providers from '../src/components/Providers'
 import ConditionalNavbar from '../src/components/ConditionalNavbar'
 import ConditionalFooter from '../src/components/ConditionalFooter'
+import CookieConsent from '../src/components/CookieConsent'
+import FacebookPixel from '../src/components/FacebookPixel'
+import Analytics from '../src/components/Analytics'
 import LanguageWrapper from '../src/components/LanguageWrapper'
+import ScrollToTop from '../src/components/ScrollToTop'
 import DynamicHtmlLang from '../src/components/DynamicHtmlLang'
 import { metadata as metadataConfig, generateAlternates } from '../src/config/metadata'
 import './globals.css'
 import './rtl.css'
-
-// Lazy load non-critical components to reduce initial bundle
-const CookieConsent = dynamic(() => import('../src/components/CookieConsent'), { ssr: false })
-const FacebookPixel = dynamic(() => import('../src/components/FacebookPixel'), { ssr: false })
-const Analytics = dynamic(() => import('../src/components/Analytics'), { ssr: false })
-const ScrollToTop = dynamic(() => import('../src/components/ScrollToTop'), { ssr: false })
 
 // Configure main font - DM Sans (optimized for LCP)
 // Using variable font for better performance and smaller bundle
@@ -134,26 +131,21 @@ export default function RootLayout({ children }) {
   return (
     <html suppressHydrationWarning>
       <head>
-        {/* 
-          PERFORMANCE: Preconnect to critical domains
-          Note: Firebase Auth iframe is now deferred via requestIdleCallback
-          These preconnects help when auth IS eventually needed
-        */}
-        {/* Google Fonts - highest priority for LCP */}
+        {/* Preconnect to Google Fonts for faster loading */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         
-        {/* Firebase Auth domain - preconnect for when auth is initialized */}
-        <link rel="preconnect" href="https://esimcreator-f00dd.firebaseapp.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://apis.google.com" crossOrigin="anonymous" />
+        {/* Preload critical translation file with high priority */}
+        <link 
+          rel="preload" 
+          href="/locales/en/common.json" 
+          as="fetch" 
+          type="application/json"
+          crossOrigin="anonymous"
+        />
         
-        {/* DNS prefetch for secondary Firebase services (not render-blocking) */}
-        <link rel="dns-prefetch" href="https://www.googleapis.com" />
-        <link rel="dns-prefetch" href="https://securetoken.googleapis.com" />
-        <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com" />
+        {/* DNS prefetch for non-critical third-party domains (deferred loading) */}
         <link rel="dns-prefetch" href="https://firebasestorage.googleapis.com" />
-        
-        {/* DNS prefetch for analytics/tracking (loaded after page interactive) */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
         

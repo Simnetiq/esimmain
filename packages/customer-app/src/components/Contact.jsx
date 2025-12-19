@@ -20,7 +20,7 @@ const showToast = async (type, message) => {
 // Inline SVG Icons
 const ChevronDownIcon = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="m6 9 6 6 6-6"/>
+    <path d="m6 9 6 6 6-6" />
   </svg>
 );
 
@@ -28,43 +28,43 @@ const ChevronDownIcon = ({ className }) => (
 
 const SmartphoneIcon = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/>
+    <rect width="14" height="20" x="5" y="2" rx="2" ry="2" /><path d="M12 18h.01" />
   </svg>
 );
 
 const CreditCardIcon = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/>
+    <rect width="20" height="14" x="2" y="5" rx="2" /><line x1="2" x2="22" y1="10" y2="10" />
   </svg>
 );
 
 const WifiIcon = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/><path d="M5 12.859a10 10 0 0 1 14 0"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/>
+    <path d="M12 20h.01" /><path d="M2 8.82a15 15 0 0 1 20 0" /><path d="M5 12.859a10 10 0 0 1 14 0" /><path d="M8.5 16.429a5 5 0 0 1 7 0" />
   </svg>
 );
 
 const SettingsIcon = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>
+    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" />
   </svg>
 );
 
 const SendIcon = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>
+    <path d="m22 2-7 20-4-9-9-4Z" /><path d="M22 2 11 13" />
   </svg>
 );
 
 const UserIcon = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
   </svg>
 );
 
 const MailIcon = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+    <rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
   </svg>
 );
 
@@ -133,7 +133,7 @@ const Contact = () => {
   const { t, locale } = useI18n();
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
-  
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -148,26 +148,48 @@ const Contact = () => {
   }, [locale, pathname]);
 
   const isRTL = mounted ? getLanguageDirection(currentLanguage) === 'rtl' : false;
-  
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    message: ''
+    message: '',
+    type: 'contact', // contact, deletion_request
+    agreementAccepted: false
   });
+  const [requestType, setRequestType] = useState('contact'); // contact | deletion_request
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
 
   const handleInputChange = useCallback((e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
   }, []);
+
+  const handleRequestTypeChange = (type) => {
+    setRequestType(type);
+    setFormData(prev => ({
+      ...prev,
+      type: type,
+      agreementAccepted: false,
+      message: type === 'deletion_request' ? 'Account Deletion Request' : ''
+    }));
+  };
 
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
-      await createContactRequest(formData);
+      await createContactRequest({
+        ...formData,
+        type: requestType,
+        agreementText: requestType === 'deletion_request'
+          ? "I hereby request the deletion of my account and all associated data. I understand this action is irreversible and will result in the permanent loss of my purchase history, active eSIMs, and account settings."
+          : ''
+      });
       showToast('success', t('contact.messageSuccess', 'Your message has been sent successfully! We\'ll get back to you soon.'));
       setFormData({ name: '', email: '', message: '' });
     } catch {
@@ -325,7 +347,7 @@ const Contact = () => {
       {/* Gradient Orbs - subtle background effect */}
       <div className="absolute top-0 left-0 w-[600px] h-[600px] rounded-full blur-[120px] -translate-x-1/3 -translate-y-1/3 pointer-events-none" style={{ backgroundColor: 'rgba(83, 116, 205, 0.08)' }} />
       <div className="absolute top-1/2 right-0 w-[500px] h-[500px] rounded-full blur-[100px] translate-x-1/3 pointer-events-none" style={{ backgroundColor: 'rgba(83, 116, 205, 0.06)' }} />
-      
+
       {/* Grid Pattern - sides */}
       <div className="hidden xl:block absolute left-0 top-0 bottom-0 w-24 pointer-events-none" style={gridPatternStyle} />
       <div className="hidden xl:block absolute right-0 top-0 bottom-0 w-24 pointer-events-none" style={gridPatternStyle} />
@@ -350,15 +372,44 @@ const Contact = () => {
       {/* Main Content */}
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 pb-16">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
+
           {/* Contact Form - Sticky on desktop */}
           <div className="lg:col-span-1">
-          <h2 className={`text-xl sm:text-2xl font-semibold text-eerie-black mb-6 ${isRTL ? 'text-right' : ''}`}>
-          {t('contact.sendMessage', 'Send us a Message')}
+            <h2 className={`text-xl sm:text-2xl font-semibold text-eerie-black mb-6 ${isRTL ? 'text-right' : ''}`}>
+              {t('contact.sendMessage', 'Send us a Message')}
             </h2>
             <div className="lg:sticky lg:top-24">
               <div className="bg-white border-gray-100 shadow-lg shadow-gray-200/50 p-6 sm:p-8">
-                
+
+                <div className="flex border-b border-gray-100 mb-6">
+                  <button
+                    type="button"
+                    onClick={() => handleRequestTypeChange('contact')}
+                    className={`flex-1 pb-3 text-sm font-medium transition-colors relative ${requestType === 'contact'
+                        ? 'text-tufts-blue'
+                        : 'text-gray-500 hover:text-gray-700'
+                      }`}
+                  >
+                    {t('contact.generalInquiry', 'General Inquiry')}
+                    {requestType === 'contact' && (
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-tufts-blue" />
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleRequestTypeChange('deletion_request')}
+                    className={`flex-1 pb-3 text-sm font-medium transition-colors relative ${requestType === 'deletion_request'
+                        ? 'text-tufts-blue'
+                        : 'text-gray-500 hover:text-gray-700'
+                      }`}
+                  >
+                    {t('contact.deletionRequest', 'Delete Account')}
+                    {requestType === 'deletion_request' && (
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-tufts-blue" />
+                    )}
+                  </button>
+                </div>
+
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <label htmlFor="name" className={`block text-sm font-medium text-gray-700 mb-2 ${isRTL ? 'text-right' : ''}`}>
@@ -400,22 +451,52 @@ const Contact = () => {
                     </div>
                   </div>
 
-                  <div>
-                    <label htmlFor="message" className={`block text-sm font-medium text-gray-700 mb-2 ${isRTL ? 'text-right' : ''}`}>
-                      {t('contact.message', 'Message')}
-                    </label>
-                    <textarea
-                      id="message"
-                      name="message"
-                      value={formData.message}
-                      onChange={handleInputChange}
-                      required
-                      rows={4}
-                      className={`w-full px-4 py-3 border border-gray-200 focus:ring-2 focus:ring-tufts-blue/20 focus:border-tufts-blue transition-colors resize-none ${isRTL ? 'text-right' : ''}`}
-                      placeholder={t('contact.messagePlaceholder', 'How can we help you?')}
-                      dir={isRTL ? 'rtl' : 'ltr'}
-                    />
-                  </div>
+                  {requestType === 'contact' ? (
+                    <div>
+                      <label htmlFor="message" className={`block text-sm font-medium text-gray-700 mb-2 ${isRTL ? 'text-right' : ''}`}>
+                        {t('contact.message', 'Message')}
+                      </label>
+                      <textarea
+                        id="message"
+                        name="message"
+                        value={formData.message}
+                        onChange={handleInputChange}
+                        required
+                        rows={4}
+                        className={`w-full px-4 py-3 border border-gray-200 focus:ring-2 focus:ring-tufts-blue/20 focus:border-tufts-blue transition-colors resize-none ${isRTL ? 'text-right' : ''}`}
+                        placeholder={t('contact.messagePlaceholder', 'How can we help you?')}
+                        dir={isRTL ? 'rtl' : 'ltr'}
+                      />
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="bg-red-50 p-4 rounded-lg border border-red-100">
+                        <h4 className="text-red-800 font-medium mb-2 text-sm">
+                          {t('contact.deletionWarning', 'Account Deletion is Permanent')}
+                        </h4>
+                        <p className="text-red-600 text-sm leading-relaxed">
+                          {t('contact.deletionAgreement', "I hereby request the deletion of my account and all associated data. I understand this action is irreversible and will result in the permanent loss of my purchase history, active eSIMs, and account settings.")}
+                        </p>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <div className="flex items-center h-5">
+                          <input
+                            id="agreementAccepted"
+                            name="agreementAccepted"
+                            type="checkbox"
+                            checked={formData.agreementAccepted}
+                            onChange={handleInputChange}
+                            required
+                            className="h-4 w-4 text-tufts-blue focus:ring-tufts-blue border-gray-300 rounded"
+                          />
+                        </div>
+                        <label htmlFor="agreementAccepted" className="font-medium text-gray-700 text-sm cursor-pointer select-none">
+                          {t('contact.confirmDeletion', 'I understand and agree to delete my account and data')}
+                        </label>
+                      </div>
+                    </div>
+                  )}
 
                   <button
                     type="submit"
@@ -438,8 +519,8 @@ const Contact = () => {
                   <p className={`text-sm text-gray-500 ${isRTL ? 'text-right' : ''}`}>
                     {t('contact.quickResponse', 'Or email us directly at')}
                   </p>
-                  <a 
-                    href="mailto:support@simnetiq.net" 
+                  <a
+                    href="mailto:support@simnetiq.net"
                     className={`text-tufts-blue font-medium hover:underline ${isRTL ? 'block text-right' : ''}`}
                   >
                     support@simnetiq.net
@@ -454,7 +535,7 @@ const Contact = () => {
             <h2 className={`text-xl sm:text-2xl font-semibold text-eerie-black mb-6 ${isRTL ? 'text-right' : ''}`}>
               {t('contact.faqTitle', 'Frequently Asked Questions')}
             </h2>
-            
+
             {faqCategories.map((category, categoryIndex) => (
               <FAQCategory
                 key={categoryIndex}
@@ -473,7 +554,7 @@ const Contact = () => {
 
       {/* App Download CTA */}
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 pb-16">
-        <BlogAppDownload 
+        <BlogAppDownload
           language={currentLanguage}
           isRTL={isRTL}
           location="contact_page"

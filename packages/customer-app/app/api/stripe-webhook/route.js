@@ -7,7 +7,8 @@ import {
   trackFailedPurchase
 } from '@esim/shared/services/fraudDetectionService';
 import {
-  recordBlockedPayment
+  recordBlockedPayment,
+  syncToStripeRadar
 } from '@esim/shared/services/fraudSignalsService';
 
 // Get Stripe secret key based on mode (test or live)

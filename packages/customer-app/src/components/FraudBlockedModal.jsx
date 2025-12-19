@@ -31,7 +31,6 @@ const FraudBlockedModal = ({
   blockType = 'temporary',
   message,
   expiresAt,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   remainingHours,
   canContactSupport = true,
   userId,
@@ -111,7 +110,6 @@ const FraudBlockedModal = ({
   if (!isOpen) return null;
 
   const isTemporary = blockType === 'temporary';
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const isPermanent = blockType === 'permanent';
   const isCardBlocked = blockType === 'card_blocked';
 
