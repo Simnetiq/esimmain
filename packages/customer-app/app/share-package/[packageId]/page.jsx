@@ -3,11 +3,11 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useRouter, usePathname } from 'next/navigation';
-import { 
-  Globe, 
-  Wifi, 
-  Clock, 
- 
+import {
+  Globe,
+  Wifi,
+  Clock,
+
   DollarSign,
   CreditCard,
   Smartphone
@@ -27,6 +27,7 @@ import { formatPrice, calculateDiscountedPrice } from '@esim/shared/utils/priceU
 import FraudBlockedModal from '../../../src/components/FraudBlockedModal';
 import { useFraudCheck } from '../../../src/hooks/useFraudCheck';
 import Image from 'next/image';
+import AuthModal from '@esim/shared/components/AuthModal';
 
 
 const SharePackagePage = () => {
@@ -36,7 +37,7 @@ const SharePackagePage = () => {
   const { currentUser } = useAuth();
   const { t, locale, isLoading: i18nLoading } = useI18n();
   const packageId = params.packageId;
-  
+
   // Language detection and RTL support
   const currentLanguage = React.useMemo(() => {
     try {
@@ -55,13 +56,13 @@ const SharePackagePage = () => {
       return 'en';
     }
   }, [locale, pathname, i18nLoading]);
-  
+
   const isRTL = getLanguageDirection(currentLanguage) === 'rtl';
-  
+
   // Get country info from URL parameters (client-side only)
   const [urlCountryCode, setUrlCountryCode] = useState(null);
   const [urlCountryName, setUrlCountryName] = useState(null);
-  
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const searchParams = new URLSearchParams(window.location.search);
@@ -69,38 +70,50 @@ const SharePackagePage = () => {
       setUrlCountryName(searchParams.get('name'));
     }
   }, []);
+
   const [packageData, setPackageData] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Compute flag src based on available country code
+  const flagSrc = useMemo(() => {
+    const countryCode = urlCountryCode || packageData?.country_code;
+    if (countryCode) {
+      const isoCode = getISOCode(countryCode);
+      return `/flags/4x3/${isoCode}.svg`;
+    }
+    return '/flags/4x3/un.svg'; // Default to UN flag
+  }, [urlCountryCode, packageData?.country_code]);
   const [hasReferralDiscount, setHasReferralDiscount] = useState(false);
   const [referralSettings, setReferralSettings] = useState({ discountPercentage: 10, minimumPrice: 0.5 });
   const [processingPayment, setProcessingPayment] = useState(false);
   const [providerInfo, setProviderInfo] = useState(null);
   const [countryTranslations, setCountryTranslations] = useState({});
   const [translationsLoaded, setTranslationsLoaded] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  
+
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
   // Fraud detection hook
-  const { 
-    isBlocked, 
-    blockData, 
-    checkFraudStatus, 
+  const {
+    isBlocked,
+    blockData,
+    checkFraudStatus,
     clearBlockedState,
     handlePaymentError,
-    loading: fraudCheckLoading 
+    loading: fraudCheckLoading
   } = useFraudCheck();
 
   const loadFromAiraloAPI = useCallback(async () => {
     try {
       const response = await fetch(`/api/airalo/plans`);
       const data = await response.json();
-      
+
       if (data.success && data.plans) {
-        const packageData = data.plans.find(pkg => 
-          pkg.slug === packageId || 
+        const packageData = data.plans.find(pkg =>
+          pkg.slug === packageId ||
           pkg.id === packageId ||
           pkg.name?.toLowerCase().includes(packageId.toLowerCase())
         );
-        
+
         if (packageData) {
           const transformedData = {
             id: packageData.slug || packageData.id,
@@ -121,11 +134,11 @@ const SharePackagePage = () => {
             slug: packageData.slug
           };
           setPackageData(transformedData);
-          
+
           // Extract provider info
           const provider = getProviderFromPlanData(transformedData);
           setProviderInfo(provider);
-          
+
           // Fetch country translations from Firebase
           if (transformedData.country_code) {
             try {
@@ -142,7 +155,7 @@ const SharePackagePage = () => {
             }
           }
           setTranslationsLoaded(true);
-          
+
           return true; // Package found
         } else {
         }
@@ -157,14 +170,14 @@ const SharePackagePage = () => {
   const loadPackageData = useCallback(async () => {
     try {
       setLoading(true);
-      
+
       // Try to load from Firebase dataplans collection first
       const { doc, getDoc } = await import('firebase/firestore');
       const { db } = await import('@esim/shared/firebase/config');
-      
+
       const packageRef = doc(db, 'dataplans', packageId);
       const packageSnap = await getDoc(packageRef);
-      
+
       if (packageSnap.exists()) {
         const data = packageSnap.data();
         const fullData = {
@@ -172,11 +185,11 @@ const SharePackagePage = () => {
           ...data
         };
         setPackageData(fullData);
-        
+
         // Extract provider info
         const provider = getProviderFromPlanData(fullData);
         setProviderInfo(provider);
-        
+
         // Fetch country translations from Firebase
         if (fullData.country_code) {
           try {
@@ -196,20 +209,20 @@ const SharePackagePage = () => {
         } else {
           setTranslationsLoaded(true); // No country code, mark as loaded
         }
-        
+
         return; // Package found, exit early
       } else {
       }
-      
+
       // If not found in Firebase, try to load from Airalo API
       const foundInAPI = await loadFromAiraloAPI();
-      
+
       if (!foundInAPI && urlCountryCode) {
         // Try to find a package for the country from the URL
         try {
           const response = await fetch(`/api/airalo/plans?country=${urlCountryCode}`);
           const data = await response.json();
-          
+
           if (data.success && data.plans && data.plans.length > 0) {
             // Use the first available plan for this country
             const fallbackPackage = data.plans[0];
@@ -232,11 +245,11 @@ const SharePackagePage = () => {
               slug: fallbackPackage.slug
             };
             setPackageData(fallbackData);
-            
+
             // Extract provider info
             const provider = getProviderFromPlanData(fallbackData);
             setProviderInfo(provider);
-            
+
             // Fetch country translations from Firebase
             if (fallbackData.country_code) {
               try {
@@ -251,13 +264,13 @@ const SharePackagePage = () => {
               }
             }
             setTranslationsLoaded(true);
-            
+
             return;
           }
         } catch {
         }
       }
-      
+
       if (!foundInAPI) {
         // Don't set packageData to null here, let the component handle the "not found" state
       }
@@ -273,7 +286,7 @@ const SharePackagePage = () => {
     try {
       const settings = await getReferralSettings();
       setReferralSettings(settings);
-      } catch {
+    } catch {
     }
   }, []);
 
@@ -307,8 +320,8 @@ const SharePackagePage = () => {
     const originalPrice = parseFloat(packageData.price);
     const discountPercentage = referralSettings.discountPercentage || 10;
     const minimumPrice = referralSettings.minimumPrice || 0.5;
-    
-    const discountedPrice = hasReferralDiscount 
+
+    const discountedPrice = hasReferralDiscount
       ? Math.max(minimumPrice, originalPrice * (100 - discountPercentage) / 100)
       : originalPrice;
     const finalPrice = hasReferralDiscount ? discountedPrice : originalPrice;
@@ -337,15 +350,14 @@ const SharePackagePage = () => {
     }
     return `/${currentLanguage}${path}`;
   };
-  
+
   // Handle Stripe payment
   const handleStripePayment = async () => {
     if (!currentUser) {
-      toast.error('Please log in to purchase this package');
-      router.push(getLocalizedUrl('/login'));
+      setShowAuthModal(true);
       return;
     }
-    
+
     if (!packageData) {
       toast.error('Package data not loaded yet');
       return;
@@ -356,7 +368,7 @@ const SharePackagePage = () => {
     try {
       // Check fraud status before proceeding
       const fraudStatus = await checkFraudStatus(currentUser.uid, currentUser.email);
-      
+
       if (fraudStatus.blocked) {
         setProcessingPayment(false);
         // Modal will be shown automatically by the hook
@@ -372,7 +384,7 @@ const SharePackagePage = () => {
       }
 
       const checkoutData = prepareCheckoutData();
-      
+
       // Track purchase initiation
       trackCustomFacebookEvent('InitiateCheckout', {
         content_name: packageData.name,
@@ -393,15 +405,15 @@ const SharePackagePage = () => {
       if (typeof window !== 'undefined' && window.Stripe) {
         try {
           const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
-          
+
           // Only create Radar Session if we have a publishable key
           if (publishableKey) {
             const stripe = window.Stripe(publishableKey);
-            
+
             // Check if createRadarSession is available (it might not be in older Stripe.js versions)
             if (stripe && typeof stripe.createRadarSession === 'function') {
               const { radarSession, error } = await stripe.createRadarSession();
-              
+
               if (error) {
                 console.warn('Radar Session creation failed:', error);
                 // Continue anyway - Stripe Checkout will still work
@@ -445,18 +457,18 @@ const SharePackagePage = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        
+
         // Check if this is a fraud block error
         if (handlePaymentError(errorData)) {
           setProcessingPayment(false);
           return; // Modal will be shown
         }
-        
+
         throw new Error(errorData.error || 'Failed to create payment session');
       }
 
       const result = await response.json();
-      
+
       if (result.sessionUrl) {
         toast.success('Redirecting to Stripe checkout...');
         window.location.href = result.sessionUrl;
@@ -473,12 +485,12 @@ const SharePackagePage = () => {
     if (data === 'Unlimited' || data === -1) {
       return 'Unlimited';
     }
-    
+
     // Handle cases where data might already contain the unit
     if (typeof data === 'string' && data.includes(unit)) {
       return data; // Return as-is if unit is already included
     }
-    
+
     return `${data} ${unit}`;
   }, []);
 
@@ -493,51 +505,56 @@ const SharePackagePage = () => {
 
   const getFullCountryName = useCallback((countryCode) => {
     if (!countryCode) return '';
-    
+
+    // Handle special cases for global plans
+    if (countryCode === 'discover-global' || countryCode === 'global') {
+      return t('sharePackage.globalCoverage', 'Global');
+    }
+
     // First, try Firebase translations (most accurate)
     if (countryTranslations && countryTranslations[currentLanguage]) {
       return countryTranslations[currentLanguage];
     }
-    
+
     // Fallback to hardcoded translations in getCountryName
     const translatedName = getCountryName(countryCode, currentLanguage);
     if (translatedName && translatedName !== countryCode) {
       return translatedName;
     }
-    
+
     // Fallback to mobileCountries
-    const country = mobileCountries.find(c => 
-      c.code === countryCode.toUpperCase() || 
+    const country = mobileCountries.find(c =>
+      c.code === countryCode.toUpperCase() ||
       c.id === countryCode.toUpperCase()
     );
-    
+
     if (country) {
       return country.name;
     }
-    
+
     return capitalizeWords(countryCode);
-  }, [countryTranslations, currentLanguage]);
+  }, [countryTranslations, currentLanguage, t]);
 
   // Generate SEO metadata - defined after helper functions to avoid reference errors
   const metadata = useMemo(() => {
     if (!packageData) return null;
-    
+
     const countryName = capitalizeWords(urlCountryName) || getFullCountryName(urlCountryCode || packageData.country_code) || 'Global';
     const planName = packageData.name || 'eSIM Package';
     const price = formatPrice(packageData.price);
     const data = formatData(packageData.data, packageData.dataUnit);
     const provider = providerInfo?.name || 'Provider';
-    
+
     const metaTitle = t('sharePackage.metaTitle', 'Buy {planName} eSIM - {country} | Secure Checkout')
       .replace('{planName}', planName)
       .replace('{country}', countryName);
-    
-    const metaDescription = t('sharePackage.metaDescription', 
+
+    const metaDescription = t('sharePackage.metaDescription',
       'Buy {planName} eSIM for {country}. Instant activation, secure checkout, global coverage. Starting from ${price}. Perfect for travelers and digital nomads.')
       .replace('{planName}', planName)
       .replace('{country}', countryName)
       .replace('{price}', price);
-    
+
     return {
       title: metaTitle,
       description: metaDescription,
@@ -590,27 +607,36 @@ const SharePackagePage = () => {
 
   return (
     <div className="bg-white min-h-screen flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
-        {/* Fraud Blocked Modal */}
-        <FraudBlockedModal
-          isOpen={isBlocked}
-          onClose={clearBlockedState}
-          blockType={blockData?.blockType}
-          message={blockData?.message}
-          expiresAt={blockData?.expiresAt}
-          remainingHours={blockData?.remainingHours}
-          canContactSupport={blockData?.canContactSupport}
-          userId={currentUser?.uid}
-          email={currentUser?.email}
-        />
+      {/* Fraud Blocked Modal */}
+      <FraudBlockedModal
+        isOpen={isBlocked}
+        onClose={clearBlockedState}
+        blockType={blockData?.blockType}
+        message={blockData?.message}
+        expiresAt={blockData?.expiresAt}
+        remainingHours={blockData?.remainingHours}
+        canContactSupport={blockData?.canContactSupport}
+        userId={currentUser?.uid}
+        email={currentUser?.email}
+      />
 
-        {/* Processing Overlay */}
-        {(processingPayment || fraudCheckLoading) && (
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onAuthenticated={() => {
+          setShowAuthModal(false);
+          toast.success(t('auth.loggedIn', 'Logged in successfully'));
+        }}
+      />
+
+      {/* Processing Overlay */}
+      {(processingPayment || fraudCheckLoading) && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white rounded-lg p-6 max-w-sm mx-4">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tufts-blue mx-auto mb-4"></div>
               <p className="text-gray-900 font-semibold">
-                {fraudCheckLoading 
+                {fraudCheckLoading
                   ? t('sharePackage.verifyingAccount', 'Verifying your account...')
                   : t('sharePackage.redirectingPayment', 'Redirecting to payment...')
                 }
@@ -624,12 +650,12 @@ const SharePackagePage = () => {
       <div className="relative isolate flex-1 flex flex-col">
         {/* Horizontal Line - Top */}
         <div className="hidden sm:block absolute top-0 left-0 right-0 h-px bg-gray-200"></div>
-        
+
         {/* Horizontal Line - Bottom */}
         <div className="hidden sm:block absolute bottom-0 left-0 right-0 h-px bg-gray-200"></div>
 
         {/* Grid Pattern - Left Side */}
-        <div 
+        <div
           className="hidden xl:block absolute left-0 top-0 bottom-0 w-32 "
           style={{
             backgroundSize: '10px 10px',
@@ -639,7 +665,7 @@ const SharePackagePage = () => {
         ></div>
 
         {/* Grid Pattern - Right Side */}
-        <div 
+        <div
           className="hidden xl:block absolute right-0 top-0 bottom-0 w-32 "
           style={{
             backgroundSize: '10px 10px',
@@ -648,7 +674,7 @@ const SharePackagePage = () => {
           }}
         ></div>
 
-<div className="mx-auto w-full max-w-9xl">
+        <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
             <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
               <p className="font-mono text-sm max-w-2xl sm:text-base font-medium tracking-widest uppercase text-gray-500">
@@ -659,19 +685,16 @@ const SharePackagePage = () => {
                   <div className="flex justify-start items-center gap-4">
                     {/* Country Flag */}
                     <div className="flex-shrink-0 w-20 sm:w-24 lg:w-28 aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg flex items-center justify-center border-2 border-gray-200 overflow-hidden relative">
-                      <Image
-                        src={`/flags/4x3/${getISOCode(urlCountryCode || packageData.country_code)}.svg`}
-                        alt={`${capitalizeWords(urlCountryName) || getFullCountryName(urlCountryCode || packageData.country_code)} flag`}
-                        fill
-                        sizes="(max-width: 640px) 80px, (max-width: 1024px) 96px, 112px"
-                        className="object-cover"
-                        priority
+                      <img
+                        src={flagSrc}
+                        alt={`${capitalizeWords(urlCountryName) || getFullCountryName(urlCountryCode || packageData?.country_code) || 'Global'} flag`}
+                        className="w-full h-full object-cover"
                       />
                     </div>
                     {/* Country Info */}
                     <div>
                       <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-tufts-blue">
-                        {(urlCountryName || getFullCountryName(urlCountryCode || packageData.country_code)) && 
+                        {(urlCountryName || getFullCountryName(urlCountryCode || packageData.country_code)) &&
                           <>{capitalizeWords(urlCountryName) || getFullCountryName(urlCountryCode || packageData.country_code)} - </>}
                         {formatData(packageData.data || packageData.capacity, packageData.dataUnit || 'GB')}
                       </h2>
@@ -703,13 +726,13 @@ const SharePackagePage = () => {
             <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
               <div>
                 <p className="text-cool-black text-sm mt-2 mx-auto">{packageData.description || t('sharePackage.travelPackage', 'Travel Package')}</p>
-                
+
                 {/* Payment Button */}
                 <div className="mt-6 max-w-2xl space-y-4">
                   {/* Stripe Payment Button */}
                   <button
                     onClick={handleStripePayment}
-                    disabled={processingPayment || !termsAccepted}
+                    disabled={processingPayment}
                     className="w-full flex items-center justify-between p-4 border-2 border-gray-200 rounded-lg hover:border-tufts-blue hover:bg-jordy-blue/5 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <div className={`flex items-center gap-3`}>
@@ -717,38 +740,35 @@ const SharePackagePage = () => {
                         <CreditCard className="w-6 h-6 text-tufts-blue" />
                       </div>
                       <div>
-                        <p className="font-semibold text-eerie-black">{t('sharePackage.payNow', 'Proceed to Payment')}</p>
-                        <p className="text-xs text-cool-black">{t('sharePackage.secureStripe', 'Secure payment via Stripe')}</p>
+                        <p className="font-semibold text-eerie-black">
+                          {currentUser ? t('sharePackage.payNow', 'Proceed to Payment') : t('sharePackage.loginToContinue', 'Log in to Continue')}
+                        </p>
+                        <p className="text-xs text-cool-black">
+                          {currentUser ? t('sharePackage.secureStripe', 'Secure payment via Stripe') : t('sharePackage.loginDesc', 'Sign in with Google or Apple')}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <svg className="w-8 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                        <rect x="2" y="5" width="20" height="14" rx="2" fill="none" stroke="currentColor" strokeWidth="2"/>
-                        <path d="M2 10h20" stroke="currentColor" strokeWidth="2"/>
+                        <rect x="2" y="5" width="20" height="14" rx="2" fill="none" stroke="currentColor" strokeWidth="2" />
+                        <path d="M2 10h20" stroke="currentColor" strokeWidth="2" />
                       </svg>
                     </div>
                   </button>
-                  
-                  {/* Terms and Conditions Checkbox */}
-                  <div className={`flex justify-start gap-3`}>
-                    <input
-                      type="checkbox"
-                      id="terms-checkbox"
-                      checked={termsAccepted}
-                      onChange={(e) => setTermsAccepted(e.target.checked)}
-                      className="mt-1 w-4 h-4 text-tufts-blue bg-gray-100 border-gray-300 rounded focus:ring-tufts-blue focus:ring-2 cursor-pointer"
-                    />
-                    <label htmlFor="terms-checkbox" className={`text-sm text-cool-black cursor-pointer`}>
-                      {t('sharePackage.agreeToTerms', 'By proceeding to payment you agree to the')}{' '}
-                      <a 
-                        href={getLocalizedUrl('/terms-of-service')} 
-                        target="_blank" 
+
+                  {/* Implicit Terms and Conditions */}
+                  <div className="text-center">
+                    <p className={`text-xs text-cool-black`}>
+                      {t('sharePackage.implicitTerms', 'By clicking "Proceed to Payment" you agree to the')}{' '}
+                      <a
+                        href={getLocalizedUrl('/terms-of-service')}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-tufts-blue hover:underline"
                       >
                         {t('sharePackage.termsOfService', 'Terms of Service')}
                       </a>
-                    </label>
+                    </p>
                   </div>
                 </div>
               </div>
@@ -774,7 +794,7 @@ const SharePackagePage = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="bg-jordy-blue/10 p-4 border border-gray-200/70">
                   <div className={`flex justify-start items-start gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                     <div className="flex-shrink-0 bg-tufts-blue/10 p-2">
@@ -786,7 +806,7 @@ const SharePackagePage = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="bg-jordy-blue/10 p-4 border border-gray-200/70">
                   <div className={`flex justify-start items-start gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                     <div className="flex-shrink-0 bg-tufts-blue/10 p-2">
@@ -854,13 +874,13 @@ const SharePackagePage = () => {
           <div className="mx-auto w-full max-w-7xl">
             <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
               <div className="grid gap-6 lg:grid-cols-2">
-                
+
                 {/* iOS Instructions */}
                 <div className="border border-gray-200 p-6">
                   <div className={`flex justify-start items-center gap-3 mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                    <img  
-                      src="/images/logo_icon/apple.svg" 
-                      alt="iOS" 
+                    <img
+                      src="/images/logo_icon/apple.svg"
+                      alt="iOS"
                       width="32"
                       height="32"
                       className="w-8 h-8"
@@ -869,7 +889,7 @@ const SharePackagePage = () => {
                       {t('sharePackage.iosInstructions', 'iOS Instructions')}
                     </h4>
                   </div>
-                  
+
                   <div className="space-y-4">
                     <div className={`flex justify-start gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                       <div className="flex-shrink-0 w-6 h-6 rounded-full bg-tufts-blue text-white flex items-center justify-center text-sm font-semibold">
@@ -881,7 +901,7 @@ const SharePackagePage = () => {
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className={`flex justify-start gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                       <div className="flex-shrink-0 w-6 h-6 rounded-full bg-tufts-blue text-white flex items-center justify-center text-sm font-semibold">
                         2
@@ -892,7 +912,7 @@ const SharePackagePage = () => {
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className={`flex justify-start gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                       <div className="flex-shrink-0 w-6 h-6 rounded-full bg-tufts-blue text-white flex items-center justify-center text-sm font-semibold">
                         3
@@ -903,7 +923,7 @@ const SharePackagePage = () => {
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className={`flex justify-start gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                       <div className="flex-shrink-0 w-6 h-6 rounded-full bg-tufts-blue text-white flex items-center justify-center text-sm font-semibold">
                         4
@@ -922,9 +942,9 @@ const SharePackagePage = () => {
                     rel="noopener noreferrer"
                     className={`mt-6 btn-primary text-white shadow-sm inline-flex items-center w-full justify-center ${isRTL ? 'flex-row-reverse' : ''}`}
                   >
-                    <img 
-                      src="/images/logo_icon/apple.svg" 
-                      alt="iOS" 
+                    <img
+                      src="/images/logo_icon/apple.svg"
+                      alt="iOS"
                       width="20"
                       height="20"
                       className={isRTL ? 'w-5 h-5 ml-2' : 'w-5 h-5 mr-2'}
@@ -936,9 +956,9 @@ const SharePackagePage = () => {
                 {/* Android Instructions */}
                 <div className="border border-gray-200 p-6">
                   <div className={`flex justify-start items-center gap-3 mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                    <img 
-                      src="/images/logo_icon/android.svg" 
-                      alt="Android" 
+                    <img
+                      src="/images/logo_icon/android.svg"
+                      alt="Android"
                       width="32"
                       height="32"
                       className="w-8 h-8"
@@ -947,7 +967,7 @@ const SharePackagePage = () => {
                       {t('sharePackage.androidInstructions', 'Android Instructions')}
                     </h4>
                   </div>
-                  
+
                   <div className="space-y-4">
                     <div className={`flex justify-start gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                       <div className="flex-shrink-0 w-6 h-6 rounded-full bg-tufts-blue text-white flex items-center justify-center text-sm font-semibold">
@@ -959,7 +979,7 @@ const SharePackagePage = () => {
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className={`flex justify-start items-start gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                       <div className="flex-shrink-0 w-6 h-6 rounded-full bg-tufts-blue text-white flex items-center justify-center text-sm font-semibold">
                         2
@@ -970,7 +990,7 @@ const SharePackagePage = () => {
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className={`flex justify-start items-start gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                       <div className="flex-shrink-0 w-6 h-6 rounded-full bg-tufts-blue text-white flex items-center justify-center text-sm font-semibold">
                         3
@@ -981,7 +1001,7 @@ const SharePackagePage = () => {
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className={`flex justify-start items-start gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                       <div className="flex-shrink-0 w-6 h-6 rounded-full bg-tufts-blue text-white flex items-center justify-center text-sm font-semibold">
                         4
@@ -1000,9 +1020,9 @@ const SharePackagePage = () => {
                     rel="noopener noreferrer"
                     className={`mt-6 btn-primary text-white shadow-sm inline-flex items-center w-full justify-center ${isRTL ? 'flex-row-reverse' : ''}`}
                   >
-                    <img 
-                      src="/images/logo_icon/android.svg" 
-                      alt="Android" 
+                    <img
+                      src="/images/logo_icon/android.svg"
+                      alt="Android"
                       width="18"
                       height="18"
                       className={isRTL ? 'w-4 h-4 ml-2' : 'w-4 h-4 mr-2'}
@@ -1017,7 +1037,7 @@ const SharePackagePage = () => {
           <div className="w-full h-px bg-gray-100"></div>
         </div>
 
-        
+
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { getLanguageDirection, detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
 import { usePathname, useRouter } from 'next/navigation';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore';
 import { db } from '@esim/shared/firebase/config';
 import { parsePrice } from '@esim/shared/utils/priceUtils';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
@@ -12,22 +12,21 @@ import { useCountries } from '@esim/shared/hooks/useCountries';
 
 // Components
 import PlanSelectionBottomSheet from '../PlanSelectionBottomSheet';
-import { 
-  GlobalPlanCard, 
+import {
+  GlobalPlanCard,
   RegionSection,
-  GlobeIcon, 
-  ArrowRightIcon, 
+  GlobeIcon,
+  ArrowRightIcon,
   ChevronDownIcon,
   REGION_SLUGS,
-  countCountriesFromPlans 
+  countCountriesFromPlans
 } from './plans';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function PlansSection({ selectedCountry }) {
   const { t, locale, isLoading: i18nLoading } = useI18n();
   const pathname = usePathname();
   const router = useRouter();
-  
+
   // State
   const [globalPlans, setGlobalPlans] = useState([]);
   const [globalLoading, setGlobalLoading] = useState(true);
@@ -35,12 +34,12 @@ export default function PlansSection({ selectedCountry }) {
   const [regionData, setRegionData] = useState({});
   const [regionLoading, setRegionLoading] = useState({});
   const [showMoreRegions, setShowMoreRegions] = useState(false);
-  
+
   // Bottom sheet state
   const [showPlanSheet, setShowPlanSheet] = useState(false);
   const [selectedPlans, setSelectedPlans] = useState([]);
   const [loadingSheetPlans, setLoadingSheetPlans] = useState(false);
-  
+
   const getCurrentLanguage = useCallback(() => {
     if (locale) return locale;
     if (typeof window !== 'undefined') {
@@ -52,7 +51,7 @@ export default function PlansSection({ selectedCountry }) {
 
   const currentLanguage = useMemo(() => getCurrentLanguage(), [getCurrentLanguage]);
   const isRTL = useMemo(() => getLanguageDirection(currentLanguage) === 'rtl', [currentLanguage]);
-  
+
   const { countries, isLoading: countriesLoading } = useCountries(currentLanguage);
 
   // Fetch Discover Global plans
@@ -60,37 +59,73 @@ export default function PlansSection({ selectedCountry }) {
     const fetchGlobalPlans = async () => {
       try {
         setGlobalLoading(true);
-        
+
         const globalQuery = query(
           collection(db, 'dataplans'),
           where('country_title', '==', 'Discover Global')
         );
         const snapshot = await getDocs(globalQuery);
         let plans = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        
+
         // Filter enabled, non-topup
-        plans = plans.filter(p => 
-          p.enabled !== false && 
-          p.is_topup !== true && 
+        plans = plans.filter(p =>
+          p.enabled !== false &&
+          p.is_topup !== true &&
           p.type !== 'topup'
         );
-        
+
         // Count countries from first plan's operator_coverages
         if (plans.length > 0) {
           const count = countCountriesFromPlans([plans[0]]);
           setGlobalCountriesCount(count);
         }
-        
+
         if (plans.length > 0) {
           const regularPlans = plans.filter(p => !(p.data || '').toLowerCase().includes('unlimited') && !p.is_unlimited);
           const unlimitedPlans = plans.filter(p => (p.data || '').toLowerCase().includes('unlimited') || p.is_unlimited);
-          
+
           regularPlans.sort((a, b) => (parsePrice(a.price) || 999) - (parsePrice(b.price) || 999));
           unlimitedPlans.sort((a, b) => (parsePrice(a.price) || 999) - (parsePrice(b.price) || 999));
-          
-          // Get 2 cheapest regular + 2 cheapest unlimited
-          const selected = [...regularPlans.slice(0, 2), ...unlimitedPlans.slice(0, 2)].slice(0, 4);
-          setGlobalPlans(selected);
+
+          // Prioritize plans with specific data amounts: 200MB, 1GB, 10GB, 20GB
+          const priorityPlans = [];
+          const dataPriorities = [
+            { search: '200 mb', exact: true },
+            { search: '1 gb', exact: true },
+            { search: '10 gb', exact: true },
+            { search: '20 gb', exact: true }
+          ];
+
+          for (const priority of dataPriorities) {
+            const found = regularPlans.find(p => {
+              const data = (p.data || '').toLowerCase().trim();
+              if (priority.exact) {
+                return data === priority.search;
+              } else {
+                return data.includes(priority.search);
+              }
+            });
+            if (found && !priorityPlans.find(p => p.id === found.id)) {
+              priorityPlans.push(found);
+            }
+          }
+
+          // Fill remaining slots with cheapest plans
+          const remainingSlots = 4 - priorityPlans.length;
+          if (remainingSlots > 0) {
+            const remainingPlans = regularPlans.filter(p =>
+              !priorityPlans.find(pp => pp.id === p.id)
+            ).slice(0, remainingSlots);
+            priorityPlans.push(...remainingPlans);
+          }
+
+          // Add unlimited plans if we have space and they exist
+          if (priorityPlans.length < 4 && unlimitedPlans.length > 0) {
+            const unlimitedToAdd = Math.min(4 - priorityPlans.length, unlimitedPlans.length);
+            priorityPlans.push(...unlimitedPlans.slice(0, unlimitedToAdd));
+          }
+
+          setGlobalPlans(priorityPlans.slice(0, 4));
         }
       } catch (error) {
         console.error('Error fetching global plans:', error);
@@ -105,11 +140,23 @@ export default function PlansSection({ selectedCountry }) {
   // Fetch regional plans
   const fetchRegionPlans = useCallback(async (region) => {
     setRegionLoading(prev => ({ ...prev, [region]: true }));
-    
+
     try {
+      // Fetch region config to get popular countries
+      let popularCountries = [];
+      try {
+        const regionDocRef = doc(db, 'regions', region);
+        const regionDocSnap = await getDoc(regionDocRef);
+        if (regionDocSnap.exists()) {
+          popularCountries = regionDocSnap.data().popularCountries || [];
+        }
+      } catch (err) {
+        console.error('Error fetching region config:', err);
+      }
+
       const slugs = REGION_SLUGS[region] || [region];
       let allPlans = [];
-      
+
       for (const slug of slugs) {
         const regionQuery = query(
           collection(db, 'dataplans'),
@@ -119,24 +166,24 @@ export default function PlansSection({ selectedCountry }) {
         const plans = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         allPlans = [...allPlans, ...plans];
       }
-      
-      allPlans = allPlans.filter(p => 
-        p.enabled !== false && 
-        p.is_topup !== true && 
+
+      allPlans = allPlans.filter(p =>
+        p.enabled !== false &&
+        p.is_topup !== true &&
         p.type !== 'topup'
       );
-      
+
       const countriesCount = countCountriesFromPlans(allPlans);
-      
+
       setRegionData(prev => ({
         ...prev,
-        [region]: { plans: allPlans, countriesCount }
+        [region]: { plans: allPlans, countriesCount, popularCountries }
       }));
     } catch (error) {
       console.error(`Error fetching ${region} plans:`, error);
       setRegionData(prev => ({
         ...prev,
-        [region]: { plans: [], countriesCount: 0 }
+        [region]: { plans: [], countriesCount: 0, popularCountries: [] }
       }));
     } finally {
       setRegionLoading(prev => ({ ...prev, [region]: false }));
@@ -162,21 +209,21 @@ export default function PlansSection({ selectedCountry }) {
   const handleCountrySelect = useCallback(async (country) => {
     setLoadingSheetPlans(true);
     setShowPlanSheet(true);
-    
+
     try {
       const plansQuery = query(
         collection(db, 'dataplans'),
         where('country_codes', 'array-contains', country.code)
       );
       const snapshot = await getDocs(plansQuery);
-      
+
       let plans = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      plans = plans.filter(p => 
-        p.enabled !== false && 
-        p.is_topup !== true && 
+      plans = plans.filter(p =>
+        p.enabled !== false &&
+        p.is_topup !== true &&
         p.type !== 'topup'
       );
-      
+
       setSelectedPlans(plans);
     } catch (error) {
       console.error('Error loading plans:', error);
@@ -199,8 +246,8 @@ export default function PlansSection({ selectedCountry }) {
         source: 'home_plans_section',
         timestamp: new Date().toISOString()
       });
-      
-      const planUrl = currentLanguage === 'en' 
+
+      const planUrl = currentLanguage === 'en'
         ? `/share-package/${plan.id}?country=${plan.country_slug || region}`
         : `/${currentLanguage}/share-package/${plan.id}?country=${plan.country_slug || region}`;
       router.push(planUrl);
@@ -215,10 +262,10 @@ export default function PlansSection({ selectedCountry }) {
       source: 'home_global_section',
       timestamp: new Date().toISOString()
     });
-    
-    const planUrl = currentLanguage === 'en' 
-      ? `/share-package/${plan.id}?country=discover-global`
-      : `/${currentLanguage}/share-package/${plan.id}?country=discover-global`;
+
+    const planUrl = currentLanguage === 'en'
+      ? `/share-package/${encodeURIComponent(plan.id)}?country=discover-global`
+      : `/${currentLanguage}/share-package/${encodeURIComponent(plan.id)}?country=discover-global`;
     router.push(planUrl);
   }, [currentLanguage, router]);
 
@@ -227,7 +274,14 @@ export default function PlansSection({ selectedCountry }) {
     const plansUrl = currentLanguage === 'en' ? '/esim-plans' : `/${currentLanguage}/esim-plans`;
     router.push(plansUrl);
   }, [currentLanguage, router]);
-  
+
+  // Handle external country selection (e.g., from Hero/URL search)
+  useEffect(() => {
+    if (selectedCountry) {
+      handleCountrySelect(selectedCountry);
+    }
+  }, [selectedCountry]); // handleCountrySelect is stable via useCallback
+
   const gridPatternStyle = useMemo(() => ({
     backgroundSize: '10px 10px',
     backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
@@ -278,7 +332,7 @@ export default function PlansSection({ selectedCountry }) {
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl">
             <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl space-y-8">
-              
+
               {/* Discover Global Section */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
@@ -294,7 +348,7 @@ export default function PlansSection({ selectedCountry }) {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                   {globalLoading ? (
                     [...Array(4)].map((_, i) => (
@@ -326,6 +380,7 @@ export default function PlansSection({ selectedCountry }) {
                 countries={countries}
                 plans={regionData.europe?.plans || []}
                 countriesCount={regionData.europe?.countriesCount || 0}
+                popularCountries={regionData.europe?.popularCountries || []}
                 plansLoading={regionLoading.europe}
                 onCountrySelect={handleCountrySelect}
                 onPlanClick={(plan, openFull) => handlePlanClick(plan, 'europe', openFull)}
@@ -337,6 +392,7 @@ export default function PlansSection({ selectedCountry }) {
                 countries={countries}
                 plans={regionData.asia?.plans || []}
                 countriesCount={regionData.asia?.countriesCount || 0}
+                popularCountries={regionData.asia?.popularCountries || []}
                 plansLoading={regionLoading.asia}
                 onCountrySelect={handleCountrySelect}
                 onPlanClick={(plan, openFull) => handlePlanClick(plan, 'asia', openFull)}
@@ -351,6 +407,7 @@ export default function PlansSection({ selectedCountry }) {
                     countries={countries}
                     plans={regionData.americas?.plans || []}
                     countriesCount={regionData.americas?.countriesCount || 0}
+                    popularCountries={regionData.americas?.popularCountries || []}
                     plansLoading={regionLoading.americas}
                     onCountrySelect={handleCountrySelect}
                     onPlanClick={(plan, openFull) => handlePlanClick(plan, 'americas', openFull)}
@@ -361,6 +418,7 @@ export default function PlansSection({ selectedCountry }) {
                     countries={countries}
                     plans={regionData.africa?.plans || []}
                     countriesCount={regionData.africa?.countriesCount || 0}
+                    popularCountries={regionData.africa?.popularCountries || []}
                     plansLoading={regionLoading.africa}
                     onCountrySelect={handleCountrySelect}
                     onPlanClick={(plan, openFull) => handlePlanClick(plan, 'africa', openFull)}
@@ -371,6 +429,7 @@ export default function PlansSection({ selectedCountry }) {
                     countries={countries}
                     plans={regionData.oceania?.plans || []}
                     countriesCount={regionData.oceania?.countriesCount || 0}
+                    popularCountries={regionData.oceania?.popularCountries || []}
                     plansLoading={regionLoading.oceania}
                     onCountrySelect={handleCountrySelect}
                     onPlanClick={(plan, openFull) => handlePlanClick(plan, 'oceania', openFull)}
@@ -390,7 +449,7 @@ export default function PlansSection({ selectedCountry }) {
                     <ChevronDownIcon className="w-5 h-5" />
                   </button>
                 )}
-                
+
                 <button
                   onClick={handleNavigateToPlans}
                   className="btn-primary inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full w-full sm:w-auto"
