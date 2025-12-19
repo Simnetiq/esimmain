@@ -94,25 +94,6 @@ const AuthModal = ({ isOpen, onClose, onAuthenticated }) => {
                             </div>
                         </div>
 
-                        <button
-                            onClick={async () => {
-                                try {
-                                    setLoading(true);
-                                    await loginAsGuest();
-                                    onAuthenticated();
-                                    onClose();
-                                } catch (error) {
-                                    console.error('Guest login failed', error);
-                                } finally {
-                                    setLoading(false);
-                                }
-                            }}
-                            disabled={loading}
-                            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-50 mb-3"
-                        >
-                            <UserIcon className="w-5 h-5" />
-                            <span className="text-sm font-medium">{t('auth.guest_checkout', 'Continue as Guest')}</span>
-                        </button>
 
                         <div className="grid grid-cols-2 gap-3">
                             <button
