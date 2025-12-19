@@ -21,7 +21,7 @@ export const SLUG_TO_ISO_CODE = {
   'austria': 'at',
   'azerbaijan': 'az',
   'azores': 'pt',
-  
+
   // B
   'bahamas': 'bs',
   'bahrain': 'bh',
@@ -42,7 +42,7 @@ export const SLUG_TO_ISO_CODE = {
   'bulgaria': 'bg',
   'burkina-faso': 'bf',
   'burundi': 'bi',
-  
+
   // C
   'cambodia': 'kh',
   'cameroon': 'cm',
@@ -69,7 +69,7 @@ export const SLUG_TO_ISO_CODE = {
   'cyprus': 'cy',
   'czech-republic': 'cz',
   'côte-d\'ivoire': 'ci',
-  
+
   // D
   'democratic-republic-of-the-congo': 'cd',
   'denmark': 'dk',
@@ -77,7 +77,7 @@ export const SLUG_TO_ISO_CODE = {
   'djibouti': 'dj',
   'dominica': 'dm',
   'dominican-republic': 'do',
-  
+
   // E
   'ecuador': 'ec',
   'egypt': 'eg',
@@ -89,14 +89,14 @@ export const SLUG_TO_ISO_CODE = {
   'ethiopia': 'et',
   'europe': 'eu',
   'european-union-and-united-kingdom': 'eu',
-  
+
   // F
   'faroe-islands': 'fo',
   'fiji': 'fj',
   'finland': 'fi',
   'france': 'fr',
   'french-polynesia': 'pf',
-  
+
   // G
   'gabon': 'ga',
   'gambia': 'gm',
@@ -112,13 +112,13 @@ export const SLUG_TO_ISO_CODE = {
   'guinea': 'gn',
   'guinea-bissau': 'gw',
   'guyana': 'gy',
-  
+
   // H
   'haiti': 'ht',
   'honduras': 'hn',
   'hong-kong': 'hk',
   'hungary': 'hu',
-  
+
   // I
   'iceland': 'is',
   'india': 'in',
@@ -129,13 +129,13 @@ export const SLUG_TO_ISO_CODE = {
   'israel': 'il',
   'italy': 'it',
   'ivory-coast': 'ci',
-  
+
   // J
   'jamaica': 'jm',
   'japan': 'jp',
   'jersey': 'je',
   'jordan': 'jo',
-  
+
   // K
   'kazakhstan': 'kz',
   'kenya': 'ke',
@@ -143,7 +143,7 @@ export const SLUG_TO_ISO_CODE = {
   'kosovo': 'xk',
   'kuwait': 'kw',
   'kyrgyzstan': 'kg',
-  
+
   // L
   'laos': 'la',
   'latin-america': 'un',
@@ -155,7 +155,7 @@ export const SLUG_TO_ISO_CODE = {
   'liechtenstein': 'li',
   'lithuania': 'lt',
   'luxembourg': 'lu',
-  
+
   // M
   'macau': 'mo',
   'macao': 'mo',
@@ -184,7 +184,7 @@ export const SLUG_TO_ISO_CODE = {
   'morocco': 'ma',
   'mozambique': 'mz',
   'myanmar': 'mm',
-  
+
   // N
   'namibia': 'na',
   'nauru': 'nr',
@@ -200,10 +200,10 @@ export const SLUG_TO_ISO_CODE = {
   'north-macedonia': 'mk',
   'northern-cyprus': 'cy',
   'norway': 'no',
-  
+
   // O
   'oman': 'om',
-  
+
   // P
   'pakistan': 'pk',
   'palau': 'pw',
@@ -218,10 +218,10 @@ export const SLUG_TO_ISO_CODE = {
   'poland': 'pl',
   'portugal': 'pt',
   'puerto-rico': 'pr',
-  
+
   // Q
   'qatar': 'qa',
-  
+
   // R
   'republic-of-the-congo': 'cg',
   'reunion': 're',
@@ -230,7 +230,7 @@ export const SLUG_TO_ISO_CODE = {
   'romania': 'ro',
   'russia': 'ru',
   'rwanda': 'rw',
-  
+
   // S
   'saba': 'bq',
   'saint-barthlemy': 'bl', // Slug without é
@@ -266,7 +266,7 @@ export const SLUG_TO_ISO_CODE = {
   'sweden': 'se',
   'switzerland': 'ch',
   'syria': 'sy',
-  
+
   // T
   'taiwan': 'tw',
   'tajikistan': 'tj',
@@ -282,7 +282,7 @@ export const SLUG_TO_ISO_CODE = {
   'turkmenistan': 'tm',
   'turks-and-caicos-islands': 'tc',
   'tuvalu': 'tv',
-  
+
   // U
   'uganda': 'ug',
   'ukraine': 'ua',
@@ -291,7 +291,7 @@ export const SLUG_TO_ISO_CODE = {
   'united-states': 'us',
   'uruguay': 'uy',
   'uzbekistan': 'uz',
-  
+
   // V
   'vanuatu': 'vu',
   'vatican-city': 'va',
@@ -300,14 +300,14 @@ export const SLUG_TO_ISO_CODE = {
   'virgin-islands-(british)': 'vg',
   'virgin-islands-(u.s.)': 'vi',
   'virgin-islands': 'vg',
-  
+
   // Y
   'yemen': 'ye',
-  
+
   // Z
   'zambia': 'zm',
   'zimbabwe': 'zw',
-  
+
   // Regional
   'africa': 'un',
   'asia': 'un',
@@ -323,14 +323,14 @@ export const SLUG_TO_ISO_CODE = {
  */
 export function getISOCode(code) {
   if (!code) return 'un'; // Default to UN flag
-  
+
   const normalized = code.toLowerCase().trim();
-  
+
   // If it's already a 2-letter ISO code, return it
   if (normalized.length === 2 && /^[a-z]{2}$/.test(normalized)) {
     return normalized;
   }
-  
+
   // Look up in mapping
   return SLUG_TO_ISO_CODE[normalized] || 'un';
 }

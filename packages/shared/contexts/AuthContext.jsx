@@ -10,7 +10,8 @@ import {
   sendPasswordResetEmail,
   signInWithPopup,
   GoogleAuthProvider,
-  OAuthProvider
+  OAuthProvider,
+  signInAnonymously
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../firebase/config';
@@ -30,6 +31,32 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [userProfile, setUserProfile] = useState(null);
 
+  async function loginAsGuest() {
+    try {
+      const { user } = await signInAnonymously(auth);
+
+      // Create a guest profile in Firestore if needed
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (!userDoc.exists()) {
+        const preferredLanguage = typeof window !== 'undefined' ?
+          localStorage.getItem('Simnetiq-language') || 'en' : 'en';
+
+        await setDoc(doc(db, 'users', user.uid), {
+          uid: user.uid,
+          isAnonymous: true,
+          createdAt: new Date(),
+          role: 'customer',
+          preferredLanguage: preferredLanguage,
+          displayName: 'Guest User'
+        });
+      }
+      return user;
+    } catch (error) {
+      console.error('Error signing in as guest:', error);
+      throw error;
+    }
+  }
+
   async function signup(email, password, displayName, referralCode = null, recaptchaToken = null) {
     try {
       // Verify reCAPTCHA token if provided
@@ -44,7 +71,7 @@ export function AuthProvider({ children }) {
           });
 
           const verifyData = await verifyResponse.json();
-          
+
           if (!verifyData.success) {
             throw new Error('reCAPTCHA verification failed. Please try again.');
           }
@@ -52,15 +79,15 @@ export function AuthProvider({ children }) {
           throw new Error('Failed to verify reCAPTCHA. Please try again.');
         }
       }
-      
+
       // Generate and send verification OTP first (before creating account)
       const otpData = generateOTPWithTimestamp(10); // 10 minutes expiry
       const emailSent = await sendVerificationEmail(email, displayName, otpData.otp);
-      
+
       if (!emailSent) {
         throw new Error('Failed to send verification email. Please try again.');
       }
-      
+
       // Store pending signup data in localStorage (not in Firebase yet)
       const pendingSignup = {
         email,
@@ -71,9 +98,9 @@ export function AuthProvider({ children }) {
         expiresAt: otpData.expiresAt,
         timestamp: Date.now()
       };
-      
+
       localStorage.setItem('pendingSignup', JSON.stringify(pendingSignup));
-      
+
       return { pending: true, otp: otpData.otp, emailSent };
     } catch (error) {
       throw error;
@@ -94,16 +121,16 @@ export function AuthProvider({ children }) {
           });
 
           const verifyData = await verifyResponse.json();
-          
+
           if (!verifyData.success) {
             throw new Error('reCAPTCHA verification failed. Please try again.');
           }
-          
+
         } catch {
           throw new Error('Failed to verify reCAPTCHA. Please try again.');
         }
       }
-      
+
       const { user } = await signInWithEmailAndPassword(auth, email, password);
       return user;
     } catch (error) {
@@ -131,14 +158,14 @@ export function AuthProvider({ children }) {
     try {
       const provider = new GoogleAuthProvider();
       const { user } = await signInWithPopup(auth, provider);
-      
+
       // Check if user profile exists, if not create it
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       if (!userDoc.exists()) {
         // Get current language preference from localStorage
-        const preferredLanguage = typeof window !== 'undefined' ? 
+        const preferredLanguage = typeof window !== 'undefined' ?
           localStorage.getItem('Simnetiq-language') || 'en' : 'en';
-        
+
         // Create user profile directly
         await setDoc(doc(db, 'users', user.uid), {
           email: user.email,
@@ -158,7 +185,7 @@ export function AuthProvider({ children }) {
           // Don't fail the signup if newsletter addition fails
         }
       }
-      
+
       return user;
     } catch (error) {
       throw error;
@@ -167,31 +194,19 @@ export function AuthProvider({ children }) {
 
   async function signInWithApple() {
     try {
-      // Ensure auth is initialized
-      if (!auth) {
-        throw new Error('Firebase Auth is not initialized. Please refresh the page and try again.');
-      }
-      
       const provider = new OAuthProvider('apple.com');
       provider.addScope('email');
       provider.addScope('name');
-      
-      // Debug logging
-      if (typeof window !== 'undefined') {
-        console.log('[Apple Sign-In] Auth initialized:', !!auth);
-        console.log('[Apple Sign-In] Provider created:', provider.providerId);
-      }
-      
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      
+
+      const { user } = await signInWithPopup(auth, provider);
+
       // Check if user profile exists, if not create it
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       if (!userDoc.exists()) {
         // Get current language preference from localStorage
-        const preferredLanguage = typeof window !== 'undefined' ? 
+        const preferredLanguage = typeof window !== 'undefined' ?
           localStorage.getItem('Simnetiq-language') || 'en' : 'en';
-        
+
         // Create user profile directly
         await setDoc(doc(db, 'users', user.uid), {
           email: user.email,
@@ -212,11 +227,9 @@ export function AuthProvider({ children }) {
           // Don't fail the signup if newsletter addition fails
         }
       }
-      
+
       return user;
     } catch (error) {
-      // Enhanced error logging for debugging
-      console.error('[Apple Sign-In] Error:', error.code, error.message);
       throw error;
     }
   }
@@ -230,13 +243,13 @@ export function AuthProvider({ children }) {
 
       const userData = JSON.parse(pendingUserData);
       const currentUser = auth?.currentUser;
-      
+
       if (!currentUser) {
         throw new Error('No authenticated user found');
       }
 
       // Get current language preference from localStorage
-      const preferredLanguage = typeof window !== 'undefined' ? 
+      const preferredLanguage = typeof window !== 'undefined' ?
         localStorage.getItem('Simnetiq-language') || 'en' : 'en';
 
       // Create user profile in Firestore
@@ -262,7 +275,7 @@ export function AuthProvider({ children }) {
 
       // Clean up pending data
       localStorage.removeItem('pendingUserData');
-      
+
       return currentUser;
     } catch (error) {
       throw error;
@@ -293,7 +306,7 @@ export function AuthProvider({ children }) {
       // Check for referral code from pendingUserData
       const pendingUserData = localStorage.getItem('pendingUserData');
       let referralCode = pendingSignup.referralCode || null;
-      
+
       if (pendingUserData) {
         const userData = JSON.parse(pendingUserData);
         referralCode = userData.referralCode || referralCode;
@@ -303,14 +316,14 @@ export function AuthProvider({ children }) {
 
       // Create Firebase account only after successful verification
       const { user } = await createUserWithEmailAndPassword(auth, pendingSignup.email, pendingSignup.password);
-      
+
       // Update profile with display name
       await updateProfile(user, { displayName: pendingSignup.displayName });
-      
+
       // Get current language preference from localStorage
-      const preferredLanguage = typeof window !== 'undefined' ? 
+      const preferredLanguage = typeof window !== 'undefined' ?
         localStorage.getItem('Simnetiq-language') || 'en' : 'en';
-      
+
       // Create user profile in Firestore
       await setDoc(doc(db, 'users', user.uid), {
         email: user.email,
@@ -364,18 +377,18 @@ export function AuthProvider({ children }) {
       try {
         // First try to get by UID
         const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-        
+
         let profileData = null;
-        
+
         if (userDoc.exists()) {
           profileData = userDoc.data();
         }
-        
+
         // Always also check by email to find admin documents
         const usersRef = collection(db, 'users');
         const q = query(usersRef, where('email', '==', currentUser.email));
         const querySnapshot = await getDocs(q);
-        
+
         if (!querySnapshot.empty) {
           // Look for admin role first
           let adminDoc = null;
@@ -386,7 +399,7 @@ export function AuthProvider({ children }) {
               break;
             }
           }
-          
+
           if (adminDoc) {
             const adminProfileData = adminDoc.data();
             setUserProfile(adminProfileData);
@@ -408,7 +421,7 @@ export function AuthProvider({ children }) {
       setLoading(false);
       return;
     }
-    
+
     const unsubscribe = onAuthStateChanged(authInstance, async (user) => {
       setCurrentUser(user);
       if (user) {
@@ -440,6 +453,7 @@ export function AuthProvider({ children }) {
     verifyEmailOTP,
     updateUserProfile,
     loadUserProfile,
+    loginAsGuest,
     // Admin functions
     hasAdminAccess: () => hasAdminAccess(userProfile),
     hasSuperAdminAccess: () => hasSuperAdminAccess(userProfile),
@@ -456,7 +470,7 @@ export function AuthProvider({ children }) {
         where('email', '==', email)
       );
       const existingSnapshot = await getDocs(existingQuery);
-      
+
       if (existingSnapshot.empty) {
         // Create new newsletter subscription with all provided data
         await addDoc(collection(db, 'newsletter'), {

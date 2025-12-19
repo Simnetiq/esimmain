@@ -43,7 +43,34 @@ export const useCountryFilters = (countries) => {
   const [filteredCountries, setFilteredCountries] = useState([]);
   const [topPlansByRegion, setTopPlansByRegion] = useState({});
 
-  // Fetch top plans for the popular region
+  // State for region configuration
+  const [regionConfig, setRegionConfig] = useState(null);
+
+  // Fetch region config when selectedRegion changes
+  useEffect(() => {
+    const fetchRegionConfig = async () => {
+      if (selectedRegion === 'all') {
+        setRegionConfig(null);
+        return;
+      }
+
+      try {
+        const regionDoc = await getDoc(doc(db, 'regions', selectedRegion));
+        if (regionDoc.exists()) {
+          setRegionConfig(regionDoc.data());
+        } else {
+          setRegionConfig(null);
+        }
+      } catch (error) {
+        console.error('Error fetching region configuration:', error);
+        setRegionConfig(null);
+      }
+    };
+
+    fetchRegionConfig();
+  }, [selectedRegion]);
+
+  // Fetch top plans for the popular region (Legacy support or if needed for other logic)
   useEffect(() => {
     const fetchTopPlans = async () => {
       try {
@@ -52,14 +79,14 @@ export const useCountryFilters = (countries) => {
           const data = popularRegionDoc.data();
           if (data.topPlanIds && data.topPlanIds.length > 0) {
             // Fetch the plans data
-            const plansPromises = data.topPlanIds.map(planId => 
+            const plansPromises = data.topPlanIds.map(planId =>
               getDoc(doc(db, 'dataplans', planId))
             );
             const plansSnapshots = await Promise.all(plansPromises);
             const plans = plansSnapshots
               .filter(snap => snap.exists())
               .map(snap => ({ id: snap.id, ...snap.data() }));
-            
+
             // Extract country codes from plans
             const countryCodes = new Set();
             plans.forEach(plan => {
@@ -69,7 +96,7 @@ export const useCountryFilters = (countries) => {
                 countryCodes.add(plan.country_code);
               }
             });
-            
+
             setTopPlansByRegion({
               popular: Array.from(countryCodes)
             });
@@ -92,7 +119,7 @@ export const useCountryFilters = (countries) => {
 
     setIsSearching(true);
     try {
-      
+
       if (countries && countries.length > 0) {
         const results = countries.filter(country => {
           const searchLower = term.toLowerCase();
@@ -103,7 +130,7 @@ export const useCountryFilters = (countries) => {
             country.name?.toLowerCase().includes(searchLower)
           );
         });
-        
+
         setSearchResults(results);
       } else {
         setSearchResults([]);
@@ -131,50 +158,68 @@ export const useCountryFilters = (countries) => {
   // Filter by region
   const filterByRegion = (countriesList) => {
     if (!countriesList || countriesList.length === 0) return [];
-    
+
     // If searching, don't apply region filters
     if (searchTerm) {
       return [...countriesList];
     }
-    
+
+    // 1. Check for manually defined "Popular Countries" in region config
+    // This applies to ANY region (Asia, Europe, Popular, etc.) if configured in Admin
+    if (regionConfig && regionConfig.popularCountries && regionConfig.popularCountries.length > 0) {
+      // Map codes to actual country objects
+      const selectedCountries = regionConfig.popularCountries.map(code =>
+        countriesList.find(c => c.code === code)
+      ).filter(Boolean);
+
+      if (selectedCountries.length > 0) {
+        return selectedCountries;
+      }
+    }
+
     // Filter by selected region
     if (selectedRegion === 'popular') {
-      // First, try using topPlanIds from Firebase regions collection
+      // First, try using topPlanIds from Firebase regions collection (Legacy)
       if (topPlansByRegion.popular && topPlansByRegion.popular.length > 0) {
-        const popularCountries = countriesList.filter(country => 
+        const popularCountries = countriesList.filter(country =>
           topPlansByRegion.popular.includes(country.code)
         );
-        
-        // If we found countries from topPlanIds, return them
+
         if (popularCountries.length > 0) {
           return popularCountries;
         }
       }
-      
+
       // Fallback 1: Check if country has is_popular flag from Firebase
-      const popularFlaggedCountries = countriesList.filter(country => 
+      const popularFlaggedCountries = countriesList.filter(country =>
         country.is_popular === true
       );
-      
+
       if (popularFlaggedCountries.length > 0) {
         return popularFlaggedCountries;
       }
-      
+
       // Fallback 2: Use hardcoded list
-      return countriesList.filter(country => 
+      return countriesList.filter(country =>
         popularCountryCodes.includes(country.code)
       );
     } else if (selectedRegion !== 'all') {
       // First try using the region field from Firebase
       const filtered = countriesList.filter(country => {
         if (country.region === selectedRegion) return true;
+
+        // Handle Americas mapping
+        if (selectedRegion === 'americas' && (country.region === 'north-america' || country.region === 'south-america' || country.region === 'latin-america')) {
+          return true;
+        }
+
         // Fallback to hardcoded mapping if no region field
         const regionCodes = regionMapping[selectedRegion] || [];
         return regionCodes.includes(country.code);
       });
       return filtered;
     }
-    
+
     return [...countriesList];
   };
 
@@ -183,7 +228,7 @@ export const useCountryFilters = (countries) => {
     const countriesToFilter = searchTerm ? searchResults : countries;
     const filtered = filterByRegion(countriesToFilter);
     setFilteredCountries(filtered);
-  }, [searchTerm, countries, searchResults, selectedRegion, topPlansByRegion]);
+  }, [searchTerm, countries, searchResults, selectedRegion, topPlansByRegion, regionConfig]);
 
   return {
     selectedRegion,
