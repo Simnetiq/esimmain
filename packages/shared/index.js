@@ -18,6 +18,14 @@ export { useCountryFilters } from './hooks/useCountryFilters';
 export { useRegions } from './hooks/useRegions';
 export { useLazyAuth } from './hooks/useLazyAuth';
 
+// Components
+export { default as AuthModal } from './components/AuthModal.jsx';
+export { default as FlagIcon } from './components/FlagIcon.jsx';
+export { default as Providers } from './components/Providers.jsx';
+export { default as LightProviders } from './components/LightProviders.jsx';
+export { default as Loading } from './components/Loading.jsx';
+
 // Lazy Firebase Auth (for performance optimization)
 export * from './firebase/lazyAuth';
+
 

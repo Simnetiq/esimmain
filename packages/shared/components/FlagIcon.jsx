@@ -14,11 +14,11 @@ import { getISOCode } from '@esim/shared/utils/countryCodeMap';
  * @param {boolean} squared - Use 1x1 aspect ratio (default: false, uses 4x3)
  * @param {string} className - Additional CSS classes
  */
-const FlagIcon = ({ 
-  countryCode, 
-  size = 'md', 
+const FlagIcon = ({
+  countryCode,
+  size = 'md',
   squared = false,
-  className = '' 
+  className = ''
 }) => {
   if (!countryCode) {
     return null;
@@ -26,11 +26,11 @@ const FlagIcon = ({
 
   // Convert to proper ISO code (handles both slugs and ISO codes)
   const code = getISOCode(countryCode);
-  
+
   // Determine flag path based on aspect ratio
   const aspectRatio = squared ? '1x1' : '4x3';
   const flagPath = `/flags/${aspectRatio}/${code}.svg`;
-  
+
   // Size mappings for 4:3 aspect ratio flags
   const sizeMap = {
     'xs': 'w-4 h-3',      // 16px × 12px (4:3)
@@ -41,7 +41,7 @@ const FlagIcon = ({
     '2xl': 'w-24 h-18',   // 96px × 72px (4:3)
     '3xl': 'w-32 h-24',   // 128px × 96px (4:3)
   };
-  
+
   // Size mappings for 1:1 aspect ratio flags
   const squaredSizeMap = {
     'xs': 'w-4 h-4',      // 16px × 16px
@@ -52,11 +52,11 @@ const FlagIcon = ({
     '2xl': 'w-24 h-24',   // 96px × 96px
     '3xl': 'w-32 h-32',   // 128px × 128px
   };
-  
+
   const sizeClass = squared ? squaredSizeMap[size] : sizeMap[size];
 
   return (
-    <span 
+    <span
       className={`inline-flex items-center justify-center overflow-hidden rounded-sm ${sizeClass} ${className}`}
       title={countryCode.toUpperCase()}
     >

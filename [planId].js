@@ -24,11 +24,11 @@ const formatData = (data, unit = 'GB') => {
   if (data === 'Unlimited' || data === -1 || data === Infinity) {
     return 'Unlimited';
   }
-  
+
   if (typeof data === 'string' && data.includes(unit)) {
     return data;
   }
-  
+
   return `${data} ${unit}`;
 };
 
@@ -38,7 +38,7 @@ export default function PlanDetailScreen() {
   const insets = useSafeAreaInsets();
   const { isDark, colors } = useTheme();
   const { currentUser } = useAuth();
-  
+
   const [plan, setPlan] = useState(null);
   const [country, setCountry] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -49,15 +49,15 @@ export default function PlanDetailScreen() {
     const loadPlanData = async () => {
       try {
         setLoading(true);
-        
+
         // Try to get plan from AsyncStorage (passed from bottom sheet)
         const storedPlan = await AsyncStorage.getItem('selectedPlan');
         const storedCountry = await AsyncStorage.getItem('selectedCountry');
-        
+
         if (storedPlan) {
           const planData = JSON.parse(storedPlan);
           setPlan(planData);
-          
+
           if (storedCountry) {
             const countryData = JSON.parse(storedCountry);
             setCountry(countryData);
@@ -112,7 +112,7 @@ export default function PlanDetailScreen() {
       const planDataStr = getPlanData(plan);
       const displayPrice = getDisplayPrice(plan);
       const chargePrice = getChargePrice(plan); // same priority as display to avoid mismatch
-      
+
       const orderId = plan.id || plan.slug || 'plan';
       const orderData = {
         order: orderId,
@@ -135,7 +135,7 @@ export default function PlanDetailScreen() {
 
       if (paymentResult.success) {
         console.log('✅ Payment successful, waiting for order processing...');
-        
+
         try {
           // Step 2: Wait for webhook to create the eSIM
           // The backend webhook verifies payment and creates the Airalo eSIM
@@ -178,7 +178,7 @@ export default function PlanDetailScreen() {
           });
         } catch (orderError) {
           console.error('⚠️ Order processing error:', orderError);
-          
+
           // Payment succeeded but order processing timed out
           // The webhook might still complete - user should check their orders
           Alert.alert(
@@ -186,7 +186,7 @@ export default function PlanDetailScreen() {
             'Your payment was successful! Your eSIM is being prepared. Please check "My eSIMs" shortly, or contact support if it doesn\'t appear within a few minutes.',
             [{ text: 'OK' }]
           );
-          
+
           router.push({
             pathname: '/payment-success',
             params: {
@@ -199,10 +199,10 @@ export default function PlanDetailScreen() {
       }
     } catch (error) {
       console.error('Payment error:', error);
-      
+
       const errorMessage = error.message || 'Failed to process payment. Please try again.';
       const isDevBuildError = errorMessage.includes('development build') || errorMessage.includes('Expo Go');
-      
+
       Alert.alert(
         isDevBuildError ? 'Development Build Required' : 'Payment Failed',
         errorMessage,
@@ -246,11 +246,11 @@ export default function PlanDetailScreen() {
     const validity = getPlanValidity(plan);
     const op = plan.operator || plan.provider || '';
     const dataVal = getPlanData(plan);
-    
+
     // Check for voice and SMS
     const voice = plan.voice || plan.voice_minutes || 0;
     const sms = plan.sms || 0;
-    
+
     // Extract operators from operator_coverages if available
     const operatorsList = [];
     if (plan.operator_coverages && Array.isArray(plan.operator_coverages)) {
@@ -268,7 +268,7 @@ export default function PlanDetailScreen() {
         }
       });
     }
-    
+
     return {
       originalPrice: price,
       days: validity,
@@ -287,7 +287,7 @@ export default function PlanDetailScreen() {
   if (loading) {
     return (
       <View style={styles.container}>
-        
+
         <StatusBar style={isDark ? 'light' : 'dark'} />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
@@ -303,8 +303,8 @@ export default function PlanDetailScreen() {
     return (
       <View style={styles.container}>
         <LinearGradient
-          colors={isDark 
-            ? ['#000000', '#0a0a0a', '#000000'] 
+          colors={isDark
+            ? ['#000000', '#0a0a0a', '#000000']
             : ['#f8fafc', '#f0f4ff', '#e8f0fe']
           }
           locations={[0, 0.5, 1]}
@@ -330,7 +330,7 @@ export default function PlanDetailScreen() {
 
   return (
     <View style={styles.container}>
-  
+
       <StatusBar style={isDark ? 'light' : 'dark'} />
 
       <ScrollShadow
@@ -339,14 +339,14 @@ export default function PlanDetailScreen() {
         style={styles.scrollShadow}
         color={isDark ? '#000000' : '#f8fafc'}
       >
-        <AnimatedScrollView 
+        <AnimatedScrollView
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={[
-            styles.scrollContent, 
-            { 
+            styles.scrollContent,
+            {
               paddingTop: insets.top + 12,
-              paddingBottom: insets.bottom + 40 
+              paddingBottom: insets.bottom + 40
             }
           ]}
         >
@@ -375,326 +375,45 @@ export default function PlanDetailScreen() {
                 </View>
               </Pressable>
             )}
-            
+
             <Text style={[styles.headerTitle, { color: colors.text }]}>
               Plan Details
             </Text>
             <View style={styles.headerSpacer} />
           </View>
-        {/* Country & Plan Header */}
-        {country && (
-          <Card style={[
-            styles.countryHeader, 
-            { 
-              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.8)',
-              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
-              borderWidth: 1,
-            },
-            styles.cardShadow
-          ]}>
-            <View style={styles.countryInfo}>
-              <View
-                style={[styles.flagContainer, { backgroundColor: colors.input }]}
-              >
-                <FlagIcon
-                  countryCode={country.code || country.slug || country.name}
-                  firebasePhotoUrl={country.photo}
-                  width={60}
-                  height={60}
-                  isDark={isDark}
-                  isRegional={country.is_regional}
-                  aspectRatio="1x1"
-                />
-              </View>
-              <View style={styles.countryTextContainer}>
-                <Text style={[styles.countryName, { color: colors.text }]}>
-                  {country.displayName || country.name}
-                </Text>
-                <Text style={[styles.planSubtitle, { color: colors.textSecondary }]}>
-                  {formattedData}
-                </Text>
-              </View>
-            </View>
-          </Card>
-        )}
-
-        {/* Plan Details Card - Redesigned */}
-        <Card style={[
-          styles.detailsCard, 
-          { 
-            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.8)',
-            borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
-            borderWidth: 1,
-          },
-          styles.cardShadow
-        ]}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            Plan Details
-          </Text>
-
-          {/* Data Amount */}
-          <View style={[
-            styles.planInfoRow,
-            { borderBottomColor: colors.divider }
-          ]}>
-            <View style={[styles.planInfoIconContainer, { backgroundColor: isDark ? 'rgba(59, 130, 246, 0.15)' : 'rgba(59, 130, 246, 0.1)' }]}>
-              <Wifi size={18} color={colors.primary} />
-            </View>
-            <Text style={[styles.planInfoLabel, { color: colors.textSecondary }]}>Data</Text>
-            <Text style={[styles.planInfoValue, { color: colors.text }]}>{formattedData}</Text>
-          </View>
-
-          {/* Validity */}
-          <View style={[
-            styles.planInfoRow,
-            { borderBottomColor: colors.divider }
-          ]}>
-            <View style={[styles.planInfoIconContainer, { backgroundColor: isDark ? 'rgba(59, 130, 246, 0.15)' : 'rgba(59, 130, 246, 0.1)' }]}>
-              <Clock size={18} color={colors.primary} />
-            </View>
-            <Text style={[styles.planInfoLabel, { color: colors.textSecondary }]}>Validity</Text>
-            <Text style={[styles.planInfoValue, { color: colors.text }]}>{days} {days === 1 ? 'day' : 'days'}</Text>
-          </View>
-
-          {/* Voice Minutes - if available */}
-          {hasVoice && (
-            <View style={[
-              styles.planInfoRow,
-              { borderBottomColor: colors.divider }
+          {/* Country & Plan Header */}
+          {country && (
+            <Card style={[
+              styles.countryHeader,
+              {
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.8)',
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+                borderWidth: 1,
+              },
+              styles.cardShadow
             ]}>
-              <View style={[styles.planInfoIconContainer, { backgroundColor: 'rgba(34, 197, 94, 0.15)' }]}>
-                <Phone size={18} color={colors.success} />
-              </View>
-              <Text style={[styles.planInfoLabel, { color: colors.textSecondary }]}>Voice</Text>
-              <Text style={[styles.planInfoValue, { color: colors.success }]}>{voiceMinutes} min</Text>
-            </View>
-          )}
-
-          {/* SMS - if available */}
-          {hasSms && (
-            <View style={[
-              styles.planInfoRow,
-              { borderBottomColor: colors.divider }
-            ]}>
-              <View style={[styles.planInfoIconContainer, { backgroundColor: 'rgba(34, 197, 94, 0.15)' }]}>
-                <MessageSquare size={18} color={colors.success} />
-              </View>
-              <Text style={[styles.planInfoLabel, { color: colors.textSecondary }]}>SMS</Text>
-              <Text style={[styles.planInfoValue, { color: colors.success }]}>{smsCount} texts</Text>
-            </View>
-          )}
-
-          {/* eSIM Provider/Operator */}
-          {operator && (
-            <View style={[
-              styles.planInfoRow,
-              { borderBottomWidth: 0 }
-            ]}>
-              <View style={[styles.planInfoIconContainer, { backgroundColor: isDark ? 'rgba(147, 51, 234, 0.15)' : 'rgba(147, 51, 234, 0.1)' }]}>
-                <Smartphone size={18} color="#9333ea" />
-              </View>
-              <Text style={[styles.planInfoLabel, { color: colors.textSecondary }]}>Provider</Text>
-              <Text style={[styles.planInfoValue, { color: colors.text }]}>{operator}</Text>
-            </View>
-          )}
-
-          {/* Price Display */}
-          <View style={[
-            styles.priceDisplayContainer,
-          
-          ]}>
-            <View style={styles.priceDisplayContent}>
-              <Text style={[styles.priceDisplayLabel, { color: colors.textSecondary }]}>Price</Text>
-              <Text style={[styles.priceDisplayValue, { color: colors.primary }]}>{formattedPrice}</Text>
-            </View>
-         
-          </View>
-
-          {/* Payment Button */}
-          <View style={styles.paymentButtonWrapper}>
-            <Button
-              variant="primary"
-              size="lg"
-              onPress={handlePayment}
-              disabled={processingPayment || !termsAccepted}
-              style={[
-                styles.paymentButton,
-                {
-                  backgroundColor: termsAccepted ? colors.primary : colors.gray500,
-                  opacity: termsAccepted ? 1 : 0.5,
-                }
-              ]}
-            >
-              {processingPayment ? (
-                <ActivityIndicator size="small" color="#fff" />
-              ) : (
-                <View style={styles.buttonContent}>
-                  <CreditCard size={20} color="#fff" />
-                  <Text style={styles.paymentButtonText}>
-                    Pay Securely
-                  </Text>
-                </View>
-              )}
-            </Button>
-          </View>
-
-          {/* Terms Checkbox */}
-          <View style={styles.termsContainerWithMargin}>
-            <TouchableOpacity
-              style={styles.checkboxRow}
-              onPress={handleToggleTerms}
-              activeOpacity={0.7}
-            >
-              <View style={[
-                styles.checkbox,
-                { 
-                  backgroundColor: termsAccepted ? colors.primary : 'transparent',
-                  borderColor: termsAccepted ? colors.primary : colors.border,
-                }
-              ]}>
-                {termsAccepted && <Check size={14} color={colors.buttonText} />}
-              </View>
-              <Text style={[styles.termsText, { color: colors.text }]}>
-                I agree to the{' '}
-                <Text
-                  style={[styles.termsLink, { color: colors.primary }]}
-                  onPress={handleTermsPress}
+              <View style={styles.countryInfo}>
+                <View
+                  style={[styles.flagContainer, { backgroundColor: colors.input }]}
                 >
-                  Terms of Service
-                </Text>
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </Card>
 
-        {/* Features */}
-        <Card style={[
-          styles.featuresCard, 
-          { 
-            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.8)',
-            borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
-            borderWidth: 1,
-          },
-          styles.cardShadow
-        ]}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            What's Included
-          </Text>
-          
-          <View style={styles.featureList}>
-            {/* Voice Minutes - if available */}
-            {hasVoice && (
-              <View style={[
-                styles.includedFeatureRow,
-                { 
-                  backgroundColor: isDark ? 'rgba(34, 197, 94, 0.1)' : 'rgba(34, 197, 94, 0.08)',
-                  borderColor: isDark ? 'rgba(34, 197, 94, 0.2)' : 'rgba(34, 197, 94, 0.15)',
-                }
-              ]}>
-                <View style={[styles.includedIconContainer, { backgroundColor: 'rgba(34, 197, 94, 0.15)' }]}>
-                  <Phone size={18} color={colors.success} />
                 </View>
-                <View style={styles.includedContent}>
-                  <Text style={[styles.includedLabel, { color: colors.text }]}>
-                    Voice Calls
+                <View style={styles.countryTextContainer}>
+                  <Text style={[styles.countryName, { color: colors.text }]}>
+                    {country.displayName || country.name}
                   </Text>
-                  <Text style={[styles.includedValue, { color: colors.success }]}>
-                    {voiceMinutes} {voiceMinutes === 1 ? 'minute' : 'minutes'} included
+                  <Text style={[styles.planSubtitle, { color: colors.textSecondary }]}>
+                    {formattedData}
                   </Text>
                 </View>
-                <Check size={20} color={colors.success} />
               </View>
-            )}
+            </Card>
+          )}
 
-            {/* SMS - if available */}
-            {hasSms && (
-              <View style={[
-                styles.includedFeatureRow,
-                { 
-                  backgroundColor: isDark ? 'rgba(34, 197, 94, 0.1)' : 'rgba(34, 197, 94, 0.08)',
-                  borderColor: isDark ? 'rgba(34, 197, 94, 0.2)' : 'rgba(34, 197, 94, 0.15)',
-                }
-              ]}>
-                <View style={[styles.includedIconContainer, { backgroundColor: 'rgba(34, 197, 94, 0.15)' }]}>
-                  <MessageSquare size={18} color={colors.success} />
-                </View>
-                <View style={styles.includedContent}>
-                  <Text style={[styles.includedLabel, { color: colors.text }]}>
-                    Text Messages
-                  </Text>
-                  <Text style={[styles.includedValue, { color: colors.success }]}>
-                    {smsCount} SMS included
-                  </Text>
-                </View>
-                <Check size={20} color={colors.success} />
-              </View>
-            )}
-
-            {/* Data - always included */}
-            <View style={[
-              styles.includedFeatureRow,
-              { 
-                backgroundColor: isDark ? 'rgba(34, 197, 94, 0.1)' : 'rgba(34, 197, 94, 0.08)',
-                borderColor: isDark ? 'rgba(34, 197, 94, 0.2)' : 'rgba(34, 197, 94, 0.15)',
-              }
-            ]}>
-              <View style={[styles.includedIconContainer, { backgroundColor: 'rgba(34, 197, 94, 0.15)' }]}>
-                <Wifi size={18} color={colors.success} />
-              </View>
-              <View style={styles.includedContent}>
-                <Text style={[styles.includedLabel, { color: colors.text }]}>
-                  Mobile Data
-                </Text>
-                <Text style={[styles.includedValue, { color: colors.success }]}>
-                  {formattedData} included
-                </Text>
-              </View>
-              <Check size={20} color={colors.success} />
-            </View>
-
-            {/* Standard features */}
-            <View style={styles.featureItem}>
-              <Check size={18} color={colors.success} />
-              <Text style={[styles.featureText, { color: colors.text }]}>
-                Instant activation
-              </Text>
-            </View>
-            <View style={styles.featureItem}>
-              <Check size={18} color={colors.success} />
-              <Text style={[styles.featureText, { color: colors.text }]}>
-                No contracts or commitments
-              </Text>
-            </View>
-            <View style={styles.featureItem}>
-              <Check size={18} color={colors.success} />
-              <Text style={[styles.featureText, { color: colors.text }]}>
-                Works in {country?.displayName || country?.name || 'selected country'}
-              </Text>
-            </View>
-            <View style={styles.featureItem}>
-              <Check size={18} color={colors.success} />
-              <Text style={[styles.featureText, { color: colors.text }]}>
-                24/7 customer support
-              </Text>
-            </View>
-
-            {/* Show "data only" message only if no voice and no SMS */}
-            {!hasVoice && !hasSms && (
-              <View style={styles.featureItem}>
-                <X size={18} color={colors.error} />
-                <Text style={[styles.featureText, { color: colors.textSecondary }]}>
-                  SMS and calls are not included (data only)
-                </Text>
-              </View>
-            )}
-          </View>
-        </Card>
-
-        {/* Operators/Networks - if multiple operators available */}
-        {operators.length > 0 && (
+          {/* Plan Details Card - Redesigned */}
           <Card style={[
-            styles.operatorsCard, 
-            { 
+            styles.detailsCard,
+            {
               backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.8)',
               borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
               borderWidth: 1,
@@ -702,190 +421,463 @@ export default function PlanDetailScreen() {
             styles.cardShadow
           ]}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>
-              Supported Networks
+              Plan Details
             </Text>
-            <Text style={[styles.operatorsSubtitle, { color: colors.textSecondary }]}>
-              {plan.networks || `${operators.length}+ networks available`}
-            </Text>
-            
-            <View style={styles.operatorsList}>
-              {operators.map((op, index) => (
-                <View 
-                  key={`${op.name}-${index}`}
-                  style={[
-                    styles.operatorRow,
-                    { 
-                      borderBottomWidth: index < operators.length - 1 ? 1 : 0,
-                      borderBottomColor: colors.divider,
-                    }
-                  ]}
-                >
-                  <View style={[styles.operatorIconContainer, { backgroundColor: colors.input }]}>
-                    <Radio size={16} color={colors.primary} />
-                  </View>
-                  <View style={styles.operatorContent}>
-                    <Text style={[styles.operatorName, { color: colors.text }]}>
-                      {op.name}
-                    </Text>
-                  </View>
-                  <View style={[
-                    styles.networkTypeBadge,
-                    { 
-                      backgroundColor: op.type === '5G' 
-                        ? (isDark ? 'rgba(59, 130, 246, 0.2)' : 'rgba(59, 130, 246, 0.1)')
-                        : (isDark ? 'rgba(156, 163, 175, 0.2)' : 'rgba(156, 163, 175, 0.1)'),
-                    }
-                  ]}>
-                    <Text style={[
-                      styles.networkTypeText,
-                      { 
-                        color: op.type === '5G' ? colors.primary : colors.textSecondary,
-                      }
-                    ]}>
-                      {op.type}
-                    </Text>
-                  </View>
+
+            {/* Data Amount */}
+            <View style={[
+              styles.planInfoRow,
+              { borderBottomColor: colors.divider }
+            ]}>
+              <View style={[styles.planInfoIconContainer, { backgroundColor: isDark ? 'rgba(59, 130, 246, 0.15)' : 'rgba(59, 130, 246, 0.1)' }]}>
+                <Wifi size={18} color={colors.primary} />
+              </View>
+              <Text style={[styles.planInfoLabel, { color: colors.textSecondary }]}>Data</Text>
+              <Text style={[styles.planInfoValue, { color: colors.text }]}>{formattedData}</Text>
+            </View>
+
+            {/* Validity */}
+            <View style={[
+              styles.planInfoRow,
+              { borderBottomColor: colors.divider }
+            ]}>
+              <View style={[styles.planInfoIconContainer, { backgroundColor: isDark ? 'rgba(59, 130, 246, 0.15)' : 'rgba(59, 130, 246, 0.1)' }]}>
+                <Clock size={18} color={colors.primary} />
+              </View>
+              <Text style={[styles.planInfoLabel, { color: colors.textSecondary }]}>Validity</Text>
+              <Text style={[styles.planInfoValue, { color: colors.text }]}>{days} {days === 1 ? 'day' : 'days'}</Text>
+            </View>
+
+            {/* Voice Minutes - if available */}
+            {hasVoice && (
+              <View style={[
+                styles.planInfoRow,
+                { borderBottomColor: colors.divider }
+              ]}>
+                <View style={[styles.planInfoIconContainer, { backgroundColor: 'rgba(34, 197, 94, 0.15)' }]}>
+                  <Phone size={18} color={colors.success} />
                 </View>
-              ))}
+                <Text style={[styles.planInfoLabel, { color: colors.textSecondary }]}>Voice</Text>
+                <Text style={[styles.planInfoValue, { color: colors.success }]}>{voiceMinutes} min</Text>
+              </View>
+            )}
+
+            {/* SMS - if available */}
+            {hasSms && (
+              <View style={[
+                styles.planInfoRow,
+                { borderBottomColor: colors.divider }
+              ]}>
+                <View style={[styles.planInfoIconContainer, { backgroundColor: 'rgba(34, 197, 94, 0.15)' }]}>
+                  <MessageSquare size={18} color={colors.success} />
+                </View>
+                <Text style={[styles.planInfoLabel, { color: colors.textSecondary }]}>SMS</Text>
+                <Text style={[styles.planInfoValue, { color: colors.success }]}>{smsCount} texts</Text>
+              </View>
+            )}
+
+            {/* eSIM Provider/Operator */}
+            {operator && (
+              <View style={[
+                styles.planInfoRow,
+                { borderBottomWidth: 0 }
+              ]}>
+                <View style={[styles.planInfoIconContainer, { backgroundColor: isDark ? 'rgba(147, 51, 234, 0.15)' : 'rgba(147, 51, 234, 0.1)' }]}>
+                  <Smartphone size={18} color="#9333ea" />
+                </View>
+                <Text style={[styles.planInfoLabel, { color: colors.textSecondary }]}>Provider</Text>
+                <Text style={[styles.planInfoValue, { color: colors.text }]}>{operator}</Text>
+              </View>
+            )}
+
+            {/* Price Display */}
+            <View style={[
+              styles.priceDisplayContainer,
+
+            ]}>
+              <View style={styles.priceDisplayContent}>
+                <Text style={[styles.priceDisplayLabel, { color: colors.textSecondary }]}>Price</Text>
+                <Text style={[styles.priceDisplayValue, { color: colors.primary }]}>{formattedPrice}</Text>
+              </View>
+
+            </View>
+
+            {/* Payment Button */}
+            <View style={styles.paymentButtonWrapper}>
+              <Button
+                variant="primary"
+                size="lg"
+                onPress={handlePayment}
+                disabled={processingPayment || !termsAccepted}
+                style={[
+                  styles.paymentButton,
+                  {
+                    backgroundColor: termsAccepted ? colors.primary : colors.gray500,
+                    opacity: termsAccepted ? 1 : 0.5,
+                  }
+                ]}
+              >
+                {processingPayment ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <View style={styles.buttonContent}>
+                    <CreditCard size={20} color="#fff" />
+                    <Text style={styles.paymentButtonText}>
+                      Pay Securely
+                    </Text>
+                  </View>
+                )}
+              </Button>
+            </View>
+
+            {/* Terms Checkbox */}
+            <View style={styles.termsContainerWithMargin}>
+              <TouchableOpacity
+                style={styles.checkboxRow}
+                onPress={handleToggleTerms}
+                activeOpacity={0.7}
+              >
+                <View style={[
+                  styles.checkbox,
+                  {
+                    backgroundColor: termsAccepted ? colors.primary : 'transparent',
+                    borderColor: termsAccepted ? colors.primary : colors.border,
+                  }
+                ]}>
+                  {termsAccepted && <Check size={14} color={colors.buttonText} />}
+                </View>
+                <Text style={[styles.termsText, { color: colors.text }]}>
+                  I agree to the{' '}
+                  <Text
+                    style={[styles.termsLink, { color: colors.primary }]}
+                    onPress={handleTermsPress}
+                  >
+                    Terms of Service
+                  </Text>
+                </Text>
+              </TouchableOpacity>
             </View>
           </Card>
-        )}
 
-        {/* Security Features */}
-        <Card style={[
-          styles.securityCard, 
-          { 
-            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.8)',
-            borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
-            borderWidth: 1,
-          },
-          styles.cardShadow
-        ]}>
-          <View style={styles.securityItem}>
-            <Shield size={20} color={colors.primary} />
-            <Text style={[styles.securityText, { color: colors.text }]}>
-              Bank-level security
+          {/* Features */}
+          <Card style={[
+            styles.featuresCard,
+            {
+              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.8)',
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+              borderWidth: 1,
+            },
+            styles.cardShadow
+          ]}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              What's Included
             </Text>
-          </View>
-          <View style={styles.securityItem}>
-            <Zap size={20} color={colors.primary} />
-            <Text style={[styles.securityText, { color: colors.text }]}>
-              Instant activation
-            </Text>
-          </View>
-          <View style={styles.securityItem}>
-            <Globe size={20} color={colors.primary} />
-            <Text style={[styles.securityText, { color: colors.text }]}>
-              Global coverage
-            </Text>
-          </View>
-        </Card>
 
-        {/* Activation Instructions */}
-        <Card style={[
-          styles.activationCard, 
-          { 
-            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.8)',
-            borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
-            borderWidth: 1,
-          },
-          styles.cardShadow
-        ]}>
-          <View style={styles.activationHeader}>
-            <Info size={20} color={colors.primary} />
-            <Text style={[styles.sectionTitle, { color: colors.text, marginBottom: 0 }]}>
-              Activation Instructions
-            </Text>
-          </View>
-          
-          {Platform.OS === 'ios' ? (
-            <View style={styles.instructionsList}>
-              <View style={styles.instructionStep}>
-                <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
-                  <Text style={[styles.stepNumberText, { color: colors.buttonText }]}>1</Text>
+            <View style={styles.featureList}>
+              {/* Voice Minutes - if available */}
+              {hasVoice && (
+                <View style={[
+                  styles.includedFeatureRow,
+                  {
+                    backgroundColor: isDark ? 'rgba(34, 197, 94, 0.1)' : 'rgba(34, 197, 94, 0.08)',
+                    borderColor: isDark ? 'rgba(34, 197, 94, 0.2)' : 'rgba(34, 197, 94, 0.15)',
+                  }
+                ]}>
+                  <View style={[styles.includedIconContainer, { backgroundColor: 'rgba(34, 197, 94, 0.15)' }]}>
+                    <Phone size={18} color={colors.success} />
+                  </View>
+                  <View style={styles.includedContent}>
+                    <Text style={[styles.includedLabel, { color: colors.text }]}>
+                      Voice Calls
+                    </Text>
+                    <Text style={[styles.includedValue, { color: colors.success }]}>
+                      {voiceMinutes} {voiceMinutes === 1 ? 'minute' : 'minutes'} included
+                    </Text>
+                  </View>
+                  <Check size={20} color={colors.success} />
                 </View>
-                <Text style={[styles.instructionText, { color: colors.text }]}>
-                  After purchase, you'll receive a QR code and activation details via email
+              )}
+
+              {/* SMS - if available */}
+              {hasSms && (
+                <View style={[
+                  styles.includedFeatureRow,
+                  {
+                    backgroundColor: isDark ? 'rgba(34, 197, 94, 0.1)' : 'rgba(34, 197, 94, 0.08)',
+                    borderColor: isDark ? 'rgba(34, 197, 94, 0.2)' : 'rgba(34, 197, 94, 0.15)',
+                  }
+                ]}>
+                  <View style={[styles.includedIconContainer, { backgroundColor: 'rgba(34, 197, 94, 0.15)' }]}>
+                    <MessageSquare size={18} color={colors.success} />
+                  </View>
+                  <View style={styles.includedContent}>
+                    <Text style={[styles.includedLabel, { color: colors.text }]}>
+                      Text Messages
+                    </Text>
+                    <Text style={[styles.includedValue, { color: colors.success }]}>
+                      {smsCount} SMS included
+                    </Text>
+                  </View>
+                  <Check size={20} color={colors.success} />
+                </View>
+              )}
+
+              {/* Data - always included */}
+              <View style={[
+                styles.includedFeatureRow,
+                {
+                  backgroundColor: isDark ? 'rgba(34, 197, 94, 0.1)' : 'rgba(34, 197, 94, 0.08)',
+                  borderColor: isDark ? 'rgba(34, 197, 94, 0.2)' : 'rgba(34, 197, 94, 0.15)',
+                }
+              ]}>
+                <View style={[styles.includedIconContainer, { backgroundColor: 'rgba(34, 197, 94, 0.15)' }]}>
+                  <Wifi size={18} color={colors.success} />
+                </View>
+                <View style={styles.includedContent}>
+                  <Text style={[styles.includedLabel, { color: colors.text }]}>
+                    Mobile Data
+                  </Text>
+                  <Text style={[styles.includedValue, { color: colors.success }]}>
+                    {formattedData} included
+                  </Text>
+                </View>
+                <Check size={20} color={colors.success} />
+              </View>
+
+              {/* Standard features */}
+              <View style={styles.featureItem}>
+                <Check size={18} color={colors.success} />
+                <Text style={[styles.featureText, { color: colors.text }]}>
+                  Instant activation
                 </Text>
               </View>
-              <View style={styles.instructionStep}>
-                <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
-                  <Text style={[styles.stepNumberText, { color: colors.buttonText }]}>2</Text>
-                </View>
-                <Text style={[styles.instructionText, { color: colors.text }]}>
-                  Go to Settings → Cellular → Add eSIM
+              <View style={styles.featureItem}>
+                <Check size={18} color={colors.success} />
+                <Text style={[styles.featureText, { color: colors.text }]}>
+                  No contracts or commitments
                 </Text>
               </View>
-              <View style={styles.instructionStep}>
-                <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
-                  <Text style={[styles.stepNumberText, { color: colors.buttonText }]}>3</Text>
-                </View>
-                <Text style={[styles.instructionText, { color: colors.text }]}>
-                  Scan the QR code or enter the activation code manually
+              <View style={styles.featureItem}>
+                <Check size={18} color={colors.success} />
+                <Text style={[styles.featureText, { color: colors.text }]}>
+                  Works in {country?.displayName || country?.name || 'selected country'}
                 </Text>
               </View>
-              <View style={styles.instructionStep}>
-                <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
-                  <Text style={[styles.stepNumberText, { color: colors.buttonText }]}>4</Text>
-                </View>
-                <Text style={[styles.instructionText, { color: colors.text }]}>
-                  Label your eSIM (e.g., "Travel Data") and set it as your data line
+              <View style={styles.featureItem}>
+                <Check size={18} color={colors.success} />
+                <Text style={[styles.featureText, { color: colors.text }]}>
+                  24/7 customer support
                 </Text>
               </View>
-              <View style={styles.instructionStep}>
-                <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
-                  <Text style={[styles.stepNumberText, { color: colors.buttonText }]}>5</Text>
+
+              {/* Show "data only" message only if no voice and no SMS */}
+              {!hasVoice && !hasSms && (
+                <View style={styles.featureItem}>
+                  <X size={18} color={colors.error} />
+                  <Text style={[styles.featureText, { color: colors.textSecondary }]}>
+                    SMS and calls are not included (data only)
+                  </Text>
                 </View>
-                <Text style={[styles.instructionText, { color: colors.text }]}>
-                  Enable "Allow Cellular Data Switching" to use both SIMs seamlessly
-                </Text>
-              </View>
+              )}
             </View>
-          ) : (
-            <View style={styles.instructionsList}>
-              <View style={styles.instructionStep}>
-                <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
-                  <Text style={[styles.stepNumberText, { color: colors.buttonText }]}>1</Text>
-                </View>
-                <Text style={[styles.instructionText, { color: colors.text }]}>
-                  After purchase, you'll receive a QR code and activation details via email
-                </Text>
+          </Card>
+
+          {/* Operators/Networks - if multiple operators available */}
+          {operators.length > 0 && (
+            <Card style={[
+              styles.operatorsCard,
+              {
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.8)',
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+                borderWidth: 1,
+              },
+              styles.cardShadow
+            ]}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                Supported Networks
+              </Text>
+              <Text style={[styles.operatorsSubtitle, { color: colors.textSecondary }]}>
+                {plan.networks || `${operators.length}+ networks available`}
+              </Text>
+
+              <View style={styles.operatorsList}>
+                {operators.map((op, index) => (
+                  <View
+                    key={`${op.name}-${index}`}
+                    style={[
+                      styles.operatorRow,
+                      {
+                        borderBottomWidth: index < operators.length - 1 ? 1 : 0,
+                        borderBottomColor: colors.divider,
+                      }
+                    ]}
+                  >
+                    <View style={[styles.operatorIconContainer, { backgroundColor: colors.input }]}>
+                      <Radio size={16} color={colors.primary} />
+                    </View>
+                    <View style={styles.operatorContent}>
+                      <Text style={[styles.operatorName, { color: colors.text }]}>
+                        {op.name}
+                      </Text>
+                    </View>
+                    <View style={[
+                      styles.networkTypeBadge,
+                      {
+                        backgroundColor: op.type === '5G'
+                          ? (isDark ? 'rgba(59, 130, 246, 0.2)' : 'rgba(59, 130, 246, 0.1)')
+                          : (isDark ? 'rgba(156, 163, 175, 0.2)' : 'rgba(156, 163, 175, 0.1)'),
+                      }
+                    ]}>
+                      <Text style={[
+                        styles.networkTypeText,
+                        {
+                          color: op.type === '5G' ? colors.primary : colors.textSecondary,
+                        }
+                      ]}>
+                        {op.type}
+                      </Text>
+                    </View>
+                  </View>
+                ))}
               </View>
-              <View style={styles.instructionStep}>
-                <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
-                  <Text style={[styles.stepNumberText, { color: colors.buttonText }]}>2</Text>
-                </View>
-                <Text style={[styles.instructionText, { color: colors.text }]}>
-                  Go to Settings → Network & internet → SIMs → Add SIM → Download a SIM instead
-                </Text>
-              </View>
-              <View style={styles.instructionStep}>
-                <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
-                  <Text style={[styles.stepNumberText, { color: colors.buttonText }]}>3</Text>
-                </View>
-                <Text style={[styles.instructionText, { color: colors.text }]}>
-                  Scan the QR code or enter the activation code manually
-                </Text>
-              </View>
-              <View style={styles.instructionStep}>
-                <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
-                  <Text style={[styles.stepNumberText, { color: colors.buttonText }]}>4</Text>
-                </View>
-                <Text style={[styles.instructionText, { color: colors.text }]}>
-                  Name your eSIM profile and select it for mobile data
-                </Text>
-              </View>
-              <View style={styles.instructionStep}>
-                <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
-                  <Text style={[styles.stepNumberText, { color: colors.buttonText }]}>5</Text>
-                </View>
-                <Text style={[styles.instructionText, { color: colors.text }]}>
-                  Enable "Mobile data" for your eSIM in SIM settings
-                </Text>
-              </View>
-            </View>
+            </Card>
           )}
-        </Card>
+
+          {/* Security Features */}
+          <Card style={[
+            styles.securityCard,
+            {
+              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.8)',
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+              borderWidth: 1,
+            },
+            styles.cardShadow
+          ]}>
+            <View style={styles.securityItem}>
+              <Shield size={20} color={colors.primary} />
+              <Text style={[styles.securityText, { color: colors.text }]}>
+                Bank-level security
+              </Text>
+            </View>
+            <View style={styles.securityItem}>
+              <Zap size={20} color={colors.primary} />
+              <Text style={[styles.securityText, { color: colors.text }]}>
+                Instant activation
+              </Text>
+            </View>
+            <View style={styles.securityItem}>
+              <Globe size={20} color={colors.primary} />
+              <Text style={[styles.securityText, { color: colors.text }]}>
+                Global coverage
+              </Text>
+            </View>
+          </Card>
+
+          {/* Activation Instructions */}
+          <Card style={[
+            styles.activationCard,
+            {
+              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.8)',
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+              borderWidth: 1,
+            },
+            styles.cardShadow
+          ]}>
+            <View style={styles.activationHeader}>
+              <Info size={20} color={colors.primary} />
+              <Text style={[styles.sectionTitle, { color: colors.text, marginBottom: 0 }]}>
+                Activation Instructions
+              </Text>
+            </View>
+
+            {Platform.OS === 'ios' ? (
+              <View style={styles.instructionsList}>
+                <View style={styles.instructionStep}>
+                  <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
+                    <Text style={[styles.stepNumberText, { color: colors.buttonText }]}>1</Text>
+                  </View>
+                  <Text style={[styles.instructionText, { color: colors.text }]}>
+                    After purchase, you'll receive a QR code and activation details via email
+                  </Text>
+                </View>
+                <View style={styles.instructionStep}>
+                  <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
+                    <Text style={[styles.stepNumberText, { color: colors.buttonText }]}>2</Text>
+                  </View>
+                  <Text style={[styles.instructionText, { color: colors.text }]}>
+                    Go to Settings → Cellular → Add eSIM
+                  </Text>
+                </View>
+                <View style={styles.instructionStep}>
+                  <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
+                    <Text style={[styles.stepNumberText, { color: colors.buttonText }]}>3</Text>
+                  </View>
+                  <Text style={[styles.instructionText, { color: colors.text }]}>
+                    Scan the QR code or enter the activation code manually
+                  </Text>
+                </View>
+                <View style={styles.instructionStep}>
+                  <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
+                    <Text style={[styles.stepNumberText, { color: colors.buttonText }]}>4</Text>
+                  </View>
+                  <Text style={[styles.instructionText, { color: colors.text }]}>
+                    Label your eSIM (e.g., "Travel Data") and set it as your data line
+                  </Text>
+                </View>
+                <View style={styles.instructionStep}>
+                  <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
+                    <Text style={[styles.stepNumberText, { color: colors.buttonText }]}>5</Text>
+                  </View>
+                  <Text style={[styles.instructionText, { color: colors.text }]}>
+                    Enable "Allow Cellular Data Switching" to use both SIMs seamlessly
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              <View style={styles.instructionsList}>
+                <View style={styles.instructionStep}>
+                  <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
+                    <Text style={[styles.stepNumberText, { color: colors.buttonText }]}>1</Text>
+                  </View>
+                  <Text style={[styles.instructionText, { color: colors.text }]}>
+                    After purchase, you'll receive a QR code and activation details via email
+                  </Text>
+                </View>
+                <View style={styles.instructionStep}>
+                  <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
+                    <Text style={[styles.stepNumberText, { color: colors.buttonText }]}>2</Text>
+                  </View>
+                  <Text style={[styles.instructionText, { color: colors.text }]}>
+                    Go to Settings → Network & internet → SIMs → Add SIM → Download a SIM instead
+                  </Text>
+                </View>
+                <View style={styles.instructionStep}>
+                  <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
+                    <Text style={[styles.stepNumberText, { color: colors.buttonText }]}>3</Text>
+                  </View>
+                  <Text style={[styles.instructionText, { color: colors.text }]}>
+                    Scan the QR code or enter the activation code manually
+                  </Text>
+                </View>
+                <View style={styles.instructionStep}>
+                  <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
+                    <Text style={[styles.stepNumberText, { color: colors.buttonText }]}>4</Text>
+                  </View>
+                  <Text style={[styles.instructionText, { color: colors.text }]}>
+                    Name your eSIM profile and select it for mobile data
+                  </Text>
+                </View>
+                <View style={styles.instructionStep}>
+                  <View style={[styles.stepNumber, { backgroundColor: colors.primary }]}>
+                    <Text style={[styles.stepNumberText, { color: colors.buttonText }]}>5</Text>
+                  </View>
+                  <Text style={[styles.instructionText, { color: colors.text }]}>
+                    Enable "Mobile data" for your eSIM in SIM settings
+                  </Text>
+                </View>
+              </View>
+            )}
+          </Card>
 
         </AnimatedScrollView>
       </ScrollShadow>
@@ -1048,7 +1040,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     borderRadius: 16,
-   
+
     marginTop: 16,
   },
   priceDisplayContent: {
@@ -1109,7 +1101,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginBottom: 4,
   },
-  priceValue: { 
+  priceValue: {
     fontSize: 32,
     fontWeight: '400',
   },

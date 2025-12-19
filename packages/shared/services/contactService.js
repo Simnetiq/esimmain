@@ -1,14 +1,14 @@
-import { 
-  collection, 
-  doc, 
-  getDocs, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  query, 
-  where, 
-  orderBy, 
-  serverTimestamp 
+import {
+  collection,
+  doc,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  orderBy,
+  serverTimestamp
 } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
@@ -18,6 +18,9 @@ const createContactRequestData = (requestData) => {
     name: requestData.name || '',
     email: requestData.email || '',
     message: requestData.message || '',
+    type: requestData.type || 'contact', // contact, deletion_request
+    agreementAccepted: requestData.agreementAccepted || false,
+    agreementText: requestData.agreementText || '',
     status: 'new', // new, in_progress, resolved, closed
     priority: 'medium', // low, medium, high, urgent
     createdAt: serverTimestamp(),
@@ -85,15 +88,15 @@ export const updateContactRequestStatus = async (requestId, status, notes = '') 
       status,
       updatedAt: serverTimestamp()
     };
-    
+
     if (status === 'resolved' || status === 'closed') {
       updateData.resolvedAt = serverTimestamp();
     }
-    
+
     if (notes) {
       updateData.notes = [notes];
     }
-    
+
     await updateDoc(requestRef, updateData);
     return { success: true };
   } catch (error) {
