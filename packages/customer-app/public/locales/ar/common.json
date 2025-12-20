@@ -303,14 +303,7 @@
     "welcomeMessage": "مرحباً بك في Simnetiq - حل eSIM العالمي الخاص بك",
     "trustedByThousands": "موثوق من قبل آلاف المسافرين حول العالم"
   },
-  "dashboard": {
-    "checkingEsimDetails": "يتم فحص تفاصيل eSIM...",
-    "checkEsimDetailsInApi": "فحص تفاصيل eSIM في API",
-    "checkingUsage": "يتم فحص الاستخدام...",
-    "checkUsageAndStatus": "فحص الاستخدام والحالة",
-    "openInAppleEsim": "فتح في Apple eSIM",
-    "downloadQrCode": "تحميل الرمز QR"
-  },
+
   "QRCodeModal": {
     
     "esimQrCode": "رمز QR eSIM",
