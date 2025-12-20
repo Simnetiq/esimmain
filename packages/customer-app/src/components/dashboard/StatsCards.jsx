@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Globe, QrCode, Wallet, Users } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
@@ -7,37 +7,48 @@ import { formatPrice } from '@esim/shared/utils/priceUtils';
 
 const StatsCards = ({ orders, activeOrders, referralStats }) => {
   const router = useRouter();
-  const { t, locale } = useI18n();
   const pathname = usePathname();
-  
-  // Get current language for RTL detection
-  const getCurrentLanguage = () => {
-    if (locale) return locale;
-    if (typeof window !== 'undefined') {
-      const savedLanguage = localStorage.getItem('Simnetiq-language');
-      if (savedLanguage) return savedLanguage;
-    }
-    return detectLanguageFromPath(pathname);
-  };
+  const { t, locale, isLoading: i18nLoading } = useI18n();
+  const [mounted, setMounted] = useState(false);
 
-  const currentLanguage = getCurrentLanguage();
-  const isRTL = getLanguageDirection(currentLanguage) === 'rtl';
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Language detection with fallback
+  const detectedLanguage = useMemo(() => {
+    try {
+      if (i18nLoading) {
+        if (typeof window !== 'undefined') {
+          const savedLanguage = localStorage.getItem('Simnetiq-language');
+          if (savedLanguage) return savedLanguage;
+        }
+        return detectLanguageFromPath(pathname) || 'en';
+      }
+      return locale || 'en';
+    } catch {
+      return 'en';
+    }
+  }, [locale, pathname, i18nLoading]);
+
+  const direction = mounted ? getLanguageDirection(detectedLanguage) : 'ltr';
+  const isRTL = direction === 'rtl';
   
   // Helper function to generate localized URLs
   const getLocalizedUrl = (path) => {
-    if (currentLanguage === 'en') {
+    if (detectedLanguage === 'en') {
       return path;
     }
-    return `/${currentLanguage}${path}`;
+    return `/${detectedLanguage}${path}`;
   };
 
   return (
-    <div className="bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="bg-white" dir={direction} lang={detectedLanguage}>
       {/* Stats Section */}
       <div className="mx-auto w-full max-w-9xl">
         <div className="mx-auto w-full max-w-7xl">
           <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-            <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 ${isRTL ? 'md:grid-flow-col-dense' : ''}`}>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6">
           {/* Total Orders Card */}
           <div className="relative">
             <div className="absolute inset-px bg-white rounded-lg"></div>
@@ -48,7 +59,7 @@ const StatsCards = ({ orders, activeOrders, referralStats }) => {
                 </p>
                 <Globe className="w-5 h-5 text-tufts-blue" />
               </div>
-              <div className={`flex items-center ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
+              <div className="flex items-center">
                 <span className="text-3xl font-bold text-eerie-black">
                   {orders.length}
                 </span>
@@ -67,7 +78,7 @@ const StatsCards = ({ orders, activeOrders, referralStats }) => {
                 </p>
                 <QrCode className="w-5 h-5 text-tufts-blue" />
               </div>
-              <div className={`flex items-center ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
+              <div className="flex items-center">
                 <span className="text-3xl font-bold text-eerie-black">
                   {activeOrders.length}
                 </span>
@@ -91,7 +102,7 @@ const StatsCards = ({ orders, activeOrders, referralStats }) => {
               </div>
               
               <div className="space-y-3">
-                <div className={`flex items-center ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
+                <div className="flex items-center">
                   <span className="text-3xl font-bold text-eerie-black">
                     {formatPrice(referralStats.totalEarnings)}
                   </span>
@@ -102,7 +113,7 @@ const StatsCards = ({ orders, activeOrders, referralStats }) => {
                 </p>
                 
                 {(referralStats.usageCount || 0) > 0 && (
-                  <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
+                  <div className="flex items-center gap-2">
                     <Users className="w-4 h-4 text-tufts-blue" />
                     <span className="text-sm font-medium text-eerie-black">
                       {Math.floor(referralStats.usageCount || 0)} {t('dashboard.uses', 'uses')}

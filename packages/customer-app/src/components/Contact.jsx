@@ -90,7 +90,7 @@ const FAQItem = ({ question, answer, isOpen, onToggle, isRTL, steps }) => (
         {steps && steps.length > 0 && (
           <div className="mt-3 space-y-2">
             {steps.map((step, idx) => (
-              <div key={idx} className={`flex gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div key={idx} className={`flex gap-3 `}>
                 <span className="flex-shrink-0 w-6 h-6 rounded-full bg-tufts-blue/10 text-tufts-blue flex items-center justify-center text-xs font-semibold">
                   {idx + 1}
                 </span>
@@ -107,7 +107,7 @@ const FAQItem = ({ question, answer, isOpen, onToggle, isRTL, steps }) => (
 // FAQ Category Component
 const FAQCategory = ({ icon: Icon, title, faqs, openFaq, onToggle, categoryIndex, isRTL }) => (
   <div className="bg-white shadow-lg shadow-gray-200/50 overflow-hidden">
-    <div className={`p-5 border-b border-gray-100 flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+    <div className={`p-5 border-b border-gray-100 flex items-center gap-3 `}>
       <div className="w-10 h-10 bg-tufts-blue/10 flex items-center justify-center">
         <Icon className="w-5 h-5 text-tufts-blue" />
       </div>
@@ -501,7 +501,7 @@ const Contact = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`w-full py-3.5 px-6 bg-eerie-black text-white rounded-full font-medium flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${isRTL ? 'flex-row-reverse' : ''}`}
+                    className={`w-full py-3.5 px-6 bg-eerie-black text-white rounded-full font-medium flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed `}
                   >
                     {isSubmitting ? (
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />

@@ -164,7 +164,8 @@
     "plan": "тариф",
     "plans": "тарифы",
     "from": "От",
-    "priceNotAvailable": "Цена Н/Д"
+    "priceNotAvailable": "Цена Н/Д",
+    "regionalPlans": "Региональные тарифы"
   },
   "discount": {
     "get35Off": "Получите скидку 35%",
@@ -179,6 +180,14 @@
     "africa": "Африка",
     "oceania": "Океания",
     "all": "Все"
+  },
+  "region": {
+    "popular_countries": "Популярные страны",
+    "asia_countries": "Популярно в Азии",
+    "europe_countries": "Популярно в Европе",
+    "americas_countries": "Популярно в Америке",
+    "africa_countries": "Популярно в Африке",
+    "oceania_countries": "Популярно в Океании"
   },
   "language": {
     "select": "Выберите язык",
@@ -451,17 +460,24 @@
     "globalCoverage": "Покрытие в более чем 130 странах",
     "countries": "стран",
     "oneEsimAll": "Один eSIM покрывает все страны в",
+    "oneEsim": "Один eSIM, покрытие по всему миру",
     "regionalEsim": "Региональный eSIM",
     "bestPrice": "Лучшая цена",
     "unlimited": "Безлимитные данные",
     "moreData": "Больше данных",
     "comingSoon": "Скоро",
-    "viewAllPlans": "Посмотреть все тарифы"
+    "viewAllPlans": "Посмотреть все тарифы",
+    "selectCountry": "Выберите конкретную страну для местных тарифов",
+    "discoverGlobal": "Открыть для себя Global",
+    "covers": "Покрывает",
+    "exploreAll": "Исследовать все",
+    "noGlobalPlans": "Глобальные тарифы скоро"
   },
   "common": {
     "close": "Закрыть",
     "days": "дней",
-    "from": "От"
+    "from": "От",
+    "viewAllCountries": "Посмотреть все страны"
   },
   "sharePackage": {
     "title": "Купить пакет eSIM",

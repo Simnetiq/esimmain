@@ -40,16 +40,27 @@ export default function PlansSection({ selectedCountry }) {
   const [selectedPlans, setSelectedPlans] = useState([]);
   const [loadingSheetPlans, setLoadingSheetPlans] = useState(false);
 
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const getCurrentLanguage = useCallback(() => {
-    if (locale) return locale;
-    if (typeof window !== 'undefined') {
-      const savedLanguage = localStorage.getItem('Simnetiq-language');
-      if (savedLanguage) return savedLanguage;
+    try {
+      if (locale) return locale;
+      if (typeof window !== 'undefined') {
+        const savedLanguage = localStorage.getItem('Simnetiq-language');
+        if (savedLanguage) return savedLanguage;
+      }
+      return detectLanguageFromPath(pathname) || 'en';
+    } catch {
+      return 'en';
     }
-    return detectLanguageFromPath(pathname);
   }, [locale, pathname]);
 
   const currentLanguage = useMemo(() => getCurrentLanguage(), [getCurrentLanguage]);
+  const direction = mounted ? getLanguageDirection(currentLanguage) : 'ltr';
   const isRTL = useMemo(() => getLanguageDirection(currentLanguage) === 'rtl', [currentLanguage]);
 
   const { countries, isLoading: countriesLoading } = useCountries(currentLanguage);
@@ -257,7 +268,7 @@ export default function PlansSection({ selectedCountry }) {
   // Loading skeleton
   if (isLoading) {
     return (
-      <div className="bg-white flex flex-col overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="bg-white flex flex-col overflow-hidden" dir={direction} lang={currentLanguage}>
         <div className="relative flex-1 flex flex-col">
           <div className="mx-auto w-full max-w-9xl">
             <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
@@ -273,7 +284,7 @@ export default function PlansSection({ selectedCountry }) {
   }
 
   return (
-    <div className="bg-white flex flex-col overflow-hidden">
+    <div className="bg-white flex flex-col overflow-hidden" dir={direction} lang={currentLanguage}>
       <div className="relative flex-1 flex flex-col">
         <div className="hidden xl:block absolute left-0 top-0 bottom-0 w-32" style={gridPatternStyle} />
         <div className="hidden xl:block absolute right-0 top-0 bottom-0 w-32" style={gridPatternStyle} />
@@ -282,10 +293,10 @@ export default function PlansSection({ selectedCountry }) {
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
             <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              <p className="text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500">
+              <p className={`text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 ${isRTL ? 'text-right' : 'text-left'}`}>
                 {t('plans.title', 'eSIM Plans')}
               </p>
-              <h2 className="mt-4 text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-eerie-black max-w-5xl">
+              <h2 className={`mt-4 text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-eerie-black max-w-5xl ${isRTL ? 'text-right' : 'text-left'}`}>
                 {t('plans.subtitle', 'Stay connected worldwide')}
               </h2>
             </div>
@@ -300,11 +311,11 @@ export default function PlansSection({ selectedCountry }) {
 
               {/* Discover Global Section */}
               <div className="space-y-4">
-                <div className="flex items-center gap-2">
+                <div className={`flex items-center gap-2 `}>
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-tufts-blue to-blue-600 flex items-center justify-center">
                     <GlobeIcon className="w-4 h-4 text-white" />
                   </div>
-                  <div>
+                  <div className={isRTL ? 'text-right' : 'text-left'}>
                     <h3 className="text-lg font-bold text-eerie-black">
                       {t('deals.discoverGlobal', 'Discover Global')}
                     </h3>
@@ -329,7 +340,7 @@ export default function PlansSection({ selectedCountry }) {
                       />
                     ))
                   ) : (
-                    <div className="col-span-full text-center py-8 text-gray-400 text-sm">
+                    <div className={`col-span-full py-8 text-gray-400 text-sm ${isRTL ? 'text-right' : 'text-center'}`}>
                       {t('deals.noGlobalPlans', 'Global plans coming soon')}
                     </div>
                   )}
@@ -408,7 +419,7 @@ export default function PlansSection({ selectedCountry }) {
                 {!showMoreRegions && (
                   <button
                     onClick={() => setShowMoreRegions(true)}
-                    className="btn-secondary flex items-center gap-2 px-6 py-3 rounded-full font-semibold  w-full sm:w-auto"
+                    className={`btn-secondary flex items-center gap-2 px-6 py-3 rounded-full font-semibold w-full sm:w-auto `}
                   >
                     <span>{t('plans.showMoreRegions', 'Show More Regions')}</span>
                     <ChevronDownIcon className="w-5 h-5" />
@@ -417,10 +428,10 @@ export default function PlansSection({ selectedCountry }) {
 
                 <button
                   onClick={handleNavigateToPlans}
-                  className="btn-primary inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full w-full sm:w-auto"
+                  className={`btn-primary inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full w-full sm:w-auto `}
                 >
                   <span>{t('plans.seeAllPlans', 'See All Plans')}</span>
-                  <ArrowRightIcon className="w-5 h-5" />
+                  <ArrowRightIcon className={`w-5 h-5 ${isRTL ? 'rotate-180' : ''}`} />
                 </button>
               </div>
 

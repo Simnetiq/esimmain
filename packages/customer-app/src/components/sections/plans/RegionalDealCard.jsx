@@ -1,38 +1,68 @@
-import { memo, useMemo } from 'react';
+import { memo, useState, useEffect, useMemo } from 'react';
+import { usePathname } from 'next/navigation';
+import { useI18n } from '@esim/shared/contexts/I18nContext';
+import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
-import { 
-  GlobeIcon, 
-  MapPinIcon, 
-  DollarSignIcon, 
+import {
+  GlobeIcon,
+  MapPinIcon,
+  DollarSignIcon,
   InfinityIcon,
-  ArrowRightIcon 
+  ArrowRightIcon
 } from './PlanIcons';
 import { getBestPlans, getRegionNames, REGION_ICONS } from './planUtils';
 
 // Region flags for visual display
 const REGION_FLAGS = {
   europe: ['🇫🇷', '🇩🇪', '🇮🇹', '🇪🇸', '🇬🇧', '🇳🇱', '🇵🇹','🇵🇱','🇦🇱','🇩🇰'],
-  asia: ['🇯🇵', '🇰🇷', '🇹🇭', '🇸🇬', '🇻🇳', '🇮🇩', '🇹🇼',], 
+  asia: ['🇯🇵', '🇰🇷', '🇹🇭', '🇸🇬', '🇻🇳', '🇮🇩', '🇹🇼',],
   americas: ['🇺🇸', '🇨🇦', '🇲🇽', '🇧🇷', '🇦🇷', '🇨🇴', '🇨🇺' , '🇨🇷', '🇨🇻'],
   africa: ['🇿🇦', '🇪🇬', '🇲🇦', '🇰🇪', '🇳🇬', '🇬🇭', '🇸🇩', '🇸🇱'],
   oceania: ['🇦🇺', '🇳🇿', '🇫🇯', '🇮🇩', '🇵🇭', '🇲🇾', '🇸🇧' , '🇸🇨'],
 };
 
 // Regional Deal Card - Clean design matching FeaturesSection
-const RegionalDealCard = memo(function RegionalDealCard({ 
-  region, 
-  plans, 
-  countriesCount, 
-  onPlanClick, 
-  t, 
-  isLoading 
+const RegionalDealCard = memo(function RegionalDealCard({
+  region,
+  plans,
+  countriesCount,
+  onPlanClick,
+  t,
+  isLoading
 }) {
+  const pathname = usePathname();
+  const { locale, isLoading: i18nLoading } = useI18n();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Language detection with fallback
+  const detectedLanguage = useMemo(() => {
+    try {
+      if (i18nLoading) {
+        if (typeof window !== 'undefined') {
+          const savedLanguage = localStorage.getItem('Simnetiq-language');
+          if (savedLanguage) return savedLanguage;
+        }
+        return detectLanguageFromPath(pathname) || 'en';
+      }
+      return locale || 'en';
+    } catch {
+      return 'en';
+    }
+  }, [locale, pathname, i18nLoading]);
+
+  const direction = mounted ? getLanguageDirection(detectedLanguage) : 'ltr';
+  const isRTL = direction === 'rtl';
+
   const { plan1, plan2, hasUnlimited } = useMemo(() => getBestPlans(plans), [plans]);
   const regionNames = useMemo(() => getRegionNames(t), [t]);
   const flags = REGION_FLAGS[region] || REGION_FLAGS.europe;
 
   return (
-    <div className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 h-full flex flex-col">
+    <div className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 h-full flex flex-col" dir={direction} lang={detectedLanguage}>
       {/* Visual Header Area - Clean gray background with flags */}
       <div className="relative h-32 sm:h-36 lg:h-40 overflow-hidden bg-gray-100">
         {/* Subtle pattern overlay */}
@@ -62,13 +92,13 @@ const RegionalDealCard = memo(function RegionalDealCard({
         
         
         
-        {/* Region icon - bottom left */}
-        <div className="absolute bottom-3 left-3 w-12 h-12 rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center text-2xl shadow-sm">
+        {/* Region icon - bottom left/right based on RTL */}
+        <div className={`absolute bottom-3 w-12 h-12 rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center text-2xl shadow-sm ${isRTL ? 'right-3' : 'left-3'}`}>
           {REGION_ICONS[region] || '🌍'}
         </div>
         
-        {/* Countries count badge */}
-        <div className="absolute bottom-3 right-3 px-2.5 py-1 bg-white/90 backdrop-blur-sm rounded-full flex items-center gap-1.5 shadow-sm">
+        {/* Countries count badge - bottom right/left based on RTL */}
+        <div className={`absolute bottom-3 px-2.5 py-1 bg-white/90 backdrop-blur-sm rounded-full flex items-center gap-1.5 shadow-sm ${isRTL ? 'left-3' : 'right-3'}`}>
           <GlobeIcon className="w-3.5 h-3.5 text-tufts-blue" />
           <span className="text-xs font-semibold text-eerie-black">
             {countriesCount > 0 ? `${countriesCount}` : '30+'} {t('deals.countries', 'countries')}
@@ -79,12 +109,12 @@ const RegionalDealCard = memo(function RegionalDealCard({
       {/* Content Area */}
       <div className="p-4 lg:p-5 flex-1 flex flex-col">
         {/* Description text first */}
-        <p className="text-gray-500 text-sm leading-relaxed mb-2">
+        <p className={`text-gray-500 text-sm leading-relaxed mb-2 ${isRTL ? 'text-right' : 'text-left'}`}>
           {t('deals.oneEsimAll', 'One eSIM covers all countries in')} {regionNames[region]}
         </p>
         
         {/* Title */}
-        <h3 className="text-lg lg:text-xl font-semibold text-eerie-black mb-4">
+        <h3 className={`text-lg lg:text-xl font-semibold text-eerie-black mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
           {regionNames[region]} {t('deals.regionalEsim', 'Regional eSIM')}
         </h3>
 
@@ -100,25 +130,25 @@ const RegionalDealCard = memo(function RegionalDealCard({
               {plan1 && (
                 <button
                   onClick={() => onPlanClick(plan1)}
-                  className="group/plan bg-white hover:bg-gray-50 rounded-lg p-3 text-left transition-all duration-200 hover:shadow-sm border border-gray-100"
+                  className={`group/plan bg-white hover:bg-gray-50 rounded-lg p-3 transition-all duration-200 hover:shadow-sm border border-gray-100 ${isRTL ? 'text-right' : 'text-left'}`}
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
+                  <div className={`flex items-center justify-between gap-2 `}>
+                    <div className={`flex items-center gap-2 min-w-0 `}>
                       <div className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center flex-shrink-0">
                         <DollarSignIcon className="w-4 h-4 text-green-600" />
                       </div>
-                      <div>
+                      <div className={isRTL ? 'text-right' : 'text-left'}>
                         <p className="text-sm font-medium text-eerie-black">
                           {plan1.data} · {plan1.period || plan1.validity}d
                         </p>
                         <p className="text-[11px] text-gray-500">{t('deals.bestPrice', 'Best price')}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className={`flex items-center gap-2 `}>
                       <span className="text-base font-bold text-tufts-blue">
                         {formatPrice(plan1.price)}
                       </span>
-                      <ArrowRightIcon className="w-4 h-4 text-gray-300 group-hover/plan:text-tufts-blue group-hover/plan:translate-x-0.5 transition-all" />
+                      <ArrowRightIcon className={`w-4 h-4 text-gray-300 group-hover/plan:text-tufts-blue transition-all group-hover/plan:translate-x-0.5 ${isRTL ? 'rotate-180' : ''}`} />
                     </div>
                   </div>
                 </button>
@@ -127,10 +157,10 @@ const RegionalDealCard = memo(function RegionalDealCard({
               {plan2 && (
                 <button
                   onClick={() => onPlanClick(plan2)}
-                  className="group/plan bg-white hover:bg-gray-50 rounded-lg p-3 text-left transition-all duration-200 hover:shadow-sm border border-gray-100"
+                  className={`group/plan bg-white hover:bg-gray-50 rounded-lg p-3 transition-all duration-200 hover:shadow-sm border border-gray-100 ${isRTL ? 'text-right' : 'text-left'}`}
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
+                  <div className={`flex items-center justify-between gap-2 `}>
+                    <div className={`flex items-center gap-2 min-w-0 `}>
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${hasUnlimited ? 'bg-purple-50' : 'bg-blue-50'}`}>
                         {hasUnlimited ? (
                           <InfinityIcon className="w-4 h-4 text-purple-600" />
@@ -138,7 +168,7 @@ const RegionalDealCard = memo(function RegionalDealCard({
                           <span className="text-[10px] font-bold text-blue-600">+GB</span>
                         )}
                       </div>
-                      <div>
+                      <div className={isRTL ? 'text-right' : 'text-left'}>
                         <p className="text-sm font-medium text-eerie-black">
                           {plan2.data} · {plan2.period || plan2.validity}d
                         </p>
@@ -147,18 +177,18 @@ const RegionalDealCard = memo(function RegionalDealCard({
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className={`flex items-center gap-2 `}>
                       <span className="text-base font-bold text-tufts-blue">
                         {formatPrice(plan2.price)}
                       </span>
-                      <ArrowRightIcon className="w-4 h-4 text-gray-300 group-hover/plan:text-tufts-blue group-hover/plan:translate-x-0.5 transition-all" />
+                      <ArrowRightIcon className={`w-4 h-4 text-gray-300 group-hover/plan:text-tufts-blue transition-all group-hover/plan:translate-x-0.5 ${isRTL ? 'rotate-180' : ''}`} />
                     </div>
                   </div>
                 </button>
               )}
 
               {!plan1 && !plan2 && !isLoading && (
-                <div className="bg-gray-100 rounded-lg p-3 text-center text-gray-400 text-xs">
+                <div className={`bg-gray-100 rounded-lg p-3 text-gray-400 text-xs ${isRTL ? 'text-right' : 'text-center'}`}>
                   {t('deals.comingSoon', 'Coming soon')}
                 </div>
               )}
@@ -170,10 +200,10 @@ const RegionalDealCard = memo(function RegionalDealCard({
         {plans && plans.length > 2 && (
           <button
             onClick={() => onPlanClick(null, true)}
-            className="mt-3 w-full py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-xs text-eerie-black font-semibold flex items-center justify-center gap-1.5 transition-colors group/view"
+            className={`mt-3 w-full py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-xs text-eerie-black font-semibold flex items-center justify-center gap-1.5 transition-colors group/view `}
           >
             {t('deals.viewAllPlans', 'View all plans')} ({plans.length})
-            <ArrowRightIcon className="w-3.5 h-3.5 group-hover/view:translate-x-0.5 transition-transform" />
+            <ArrowRightIcon className={`w-3.5 h-3.5 transition-transform group-hover/view:translate-x-0.5 ${isRTL ? 'rotate-180' : ''}`} />
           </button>
         )}
       </div>

@@ -152,7 +152,8 @@
     "plan": "خطة",
     "plans": "خطط",
     "from": "من",
-    "priceNotAvailable": "السعر غير متاح"
+    "priceNotAvailable": "السعر غير متاح",
+    "regionalPlans": "الخطط الإقليمية"
   },
   "discount": {
     "get35Off": "احصل على خصم 35%",
@@ -167,6 +168,14 @@
     "africa": "أفريقيا",
     "oceania": "أوقيانوسيا",
     "all": "الكل"
+  },
+  "region": {
+    "popular_countries": "الدول الشائعة",
+    "asia_countries": "شائع في آسيا",
+    "europe_countries": "شائع في أوروبا",
+    "americas_countries": "شائع في الأمريكتين",
+    "africa_countries": "شائع في أفريقيا",
+    "oceania_countries": "شائع في أوقيانوسيا"
   },
   "language": {
     "select": "اختر اللغة",
@@ -520,17 +529,24 @@
     "globalCoverage": "التغطية في أكثر من 130 دولة",
     "countries": "دول",
     "oneEsimAll": "eSIM واحد يغطي جميع الدول في",
+    "oneEsim": "eSIM واحد، تغطية عالمية",
     "regionalEsim": "eSIM إقليمي",
     "bestPrice": "أفضل سعر",
     "unlimited": "بيانات غير محدودة",
     "moreData": "المزيد من البيانات",
     "comingSoon": "قريباً",
-    "viewAllPlans": "عرض جميع الخطط"
+    "viewAllPlans": "عرض جميع الخطط",
+    "selectCountry": "اختر دولة محددة للخطط المحلية",
+    "discoverGlobal": "اكتشف العالمي",
+    "covers": "يغطي",
+    "exploreAll": "استكشف الكل",
+    "noGlobalPlans": "الخطط العالمية قريباً"
   },
   "common": {
     "close": "إغلاق",
     "days": "أيام",
-    "from": "من"
+    "from": "من",
+    "viewAllCountries": "عرض جميع الدول"
   },
   "sharePackage": {
     "title": "مشاركة باقة",

@@ -1,7 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
+import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import Image from 'next/image';
 import { getISOCode } from '@esim/shared/utils/countryCodeMap';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
@@ -10,7 +12,31 @@ const CountryCard = ({
   country,
   onClick
 }) => {
-  const { t } = useI18n();
+  const pathname = usePathname();
+  const { t, locale, isLoading: i18nLoading } = useI18n();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const detectedLanguage = useMemo(() => {
+    try {
+      if (i18nLoading) {
+        if (typeof window !== 'undefined') {
+          const savedLanguage = localStorage.getItem('Simnetiq-language');
+          if (savedLanguage) return savedLanguage;
+        }
+        return detectLanguageFromPath(pathname) || 'en';
+      }
+      return locale || 'en';
+    } catch {
+      return 'en';
+    }
+  }, [locale, pathname, i18nLoading]);
+
+  const direction = mounted ? getLanguageDirection(detectedLanguage) : 'ltr';
+  const isRTL = direction === 'rtl';
 
   // Get country data
   const fullName = country.displayName || country.name || '';
@@ -26,13 +52,15 @@ const CountryCard = ({
       title={fullName}
       data-country-name={fullName}
       data-country-code={country.code}
+      dir={direction}
+      lang={detectedLanguage}
     >
 
 
       {/* Card Content */}
       <div className="p-4 flex flex-col">
         {/* Country Flag & Name */}
-        <div className="flex items-center gap-3 mb-3">
+        <div className={`flex items-center gap-3 mb-3 `}>
           {/* 4:3 Flag Container */}
           <div className="flex-shrink-0 w-14 sm:w-16 aspect-[4/3] bg-white  flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-300">
             {country.photo && country.photo.includes('firebasestorage') ? (
@@ -60,7 +88,7 @@ const CountryCard = ({
               />
             )}
           </div>
-          <div className="flex-1 min-w-0">
+          <div className={`flex-1 min-w-0 ${isRTL ? 'text-right' : 'text-left'}`}>
             <h3 className="text-sm sm:text-base font-semibold text-eerie-black truncate">
               {displayName}
             </h3>
@@ -76,7 +104,7 @@ const CountryCard = ({
         {/* Price Display */}
         <div className="flex items-center justify-between">
           {minPrice ? (
-            <div className="flex items-baseline gap-1.5">
+            <div className={`flex items-baseline gap-1.5 ${isRTL ? 'flex-row-reverse' : ''}`}>
               <span className="text-xs text-gray-500">{t('plans.from', 'From')}</span>
               <span className="text-base font-bold text-tufts-blue">
                 {formatPrice(minPrice)}
@@ -88,7 +116,7 @@ const CountryCard = ({
 
           {/* Arrow indicator on hover */}
           <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <svg className="w-4 h-4 text-tufts-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className={`w-4 h-4 text-tufts-blue ${isRTL ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </div>

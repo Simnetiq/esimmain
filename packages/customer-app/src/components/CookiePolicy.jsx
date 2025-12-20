@@ -121,8 +121,8 @@ const CookiePolicy = () => {
                   return (
                     <div key={index} className="group relative bg-gray-50 rounded-lg overflow-hidden hover:bg-white transition-all duration-300">
                       <div className="p-5 lg:p-6">
-                        <div className={`flex items-start justify-between mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                          <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <div className={`flex items-start justify-between mb-4 `}>
+                          <div className={`flex items-center gap-3 `}>
                             <div className="w-10 h-10 bg-tufts-blue/10 rounded-lg flex items-center justify-center flex-shrink-0">
                               <IconComponent className="w-5 h-5 text-tufts-blue" />
                             </div>
@@ -343,7 +343,7 @@ const CookiePolicy = () => {
                     </a>
                   </p>
                 </div>
-                <div className={`mt-6 flex gap-4 flex-wrap ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className={`mt-6 flex gap-4 flex-wrap `}>
                   <Link 
                     href="/privacy-policy" 
                     className="text-tufts-blue hover:text-tufts-blue/80 text-sm font-medium underline-offset-2 hover:underline"

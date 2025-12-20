@@ -158,7 +158,8 @@
     "plan": "plan",
     "plans": "planes",
     "from": "Desde",
-    "priceNotAvailable": "Precio N/D"
+    "priceNotAvailable": "Precio N/D",
+    "regionalPlans": "Planes regionales"
   },
   "discount": {
     "get35Off": "Obtén 35% DE DESCUENTO",
@@ -173,6 +174,14 @@
     "africa": "África",
     "oceania": "Oceanía",
     "all": "Todos"
+  },
+  "region": {
+    "popular_countries": "Países populares",
+    "asia_countries": "Popular en Asia",
+    "europe_countries": "Popular en Europa",
+    "americas_countries": "Popular en las Américas",
+    "africa_countries": "Popular en África",
+    "oceania_countries": "Popular en Oceanía"
   },
   "language": {
     "select": "Seleccionar idioma",
@@ -475,17 +484,24 @@
     "globalCoverage": "Cobertura en más de 130 países",
     "countries": "países",
     "oneEsimAll": "Un eSIM cubre todos los países de",
+    "oneEsim": "Un eSIM, cobertura mundial",
     "regionalEsim": "eSIM regional",
     "bestPrice": "Mejor precio",
     "unlimited": "Datos ilimitados",
     "moreData": "Más datos",
     "comingSoon": "Próximamente",
-    "viewAllPlans": "Ver todos los planes"
+    "viewAllPlans": "Ver todos los planes",
+    "selectCountry": "Seleccione un país específico para planes locales",
+    "discoverGlobal": "Descubrir Global",
+    "covers": "Cubre",
+    "exploreAll": "Explorar todo",
+    "noGlobalPlans": "Planes globales próximamente"
   },
   "common": {
     "close": "Cerrar",
     "days": "días",
-    "from": "Desde"
+    "from": "Desde",
+    "viewAllCountries": "Ver todos los países"
   },
   "sharePackage": {
     "title": "Comprar paquete eSIM",

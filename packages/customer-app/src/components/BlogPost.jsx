@@ -289,10 +289,10 @@ const BlogPost = ({ slug }) => {
           <div className="mx-auto w-full max-w-9xl">
             <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-6">
               <div className="px-4 sm:py-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-                <div className={`flex items-center justify-between mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className={`flex items-center justify-between mb-4 `}>
                   <Link 
                     href={getLocalizedBlogListUrl(detectedLanguage)} 
-                    className={`inline-flex items-center text-tufts-blue hover:text-cobalt-blue font-medium transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
+                    className={`inline-flex items-center text-tufts-blue hover:text-cobalt-blue font-medium transition-colors `}
                   >
                     {isRTL ? <ArrowRightIcon className="w-4 h-4 ml-2" /> : <ArrowLeftIcon className="w-4 h-4 mr-2" />}
                     {t('blog.backToBlog', 'Back to Blog')}
@@ -300,7 +300,7 @@ const BlogPost = ({ slug }) => {
                   
                   <button 
                     onClick={handleShare}
-                    className={`flex items-center gap-2 text-tufts-blue hover:text-cobalt-blue transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
+                    className={`flex items-center gap-2 text-tufts-blue hover:text-cobalt-blue transition-colors `}
                   >
                     <ShareIcon className="w-4 h-4" />
                     <span>{t('blog.sharePost', 'Share')}</span>
@@ -320,8 +320,8 @@ const BlogPost = ({ slug }) => {
                 </h1>
 
                 {/* Meta Information */}
-                <div className={`flex flex-wrap items-center gap-4 text-cool-black ${isRTL ? 'flex-row-reverse' : ''}`}>
-                  <div className={`flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className={`flex flex-wrap items-center gap-4 text-cool-black `}>
+                  <div className={`flex items-center gap-1 `}>
                     <CalendarIcon className="w-4 h-4" />
                     <span>{formatBlogDate(post.publishedAt, detectedLanguage)}</span>
                   </div>
@@ -367,7 +367,7 @@ const BlogPost = ({ slug }) => {
                     <h3 className={`text-base font-semibold text-eerie-black mb-4 ${isRTL ? 'text-right' : ''}`}>
                       {t('blog.relatedTags', 'Related Tags')}
                     </h3>
-                    <div className={`flex flex-wrap gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div className={`flex flex-wrap gap-2 `}>
                       {post.tags.map((tag, index) => (
                         <span key={index} className="bg-tufts-blue/10 text-tufts-blue px-3 py-1 rounded-full text-sm font-medium">
                           #{tag.length > 15 ? tag.substring(0, 15) + '...' : tag}
@@ -394,7 +394,7 @@ const BlogPost = ({ slug }) => {
       {showShareModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={closeShareModal}>
           <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6" onClick={e => e.stopPropagation()}>
-            <div className={`flex items-center justify-between mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`flex items-center justify-between mb-6 `}>
               <h3 className="text-lg font-semibold text-eerie-black">{t('blog.sharePost', 'Share this post')}</h3>
               <button onClick={closeShareModal} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                 <XIcon className="w-5 h-5 text-gray-500" />
@@ -404,7 +404,7 @@ const BlogPost = ({ slug }) => {
             <div className="space-y-3">
               <button
                 onClick={copyToClipboard}
-                className={`w-full flex items-center justify-center gap-2 px-4 py-3 bg-eerie-black text-white rounded-full hover:bg-gray-800 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
+                className={`w-full flex items-center justify-center gap-2 px-4 py-3 bg-eerie-black text-white rounded-full hover:bg-gray-800 transition-colors `}
               >
                 <CopyIcon className="w-5 h-5" />
                 <span>{t('blog.copyLink', 'Copy Link')}</span>

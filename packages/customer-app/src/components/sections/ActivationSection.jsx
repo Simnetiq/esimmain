@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
+import { getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { appStoreLinks } from '@esim/shared/utils/appStoreLinks';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
 
@@ -31,8 +32,23 @@ const AndroidIcon = () => (
 );
 
 export default function ActivationSection() {
-  const { t } = useI18n();
+  const { t, locale, isLoading: i18nLoading } = useI18n();
   const [openFaq, setOpenFaq] = useState(null);
+
+  // Language detection with fallback
+  const detectedLanguage = useMemo(() => {
+    if (i18nLoading) {
+      if (typeof window !== 'undefined') {
+        const savedLanguage = localStorage.getItem('Simnetiq-language');
+        if (savedLanguage) return savedLanguage;
+      }
+      return 'en';
+    }
+    return locale || 'en';
+  }, [locale, i18nLoading]);
+
+  const direction = getLanguageDirection(detectedLanguage);
+  const isRTL = direction === 'rtl';
   
   // Grid pattern style
   const gridPatternStyle = {
@@ -105,7 +121,7 @@ export default function ActivationSection() {
   };
 
   return (
-    <div className="bg-white flex flex-col overflow-hidden" id="how-it-works">
+    <div className="bg-white flex flex-col overflow-hidden" id="how-it-works" dir={direction} lang={detectedLanguage}>
       <div className="relative flex-1 flex flex-col">
         {/* Grid Pattern - Left Side */}
         <div 
@@ -152,14 +168,14 @@ export default function ActivationSection() {
                     </p>
                     
                     {/* Download Buttons */}
-                    <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row animate-fade-in-up animation-delay-300">
+                    <div className={`mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row animate-fade-in-up animation-delay-300 ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
                       {/* iOS Download */}
                       <a
                         href={appStoreLinks.ios}
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={handleIOSDownload}
-                        className="group inline-flex items-center gap-3 rounded-full bg-gray-900 px-6 py-3 text-sm font-medium text-white shadow-lg transition-all duration-200 hover:bg-gray-800 hover:scale-105"
+                        className={`group inline-flex items-center gap-3 rounded-full bg-gray-900 px-6 py-3 text-sm font-medium text-white shadow-lg transition-all duration-200 hover:bg-gray-800 hover:scale-105 `}
                       >
                         <AppleIcon />
                         <span className="text-base">{t('activation.appStore', 'App Store')}</span>
@@ -171,7 +187,7 @@ export default function ActivationSection() {
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={handleAndroidDownload}
-                        className="group inline-flex items-center gap-3 rounded-full bg-white px-6 py-3 text-sm font-medium text-gray-900 ring-1 ring-gray-200 shadow-sm transition-all duration-200 hover:bg-gray-50 hover:scale-105"
+                        className={`group inline-flex items-center gap-3 rounded-full bg-white px-6 py-3 text-sm font-medium text-gray-900 ring-1 ring-gray-200 shadow-sm transition-all duration-200 hover:bg-gray-50 hover:scale-105 `}
                       >
                         <AndroidIcon />
                         <span className="text-base">{t('activation.googlePlay', 'Google Play')}</span>
@@ -189,10 +205,10 @@ export default function ActivationSection() {
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
             <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              <p className="text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 mb-4 animate-fade-in-up">
+              <p className={`text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 mb-4 animate-fade-in-up ${isRTL ? 'text-right' : 'text-left'}`}>
                 {t('faq.title', 'Frequently Asked Questions')}
               </p>
-              <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-eerie-black max-w-5xl animate-fade-in-up animation-delay-100">
+              <h2 className={`text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-eerie-black max-w-5xl animate-fade-in-up animation-delay-100 ${isRTL ? 'text-right' : 'text-left'}`}>
                 {t('faq.subtitle', 'Everything you need to know about eSIM')}
               </h2>
             </div>
@@ -214,10 +230,10 @@ export default function ActivationSection() {
                     >
                       <button
                         onClick={() => toggleFaq(index)}
-                        className="w-full p-5 lg:p-6 flex items-start justify-between text-left gap-4"
+                        className={`w-full p-5 lg:p-6 flex items-start justify-between gap-4 ${isRTL ? 'text-right' : 'text-left'}`}
                         aria-expanded={isOpen}
                       >
-                        <span className="font-medium text-eerie-black text-sm lg:text-base leading-relaxed">
+                        <span className={`font-medium text-eerie-black text-sm lg:text-base leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
                           {faq.question}
                         </span>
                         {isOpen ? (
@@ -234,7 +250,7 @@ export default function ActivationSection() {
                         }`}
                       >
                         <div className="px-5 pb-5 lg:px-6 lg:pb-6">
-                          <p className="text-gray-600 text-sm leading-relaxed">
+                          <p className={`text-gray-600 text-sm leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
                             {faq.answer}
                           </p>
                         </div>

@@ -117,7 +117,7 @@ const ThankYou = ({ orderDetails }) => {
                 {/* Plan Header */}
                 {(planName || countryName) && (
                   <div className="bg-gray-900 px-5 py-4">
-                    <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div className={`flex items-center gap-3 `}>
                       <div className="w-10 h-10 bg-tufts-blue rounded-lg flex items-center justify-center">
                         <Globe className="w-5 h-5 text-white" />
                       </div>
@@ -133,7 +133,7 @@ const ThankYou = ({ orderDetails }) => {
                 <div className="p-5 space-y-3">
                   {/* Amount - Highlighted */}
                   {amount > 0 && (
-                    <div className={`flex justify-between items-center py-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div className={`flex justify-between items-center py-2 `}>
                       <span className="text-gray-600">{t('thankYou.amount', 'Amount')}</span>
                       <span className="text-lg font-bold text-tufts-blue">
                         {formatPrice(amount)}
@@ -143,21 +143,21 @@ const ThankYou = ({ orderDetails }) => {
                   
                   {/* Data & Validity Badges */}
                   {(dataAmount || validity) && (
-                    <div className={`flex flex-wrap gap-2 py-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div className={`flex flex-wrap gap-2 py-2 `}>
                       {dataAmount && (
-                        <div className={`inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-lg text-sm font-medium ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <div className={`inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-lg text-sm font-medium `}>
                           <Wifi className="w-4 h-4" />
                           <span>{dataAmount}</span>
                         </div>
                       )}
                       {validity && (
-                        <div className={`inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg text-sm font-medium ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <div className={`inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg text-sm font-medium `}>
                           <Clock className="w-4 h-4" />
                           <span>{validity} {t('dashboard.days', 'days')}</span>
                         </div>
                       )}
                       {hasQrCode && (
-                        <div className={`inline-flex items-center gap-1.5 bg-purple-50 text-purple-700 px-3 py-1.5 rounded-lg text-sm font-medium ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <div className={`inline-flex items-center gap-1.5 bg-purple-50 text-purple-700 px-3 py-1.5 rounded-lg text-sm font-medium `}>
                           <QrCode className="w-4 h-4" />
                           <span>{t('thankYou.qrReady', 'QR Ready')}</span>
                         </div>
@@ -170,7 +170,7 @@ const ThankYou = ({ orderDetails }) => {
                   
                   {/* Email */}
                   {email && (
-                    <div className={`flex justify-between items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div className={`flex justify-between items-center `}>
                       <span className="text-sm text-gray-500">{t('thankYou.email', 'Email')}</span>
                       <span className="text-sm font-medium text-gray-900">{email}</span>
                     </div>
@@ -178,7 +178,7 @@ const ThankYou = ({ orderDetails }) => {
                   
                   {/* Order ID */}
                   {orderId && (
-                    <div className={`flex justify-between items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div className={`flex justify-between items-center `}>
                       <span className="text-sm text-gray-500">{t('thankYou.orderId', 'Order ID')}</span>
                       <span className="text-xs font-mono text-gray-600 bg-gray-100 px-2 py-1 rounded">{orderId}</span>
                     </div>
@@ -196,7 +196,7 @@ const ThankYou = ({ orderDetails }) => {
             
             <div className="space-y-3">
               {/* Step 1 */}
-              <div className={`flex items-start gap-4 p-4 bg-blue-50 rounded-xl border border-blue-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex items-start gap-4 p-4 bg-blue-50 rounded-xl border border-blue-100 `}>
                 <div className="flex-shrink-0 w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center shadow-sm">
                   <Mail className="w-5 h-5 text-white" />
                 </div>
@@ -214,7 +214,7 @@ const ThankYou = ({ orderDetails }) => {
               </div>
 
               {/* Step 2 */}
-              <div className={`flex items-start gap-4 p-4 bg-purple-50 rounded-xl border border-purple-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex items-start gap-4 p-4 bg-purple-50 rounded-xl border border-purple-100 `}>
                 <div className="flex-shrink-0 w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center shadow-sm">
                   <Smartphone className="w-5 h-5 text-white" />
                 </div>
@@ -232,7 +232,7 @@ const ThankYou = ({ orderDetails }) => {
               </div>
 
               {/* Step 3 */}
-              <div className={`flex items-start gap-4 p-4 bg-emerald-50 rounded-xl border border-emerald-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex items-start gap-4 p-4 bg-emerald-50 rounded-xl border border-emerald-100 `}>
                 <div className="flex-shrink-0 w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-sm">
                   <Wifi className="w-5 h-5 text-white" />
                 </div>
@@ -255,7 +255,7 @@ const ThankYou = ({ orderDetails }) => {
           <div className="space-y-4">
             <button
               onClick={handleGoToDashboard}
-              className={`w-full bg-gray-900 hover:bg-gray-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl active:scale-[0.98] ${isRTL ? 'flex-row-reverse' : ''}`}
+              className={`w-full bg-gray-900 hover:bg-gray-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl active:scale-[0.98] `}
             >
               <QrCode className="w-5 h-5" />
               {t('thankYou.goToDashboard', 'Go to Dashboard')}

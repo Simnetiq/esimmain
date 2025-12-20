@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
+import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import CountryCard from './CountryCard';
 
 const CountriesGrid = ({
@@ -14,10 +15,35 @@ const CountriesGrid = ({
   selectedRegion,
   showAllOverride = null // When provided, parent controls the countries list directly
 }) => {
-  const { t } = useI18n();
+  const pathname = usePathname();
+  const { t, locale, isLoading: i18nLoading } = useI18n();
   const [showAll, setShowAll] = useState(false);
   const [isExpanding, setIsExpanding] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const gridRef = useRef(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Language detection with fallback
+  const detectedLanguage = useMemo(() => {
+    try {
+      if (i18nLoading) {
+        if (typeof window !== 'undefined') {
+          const savedLanguage = localStorage.getItem('Simnetiq-language');
+          if (savedLanguage) return savedLanguage;
+        }
+        return detectLanguageFromPath(pathname) || 'en';
+      }
+      return locale || 'en';
+    } catch {
+      return 'en';
+    }
+  }, [locale, pathname, i18nLoading]);
+
+  const direction = mounted ? getLanguageDirection(detectedLanguage) : 'ltr';
+  const isRTL = direction === 'rtl';
 
   // Reset showAll when region changes
   useEffect(() => {
@@ -57,7 +83,7 @@ const CountriesGrid = ({
 
   if (isLoading && countries.length === 0) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" dir={direction} lang={detectedLanguage}>
         {[...Array(8)].map((_, i) => (
           <div key={i} className="bg-gray-50 rounded-lg p-4 animate-pulse">
             <div className="flex items-center gap-3 mb-3">
@@ -76,8 +102,8 @@ const CountriesGrid = ({
 
   if (countries.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500 text-sm lg:text-base">
+      <div className="text-center py-12" dir={direction} lang={detectedLanguage}>
+        <p className={`text-gray-500 text-sm lg:text-base ${isRTL ? 'text-right' : 'text-center'}`}>
           {searchTerm
             ? t('plans.noCountriesFound', 'No countries found matching your search')
             : t('plans.noCountriesAvailable', 'No countries available yet')
@@ -88,10 +114,10 @@ const CountriesGrid = ({
   }
 
   return (
-    <div ref={gridRef}>
+    <div ref={gridRef} dir={direction} lang={detectedLanguage}>
       {/* Desktop Grid Layout - 4 columns */}
       <div
-        className="hidden sm:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+        className={`hidden sm:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 ${isRTL ? 'direction-rtl' : ''}`}
       >
         {displayedCountriesDesktop.map((country, index) => (
           <div
@@ -129,7 +155,7 @@ const CountriesGrid = ({
 
       {/* Mobile List Layout - 2 columns */}
       <div
-        className="sm:hidden grid grid-cols-2 gap-3"
+        className={`sm:hidden grid grid-cols-2 gap-3 ${isRTL ? 'direction-rtl' : ''}`}
       >
         {displayedCountriesMobile.map((country, index) => (
           <div

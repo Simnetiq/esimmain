@@ -1,6 +1,9 @@
 'use client';
 
+import { useState, useEffect, useMemo } from 'react';
+import { usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
+import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import Image from 'next/image'; 
 
 // Inline SVG icons to avoid lucide-react bundle overhead for these 4 icons
@@ -49,17 +52,51 @@ export const handleCopyDiscountCode = async (t) => {
 };
 
 export default function FeaturesSection() {
-  const { t, locale } = useI18n();
+  const pathname = usePathname();
+  const { t, locale, isLoading: i18nLoading } = useI18n();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const detectedLanguage = useMemo(() => {
+    try {
+      if (i18nLoading) {
+        if (typeof window !== 'undefined') {
+          const savedLanguage = localStorage.getItem('Simnetiq-language');
+          if (savedLanguage) return savedLanguage;
+        }
+        return detectLanguageFromPath(pathname) || 'en';
+      }
+      return locale || 'en';
+    } catch {
+      return 'en';
+    }
+  }, [locale, pathname, i18nLoading]);
+
+  const direction = mounted ? getLanguageDirection(detectedLanguage) : 'ltr';
+  const isRTL = direction === 'rtl';
+
+  // Debug logging
+  useEffect(() => {
+    console.log('[FeaturesSection] RTL Debug:', {
+      pathname,
+      locale,
+      i18nLoading,
+      detectedLanguage,
+      direction,
+      isRTL,
+      mounted,
+      localStorage: typeof window !== 'undefined' ? localStorage.getItem('Simnetiq-language') : null
+    });
+  }, [pathname, locale, i18nLoading, detectedLanguage, direction, isRTL, mounted]);
 
   // Grid pattern style
   const gridPatternStyle = {
     backgroundSize: '10px 10px',
     backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
   };
-
-  if (locale === 'he' || locale === 'ar') {
-    return null;
-  }
 
   // Features data - 4 cards with visual images
   // Using inline icon components instead of lucide-react for smaller bundle
@@ -100,7 +137,7 @@ export default function FeaturesSection() {
   ];
 
   return (
-    <div className="features-section bg-white flex flex-col overflow-hidden">
+    <div className="features-section bg-white flex flex-col overflow-hidden" dir={direction} lang={detectedLanguage}>
       <div className="relative flex-1 flex flex-col">
         {/* Grid Pattern - Left Side */}
         <div 
@@ -119,10 +156,10 @@ export default function FeaturesSection() {
           <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
             <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
               {/* CSS-only fade-in animation using animation-timeline when supported, fallback to visible */}
-              <p className="text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 mb-4 animate-fade-in-up">
+              <p className={`text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 mb-4 animate-fade-in-up ${isRTL ? 'text-right' : 'text-left'}`}>
                 {t('features.title', 'Why Choose Us')}
               </p>
-              <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-eerie-black max-w-5xl animate-fade-in-up animation-delay-100">
+              <h2 className={`text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-eerie-black max-w-5xl animate-fade-in-up animation-delay-100 ${isRTL ? 'text-right' : 'text-left'}`}>
                 {t('features.subtitle', 'Everything you need to stay connected abroad')}
               </h2>
             </div>
@@ -157,7 +194,7 @@ export default function FeaturesSection() {
                         />
                         
                         {/* Floating icon */}
-                        <div className="absolute top-4 right-4 w-11 h-11 rounded-lg bg-white/75 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <div className={`absolute top-4 w-11 h-11 rounded-lg bg-white/75 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform duration-300 ${isRTL ? 'left-4' : 'right-4'}`}>
                           <IconComponent />
                         </div>
                       </div>
@@ -165,12 +202,12 @@ export default function FeaturesSection() {
                       {/* Content Area */}
                       <div className="p-5 lg:p-6">
                         {/* Description first */}
-                        <p className="text-gray-500 text-sm leading-relaxed mb-3">
+                        <p className={`text-gray-500 text-sm leading-relaxed mb-3 ${isRTL ? 'text-right' : 'text-left'}`}>
                           {feature.description}
                         </p>
                         
                         {/* Title */}
-                        <h3 className="text-lg lg:text-xl font-semibold text-eerie-black mb-3">
+                        <h3 className={`text-lg lg:text-xl font-semibold text-eerie-black mb-3 ${isRTL ? 'text-right' : 'text-left'}`}>
                           {feature.title}
                         </h3>
                       </div>

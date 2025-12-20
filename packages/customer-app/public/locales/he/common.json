@@ -153,7 +153,8 @@
     "plan": "תוכנית",
     "plans": "תוכניות",
     "from": "מ-",
-    "priceNotAvailable": "מחיר לא זמין"
+    "priceNotAvailable": "מחיר לא זמין",
+    "regionalPlans": "תוכניות אזוריות"
   },
   "QRCodeModal": {
     "esimQrCode": "eSIM QR Code",
@@ -179,6 +180,14 @@
     "africa": "אפריקה",
     "oceania": "אוקיאניה",
     "all": "הכל"
+  },
+  "region": {
+    "popular_countries": "מדינות פופולריות",
+    "asia_countries": "פופולרי באסיה",
+    "europe_countries": "פופולרי באירופה",
+    "americas_countries": "פופולרי באמריקה",
+    "africa_countries": "פופולרי באפריקה",
+    "oceania_countries": "פופולרי באוקיאניה"
   },
   "language": {
     "select": "בחר שפה",
@@ -454,17 +463,24 @@
     "globalCoverage": "כיסוי ביותר מ-130 מדינות",
     "countries": "מדינות",
     "oneEsimAll": "eSIM אחד מכסה את כל המדינות ב",
+    "oneEsim": "eSIM אחד, כיסוי עולמי",
     "regionalEsim": "eSIM אזורי",
     "bestPrice": "המחיר הטוב ביותר",
     "unlimited": "נתונים ללא הגבלה",
     "moreData": "יותר נתונים",
     "comingSoon": "בקרוב",
-    "viewAllPlans": "צפה בכל התוכניות"
+    "viewAllPlans": "צפה בכל התוכניות",
+    "selectCountry": "בחר מדינה ספציפית לתוכניות מקומיות",
+    "discoverGlobal": "גלה גלובלי",
+    "covers": "מכסה",
+    "exploreAll": "חקור הכל",
+    "noGlobalPlans": "תוכניות גלובליות בקרוב"
   },
   "common": {
     "close": "סגור",
     "days": "ימים",
-    "from": "מ-"
+    "from": "מ-",
+    "viewAllCountries": "צפה בכל המדינות"
   },
   "sharePackage": {
     "title": "שתף חבילה",
