@@ -185,7 +185,7 @@ const Settings = () => {
           {/* Back Link */}
           <Link 
             href={getLocalizedUrl('/dashboard')}
-            className={`inline-flex items-center gap-2 text-eerie-black hover:text-tufts-blue font-medium transition-colors mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}
+            className={`inline-flex items-center gap-2 text-eerie-black hover:text-tufts-blue font-medium transition-colors mb-6 `}
           >
             <ArrowLeftIcon className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
             {t('settings.backToDashboard', 'Back to Dashboard')}
@@ -206,7 +206,7 @@ const Settings = () => {
       {/* Logout Section */}
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 pb-8">
         <div className="bg-white shadow-lg shadow-gray-200/50 p-6">
-          <div className={`flex items-start gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <div className={`flex items-start gap-4 `}>
           
             <div className="flex-1">
               <h3 className={`text-lg font-semibold text-eerie-black ${isRTL ? 'text-right' : ''}`}>
@@ -218,7 +218,7 @@ const Settings = () => {
               <button
                 onClick={handleLogout}
                 disabled={isLoggingOut}
-                className={`mt-4 inline-flex items-center gap-2 px-6 py-3 bg-red-600 text-white font-medium rounded-full hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${isRTL ? 'flex-row-reverse' : ''}`}
+                className={`mt-4 inline-flex items-center gap-2 px-6 py-3 bg-red-600 text-white font-medium rounded-full hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed `}
               >
                 {isLoggingOut ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />

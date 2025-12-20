@@ -97,7 +97,7 @@ const BottomSheet = ({
               >
                 {/* Header */}
                 <div className="px-5 py-4 border-b border-gray-100 flex-shrink-0 bg-gray-50" dir={isRTL ? 'rtl' : 'ltr'}>
-                  <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <div className={`flex items-center justify-between `}>
                     <h2 className={`text-lg font-semibold text-eerie-black tracking-tight ${isRTL ? 'text-right' : 'text-left'}`}>
                       {title}
                     </h2>
@@ -145,7 +145,7 @@ const BottomSheet = ({
 
               {/* Header */}
               <div className="px-5 pb-4 pt-2 border-b border-gray-100 bg-gray-50" dir={isRTL ? 'rtl' : 'ltr'}>
-                <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className={`flex items-center justify-between `}>
                   <h2 className={`text-lg font-semibold text-eerie-black tracking-tight ${isRTL ? 'text-right' : 'text-left'}`}>
                     {title}
                   </h2>

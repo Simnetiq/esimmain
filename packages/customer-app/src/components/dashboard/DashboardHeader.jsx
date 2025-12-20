@@ -56,9 +56,9 @@ const DashboardHeader = ({ currentUser, orders = [] }) => {
             <div className="w-full h-px bg-gray-200 my-4"></div>
 
             {/* Stats Line */}
-            <div className={`flex flex-wrap items-center gap-4 sm:gap-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`flex flex-wrap items-center gap-4 sm:gap-6 `}>
               {/* Total Orders */}
-              <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex items-center gap-2 `}>
                 <div className="w-8 h-8 bg-tufts-blue/10 rounded flex items-center justify-center">
                   <ShoppingBag className="w-4 h-4 text-tufts-blue" />
                 </div>
@@ -71,7 +71,7 @@ const DashboardHeader = ({ currentUser, orders = [] }) => {
               <div className="w-px h-8 bg-gray-200 hidden sm:block"></div>
 
               {/* Active eSIMs */}
-              <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex items-center gap-2 `}>
                 <div className="w-8 h-8 bg-tufts-blue/10 rounded flex items-center justify-center">
                   <Wifi className="w-4 h-4 text-tufts-blue" />
                 </div>
@@ -84,7 +84,7 @@ const DashboardHeader = ({ currentUser, orders = [] }) => {
               <div className="w-px h-8 bg-gray-200 hidden sm:block"></div>
 
               {/* Total Spent */}
-              <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex items-center gap-2 `}>
                 <div className="w-8 h-8 bg-tufts-blue/10 rounded flex items-center justify-center">
                   <DollarSign className="w-4 h-4 text-tufts-blue" />
                 </div>
@@ -97,11 +97,11 @@ const DashboardHeader = ({ currentUser, orders = [] }) => {
 
             {/* Quick Actions */}
             <div className="mt-6">
-              <div className={`flex flex-wrap gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex flex-wrap gap-3 `}>
                 {/* Browse eSIMs */}
                 <Link 
                   href={getLocalizedUrl('/esim-plans')}
-                  className={`inline-flex items-center gap-2 px-4 py-2.5 bg-tufts-blue text-white text-sm font-medium rounded-lg hover:bg-tufts-blue/90 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
+                  className={`inline-flex items-center gap-2 px-4 py-2.5 bg-tufts-blue text-white text-sm font-medium rounded-lg hover:bg-tufts-blue/90 transition-colors `}
                 >
                   <Store className="w-4 h-4" />
                   {t('dashboard.browseEsims', 'Browse eSIMs')}
@@ -111,7 +111,7 @@ const DashboardHeader = ({ currentUser, orders = [] }) => {
                 {/* Account Settings */}
                 <Link 
                   href={getLocalizedUrl('/settings')}
-                  className={`inline-flex items-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
+                  className={`inline-flex items-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors `}
                 >
                   <Settings className="w-4 h-4" />
                   {t('dashboard.accountSettings', 'Account Settings')}

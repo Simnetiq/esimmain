@@ -239,7 +239,7 @@ const CookieConsent = () => {
           {!showCustomize ? (
             <div className="p-5 lg:p-6">
               {/* Header */}
-              <div className={`flex items-start gap-3 mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex items-start gap-3 mb-4 `}>
                 <div className="w-10 h-10 bg-tufts-blue/10 rounded-xl flex items-center justify-center flex-shrink-0">
                   <CookieIcon className="w-5 h-5 text-tufts-blue" />
                 </div>
@@ -261,7 +261,7 @@ const CookieConsent = () => {
               </div>
 
               {/* Links */}
-              <div className={`flex flex-wrap gap-4 text-sm mb-5 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex flex-wrap gap-4 text-sm mb-5 `}>
                 <Link 
                   href="/cookie-policy" 
                   className="text-tufts-blue hover:text-tufts-blue/80 underline-offset-2 hover:underline transition-colors"
@@ -286,14 +286,14 @@ const CookieConsent = () => {
                 </button>
                 <button
                   onClick={() => setShowCustomize(true)}
-                  className={`px-5 py-2.5 text-sm font-medium text-gray-700 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors inline-flex items-center justify-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}
+                  className={`px-5 py-2.5 text-sm font-medium text-gray-700 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors inline-flex items-center justify-center gap-2 `}
                 >
                   <SettingsIcon className="w-4 h-4" />
                   {t('customize')}
                 </button>
                 <button
                   onClick={handleAcceptAll}
-                  className={`btn-primary px-5 py-2.5 text-sm inline-flex items-center justify-center gap-2 flex-1 sm:flex-none ${isRTL ? 'flex-row-reverse' : ''}`}
+                  className={`btn-primary px-5 py-2.5 text-sm inline-flex items-center justify-center gap-2 flex-1 sm:flex-none `}
                 >
                   <CheckIcon className="w-4 h-4" />
                   {t('acceptAll')}
@@ -303,7 +303,7 @@ const CookieConsent = () => {
           ) : (
             /* Customize Panel */
             <div className="p-5 lg:p-6">
-              <div className={`flex items-center justify-between mb-5 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex items-center justify-between mb-5 `}>
                 <h3 className="text-lg font-semibold text-eerie-black">
                   {t('customize')}
                 </h3>
@@ -318,7 +318,7 @@ const CookieConsent = () => {
               {/* Cookie Categories */}
               <div className="space-y-3 mb-5">
                 {/* Essential */}
-                <div className={`flex items-center justify-between p-3 bg-gray-50 rounded-lg ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className={`flex items-center justify-between p-3 bg-gray-50 rounded-lg `}>
                   <span className="text-sm font-medium text-eerie-black">{t('essential')}</span>
                   <span className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded-full">
                     {t('alwaysActive')}
@@ -326,7 +326,7 @@ const CookieConsent = () => {
                 </div>
 
                 {/* Analytics */}
-                <div className={`flex items-center justify-between p-3 bg-gray-50 rounded-lg ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className={`flex items-center justify-between p-3 bg-gray-50 rounded-lg `}>
                   <span className="text-sm font-medium text-eerie-black">{t('analytics')}</span>
                   <button
                     onClick={() => togglePreference('analytics')}
@@ -343,7 +343,7 @@ const CookieConsent = () => {
                 </div>
 
                 {/* Functional */}
-                <div className={`flex items-center justify-between p-3 bg-gray-50 rounded-lg ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className={`flex items-center justify-between p-3 bg-gray-50 rounded-lg `}>
                   <span className="text-sm font-medium text-eerie-black">{t('functional')}</span>
                   <button
                     onClick={() => togglePreference('functional')}
@@ -360,7 +360,7 @@ const CookieConsent = () => {
                 </div>
 
                 {/* Marketing */}
-                <div className={`flex items-center justify-between p-3 bg-gray-50 rounded-lg ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className={`flex items-center justify-between p-3 bg-gray-50 rounded-lg `}>
                   <span className="text-sm font-medium text-eerie-black">{t('marketing')}</span>
                   <button
                     onClick={() => togglePreference('marketing')}
@@ -380,7 +380,7 @@ const CookieConsent = () => {
               {/* Save Button */}
               <button
                 onClick={handleSavePreferences}
-                className={`btn-primary w-full py-2.5 text-sm inline-flex items-center justify-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}
+                className={`btn-primary w-full py-2.5 text-sm inline-flex items-center justify-center gap-2 `}
               >
                 <CheckIcon className="w-4 h-4" />
                 {t('savePreferences')}

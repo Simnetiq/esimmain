@@ -1,8 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { usePathname } from 'next/navigation';
 import { Globe, QrCode, Wifi, Phone, MessageSquare, Clock, Signal, ChevronRight, Zap } from 'lucide-react';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
+import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { getISOCode } from '@esim/shared/utils/countryCodeMap';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
 import { mapPackageCountryData, mapPlanDetails } from '@esim/shared/utils/esimFieldMapper';
@@ -69,8 +71,32 @@ const CircularProgress = ({ percentage, size = 48, strokeWidth = 4, isExpired = 
   );
 };
 
-const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
-  const { t } = useI18n();
+const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode }) => {
+  const pathname = usePathname();
+  const { t, locale, isLoading: i18nLoading } = useI18n();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const detectedLanguage = useMemo(() => {
+    try {
+      if (i18nLoading) {
+        if (typeof window !== 'undefined') {
+          const savedLanguage = localStorage.getItem('Simnetiq-language');
+          if (savedLanguage) return savedLanguage;
+        }
+        return detectLanguageFromPath(pathname) || 'en';
+      }
+      return locale || 'en';
+    } catch {
+      return 'en';
+    }
+  }, [locale, pathname, i18nLoading]);
+
+  const direction = mounted ? getLanguageDirection(detectedLanguage) : 'ltr';
+  const isRTL = direction === 'rtl';
 
   // Format data usage with progress
   const formatDataUsage = (remaining, total, isUnlimited) => {
@@ -197,18 +223,20 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
   return (
     <div
       className={`group relative bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden cursor-pointer h-full ${
-        isExpired 
-          ? 'border border-gray-200 opacity-80 hover:opacity-100' 
+        isExpired
+          ? 'border border-gray-200 opacity-80 hover:opacity-100'
           : 'border border-gray-200 hover:border-tufts-blue/30'
       }`}
       title={fullName}
       onClick={() => onViewQRCode(order)}
+      dir={direction}
+      lang={detectedLanguage}
     >
       {/* Card Header with Status */}
       <div className={`relative px-4 sm:px-5 pt-4 sm:pt-5 pb-3 ${isRTL ? 'text-right' : 'text-left'}`}>
         {/* Status Badge - Absolute positioned */}
         <div className={`absolute top-3 ${isRTL ? 'left-3' : 'right-3'}`}>
-          <div className={`inline-flex items-center gap-1.5 ${statusInfo.bgColor} px-2.5 py-1 rounded-full ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <div className={`inline-flex items-center gap-1.5 ${statusInfo.bgColor} px-2.5 py-1 rounded-full `}>
             <div className={`w-1.5 h-1.5 rounded-full ${statusInfo.color} animate-pulse`}></div>
             <span className={`text-xs font-medium ${statusInfo.textColor}`}>
               {statusInfo.label}
@@ -217,7 +245,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
         </div>
 
         {/* Country/Region Header */}
-        <div className={`flex items-center gap-3.5 ${isRTL ? 'flex-row-reverse' : ''}`}>
+        <div className={`flex items-center gap-3.5 `}>
           {/* Flag Container - Featured Icon Style (Untitled UI) */}
           <div className="flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center border border-gray-200 overflow-hidden shadow-sm">
             {flagPath ? (
@@ -259,9 +287,9 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
 
       {/* Metrics Section - Untitled UI Card Style */}
       <div className="px-4 sm:px-5 py-3 bg-gray-50/50 border-y border-gray-100">
-        <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+        <div className={`flex items-center justify-between `}>
           {/* Data Usage with Circular Progress */}
-          <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <div className={`flex items-center gap-3 `}>
             {loadingUsage ? (
               <div className="w-12 h-12 rounded-full bg-gray-200 animate-pulse"></div>
             ) : usage ? (
@@ -295,7 +323,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
 
           {/* Validity Badge */}
           {validityDisplay && (
-            <div className={`flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-gray-200 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-gray-200 `}>
               <Clock className="w-3.5 h-3.5 text-gray-400" />
               <span className="text-xs font-medium text-gray-600">{validityDisplay}</span>
             </div>
@@ -304,7 +332,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
         
         {/* Expiration notice */}
         {isExpired && usageData?.expired_at && (
-          <div className={`flex items-center gap-1.5 mt-2 pt-2 border-t border-gray-200 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <div className={`flex items-center gap-1.5 mt-2 pt-2 border-t border-gray-200 `}>
             <Clock className="w-3 h-3 text-amber-500" />
             <span className="text-xs text-amber-600">
               {t('dashboard.expiredOn', 'Expired on')} {new Date(usageData.expired_at).toLocaleDateString()}
@@ -315,23 +343,23 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
 
       {/* Plan Features - Tag Style */}
       {(planDetails.voice > 0 || planDetails.sms > 0 || (planDetails.operator && planDetails.operator !== 'Airalo Partner Network')) && (
-        <div className={`px-4 sm:px-5 py-2.5 flex flex-wrap gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+        <div className={`px-4 sm:px-5 py-2.5 flex flex-wrap gap-2 `}>
           {planDetails.voice > 0 && (
-            <div className={`inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2 py-1 rounded-md text-xs font-medium ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2 py-1 rounded-md text-xs font-medium `}>
               <Phone className="w-3 h-3" />
               <span>{planDetails.voice} {t('dashboard.min', 'min')}</span>
             </div>
           )}
           
           {planDetails.sms > 0 && (
-            <div className={`inline-flex items-center gap-1 bg-purple-50 text-purple-700 px-2 py-1 rounded-md text-xs font-medium ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`inline-flex items-center gap-1 bg-purple-50 text-purple-700 px-2 py-1 rounded-md text-xs font-medium `}>
               <MessageSquare className="w-3 h-3" />
               <span>{planDetails.sms} SMS</span>
             </div>
           )}
           
           {planDetails.operator && planDetails.operator !== 'Airalo Partner Network' && (
-            <div className={`inline-flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-1 rounded-md text-xs font-medium ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`inline-flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-1 rounded-md text-xs font-medium `}>
               <Signal className="w-3 h-3" />
               <span className="truncate max-w-[100px]">{planDetails.operator}</span>
             </div>
@@ -340,7 +368,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
       )}
 
       {/* Footer - Price & CTA */}
-      <div className={`px-4 sm:px-5 py-3.5 border-t border-gray-100 flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+      <div className={`px-4 sm:px-5 py-3.5 border-t border-gray-100 flex items-center justify-between `}>
         <div>
           <p className="text-xs text-gray-500 mb-0.5">{t('dashboard.price', 'Price')}</p>
           <p className="text-lg font-bold text-gray-900">
@@ -353,7 +381,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, isRTL }) => {
             e.stopPropagation();
             onViewQRCode(order);
           }}
-          className={`group/btn inline-flex items-center gap-2 px-4 py-2.5 bg-tufts-blue text-white rounded-lg font-medium hover:bg-tufts-blue/90 active:scale-[0.98] transition-all duration-200 shadow-sm hover:shadow ${isRTL ? 'flex-row-reverse' : ''}`}
+          className={`group/btn inline-flex items-center gap-2 px-4 py-2.5 bg-tufts-blue text-white rounded-lg font-medium hover:bg-tufts-blue/90 active:scale-[0.98] transition-all duration-200 shadow-sm hover:shadow `}
         >
           <QrCode className="w-4 h-4" />
           <span className="text-sm">{t('dashboard.viewQR', 'View QR')}</span>

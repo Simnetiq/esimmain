@@ -1,10 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
+import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
+import { getPlatformAppStoreLink } from '@esim/shared/utils/appStoreLinks';
 import CountrySearchBar from '../CountrySearchBar';
-import TypingText from '../text/TypingText';
 
 // Inline SVG icons to avoid lucide-react bundle overhead
 const GlobeIcon = ({ className }) => (
@@ -32,8 +34,44 @@ const ArrowRightIcon = ({ className }) => (
 );
 
 export default function HeroSection({ onCountrySelect }) {
-  const { t, translations } = useI18n();
-  
+  const pathname = usePathname();
+  const { locale, t, translations, isLoading: i18nLoading } = useI18n();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const detectedLanguage = useMemo(() => {
+    try {
+      if (i18nLoading) {
+        if (typeof window !== 'undefined') {
+          const savedLanguage = localStorage.getItem('Simnetiq-language');
+          if (savedLanguage) return savedLanguage;
+        }
+        return detectLanguageFromPath(pathname) || 'en';
+      }
+      return locale || 'en';
+    } catch {
+      return 'en';
+    }
+  }, [locale, pathname, i18nLoading]);
+
+  const direction = mounted ? getLanguageDirection(detectedLanguage) : 'ltr';
+
+  // Debug logging
+  useEffect(() => {
+    console.log('[HeroSection] RTL Debug:', {
+      pathname,
+      locale,
+      i18nLoading,
+      detectedLanguage,
+      direction,
+      mounted,
+      localStorage: typeof window !== 'undefined' ? localStorage.getItem('Simnetiq-language') : null
+    });
+  }, [pathname, locale, i18nLoading, detectedLanguage, direction, mounted]);
+
   const handleDownloadApp = () => {
     // Track with Facebook Pixel - Download App CTA
     trackCustomFacebookEvent('DownloadAppCTA', {
@@ -64,7 +102,7 @@ export default function HeroSection({ onCountrySelect }) {
   // Skeleton loader
   if (!hasTranslations) {
     return (
-      <div className="hero-section relative min-h-[85vh] flex flex-col" style={{ background: 'linear-gradient(to bottom right, rgba(83, 116, 205, 0.25), rgba(240, 249, 255, 0.4), rgba(239, 246, 255, 1))' }}>
+      <div className="hero-section relative min-h-[85vh] flex flex-col" style={{ background: 'linear-gradient(to bottom right, rgba(83, 116, 205, 0.25), rgba(240, 249, 255, 0.4), rgba(239, 246, 255, 1))' }} dir={direction} lang={detectedLanguage}>
         {/* Gradient Orbs - Using #5374CD - Large to bleed into navbar and features */}
         <div className="absolute top-0 left-0 w-[800px] h-[800px] rounded-full blur-[120px] -translate-x-1/3 -translate-y-1/3" style={{ backgroundColor: 'rgba(83, 116, 205, 0.25)' }} />
         <div className="absolute bottom-0 right-0 w-[700px] h-[700px] rounded-full blur-[100px] translate-x-1/4 translate-y-1/4" style={{ backgroundColor: 'rgba(83, 116, 205, 0.2)' }} />
@@ -84,11 +122,11 @@ export default function HeroSection({ onCountrySelect }) {
           />
           
           <div className="relative flex-1 flex flex-col items-center justify-center px-4 py-16 lg:py-20">
-            <div className="mx-auto w-full max-w-7xl">
+            <div className="mx-auto w-full max-w-7xl">§
               <div className="px-4 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl text-center">
-                
+
                 {/* Badge skeleton */}
-                <div className="flex justify-center mb-6">
+                <div className="flex mb-6 justify-center">
                   <div className="h-10 w-52 bg-white/60 rounded-full shadow-sm" />
                 </div>
                 
@@ -111,9 +149,9 @@ export default function HeroSection({ onCountrySelect }) {
                   <div className="h-5 w-full bg-gray-100/80 rounded" />
                   <div className="h-5 w-3/4 bg-gray-100/80 rounded mx-auto" />
                 </div>
-                
+
                 {/* Trust indicators skeleton */}
-                <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
+                <div className="flex flex-wrap items-center gap-6 sm:gap-10 justify-center">
                   <div className="flex items-center gap-2">
                     <div className="w-5 h-5 bg-tufts-blue/20 rounded" />
                     <div className="h-4 w-24 bg-gray-100 rounded" />
@@ -139,7 +177,7 @@ export default function HeroSection({ onCountrySelect }) {
   }
 
   return (
-    <div className="hero-section relative min-h-[85vh] flex flex-col">
+    <div className="hero-section relative min-h-[85vh] flex flex-col" dir={direction} lang={detectedLanguage}>
       {/* Gradient Orbs - Simplified and reduced blur */}
       <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full blur-[50px] opacity-60" style={{ backgroundColor: 'rgba(83, 116, 205, 0.2)' }} />
       <div className="absolute top-1/2 left-1/2 w-[500px] h-[500px] bg-white/40 rounded-full blur-[60px] -translate-x-1/2 -translate-y-1/2" />
@@ -162,26 +200,27 @@ export default function HeroSection({ onCountrySelect }) {
         <div className="relative flex-1 flex flex-col items-center justify-center px-4 py-16 lg:py-20">
           <div className="mx-auto w-full max-w-7xl">
             <div className="px-4 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl text-center">
-              
-              {/* Badge - Links to App Store */}
-              <a
-                href="https://apps.apple.com/gb/app/simnetiq-global-esim/id6755963262"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={handleDownloadApp}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full shadow-sm mb-6 hover:border-tufts-blue hover:shadow-md transition-all group"
-              >
-                <div className="w-2 h-2 bg-green-500 rounded-full" />
-                <span className="text-base font-medium text-gray-700 group-hover:text-tufts-blue transition-colors">
-                  {t('hero.badge', 'Now available on iOS')}
-                </span>
-                <ArrowRightIcon className="w-4 h-4 text-gray-400 group-hover:text-tufts-blue group-hover:translate-x-0.5 transition-all" />
-              </a>
+
+              {/* Badge - Links to App Store (auto-detects platform) */}
+              <div className="flex mb-6 justify-center">
+                <a
+                  href={getPlatformAppStoreLink()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={handleDownloadApp}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full shadow-sm hover:border-tufts-blue hover:shadow-md transition-all group"
+                >
+                  <div className="w-2 h-2 bg-green-500 rounded-full" />
+                  <span className="text-base font-medium text-gray-700 group-hover:text-tufts-blue transition-colors">
+                    {t('hero.badge', 'Now available on iOS & Android')}
+                  </span>
+                  <ArrowRightIcon className={`w-4 h-4 text-gray-400 group-hover:text-tufts-blue transition-all ${direction === 'rtl' ? 'rotate-180' : ''}`} />
+                </a>
+              </div>
               
               {/* Headline */}
               <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-eerie-black mb-8">
-                <span className="inline-block">{t('hero.stayConnected', 'The easiest way to get mobile data anywhere in the world')}</span>{' '}
-                
+                {t('hero.stayConnected', 'The easiest way to get mobile data anywhere in the world')}
               </h1>
               
               {/* Search Bar - Main CTA */}
@@ -192,12 +231,12 @@ export default function HeroSection({ onCountrySelect }) {
               </div>
               
               {/* Subtitle */}
-              <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+              <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
                 {t('hero.subtitle', 'Activate your eSIM in minutes and stay connected in 200+ destinations worldwide. Fast 4G/5G networks, simple setup, and plans designed for travelers — not roaming fees.')}
               </p>
               
               {/* Trust Indicators */}
-              <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-sm text-gray-500">
+              <div className="flex flex-wrap items-center gap-6 sm:gap-10 text-sm text-gray-500 justify-center">
                 {trustIndicators.map(({ Icon, label, key }, index) => (
                   <React.Fragment key={key}>
                     <div className="flex items-center gap-2 text-eerie-black">

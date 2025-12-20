@@ -166,13 +166,13 @@ export default function TravelBlogsSection() {
               <p className={`text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 mb-4 animate-fade-in-up ${isRTL ? 'text-right' : 'text-left'}`}>
                 {t('travelBlogs.title', 'Travel Tips & Guides')}
               </p>
-              <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 `}>
                 <h2 className={`text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-eerie-black max-w-3xl animate-fade-in-up animation-delay-100 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('travelBlogs.subtitle', 'Latest travel insights for digital nomads')}
                 </h2>
                 <Link 
                   href={getBlogListUrl()}
-                  className={`group inline-flex items-center gap-2 text-sm font-medium text-tufts-blue hover:text-tufts-blue/80 transition-colors animate-fade-in-up animation-delay-200 ${isRTL ? 'flex-row-reverse' : ''}`}
+                  className={`group inline-flex items-center gap-2 text-sm font-medium text-tufts-blue hover:text-tufts-blue/80 transition-colors animate-fade-in-up animation-delay-200 `}
                 >
                   <span>{t('travelBlogs.viewAll', 'View all articles')}</span>
                   <ArrowRightIcon className={`w-4 h-4 group-hover:translate-x-1 transition-transform ${isRTL ? 'rotate-180 group-hover:-translate-x-1' : ''}`} />

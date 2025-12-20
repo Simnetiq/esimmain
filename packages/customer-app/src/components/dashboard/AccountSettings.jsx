@@ -290,11 +290,11 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               {/* Email */}
               <div className="space-y-2">
-                <label className={`flex items-center gap-1.5 text-sm font-medium text-gray-600 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <label className={`flex items-center gap-1.5 text-sm font-medium text-gray-600 `}>
                   <MailIcon className="w-4 h-4" />
                   {t('dashboard.emailAddress', 'Email Address')}
                 </label>
-                <div className={`flex items-center justify-between p-3.5 bg-white border border-gray-200 rounded-xl ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className={`flex items-center justify-between p-3.5 bg-white border border-gray-200 rounded-xl `}>
                   <span className="text-sm text-eerie-black break-all">{currentUser.email}</span>
                   <span className="flex-shrink-0 text-xs font-medium text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
                     {t('dashboard.verified', 'Verified')}
@@ -304,12 +304,12 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
 
               {/* Name */}
               <div className="space-y-2">
-                <label className={`flex items-center gap-1.5 text-sm font-medium text-gray-600 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <label className={`flex items-center gap-1.5 text-sm font-medium text-gray-600 `}>
                   <UserIcon className="w-4 h-4" />
                   {t('dashboard.displayName', 'Display Name')}
                 </label>
                 {editingName ? (
-                  <div className={`flex gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <div className={`flex gap-2 `}>
                     <input
                       type="text"
                       value={newName}
@@ -332,7 +332,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
                     </button>
                   </div>
                 ) : (
-                  <div className={`flex items-center justify-between p-3.5 bg-white border border-gray-200 rounded-xl ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <div className={`flex items-center justify-between p-3.5 bg-white border border-gray-200 rounded-xl `}>
                     <span className="text-sm text-eerie-black">{currentUser.displayName || t('dashboard.notSet', 'Not set')}</span>
                     <button
                       onClick={() => setEditingName(true)}
@@ -346,12 +346,12 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
 
               {/* Phone Number */}
               <div className="space-y-2">
-                <label className={`flex items-center gap-1.5 text-sm font-medium text-gray-600 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <label className={`flex items-center gap-1.5 text-sm font-medium text-gray-600 `}>
                   <PhoneIcon className="w-4 h-4" />
                   {t('dashboard.phoneNumber', 'Phone Number')}
                 </label>
                 {editingPhone ? (
-                  <div className={`flex gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <div className={`flex gap-2 `}>
                     <input
                       type="tel"
                       value={newPhone}
@@ -374,7 +374,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
                     </button>
                   </div>
                 ) : (
-                  <div className={`flex items-center justify-between p-3.5 bg-white border border-gray-200 rounded-xl ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <div className={`flex items-center justify-between p-3.5 bg-white border border-gray-200 rounded-xl `}>
                     <span className="text-sm text-eerie-black">{userProfile?.phoneNumber || t('dashboard.notSet', 'Not set')}</span>
                     <button
                       onClick={() => setEditingPhone(true)}
@@ -388,11 +388,11 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
 
               {/* Account Created */}
               <div className="space-y-2">
-                <label className={`flex items-center gap-1.5 text-sm font-medium text-gray-600 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <label className={`flex items-center gap-1.5 text-sm font-medium text-gray-600 `}>
                   <CalendarIcon className="w-4 h-4" />
                   {t('dashboard.accountCreated', 'Account Created')}
                 </label>
-                <div className={`flex items-center justify-between p-3.5 bg-white border border-gray-200 rounded-xl ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className={`flex items-center justify-between p-3.5 bg-white border border-gray-200 rounded-xl `}>
                   <span className="text-sm text-eerie-black">
                     {userProfile?.createdAt ? 
                       (userProfile.createdAt.toDate ? 
@@ -414,11 +414,11 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
                 {t('dashboard.security', 'Security')}
               </h3>
               <div className="space-y-2">
-                <label className={`flex items-center gap-1.5 text-sm font-medium text-gray-600 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <label className={`flex items-center gap-1.5 text-sm font-medium text-gray-600 `}>
                   <KeyIcon className="w-4 h-4" />
                   {t('dashboard.password', 'Password')}
                 </label>
-                <div className={`flex items-center justify-between p-3.5 bg-white border border-gray-200 rounded-xl ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className={`flex items-center justify-between p-3.5 bg-white border border-gray-200 rounded-xl `}>
                   <span className="text-sm text-eerie-black">••••••••</span>
                   <button
                     onClick={handlePasswordReset}
@@ -438,7 +438,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
           {/* Social Account Info - Show for Google/Apple users */}
           {isSocialUser && (
             <div className={`shadow-lg shadow-gray-200/50 p-5 sm:p-6`}>  
-              <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex items-center gap-3 `}>
                 {isGoogleUser ? <GoogleIcon /> : <AppleIcon />}
                 <span className={`text-sm font-semibold text-eerie-black`}>
                   {isGoogleUser 
@@ -458,7 +458,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
 
           {/* Newsletter Preferences */}
           <div className="bg-white shadow-lg shadow-gray-200/50 p-5 sm:p-6">
-            <div className={`flex items-start gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`flex items-start gap-4 `}>
              
               <div className="flex-1">
                 <h3 className={`text-base font-semibold text-eerie-black ${isRTL ? 'text-right' : ''}`}>
@@ -477,7 +477,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
                     isSubscribedToNewsletter 
                       ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' 
                       : 'bg-tufts-blue text-white hover:bg-tufts-blue/90'
-                  } font-medium rounded-full transition-colors disabled:opacity-50 ${isRTL ? 'flex-row-reverse' : ''}`}
+                  } font-medium rounded-full transition-colors disabled:opacity-50 `}
                 >
                   {isUnsubscribing ? (
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />
@@ -495,7 +495,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
 
           {/* Delete Account */}
           <div className="bg-white shadow-lg shadow-gray-200/50 p-5 sm:p-6">
-            <div className={`flex items-start gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`flex items-start gap-4 `}>
               <div className="flex-1">
                 <h3 className={`text-base font-semibold text-eerie-black ${isRTL ? 'text-right' : ''}`}>
                   {t('settings.deleteAccount', 'Delete Account')}
@@ -505,7 +505,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
                 </p>
                 <button
                   onClick={() => setShowDeleteModal(true)}
-                  className={`mt-4 inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white font-medium rounded-full hover:bg-red-700 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
+                  className={`mt-4 inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white font-medium rounded-full hover:bg-red-700 transition-colors `}
                 >
                   <TrashIcon className="w-4 h-4" />
                   {t('settings.deleteMyAccount', 'Delete My Account')}
@@ -520,7 +520,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowDeleteModal(false)}>
           <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6" onClick={e => e.stopPropagation()}> 
-            <div className={`flex items-center gap-3 mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`flex items-center gap-3 mb-4 `}>
               <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
                 <AlertTriangleIcon className="w-6 h-6 text-red-600" />
               </div>
@@ -546,7 +546,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
               />
             </div>
             
-            <div className={`flex gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`flex gap-3 `}>
               <button
                 onClick={() => {
                   setShowDeleteModal(false);
@@ -559,7 +559,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
               <button
                 onClick={handleDeleteAccount}
                 disabled={isDeleting || deleteConfirmText !== 'DELETE'}
-                className={`flex-1 px-5 py-3 bg-red-600 text-white font-medium rounded-full hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}
+                className={`flex-1 px-5 py-3 bg-red-600 text-white font-medium rounded-full hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 `}
               >
                 {isDeleting ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />

@@ -96,7 +96,8 @@
     "plan": "plan",
     "plans": "plans",
     "from": "From",
-    "priceNotAvailable": "Price N/A"
+    "priceNotAvailable": "Price N/A",
+    "regionalPlans": "Regional Plans"
   },
   "discount": {
     "get35Off": "Get 35% OFF",
@@ -173,6 +174,14 @@
     "africa": "Africa",
     "oceania": "Oceania",
     "all": "All"
+  },
+  "region": {
+    "popular_countries": "Popular countries",
+    "asia_countries": "Popular in Asia",
+    "europe_countries": "Popular in Europe",
+    "americas_countries": "Popular in Americas",
+    "africa_countries": "Popular in Africa",
+    "oceania_countries": "Popular in Oceania"
   },
   "language": {
     "select": "Select Language",
@@ -523,17 +532,24 @@
     "globalCoverage": "Coverage in 130+ countries",
     "countries": "countries",
     "oneEsimAll": "One eSIM covers all countries in",
+    "oneEsim": "One eSIM, worldwide coverage",
     "regionalEsim": "Regional eSIM",
     "bestPrice": "Best price",
     "unlimited": "Unlimited data",
     "moreData": "More data",
     "comingSoon": "Coming soon",
-    "viewAllPlans": "View all plans"
+    "viewAllPlans": "View all plans",
+    "selectCountry": "Select a specific country for local plans",
+    "discoverGlobal": "Discover Global",
+    "covers": "Covers",
+    "exploreAll": "Explore All",
+    "noGlobalPlans": "Global plans coming soon"
   },
   "common": {
     "close": "Close",
     "days": "days",
-    "from": "From"
+    "from": "From",
+    "viewAllCountries": "View all countries"
   },
   "sharePackage": {
     "title": "Buy eSIM Package",
@@ -672,5 +688,25 @@
     "successMessage": "Thanks for subscribing! 🎉",
     "alreadySubscribed": "You're already subscribed!",
     "errorMessage": "Something went wrong. Please try again."
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Everything you need to know about eSIM",
+    "whatIsEsim": "What is an eSIM and how does it work?",
+    "whatIsEsimAnswer": "An eSIM (embedded SIM) is a digital SIM card that's built into your device. Instead of inserting a physical SIM card, you can download and activate a cellular plan directly onto your device. This allows you to switch between carriers and plans without needing to swap physical cards.",
+    "deviceSupport": "Which devices support eSIM?",
+    "deviceSupportAnswer": "Most modern smartphones support eSIM, including iPhone XS and newer, Google Pixel 3 and newer, Samsung Galaxy S20 and newer, and many others. Check your device settings or contact us to confirm compatibility.",
+    "howToActivate": "How do I activate my eSIM?",
+    "howToActivateAnswer": "After purchase, you'll receive a QR code via email. Simply scan this code with your device's camera in the cellular settings, and your eSIM will be activated automatically. Detailed instructions are provided for each device type.",
+    "paymentMethods": "What payment methods do you accept?",
+    "paymentMethodsAnswer": "We accept all major credit cards (Visa, Mastercard, American Express), PayPal, Apple Pay, Google Pay, and various local payment methods depending on your region.",
+    "refundPolicy": "Can I get a refund if I'm not satisfied?",
+    "refundPolicyAnswer": "Yes, we offer a 7-day money-back guarantee for unused data plans. If you haven't activated your eSIM or used any data, you can request a full refund within 7 days of purchase.",
+    "notConnecting": "My eSIM isn't connecting to the network. What should I do?",
+    "notConnectingAnswer": "First, ensure you're in an area with network coverage. Try restarting your device, toggling airplane mode on/off, or manually selecting the network in your cellular settings. If issues persist, contact our support team.",
+    "callsSms": "Can I use my eSIM for calls and SMS?",
+    "callsSmsAnswer": "Our eSIM plans are primarily data-only. However, you can use VoIP services like WhatsApp, Skype, or FaceTime for calls and messaging over your data connection.",
+    "checkUsage": "How do I check my data usage?",
+    "checkUsageAnswer": "You can monitor your data usage through your device's settings or our mobile app. We also send notifications when you're approaching your data limit."
   }
 }

@@ -6,7 +6,7 @@ import { db } from '@esim/shared/firebase/config';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
-import { detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
+import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 
 // Import components
 import CountriesGrid from './CountriesGrid';
@@ -30,13 +30,19 @@ const ArrowRightIcon = ({ className }) => (
 );
 
 const EsimPlansSection = ({ selectedCountryFromHero }) => {
-  const { t, locale } = useI18n();
+  const { t, locale, isLoading: i18nLoading } = useI18n();
   useAuth(); // Keep for future use
   const router = useRouter();
   const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const sectionRef = useRef(null);
-  
+
+  // SSR safety - mounted state
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Intersection Observer for scroll animations
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -54,15 +60,25 @@ const EsimPlansSection = ({ selectedCountryFromHero }) => {
 
     return () => observer.disconnect();
   }, []);
-  
-  // Detect current language from URL with fallback
-  const currentLanguage = useMemo(() => {
+
+  // Language detection with fallback
+  const detectedLanguage = useMemo(() => {
     try {
-      return detectLanguageFromPath(pathname) || locale || 'en';
-    } catch {
+      if (i18nLoading) {
+        if (typeof window !== 'undefined') {
+          const savedLanguage = localStorage.getItem('Simnetiq-language');
+          if (savedLanguage) return savedLanguage;
+        }
+        return detectLanguageFromPath(pathname) || 'en';
+      }
       return locale || 'en';
+    } catch {
+      return 'en';
     }
-  }, [pathname, locale]);
+  }, [locale, pathname, i18nLoading]);
+
+  const direction = mounted ? getLanguageDirection(detectedLanguage) : 'ltr';
+  const isRTL = direction === 'rtl';
   
   // This is always the main page section, not standalone
   const isPlansPage = false;
@@ -76,7 +92,7 @@ const EsimPlansSection = ({ selectedCountryFromHero }) => {
   const [loadingPlans, setLoadingPlans] = useState(false);
 
   // Use custom hooks with current language
-  const { countries, isLoading: countriesLoading } = useCountries(currentLanguage);
+  const { countries, isLoading: countriesLoading } = useCountries(detectedLanguage);
   const { 
     selectedRegion, 
     searchTerm, 
@@ -142,12 +158,12 @@ const EsimPlansSection = ({ selectedCountryFromHero }) => {
 
   // Memoize navigation handler
   const handleNavigateToPlans = useCallback(() => {
-    const plansUrl = currentLanguage && currentLanguage !== 'en' ? `/${currentLanguage}/esim-plans` : '/esim-plans';
+    const plansUrl = detectedLanguage && detectedLanguage !== 'en' ? `/${detectedLanguage}/esim-plans` : '/esim-plans';
     router.push(plansUrl);
-  }, [currentLanguage, router]);
+  }, [detectedLanguage, router]);
 
   return (
-    <div ref={sectionRef} className="w-full">
+    <div ref={sectionRef} className="w-full" dir={direction} lang={detectedLanguage}>
       {/* Countries Grid Section - Main page version - CSS animations instead of framer-motion */}
       <div
         className={`mb-6 transition-all duration-500 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
@@ -176,7 +192,7 @@ const EsimPlansSection = ({ selectedCountryFromHero }) => {
               <ChevronDownIcon className="w-5 h-5" />
             </button>
           )}
-          
+
           {/* See All Plans Button - Always show */}
           <button
             onClick={handleNavigateToPlans}

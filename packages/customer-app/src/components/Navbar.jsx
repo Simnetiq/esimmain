@@ -12,10 +12,11 @@ import { useRegions } from '@esim/shared/hooks/useRegions';
 import LanguageSelector from './LanguageSelector';
 import { detectLanguageFromPath, getLocalizedBlogListUrl, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
+import { getPlatformAppStoreLink } from '@esim/shared/utils/appStoreLinks';
 import { ChevronDown, Settings, LogOut, HeadphonesIcon, Smartphone } from 'lucide-react';
 
 const Navbar = ({ hideLanguageSelector = false }) => {
-  const { t, locale } = useI18n();
+  const { t, locale, isLoading: i18nLoading } = useI18n();
   const { currentUser, logout } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
@@ -27,7 +28,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
   const moreDropdownRef = useRef(null);
   const storeDropdownRef = useRef(null);
   const userDropdownRef = useRef(null);
-  
+
   // Get regions for store dropdown
   const { regions } = useRegions(locale);
 
@@ -60,23 +61,23 @@ const Navbar = ({ hideLanguageSelector = false }) => {
     };
   }, []);
 
-  // Detect current language from multiple sources
-  const getCurrentLanguage = () => {
-    // First try I18n context (includes Firebase preference for logged-in users)
-    if (locale) return locale;
-    
-    // Check localStorage
-    if (typeof window !== 'undefined') {
-      const savedLanguage = localStorage.getItem('Simnetiq-language');
-      if (savedLanguage) return savedLanguage;
+  // Language detection with fallback (use useMemo for consistency)
+  const detectedLanguage = React.useMemo(() => {
+    if (i18nLoading) {
+      if (typeof window !== 'undefined') {
+        const savedLanguage = localStorage.getItem('Simnetiq-language');
+        if (savedLanguage) return savedLanguage;
+      }
+      return detectLanguageFromPath(pathname) || 'en';
     }
-    
-    // Fallback to URL detection
-    return detectLanguageFromPath(pathname);
-  };
+    return locale || 'en';
+  }, [locale, pathname, i18nLoading]);
 
-  const currentLanguage = getCurrentLanguage();
-  const isRTL = getLanguageDirection(currentLanguage) === 'rtl';
+  const direction = getLanguageDirection(detectedLanguage);
+  const isRTL = direction === 'rtl';
+
+  // Keep for backward compatibility with existing code
+  const currentLanguage = detectedLanguage;
 
   // Generate localized URLs
   const getLocalizedUrl = (path) => {
@@ -180,16 +181,17 @@ const Navbar = ({ hideLanguageSelector = false }) => {
   };
 
   return (
-    <header 
+    <header
       className={`navbar-header fixed bg-white/30 backdrop-blur-xl w-full left-0 right-0 justify-center border-b border-gray-200/70 top-0 transition-transform duration-300 ${
         isVisible ? 'translate-y-0' : '-translate-y-full'
-      }`} 
+      }`}
       style={{ zIndex: 9999 }}
-      dir={isRTL ? 'rtl' : 'ltr'}
+      dir={direction}
+      lang={detectedLanguage}
     >
       <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-2 px-4">  
         <div className={`flex lg:flex-1 items-center ${isRTL ? 'justify-end' : 'justify-start'}`}> 
-          <Link href={getLocalizedUrl("/")} className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <Link href={getLocalizedUrl("/")} className={`flex items-center gap-2 `}>
             <span className="sr-only">Simnetiq</span>
             <Image 
               src="/images/logoblack.png" 
@@ -337,7 +339,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
           {/* Download App link - only for non-authenticated users */}
           {!currentUser && (
             <a
-              href="https://apps.apple.com/gb/app/simnetiq-global-esim/id6755963262"
+              href={getPlatformAppStoreLink()}
               target="_blank"
               rel="noopener noreferrer"
               onClick={handleDownloadApp}
@@ -378,7 +380,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                     <li>
                       <Link 
                         href={getLocalizedUrl('/settings')} 
-                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-gray-100 hover:text-eerie-black rounded transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
+                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-gray-100 hover:text-eerie-black rounded transition-colors `}
                         onClick={() => setIsUserDropdownOpen(false)}
                       >
                         <Settings className="w-4 h-4" />
@@ -388,7 +390,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                     <li>
                       <Link 
                         href={getLocalizedUrl('/contact')} 
-                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-gray-100 hover:text-eerie-black rounded transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
+                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-gray-100 hover:text-eerie-black rounded transition-colors `}
                         onClick={() => setIsUserDropdownOpen(false)}
                       >
                         <HeadphonesIcon className="w-4 h-4" />
@@ -405,7 +407,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                         href="https://apps.apple.com/gb/app/simnetiq-global-esim/id6755963262" 
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-gray-100 hover:text-eerie-black rounded transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
+                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-gray-100 hover:text-eerie-black rounded transition-colors `}
                         onClick={() => {
                           setIsUserDropdownOpen(false);
                           handleDownloadApp();
@@ -416,18 +418,25 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                       </a>
                     </li>
                     <li>
-                      <span 
-                        className={`inline-flex items-center gap-2 w-full p-2 text-gray-400 cursor-not-allowed ${isRTL ? 'flex-row-reverse' : ''}`}
+                      <a
+                        href="https://play.google.com/store/apps/details?id=com.simnetiq.storeAndroid&hl=en"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-gray-100 hover:text-eerie-black rounded transition-colors `}
+                        onClick={() => {
+                          setIsUserDropdownOpen(false);
+                          handleDownloadApp();
+                        }}
                       >
                         <Smartphone className="w-4 h-4" />
-                        {t('navbar.androidApp', 'Android')} <span className="text-xs">({t('navbar.comingSoon', 'Soon')})</span>
-                      </span>
+                        {t('navbar.androidApp', 'Android App')}
+                      </a>
                     </li>
                     <li className="border-t border-gray-100 mt-1 pt-1">
                       <button 
                         onClick={handleLogout}
                         disabled={isLoggingOut}
-                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-red-50 text-red-600 hover:text-red-700 rounded transition-colors disabled:opacity-50 ${isRTL ? 'flex-row-reverse' : ''}`}
+                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-red-50 text-red-600 hover:text-red-700 rounded transition-colors disabled:opacity-50 `}
                       >
                         <LogOut className="w-4 h-4" />
                         {isLoggingOut ? t('navbar.loggingOut', 'Logging out...') : t('navbar.logout', 'Log out')}
@@ -443,14 +452,14 @@ const Navbar = ({ hideLanguageSelector = false }) => {
 
       {/* Mobile menu using Portal */}
       {isMenuOpen && mounted && createPortal(
-        <div className="lg:hidden" style={{ zIndex: 99999, position: 'fixed', inset: 0 }} dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="lg:hidden" style={{ zIndex: 99999, position: 'fixed', inset: 0 }} dir={direction} lang={detectedLanguage}>
           <div 
             className="fixed inset-0 w-full h-full overflow-y-auto bg-white/80 backdrop-blur-xl" 
             style={{ zIndex: 99999 }}
           >
             {/* Header with logo and close button */}
             <div className="flex items-center justify-between p-6"> 
-              <Link href={getLocalizedUrl("/")} className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`} onClick={() => setIsMenuOpen(false)}>
+              <Link href={getLocalizedUrl("/")} className={`flex items-center gap-2 `} onClick={() => setIsMenuOpen(false)}>
                 <span className="sr-only">Simnetiq</span>
                 <Image 
                   src="/images/logoblack.png" 
@@ -548,7 +557,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                       href="https://apps.apple.com/gb/app/simnetiq-global-esim/id6755963262"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4 ${isRTL ? 'flex-row-reverse' : ''}`}
+                      className={`flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4 `}
                       onClick={() => {
                         handleDownloadApp();
                         setIsMenuOpen(false);
@@ -557,21 +566,33 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                       <Smartphone className="w-5 h-5" />
                       {t('navbar.iosApp', 'iOS App')}
                     </a>
-                    <span className={`flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-gray-400 py-3 px-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <a
+                      href="https://play.google.com/store/apps/details?id=com.simnetiq.storeAndroid&hl=en"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4 `}
+                      onClick={() => {
+                        handleDownloadApp();
+                        setIsMenuOpen(false);
+                      }}
+                    >
                       <Smartphone className="w-5 h-5" />
-                      {t('navbar.androidApp', 'Android')} <span className="text-sm">({t('navbar.comingSoon', 'Soon')})</span>
-                    </span>
+                      {t('navbar.androidApp', 'Android App')}
+                    </a>
                   </>
                 ) : (
-                  <button
+                  <a
+                    href={getPlatformAppStoreLink()}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     onClick={() => {
                       handleDownloadApp();
                       setIsMenuOpen(false);
                     }}
-                    className="flex items-center justify-center text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4 w-full bg-transparent border-none cursor-pointer"
+                    className="flex items-center justify-center text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4"
                   >
-                    {t('navbar.downloadApp', 'Download App')} 
-                  </button>
+                    {t('navbar.downloadApp', 'Download App')}
+                  </a>
                 )}
                 
                 {/* Divider before auth section */}
@@ -582,7 +603,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                   <>
                     <Link
                       href={getLocalizedUrl('/settings')}
-                      className={`flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4 ${isRTL ? 'flex-row-reverse' : ''}`}
+                      className={`flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4 `}
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <Settings className="w-5 h-5" />
@@ -591,7 +612,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                     
                     <Link
                       href={getLocalizedUrl('/contact')}
-                      className={`flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4 ${isRTL ? 'flex-row-reverse' : ''}`}
+                      className={`flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4 `}
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <HeadphonesIcon className="w-5 h-5" />
@@ -601,7 +622,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                     <button
                       onClick={handleLogout}
                       disabled={isLoggingOut}
-                      className={`flex items-center justify-center gap-2 w-full text-base sm:text-lg font-semibold text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-all duration-200 py-3 px-4 disabled:opacity-50 ${isRTL ? 'flex-row-reverse' : ''}`}
+                      className={`flex items-center justify-center gap-2 w-full text-base sm:text-lg font-semibold text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-all duration-200 py-3 px-4 disabled:opacity-50 `}
                     >
                       <LogOut className="w-5 h-5" />
                       {isLoggingOut ? t('navbar.loggingOut', 'Logging out...') : t('navbar.logout', 'Log out')}

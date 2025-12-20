@@ -199,7 +199,7 @@ const Footer = () => {
                 {getText('footer.tagline', 'Stay connected wherever you travel. Instant eSIM activation for 150+ countries.')}
               </p>
               {/* Social Icons */}
-              <div className={`flex gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex gap-1 `}>
                 {socialLinks.map((social, index) => (
                   <SocialLink
                     key={index}
