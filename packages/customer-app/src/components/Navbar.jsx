@@ -13,7 +13,7 @@ import LanguageSelector from './LanguageSelector';
 import { detectLanguageFromPath, getLocalizedBlogListUrl, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
 import { getPlatformAppStoreLink } from '@esim/shared/utils/appStoreLinks';
-import { ChevronDown, Settings, LogOut, HeadphonesIcon, Smartphone } from 'lucide-react';
+import { ChevronDown, Settings, LogOut, Headphones, Smartphone } from 'lucide-react';
 
 const Navbar = ({ hideLanguageSelector = false }) => {
   const { t, locale, isLoading: i18nLoading } = useI18n();
@@ -85,7 +85,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
     if (!mounted) {
       return path;
     }
-    if (currentLanguage === 'en') {
+    if (currentLanguage === 'en') {   
       return path;
     }
     return `/${currentLanguage}${path}`;
@@ -243,9 +243,9 @@ const Navbar = ({ hideLanguageSelector = false }) => {
               className="flex items-center gap-1 text-sm font-semibold text-eerie-black hover:text-tufts-blue transition-colors"
             >
               {t('navbar.store', 'Store')}
-              <ChevronDown 
-                className={`w-4 h-4 transition-transform ${isStoreDropdownOpen ? 'rotate-180' : ''}`} 
-                aria-hidden="true" 
+              <ChevronDown
+                className={`w-4 h-4 transition-transform ${isStoreDropdownOpen ? 'rotate-180' : ''}`}
+                aria-hidden="true"
               />
             </button>
             
@@ -298,9 +298,9 @@ const Navbar = ({ hideLanguageSelector = false }) => {
               className="flex items-center gap-1 text-sm font-semibold text-eerie-black hover:text-tufts-blue transition-colors"
             >
               {t('navbar.more', 'More')}
-              <ChevronDown 
-                className={`w-4 h-4 transition-transform ${isMoreDropdownOpen ? 'rotate-180' : ''}`} 
-                aria-hidden="true" 
+              <ChevronDown
+                className={`w-4 h-4 transition-transform ${isMoreDropdownOpen ? 'rotate-180' : ''}`}
+                aria-hidden="true"
               />
             </button>
             
@@ -398,7 +398,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                         className={`inline-flex items-center gap-2 w-full p-2 hover:bg-gray-100 hover:text-eerie-black rounded transition-colors `}
                         onClick={() => setIsUserDropdownOpen(false)}
                       >
-                        <HeadphonesIcon className="w-4 h-4" />
+                        <Headphones className="w-4 h-4" />
                         {t('navbar.support', 'Support')}
                       </Link>
                     </li>
@@ -618,7 +618,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                       className={`flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4 `}
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      <HeadphonesIcon className="w-5 h-5" />
+                      <Headphones className="w-5 h-5" />
                       {t('navbar.support', 'Support')}
                     </Link>
                     
