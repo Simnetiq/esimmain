@@ -170,9 +170,9 @@ export default function HeroSection({ onCountrySelect }) {
 
   return (
     <div className="hero-section relative min-h-[85vh] flex flex-col" dir={direction} lang={detectedLanguage}>
-      {/* Gradient Orbs - Simplified and reduced blur */}
-      <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full blur-[50px] opacity-60" style={{ backgroundColor: 'rgba(83, 116, 205, 0.2)' }} />
-      <div className="absolute top-1/2 left-1/2 w-[500px] h-[500px] bg-white/40 rounded-full blur-[60px] -translate-x-1/2 -translate-y-1/2" />
+      {/* Gradient Orbs - Fixed positioning to prevent CLS */}
+      <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full blur-[50px] opacity-60 pointer-events-none" style={{ backgroundColor: 'rgba(83, 116, 205, 0.2)', contain: 'layout paint' }} aria-hidden="true" />
+      <div className="absolute w-[500px] h-[500px] bg-white/40 rounded-full blur-[60px] pointer-events-none" style={{ top: 'calc(50% - 250px)', left: 'calc(50% - 250px)', contain: 'layout paint' }} aria-hidden="true" />
       
       <div className="relative flex-1 flex flex-col">
         

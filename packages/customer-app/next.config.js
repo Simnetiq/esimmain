@@ -2,6 +2,12 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+
+  // Skip ESLint during builds (run separately in CI)
+  // This avoids the circular structure warning from eslint-config-next v16
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   
   // Optimize images
   images: {
