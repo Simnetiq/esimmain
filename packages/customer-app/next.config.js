@@ -37,6 +37,8 @@ const nextConfig = {
   // Experimental features for better performance
   experimental: {
     optimizeCss: true,
+    // Inline critical CSS to reduce render-blocking
+    inlineCss: true,
     optimizePackageImports: [
       'lucide-react',
       'framer-motion',
