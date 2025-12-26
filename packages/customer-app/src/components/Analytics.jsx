@@ -1,40 +1,58 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 
 const Analytics = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [hasConsent, setHasConsent] = useState(false);
 
-  useEffect(() => {
-    // Check if user has marketing consent
-    const hasMarketingConsent = () => {
-      try {
-        const cookieConsent = localStorage.getItem('cookieConsent');
-        if (cookieConsent) {
-          if (cookieConsent === 'accepted' || cookieConsent === 'true') {
-            return true;
-          }
-          try {
-            const consent = JSON.parse(cookieConsent);
-            return consent.marketing === true;
-          } catch {
-            return true;
-          }
+  // Check if user has marketing/analytics consent
+  const checkConsent = () => {
+    try {
+      const cookieConsent = localStorage.getItem('cookieConsent');
+      if (cookieConsent) {
+        if (cookieConsent === 'accepted' || cookieConsent === 'true') {
+          return true;
         }
-        return false;
-      } catch {
-        return false;
+        try {
+          const consent = JSON.parse(cookieConsent);
+          return consent.marketing === true || consent.analytics === true;
+        } catch {
+          return true;
+        }
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  };
+
+  // Listen for consent changes from CookieConsent component
+  useEffect(() => {
+    // Check initial consent state
+    setHasConsent(checkConsent());
+
+    // Listen for consent changes
+    const handleConsentChange = (event) => {
+      const consent = event.detail;
+      if (consent.marketing === true || consent.analytics === true) {
+        setHasConsent(true);
       }
     };
 
-    // Only load analytics if user has consented
-    if (!hasMarketingConsent()) {
-      return;
-    }
+    window.addEventListener('cookieConsentChanged', handleConsentChange);
+    return () => {
+      window.removeEventListener('cookieConsentChanged', handleConsentChange);
+    };
+  }, []);
 
-    // Initialize gtag with lazy loading
+  // Load analytics only when consent is given
+  useEffect(() => {
+    if (!hasConsent) return;
+
+    // Initialize gtag
     const initGtag = () => {
       if (typeof window === 'undefined' || window.gtag) return;
 
@@ -60,6 +78,7 @@ const Analytics = () => {
     // Load gtag script only when needed
     const loadGtagScript = () => {
       if (document.querySelector('script[src*="googletagmanager.com/gtag/js"]')) {
+        initGtag();
         return;
       }
 
@@ -70,7 +89,7 @@ const Analytics = () => {
       document.head.appendChild(script);
     };
 
-    // Delay loading by 3 seconds or until user interaction
+    // Load after short delay or on first user interaction
     let loaded = false;
     const load = () => {
       if (loaded) return;
@@ -78,10 +97,9 @@ const Analytics = () => {
       loadGtagScript();
     };
 
-    // Load after 3 seconds
-    const timer = setTimeout(load, 3000);
+    // Load after 1 second (user already consented, so don't delay too much)
+    const timer = setTimeout(load, 1000);
 
-    // Or load on first user interaction
     const events = ['mousedown', 'touchstart', 'keydown', 'scroll'];
     events.forEach(event => {
       window.addEventListener(event, load, { once: true, passive: true });
@@ -93,14 +111,14 @@ const Analytics = () => {
         window.removeEventListener(event, load);
       });
     };
-  }, [pathname, searchParams]);
+  }, [hasConsent, pathname, searchParams]);
 
-  // Track page views on route change
+  // Track page views on route change (only if gtag is already loaded)
   useEffect(() => {
     if (typeof window === 'undefined' || !window.gtag) return;
 
     const url = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : '');
-    
+
     window.gtag('config', 'G-X39DVW1SQS', {
       page_path: url,
     });
@@ -114,4 +132,3 @@ const Analytics = () => {
 };
 
 export default Analytics;
-
