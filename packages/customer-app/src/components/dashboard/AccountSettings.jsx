@@ -258,7 +258,6 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
         await deleteUser(currentUser);
       } catch (authError) {
         // If deletion requires recent login, just log out
-        console.log('Auth deletion requires re-authentication:', authError);
       }
 
       // Log out and redirect
@@ -267,7 +266,6 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
       const homeUrl = currentLanguage === 'en' ? '/' : `/${currentLanguage}`;
       router.push(homeUrl);
     } catch (error) {
-      console.error('Error deleting account:', error);
       showToast('error', t('settings.failedToDeleteAccount', 'Failed to delete account. Please contact support.'));
     } finally {
       setIsDeleting(false);

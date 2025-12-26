@@ -61,15 +61,7 @@ export default function HeroSection({ onCountrySelect }) {
 
   // Debug logging
   useEffect(() => {
-    console.log('[HeroSection] RTL Debug:', {
-      pathname,
-      locale,
-      i18nLoading,
-      detectedLanguage,
-      direction,
-      mounted,
-      localStorage: typeof window !== 'undefined' ? localStorage.getItem('Simnetiq-language') : null
-    });
+
   }, [pathname, locale, i18nLoading, detectedLanguage, direction, mounted]);
 
   const handleDownloadApp = () => {

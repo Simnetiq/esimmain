@@ -79,8 +79,12 @@ const Navbar = ({ hideLanguageSelector = false }) => {
   // Keep for backward compatibility with existing code
   const currentLanguage = detectedLanguage;
 
-  // Generate localized URLs
+  // Generate localized URLs - only apply locale prefix after mount to avoid hydration mismatch
   const getLocalizedUrl = (path) => {
+    // Before mount, return base path to match server render
+    if (!mounted) {
+      return path;
+    }
     if (currentLanguage === 'en') {
       return path;
     }

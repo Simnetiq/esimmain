@@ -144,6 +144,9 @@ export default function RootLayout({ children }) {
           crossOrigin="anonymous"
         />
         
+        {/* Preconnect to Airalo CDN for country flag images */}
+        <link rel="preconnect" href="https://cdn.airalo.com" />
+
         {/* DNS prefetch for non-critical third-party domains (deferred loading) */}
         <link rel="dns-prefetch" href="https://firebasestorage.googleapis.com" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />

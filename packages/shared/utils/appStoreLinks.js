@@ -24,17 +24,12 @@ export const getPlatformAppStoreLink = () => {
 
   const userAgent = window.navigator.userAgent.toLowerCase();
 
-  console.log('[AppStoreLinks] User Agent:', userAgent);
-
   if (/iphone|ipad|ipod/.test(userAgent)) {
-    console.log('[AppStoreLinks] Detected iOS device, redirecting to:', appStoreLinks.ios);
     return appStoreLinks.ios;
   } else if (/android/.test(userAgent)) {
-    console.log('[AppStoreLinks] Detected Android device, redirecting to:', appStoreLinks.android);
     return appStoreLinks.android;
   }
 
   // Default to iOS for desktop/unknown devices
-  console.log('[AppStoreLinks] Unknown device, defaulting to iOS:', appStoreLinks.ios);
   return appStoreLinks.ios;
 };

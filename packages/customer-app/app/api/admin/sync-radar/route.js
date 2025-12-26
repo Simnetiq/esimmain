@@ -54,7 +54,7 @@ export async function POST(request) {
       );
     }
 
-    console.log('🔄 Starting Stripe Radar sync...');
+
 
     const result = await syncToStripeRadar(db, stripe);
 

@@ -167,9 +167,7 @@ export default async function sitemap() {
         }
       });
       
-      console.log(`[Sitemap] Found ${translationsSnapshot.size} blog translations`);
     } catch (e) {
-      console.log('[Sitemap] blog_posts_translations collection not found or error:', e.message);
     }
     
     // Method 2: Query blog_posts (legacy structure with embedded translations)
@@ -232,14 +230,10 @@ export default async function sitemap() {
         }
       });
       
-      console.log(`[Sitemap] Found ${blogsSnapshot.size} blog posts`);
     } catch (e) {
-      console.log('[Sitemap] blog_posts collection error:', e.message);
     }
     
-    console.log(`[Sitemap] Total blog URLs: ${blogPosts.length}`);
   } catch (error) {
-    console.error('Error fetching blog posts for sitemap:', error);
   }
 
   // Fetch job postings dynamically
@@ -266,7 +260,6 @@ export default async function sitemap() {
       });
     });
   } catch (error) {
-    console.error('Error fetching jobs for sitemap:', error);
   }
 
   // Combine all URLs

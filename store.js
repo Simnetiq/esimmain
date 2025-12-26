@@ -130,17 +130,14 @@ export default function MyESIMsScreen() {
   // ===== Fetch eSIMs with Performance Tracking =====
   const loadEsims = useCallback(async (showLoading = true) => {
     if (!currentUser?.uid) {
-      console.log('⚠️ No current user, skipping eSIM fetch');
       setLoading(false);
       return;
     }
 
     if (fetchAbortRef.current) {
-      console.log('⚠️ Fetch aborted');
       return;
     }
 
-    console.log(`🔄 Loading eSIMs${showLoading ? ' (with loading)' : ' (silent)'}`);
     if (showLoading) setLoading(true);
 
     try {
@@ -150,7 +147,6 @@ export default function MyESIMsScreen() {
         () => fetchUserEsims(currentUser.uid, true) // Use lightweight mode
       );
 
-      console.log(`✅ Fetched ${userEsims.length} eSIMs in ${duration}ms`);
 
       if (isMountedRef.current && !fetchAbortRef.current) {
         setEsims(userEsims);
@@ -158,10 +154,8 @@ export default function MyESIMsScreen() {
 
         // DISABLE individual card fetching to prevent API spam
         // EsimCard components will show cached data or "No data available"
-        console.log('📱 eSIMs loaded - cards will use cached usage data');
       }
     } catch (error) {
-      console.error('❌ Error fetching eSIMs:', error);
       if (isMountedRef.current && !fetchAbortRef.current) {
         setEsims([]);
         setFetchTimedOut(true); // Show error state
@@ -170,7 +164,6 @@ export default function MyESIMsScreen() {
       if (isMountedRef.current && !fetchAbortRef.current) {
         setLoading(false);
         setRefreshing(false);
-        console.log('🏁 eSIM loading complete');
       }
     }
   }, [currentUser?.uid]); // Use currentUser.uid specifically
@@ -193,11 +186,9 @@ export default function MyESIMsScreen() {
       fetchAbortRef.current = false;
       setFetchTimedOut(false);
 
-      console.log('📱 Store screen focused - checking if fetch needed');
 
       // Only fetch if we haven't fetched in this session and have a user
       if (!hasFetchedRef.current && currentUser && !fetchAbortRef.current) {
-        console.log('🔄 First time fetch for this session');
         hasFetchedRef.current = true;
 
         const timer = setTimeout(() => {
@@ -209,7 +200,6 @@ export default function MyESIMsScreen() {
         // Timeout for error state
         const timeoutTimer = setTimeout(() => {
           if (isMountedRef.current && loading && esims.length === 0) {
-            console.log('⚠️ eSIM fetch timed out');
             setFetchTimedOut(true);
             setLoading(false);
           }
@@ -221,7 +211,6 @@ export default function MyESIMsScreen() {
           clearTimeout(timeoutTimer);
         };
       } else {
-        console.log('⏭️ Skipping fetch - already loaded this session');
       }
 
       return () => {
@@ -234,7 +223,6 @@ export default function MyESIMsScreen() {
   useEffect(() => {
     // Clean up expired caches on mount
     cleanupExpiredCaches().catch(err => {
-      console.log('Cache cleanup error (non-critical):', err);
     });
     
     return () => {
@@ -250,7 +238,6 @@ export default function MyESIMsScreen() {
 
   // ===== Handlers (immediate response) =====
   const onRefresh = useCallback(() => {
-    console.log('🔄 Refreshing eSIMs...');
     hasFetchedRef.current = false; // Allow re-fetch on refresh
     setRefreshing(true);
     // Clear current data to show loading state during refresh
@@ -272,7 +259,6 @@ export default function MyESIMsScreen() {
   const handleDeleteEsim = useCallback((deletedEsimId) => {
     // Remove from local state immediately for instant UI update
     setEsims(prevEsims => prevEsims.filter(e => e.id !== deletedEsimId));
-    console.log('✅ eSIM removed from list:', deletedEsimId);
   }, []);
 
   const handleBuyEsim = useCallback(() => {

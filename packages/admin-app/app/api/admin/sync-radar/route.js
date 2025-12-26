@@ -52,9 +52,7 @@ export async function POST(request) {
         { error: 'Stripe not configured', code: 'STRIPE_NOT_CONFIGURED' },
         { status: 503 }
       );
-    }
-
-    console.log('🔄 Starting Stripe Radar sync...');
+    } 
 
     const result = await syncToStripeRadar(db, stripe);
 

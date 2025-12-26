@@ -431,7 +431,6 @@ export const blogService = {
       await updateDoc(postRef, updateData);
       return true;
     } catch (error) {
-      console.error('Error updating post:', error);
       throw error;
     }
   },
@@ -443,7 +442,6 @@ export const blogService = {
       await deleteDoc(postRef);
       return true;
     } catch (error) {
-      console.error('Error deleting post:', error);
       throw error;
     }
   },
@@ -459,7 +457,6 @@ export const blogService = {
       });
       return true;
     } catch (error) {
-      console.error('Error publishing post:', error);
       throw error;
     }
   },
@@ -501,12 +498,10 @@ export const blogService = {
       
       if (batch.length > 0) {
         await Promise.all(batch);
-        console.log(`Fixed ${batch.length} posts with missing publishedAt field`);
       }
       
       return batch.length;
     } catch (error) {
-      console.error('Error fixing missing publishedAt fields:', error);
       throw error;
     }
   },
@@ -533,7 +528,6 @@ export const blogService = {
 
       return posts;
     } catch (error) {
-      console.error('Error fetching posts by category:', error);
       throw error;
     }
   },
@@ -568,7 +562,6 @@ export const blogService = {
 
       return filteredPosts.slice(0, limitCount);
     } catch (error) {
-      console.error('Error searching posts:', error);
       throw error;
     }
   },
@@ -589,7 +582,6 @@ export const blogService = {
 
       return Array.from(categories).sort();
     } catch (error) {
-      console.error('Error fetching categories:', error);
       throw error;
     }
   },
@@ -611,7 +603,6 @@ export const blogService = {
       const doc = snapshot.docs[0];
       return excludeId ? doc.id !== excludeId : false;
     } catch (error) {
-      console.error('Error checking slug availability:', error);
       return false;
     }
   },
@@ -627,7 +618,6 @@ export const blogService = {
       });
       return true;
     } catch (error) {
-      console.error('Error scheduling post:', error);
       throw error;
     }
   },
@@ -644,7 +634,6 @@ export const blogService = {
       });
       return true;
     } catch (error) {
-      console.error('Error publishing scheduled post:', error);
       throw error;
     }
   },
@@ -669,7 +658,6 @@ export const blogService = {
 
       return posts;
     } catch (error) {
-      console.error('Error fetching scheduled posts:', error);
       throw error;
     }
   },
@@ -686,12 +674,10 @@ export const blogService = {
 
       for (const post of duePosts) {
         await this.publishScheduledPost(post.id);
-        console.log(`Published scheduled post: ${post.title}`);
       }
 
       return duePosts.length;
     } catch (error) {
-      console.error('Error checking scheduled posts:', error);
       throw error;
     }
   },
@@ -708,7 +694,6 @@ export const blogService = {
         });
       }
     } catch (error) {
-      console.error('Error incrementing views:', error);
       // Don't throw error for view increment failures
     }
   }

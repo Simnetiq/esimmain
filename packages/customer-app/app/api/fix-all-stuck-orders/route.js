@@ -17,7 +17,6 @@ import { collection, query, where, getDocs, doc, updateDoc, serverTimestamp } fr
 
 async function processStuckOrder(orderId, orderData) {
   try {
-    console.log('🔄 Processing stuck order:', orderId);
 
     // Get package ID
     const packageId = orderData.packageId || orderData.planId;
@@ -132,11 +131,9 @@ async function processStuckOrder(orderId, orderData) {
         const userOrderRef = doc(db, 'users', orderData.userId, 'esims', orderId);
         await updateDoc(userOrderRef, esimUpdateData);
       } catch (error) {
-        console.error('Error updating user order:', error);
       }
     }
 
-    console.log('✅ Fixed order:', orderId);
 
     return {
       success: true,
@@ -147,7 +144,6 @@ async function processStuckOrder(orderId, orderData) {
     };
 
   } catch (error) {
-    console.error('❌ Failed to fix order:', orderId, error.message);
     return {
       success: false,
       orderId,
@@ -170,7 +166,6 @@ export async function GET(request) {
       );
     }
 
-    console.log('🔍 Searching for stuck orders...');
 
     // Find all stuck orders (pending or processing with paymentStatus = completed)
     const ordersRef = collection(db, 'orders');
@@ -181,7 +176,6 @@ export async function GET(request) {
     );
 
     const stuckOrders = await getDocs(stuckQuery);
-    console.log(`📋 Found ${stuckOrders.size} stuck orders`);
 
     if (stuckOrders.empty) {
       return NextResponse.json({
@@ -220,7 +214,6 @@ export async function GET(request) {
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
-    console.log('✅ Finished processing stuck orders:', results);
 
     return NextResponse.json({
       success: true,
@@ -229,7 +222,6 @@ export async function GET(request) {
     });
 
   } catch (error) {
-    console.error('❌ Fix all orders error:', error);
     return NextResponse.json(
       { error: `Failed: ${error.message}` },
       { status: 500 }
@@ -250,7 +242,6 @@ export async function POST(request) {
       );
     }
 
-    console.log('🔍 Searching for stuck orders...');
 
     // Find all stuck orders
     const ordersRef = collection(db, 'orders');
@@ -261,7 +252,6 @@ export async function POST(request) {
     );
 
     const stuckOrders = await getDocs(stuckQuery);
-    console.log(`📋 Found ${stuckOrders.size} stuck orders`);
 
     if (stuckOrders.empty) {
       return NextResponse.json({
@@ -300,7 +290,6 @@ export async function POST(request) {
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
-    console.log('✅ Finished processing stuck orders:', results);
 
     return NextResponse.json({
       success: true,
@@ -309,13 +298,14 @@ export async function POST(request) {
     });
 
   } catch (error) {
-    console.error('❌ Fix all orders error:', error);
     return NextResponse.json(
       { error: `Failed: ${error.message}` },
       { status: 500 }
     );
   }
 }
+
+
 
 
 

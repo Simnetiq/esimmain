@@ -18,7 +18,6 @@ class ConfigService {
       if (configDoc.exists()) {
         const configData = configDoc.data();
         if (configData.mode) {
-          console.log('✅ Stripe mode loaded from Firestore:', configData.mode);
           return configData.mode;
         }
       }
@@ -26,22 +25,17 @@ class ConfigService {
       // Fallback to localStorage (admin panel fallback)
       const savedMode = localStorage.getItem('esim_stripe_mode');
       if (savedMode) {
-        console.log('✅ Stripe mode loaded from localStorage:', savedMode);
         return savedMode;
       }
       
       // Default to test mode
-      console.log('⚠️ No Stripe mode found, defaulting to test');
       return 'test';
     } catch (error) {
-      console.error('❌ Error loading Stripe mode:', error);
       // Fallback to localStorage
       const savedMode = localStorage.getItem('esim_stripe_mode');
       if (savedMode) {
-        console.log('✅ Stripe mode loaded from localStorage fallback:', savedMode);
         return savedMode;
       }
-      console.log('⚠️ No Stripe mode found in fallback, defaulting to test');
       return 'test';
     }
   }
@@ -56,7 +50,6 @@ class ConfigService {
       if (configDoc.exists()) {
         const configData = configDoc.data();
         if (configData.mode) {
-          console.log('✅ DataPlans environment loaded from Firestore:', configData.mode);
           return configData.mode;
         }
       }
@@ -64,15 +57,12 @@ class ConfigService {
       // Fallback to localStorage (admin panel fallback)
       const savedEnv = localStorage.getItem('esim_environment');
       if (savedEnv) {
-        console.log('✅ DataPlans environment loaded from localStorage:', savedEnv);
         return savedEnv;
       }
       
       // Default to test environment
-      console.log('⚠️ No DataPlans environment found, defaulting to test');
       return 'test';
     } catch (error) {
-      console.error('❌ Error loading DataPlans environment:', error);
       // Fallback to localStorage
       const savedEnv = localStorage.getItem('esim_environment');
       return savedEnv || 'test';
@@ -89,7 +79,6 @@ class ConfigService {
       if (configDoc.exists()) {
         const configData = configDoc.data();
         if (configData.api_key) {
-          console.log('✅ Airalo API key loaded from Firestore');
           return {
             apiKey: configData.api_key,
             environment: configData.environment || 'sandbox',
@@ -103,7 +92,6 @@ class ConfigService {
       const savedEnv = localStorage.getItem('airalo_environment') || 'test';
       
       if (savedKey) {
-        console.log('✅ Airalo API key loaded from localStorage');
         return {
           apiKey: savedKey,
           environment: savedEnv,
@@ -112,14 +100,12 @@ class ConfigService {
       }
       
       // Default configuration
-      console.log('⚠️ No Airalo API key found, using default configuration');
       return {
         apiKey: null,
         environment: 'sandbox',
         baseUrl: 'https://sandbox-partners-api.airalo.com/v2'
       };
     } catch (error) {
-      console.error('❌ Error loading Airalo configuration:', error);
       return {
         apiKey: null,
         environment: 'sandbox',
@@ -130,13 +116,11 @@ class ConfigService {
 
   // Get Stripe publishable key based on mode
   async getStripePublishableKey(mode = 'test') {
-    console.log('🔍 Getting Stripe key for mode:', mode);
     
     try {
       // First check environment variable
       const envKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
       if (envKey) {
-        console.log('🔑 Using Stripe key from environment variable');
         return envKey;
       }
       
@@ -146,22 +130,17 @@ class ConfigService {
       
       if (configDoc.exists()) {
         const configData = configDoc.data();
-        console.log('🔍 Stripe config from Firestore:', configData);
         
         // Always use live key (only one key supported now)
         const liveKey = configData.livePublishableKey || configData.live_publishable_key;
-        console.log('🔍 Live key from DB:', liveKey ? 'Yes' : 'No');
         if (liveKey) {
-          console.log('🔑 Using live key from Firebase');
           return liveKey;
         }
       }
       
       // No fallback - show error if keys not found
-      console.error('❌ No Stripe keys found in environment or Firebase');
       throw new Error('Stripe keys not configured. Please contact administrator.');
     } catch (error) {
-      console.error('❌ Error loading Stripe keys:', error);
       
       // Log the error if it's related to expired keys
       if (error.message && error.message.includes('expired')) {
@@ -179,13 +158,11 @@ class ConfigService {
       if (mode === 'live' || mode === 'production') {
         const envKey = process.env.STRIPE_SECRET_KEY_LIVE || process.env.STRIPE_SECRET_KEY;
         if (envKey) {
-          console.log('🔑 Using live secret key from environment variable');
           return envKey;
         }
       } else {
         const envKey = process.env.STRIPE_SECRET_KEY_TEST || process.env.STRIPE_SECRET_KEY;
         if (envKey) {
-          console.log('🔑 Using test secret key from environment variable');
           return envKey;
         }
       }
@@ -200,22 +177,18 @@ class ConfigService {
         if (mode === 'live' || mode === 'production') {
           const liveKey = configData.liveSecretKey || configData.live_secret_key;
           if (liveKey) {
-            console.log('🔑 Using live secret key from Firebase');
             return liveKey;
           }
         } else if (mode === 'test') {
           const testKey = configData.testSecretKey || configData.test_secret_key;
           if (testKey) {
-            console.log('🔑 Using test secret key from Firebase');
             return testKey;
           }
         }
       }
       
-      console.error('❌ No Stripe secret keys found in environment or Firebase');
       throw new Error('Stripe secret key not configured');
     } catch (error) {
-      console.error('❌ Error loading Stripe secret keys:', error);
       throw error;
     }
   }
@@ -238,9 +211,7 @@ class ConfigService {
       };
 
       await addDoc(collection(db, 'application_logs'), logData);
-      console.log('✅ Expired Stripe key logged to application logs');
     } catch (logError) {
-      console.error('❌ Failed to log expired Stripe key:', logError);
     }
   }
 
@@ -282,8 +253,7 @@ class ConfigService {
       
       if (configDoc.exists()) {
         const configData = configDoc.data();
-        if (configData.api_key) {
-          console.log('✅ OpenRouter API key loaded from Firestore');
+        if (configData.api_key) { 
           return {
             apiKey: configData.api_key,
             model: configData.model || 'openai/gpt-3.5-turbo',
@@ -299,7 +269,6 @@ class ConfigService {
       // Fallback to environment variable
       const envKey = process.env.OPENROUTER_API_KEY;
       if (envKey) {
-        console.log('✅ OpenRouter API key loaded from environment variable');
         return {
           apiKey: envKey,
           model: process.env.OPENROUTER_MODEL || 'openai/gpt-3.5-turbo',
@@ -312,7 +281,6 @@ class ConfigService {
       }
       
       // No API key found
-      console.log('⚠️ No OpenRouter API key found');
       return {
         apiKey: null,
         model: 'openai/gpt-3.5-turbo',
@@ -323,7 +291,6 @@ class ConfigService {
         siteUrl: 'https://esim.Simnetiq.net'
       };
     } catch (error) {
-      console.error('❌ Error loading OpenRouter configuration:', error);
       return {
         apiKey: null,
         model: 'openai/gpt-3.5-turbo',

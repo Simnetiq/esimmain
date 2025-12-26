@@ -67,7 +67,6 @@ export async function POST(request) {
       );
     }
 
-    console.log(`📨 Fraud appeal submitted: ${userId || email} - Appeal ID: ${result.appealId}`);
 
     return NextResponse.json({
       success: true,

@@ -24,7 +24,7 @@ export async function GET(request) {
       );
     }
 
-    console.log('🧹 Cleaning sandbox/test orders...');
+
 
     const ordersRef = collection(db, 'orders');
     
@@ -47,7 +47,6 @@ export async function GET(request) {
     testOrders.forEach(doc => allTestOrders.set(doc.id, doc.data()));
     sandboxOrders.forEach(doc => allTestOrders.set(doc.id, doc.data()));
 
-    console.log(`📋 Found ${allTestOrders.size} sandbox/test orders`);
 
     if (allTestOrders.size === 0) {
       return NextResponse.json({
@@ -63,7 +62,6 @@ export async function GET(request) {
 
     // Delete each test order
     for (const [orderId, orderData] of allTestOrders.entries()) {
-      console.log('🗑️ Deleting test order:', orderId);
       
       const orderRef = doc(db, 'orders', orderId);
       batch.delete(orderRef);
@@ -76,7 +74,6 @@ export async function GET(request) {
           batch.delete(userOrderRef);
           batchCount++;
         } catch (error) {
-          console.error('Error deleting user order:', error);
         }
       }
 
@@ -99,7 +96,6 @@ export async function GET(request) {
       await batch.commit();
     }
 
-    console.log('✅ Deleted', deleted.length, 'sandbox orders');
 
     return NextResponse.json({
       success: true,
@@ -108,7 +104,6 @@ export async function GET(request) {
     });
 
   } catch (error) {
-    console.error('❌ Clean orders error:', error);
     return NextResponse.json(
       { error: `Failed: ${error.message}` },
       { status: 500 }
@@ -129,7 +124,6 @@ export async function POST(request) {
       );
     }
 
-    console.log('🧹 Cleaning sandbox/test orders...');
 
     const ordersRef = collection(db, 'orders');
     
@@ -144,7 +138,6 @@ export async function POST(request) {
       }
     });
 
-    console.log(`📋 Found ${testOrders.length} sandbox/test orders`);
 
     if (testOrders.length === 0) {
       return NextResponse.json({
@@ -159,7 +152,6 @@ export async function POST(request) {
     let batchCount = 0;
 
     for (const order of testOrders) {
-      console.log('🗑️ Deleting test order:', order.id);
       
       const orderRef = doc(db, 'orders', order.id);
       batch.delete(orderRef);
@@ -171,7 +163,6 @@ export async function POST(request) {
           batch.delete(userOrderRef);
           batchCount++;
         } catch (error) {
-          console.error('Error deleting user order:', error);
         }
       }
 
@@ -192,7 +183,6 @@ export async function POST(request) {
       await batch.commit();
     }
 
-    console.log('✅ Deleted', deleted.length, 'sandbox orders');
 
     return NextResponse.json({
       success: true,
@@ -201,13 +191,14 @@ export async function POST(request) {
     });
 
   } catch (error) {
-    console.error('❌ Clean orders error:', error);
     return NextResponse.json(
       { error: `Failed: ${error.message}` },
       { status: 500 }
     );
   }
 }
+
+
 
 
 

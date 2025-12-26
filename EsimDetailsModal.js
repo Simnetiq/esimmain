@@ -75,17 +75,14 @@ function EsimDetailsModal({ visible, esim, userId, onClose, colors, isDark, onDe
 
         setUsageData(combinedUsageData);
         setLoadingUsage(false);
-        console.log('💾 Using cached usage in modal for', iccid.slice(-4));
         return;
       }
 
       // If no cache, don't fetch - just show no usage data
-      console.log('📵 No cached usage data in modal for', iccid.slice(-4));
       setUsageData(null);
       setLoadingUsage(false);
 
     } catch (error) {
-      console.log('⚠️ Error fetching usage in modal:', error.message);
       setUsageData(null);
     } finally {
       setLoadingUsage(false);

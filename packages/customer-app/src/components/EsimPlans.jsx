@@ -7,10 +7,9 @@ import RegionTabs from './RegionTabs';
 import PlanSelectionBottomSheet from './PlanSelectionBottomSheet';
 import { useCountries } from '@esim/shared/hooks/useCountries';
 import { db } from '@esim/shared/firebase/config';
-import { collection, query, where, getDocs, limit } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
 import { REGION_SLUGS, countCountriesFromPlans } from './sections/plans';
-import { FlagIcon } from '@esim/shared';
 
 
 // Flexible Plan Card Component
@@ -22,9 +21,6 @@ const FlexiblePlanCard = ({ plan, t, subtitle, onClick }) => {
     const validity = plan.validity
         ? `${plan.validity} ${t('plans.days', 'Days')}`
         : '';
-
-    // Determine flag or icon
-    const countryCode = plan.country_code || (plan.country_codes && plan.country_codes[0]);
 
     return (
         <div
@@ -44,11 +40,7 @@ const FlexiblePlanCard = ({ plan, t, subtitle, onClick }) => {
                 </div>
 
                 <div className="flex items-center gap-2 mb-2">
-                    {countryCode && plan.type !== 'global' ? (
-                        <FlagIcon countryCode={countryCode} size="sm" className="rounded-sm" />
-                    ) : (
-                        <Globe className="w-4 h-4 text-tufts-blue" />
-                    )}
+                    <Globe className="w-4 h-4 text-tufts-blue" />
                     <span className="text-sm text-gray-500 font-medium">{validity}</span>
                 </div>
 

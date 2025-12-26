@@ -188,12 +188,10 @@ function getFullName(code) {
 }
 
 async function backfillDataPlans() {
-  console.log('🔧 Backfilling DataPlans country names...\n');
   
   try {
     // Get all dataplans
     const plansSnapshot = await db.collection('dataplans').get();
-    console.log(`Found ${plansSnapshot.size} dataplans`);
     
     let updated = 0;
     let skipped = 0;
@@ -224,9 +222,7 @@ async function backfillDataPlans() {
           updated++;
           batchCount++;
           
-          console.log(`✅ ${doc.id}: ${data.country_code} → ${fullName}`);
         } else {
-          console.warn(`⚠️  ${doc.id}: Could not find name for code ${data.country_code}`);
           errors++;
         }
       }
@@ -234,7 +230,6 @@ async function backfillDataPlans() {
       // Commit batch every 500 docs
       if (batchCount >= 500) {
         await batch.commit();
-        console.log(`\n💾 Committed ${batchCount} updates...\n`);
         batchCount = 0;
       }
     }
@@ -244,24 +239,16 @@ async function backfillDataPlans() {
       await batch.commit();
     }
     
-    console.log('\n📊 DataPlans Summary:');
-    console.log(`   Updated: ${updated}`);
-    console.log(`   Skipped: ${skipped} (already have country_region)`);
-    console.log(`   Errors: ${errors}`);
-    
   } catch (error) {
-    console.error('❌ Error backfilling dataplans:', error);
     throw error;
   }
 }
 
 async function backfillOrders() {
-  console.log('\n🔧 Backfilling Orders country names...\n');
   
   try {
     // Get all orders
     const ordersSnapshot = await db.collection('orders').get();
-    console.log(`Found ${ordersSnapshot.size} orders`);
     
     let updated = 0;
     let skipped = 0;
@@ -292,9 +279,7 @@ async function backfillOrders() {
           updated++;
           batchCount++;
           
-          console.log(`✅ ${doc.id}: ${data.country_code} → ${fullName}`);
         } else {
-          console.warn(`⚠️  ${doc.id}: Could not find name for code ${data.country_code}`);
           errors++;
         }
       }
@@ -302,7 +287,6 @@ async function backfillOrders() {
       // Commit batch every 500 docs
       if (batchCount >= 500) {
         await batch.commit();
-        console.log(`\n💾 Committed ${batchCount} updates...\n`);
         batchCount = 0;
       }
     }
@@ -312,25 +296,17 @@ async function backfillOrders() {
       await batch.commit();
     }
     
-    console.log('\n📊 Orders Summary:');
-    console.log(`   Updated: ${updated}`);
-    console.log(`   Skipped: ${skipped} (already have country_region)`);
-    console.log(`   Errors: ${errors}`);
-    
   } catch (error) {
-    console.error('❌ Error backfilling orders:', error);
     throw error;
   }
 }
 
 async function backfillUserEsims() {
-  console.log('\n🔧 Backfilling User eSIMs country names...\n');
   
   try {
     // Get all users
     const usersSnapshot = await db.collection('users').get();
-    console.log(`Found ${usersSnapshot.size} users`);
-    
+
     let totalUpdated = 0;
     let totalSkipped = 0;
     let totalErrors = 0;
@@ -365,7 +341,6 @@ async function backfillUserEsims() {
             totalUpdated++;
             batchCount++;
             
-            console.log(`✅ ${userDoc.id}/${esimDoc.id}: ${data.country_code} → ${fullName}`);
           } else {
             totalErrors++;
           }
@@ -378,20 +353,12 @@ async function backfillUserEsims() {
       }
     }
     
-    console.log('\n📊 User eSIMs Summary:');
-    console.log(`   Updated: ${totalUpdated}`);
-    console.log(`   Skipped: ${totalSkipped}`);
-    console.log(`   Errors: ${totalErrors}`);
-    
   } catch (error) {
-    console.error('❌ Error backfilling user eSIMs:', error);
     throw error;
   }
 }
 
 async function main() {
-  console.log('🚀 Starting country display name backfill...\n');
-  console.log('This will add country_region (full English name) to all documents\n');
   
   try {
     await backfillDataPlans();
@@ -399,13 +366,7 @@ async function main() {
     await backfillUserEsims();
     
     console.log('\n✅ Backfill complete!');
-    console.log('\n📝 Next steps:');
-    console.log('1. Deploy updated Dashboard.jsx to read country_region first');
-    console.log('2. Test that Australia shows as "Australia" not "Austria"');
-    console.log('3. Monitor for any remaining display issues');
-    
   } catch (error) {
-    console.error('\n❌ Backfill failed:', error);
     process.exit(1);
   }
   
@@ -413,6 +374,10 @@ async function main() {
 }
 
 main();
+
+
+
+
 
 
 
