@@ -166,10 +166,12 @@ export default function FeaturesSection() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {features.map((feature, index) => {
                   const IconComponent = feature.IconComponent;
+                  // Apply content-visibility to below-fold features (3rd and 4th)
+                  const isAboveFold = index < 2;
                   return (
                     <div
                       key={index}
-                      className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500"
+                      className={`group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 ${!isAboveFold ? 'content-visibility-auto' : ''}`}
                       style={{ animationDelay: `${index * 100}ms` }}
                     >
                       {/* Visual/Image Area */}
@@ -182,6 +184,7 @@ export default function FeaturesSection() {
                           sizes="(max-width: 768px) 100vw, 50vw"
                           priority={feature.priority}
                           loading={feature.priority ? 'eager' : 'lazy'}
+                          fetchPriority={feature.priority ? 'high' : 'low'}
                         />
                         
                         {/* Floating icon */}

@@ -17,6 +17,16 @@
     --shadow-secondary: #c4cfcd40;
   }
 
+  /* Font fallback with size-adjust for CLS prevention */
+  @font-face {
+    font-family: 'DM Sans Fallback';
+    src: local('Arial'), local('Helvetica Neue'), local('Helvetica'), local('sans-serif');
+    size-adjust: 105%;
+    ascent-override: 92%;
+    descent-override: 25%;
+    line-gap-override: 0%;
+  }
+
   /* Base typography - uses Tailwind's font-sans which is configured with our fonts */
   html {
     scroll-behavior: smooth;
@@ -28,8 +38,8 @@
   body {
     background-color: var(--white);
     color: var(--eerie-black);
-    /* Font family via Tailwind's font-sans utility or direct CSS variable */
-    font-family: var(--font-dm-sans), var(--font-heebo), var(--font-ibm-plex-arabic), var(--font-rubik), ui-sans-serif, system-ui, sans-serif;
+    /* Font family with size-adjusted fallback for CLS prevention */
+    font-family: var(--font-dm-sans), 'DM Sans Fallback', var(--font-heebo), var(--font-ibm-plex-arabic), var(--font-rubik), ui-sans-serif, system-ui, sans-serif;
     overflow-x: hidden;
     max-width: 100vw;
   }
@@ -239,6 +249,18 @@
   .border-jordy-blue { border-color: var(--jordy-blue); }
   .border-tufts-blue { border-color: var(--tufts-blue); }
   .border-cobalt-blue { border-color: var(--cobalt-blue); }
+
+  /* Content-visibility for off-screen sections (INP/render performance) */
+  .content-visibility-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 500px;
+  }
+
+  /* Smaller intrinsic size for list items */
+  .content-visibility-auto-sm {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 150px;
+  }
 
   /* CSS Animations - Performance optimized, no JS needed */
   @keyframes fadeIn {
