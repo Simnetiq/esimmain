@@ -1,15 +1,21 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { Globe } from 'lucide-react';
 import CountriesGrid from './CountriesGrid';
 import RegionTabs from './RegionTabs';
-import PlanSelectionBottomSheet from './PlanSelectionBottomSheet';
 import { useCountries } from '@esim/shared/hooks/useCountries';
 import { db } from '@esim/shared/firebase/config';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
 import { REGION_SLUGS, countCountriesFromPlans } from './sections/plans';
+
+// Lazy load heavy modal component (reduces initial bundle)
+const PlanSelectionBottomSheet = dynamic(
+  () => import('./PlanSelectionBottomSheet'),
+  { ssr: false, loading: () => null }
+);
 
 
 // Flexible Plan Card Component

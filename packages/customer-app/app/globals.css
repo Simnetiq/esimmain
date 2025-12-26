@@ -162,72 +162,7 @@
     margin-bottom: 0.5rem;
   }
 
-  /* Blog prose styles - only loaded on blog pages */
-  .prose table {
-    width: 100%;
-    margin: 1.5rem 0;
-    border-collapse: separate;
-    border-spacing: 0;
-  }
-  .prose th, .prose td {
-    padding: 0.5rem 1rem;
-    text-align: center;
-    min-width: 100px;
-    border-right: 1px solid var(--jordy-blue);
-    border-bottom: 1px solid var(--jordy-blue);
-  }
-  .prose th:last-child, .prose td:last-child { border-right: none; }
-  .prose tr:last-child td { border-bottom: none; }
-  .prose th {
-    font-weight: 600;
-    color: var(--alice-blue);
-    background-color: var(--cool-black);
-  }
-  .prose th:first-child { border-top-left-radius: 4px; }
-  .prose th:last-child { border-top-right-radius: 4px; }
-  .prose tr:last-child td:first-child { border-bottom-left-radius: 4px; }
-  .prose tr:last-child td:last-child { border-bottom-right-radius: 4px; }
-  .prose tr:nth-child(even) td { background-color: var(--alice-blue); }
-  .prose tr:hover td { background-color: var(--alice-blue); }
-
-  .prose blockquote {
-    border-left: 4px solid var(--tufts-blue);
-    padding: 0.5rem 0 0.5rem 1rem;
-    font-style: italic;
-  }
-  .prose strong { font-weight: 600; }
-  .prose blockquote strong { font-weight: 500; }
-
-  .prose img {
-    width: 100%;
-    max-width: 800px;
-    height: auto;
-    max-height: 600px;
-    object-fit: cover;
-    border-radius: 4px;
-    box-shadow: 0 2px 8px var(--shadow-primary);
-    margin: 1.5rem auto;
-  }
-
-  .prose iframe {
-    width: 100%;
-    border-radius: 4px;
-    aspect-ratio: 16/9;
-  }
-
-  /* Blog headings */
-  .prose h1 { font-size: 1.75rem; font-weight: 700; margin: 2rem 0 1rem; }
-  .prose h2 { font-size: 1.5rem; font-weight: 600; margin: 1.5rem 0 0.75rem; }
-  .prose h3 { font-size: 1.25rem; font-weight: 600; margin: 1.25rem 0 0.5rem; }
-  .prose h4, .prose h5, .prose h6 { font-size: 1rem; font-weight: 500; margin: 1rem 0 0.5rem; }
-
-  /* Mobile prose adjustments */
-  @media (max-width: 767px) {
-    .prose { font-size: 0.875rem; }
-    .prose table { display: block; overflow-x: auto; white-space: nowrap; }
-    .prose th, .prose td { padding: 0.25rem 0.5rem; font-size: 0.75rem; min-width: 80px; }
-    .prose img { max-width: 100%; max-height: 500px; }
-  }
+  /* Blog prose styles moved to blog-prose.css for code splitting */
 }
 
 @layer utilities {

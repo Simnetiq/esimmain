@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { getLanguageDirection, detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
 import { usePathname, useRouter } from 'next/navigation';
@@ -10,8 +11,11 @@ import { parsePrice } from '@esim/shared/utils/priceUtils';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
 import { useCountries } from '@esim/shared/hooks/useCountries';
 
-// Components
-import PlanSelectionBottomSheet from '../PlanSelectionBottomSheet';
+// Lazy load heavy modal component (reduces initial bundle)
+const PlanSelectionBottomSheet = dynamic(
+  () => import('../PlanSelectionBottomSheet'),
+  { ssr: false, loading: () => null }
+);
 import {
   GlobalPlanCard,
   RegionSection,

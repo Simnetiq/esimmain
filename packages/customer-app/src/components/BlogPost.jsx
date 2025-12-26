@@ -14,6 +14,9 @@ import BlogViewCount from './BlogViewCount';
 import BlogAppDownload from './BlogAppDownload';
 import { trackBlogPostView, trackSocialShare, detectTrafficSource, initScrollTracking, initTimeTracking } from '@esim/shared/utils/trackingPixels';
 
+// Blog-specific prose styles (code-split from main bundle)
+import '../../app/blog-prose.css';
+
 // Inline SVG icons
 const CalendarIcon = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
