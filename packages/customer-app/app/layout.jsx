@@ -2,10 +2,11 @@ import { Suspense } from 'react'
 import dynamic from 'next/dynamic'
 import { Heebo, IBM_Plex_Sans_Arabic, Rubik, DM_Sans } from 'next/font/google'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { Analytics } from '@vercel/analytics/next'
 import Providers from '../src/components/Providers'
 import ConditionalNavbar from '../src/components/ConditionalNavbar'
 import ConditionalFooter from '../src/components/ConditionalFooter'
-import Analytics from '../src/components/Analytics'
+import GoogleAnalytics from '../src/components/Analytics'
 import LanguageWrapper from '../src/components/LanguageWrapper'
 import ScrollToTop from '../src/components/ScrollToTop'
 import DynamicHtmlLang from '../src/components/DynamicHtmlLang'
@@ -216,7 +217,7 @@ export default function RootLayout({ children }) {
             <DynamicHtmlLang />
             <ScrollToTop />
             <Suspense fallback={null}>
-              <Analytics />
+              <GoogleAnalytics />
             </Suspense>
             <div className="bg-white min-h-screen overflow-x-hidden max-w-full">
               <ConditionalNavbar />
@@ -230,6 +231,7 @@ export default function RootLayout({ children }) {
           </LanguageWrapper>
         </Providers>
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   )
