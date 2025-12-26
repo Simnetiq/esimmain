@@ -148,6 +148,15 @@ export default function RootLayout({ children }) {
         {/* Preconnect to Airalo CDN for country flag images */}
         <link rel="preconnect" href="https://cdn.airalo.com" />
 
+        {/* Preload LCP image for FeaturesSection (first visible feature image) */}
+        <link
+          rel="preload"
+          as="image"
+          href="/images/instant.avif"
+          type="image/avif"
+          fetchpriority="high"
+        />
+
         {/* DNS prefetch for non-critical third-party domains (deferred loading) */}
         <link rel="dns-prefetch" href="https://firebasestorage.googleapis.com" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />

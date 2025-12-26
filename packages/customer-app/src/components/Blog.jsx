@@ -56,6 +56,7 @@ const LargeFeaturedCard = memo(({ post, language, isRTL, onPostClick }) => {
               className="absolute inset-0 size-full scale-[1.01] object-cover transition-all duration-300 ease-out group-hover/article-preview:scale-[1.03]"
               quality={80}
               priority
+              fetchPriority="high"
             />
           ) : (
             <div className="absolute inset-0 size-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
@@ -407,14 +408,15 @@ const Blog = () => {
                     
                     <div className="grid gap-x-6 gap-y-8 md:grid-cols-2 md:gap-x-8 md:gap-y-10 lg:grid-cols-3">
                       {paginatedGridPosts.map((post, index) => (
-                        <GridArticleCard
-                          key={post.id}
-                          post={post}
-                          language={detectedLanguage}
-                          isRTL={isRTL}
-                          onPostClick={handlePostClick}
-                          index={index + 3}
-                        />
+                        <div key={post.id} className={index >= 6 ? 'content-visibility-auto-sm' : ''}>
+                          <GridArticleCard
+                            post={post}
+                            language={detectedLanguage}
+                            isRTL={isRTL}
+                            onPostClick={handlePostClick}
+                            index={index + 3}
+                          />
+                        </div>
                       ))}
                     </div>
                   </>
