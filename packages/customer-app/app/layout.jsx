@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
 import Script from 'next/script'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Heebo, IBM_Plex_Sans_Arabic, Rubik, DM_Sans } from 'next/font/google'
 import Providers from '../src/components/Providers'
 import ConditionalNavbar from '../src/components/ConditionalNavbar'
@@ -224,6 +225,7 @@ export default function RootLayout({ children }) {
           src="https://js.stripe.com/v3/"
           strategy="lazyOnload"
         />
+        <SpeedInsights />
       </body>
     </html>
   )
