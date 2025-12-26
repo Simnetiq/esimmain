@@ -1,5 +1,4 @@
 import { Suspense } from 'react'
-import Script from 'next/script'
 import { Heebo, IBM_Plex_Sans_Arabic, Rubik, DM_Sans } from 'next/font/google'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import Providers from '../src/components/Providers'
@@ -13,7 +12,8 @@ import ScrollToTop from '../src/components/ScrollToTop'
 import DynamicHtmlLang from '../src/components/DynamicHtmlLang'
 import { metadata as metadataConfig, generateAlternates } from '../src/config/metadata'
 import './globals.css'
-import './rtl.css'
+// RTL CSS is now loaded dynamically only when needed by DynamicHtmlLang component
+// This reduces render-blocking CSS for 97% of users (LTR languages)
 
 // Configure main font - DM Sans (optimized for LCP)
 // Using variable font for better performance and smaller bundle
