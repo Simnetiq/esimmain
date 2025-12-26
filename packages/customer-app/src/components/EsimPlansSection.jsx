@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@esim/shared/firebase/config';
 import { useRouter, usePathname } from 'next/navigation';
@@ -10,7 +11,12 @@ import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils
 
 // Import components
 import CountriesGrid from './CountriesGrid';
-import PlanSelectionBottomSheet from './PlanSelectionBottomSheet';
+
+// Lazy load heavy modal component (reduces initial bundle)
+const PlanSelectionBottomSheet = dynamic(
+  () => import('./PlanSelectionBottomSheet'),
+  { ssr: false, loading: () => null }
+);
 
 // Import hooks
 import { useCountries } from '@esim/shared/hooks/useCountries';
