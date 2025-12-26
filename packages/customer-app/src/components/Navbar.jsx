@@ -197,12 +197,13 @@ const Navbar = ({ hideLanguageSelector = false }) => {
         <div className={`flex lg:flex-1 items-center ${isRTL ? 'justify-end' : 'justify-start'}`}> 
           <Link href={getLocalizedUrl("/")} className={`flex items-center gap-2 `}>
             <span className="sr-only">Simnetiq</span>
-            <Image 
-              src="/images/logoblack.png" 
-              alt="Simnetiq Logo" 
-              width={28} 
+            <Image
+              src="/images/logoblack.png"
+              alt="Simnetiq Logo"
+              width={28}
               height={28}
-              style={{ width: 'auto', height: 'auto' }}
+              priority
+              fetchPriority="high"
             />
             <span className="text-base sm:text-lg font-light text-eerie-black">simnetiq</span>
           </Link>
@@ -465,13 +466,11 @@ const Navbar = ({ hideLanguageSelector = false }) => {
             <div className="flex items-center justify-between p-6"> 
               <Link href={getLocalizedUrl("/")} className={`flex items-center gap-2 `} onClick={() => setIsMenuOpen(false)}>
                 <span className="sr-only">Simnetiq</span>
-                <Image 
-                  src="/images/logoblack.png" 
-                  alt="Simnetiq Logo" 
+                <Image
+                  src="/images/logoblack.png"
+                  alt="Simnetiq Logo"
                   width={24}
                   height={24}
-                  className="w-6 h-6"
-                  style={{ width: 'auto', height: 'auto' }}
                 />
                 <span className="text-base font-bold text-eerie-black">Simnetiq</span>
               </Link>

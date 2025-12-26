@@ -1,17 +1,26 @@
 import { Suspense } from 'react'
+import dynamic from 'next/dynamic'
 import { Heebo, IBM_Plex_Sans_Arabic, Rubik, DM_Sans } from 'next/font/google'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import Providers from '../src/components/Providers'
 import ConditionalNavbar from '../src/components/ConditionalNavbar'
 import ConditionalFooter from '../src/components/ConditionalFooter'
-import CookieConsent from '../src/components/CookieConsent'
-import FacebookPixel from '../src/components/FacebookPixel'
 import Analytics from '../src/components/Analytics'
 import LanguageWrapper from '../src/components/LanguageWrapper'
 import ScrollToTop from '../src/components/ScrollToTop'
 import DynamicHtmlLang from '../src/components/DynamicHtmlLang'
 import { metadata as metadataConfig, generateAlternates } from '../src/config/metadata'
 import './globals.css'
+
+// Lazy load non-critical components that appear after delay or user interaction
+const CookieConsent = dynamic(() => import('../src/components/CookieConsent'), {
+  ssr: false,
+  loading: () => null
+})
+const FacebookPixel = dynamic(() => import('../src/components/FacebookPixel'), {
+  ssr: false,
+  loading: () => null
+})
 // RTL CSS is now loaded dynamically only when needed by DynamicHtmlLang component
 // This reduces render-blocking CSS for 97% of users (LTR languages)
 
