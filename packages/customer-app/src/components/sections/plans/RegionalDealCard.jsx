@@ -8,7 +8,9 @@ import {
   MapPinIcon,
   DollarSignIcon,
   InfinityIcon,
-  ArrowRightIcon
+  ArrowRightIcon,
+  PhoneIcon,
+  MessageSquareIcon
 } from './PlanIcons';
 import { getBestPlans, getRegionNames, REGION_ICONS } from './planUtils';
 
@@ -61,6 +63,14 @@ const RegionalDealCard = memo(function RegionalDealCard({
   const regionNames = useMemo(() => getRegionNames(t), [t]);
   const flags = REGION_FLAGS[region] || REGION_FLAGS.europe;
 
+  // Check if any plans have SMS or Voice
+  const hasPlansWithSms = useMemo(() => plans?.some(p => parseInt(p.sms) > 0), [plans]);
+  const hasPlansWithVoice = useMemo(() => plans?.some(p => parseInt(p.voice) > 0 || parseInt(p.calls) > 0), [plans]);
+
+  // Helper to check individual plan
+  const planHasSms = (plan) => parseInt(plan?.sms) > 0;
+  const planHasVoice = (plan) => parseInt(plan?.voice) > 0 || parseInt(plan?.calls) > 0;
+
   return (
     <div className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 h-full flex flex-col" dir={direction} lang={detectedLanguage}>
       {/* Visual Header Area - Clean gray background with flags */}
@@ -104,6 +114,24 @@ const RegionalDealCard = memo(function RegionalDealCard({
             {countriesCount > 0 ? `${countriesCount}` : '30+'} {t('deals.countries', 'countries')}
           </span>
         </div>
+
+        {/* SMS & Voice badges - top right */}
+        {(hasPlansWithSms || hasPlansWithVoice) && (
+          <div className={`absolute top-3 flex items-center gap-1 ${isRTL ? 'left-3' : 'right-3'}`}>
+            {hasPlansWithVoice && (
+              <div className="px-2 py-1 bg-teal-500/90 backdrop-blur-sm rounded-full flex items-center gap-1 shadow-sm">
+                <PhoneIcon className="w-3 h-3 text-white" />
+                <span className="text-[10px] font-semibold text-white">{t('deals.calls', 'Calls')}</span>
+              </div>
+            )}
+            {hasPlansWithSms && (
+              <div className="px-2 py-1 bg-purple-500/90 backdrop-blur-sm rounded-full flex items-center gap-1 shadow-sm">
+                <MessageSquareIcon className="w-3 h-3 text-white" />
+                <span className="text-[10px] font-semibold text-white">SMS</span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
       
       {/* Content Area */}
@@ -141,7 +169,15 @@ const RegionalDealCard = memo(function RegionalDealCard({
                         <p className="text-sm font-medium text-eerie-black">
                           {plan1.data} · {plan1.period || plan1.validity}d
                         </p>
-                        <p className="text-[11px] text-gray-500">{t('deals.bestPrice', 'Best price')}</p>
+                        <div className="flex items-center gap-1.5">
+                          <p className="text-[11px] text-gray-500">{t('deals.bestPrice', 'Best price')}</p>
+                          {(planHasSms(plan1) || planHasVoice(plan1)) && (
+                            <div className="flex items-center gap-1">
+                              {planHasVoice(plan1) && <PhoneIcon className="w-3 h-3 text-teal-500" />}
+                              {planHasSms(plan1) && <MessageSquareIcon className="w-3 h-3 text-purple-500" />}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <div className={`flex items-center gap-2 `}>
@@ -172,9 +208,17 @@ const RegionalDealCard = memo(function RegionalDealCard({
                         <p className="text-sm font-medium text-eerie-black">
                           {plan2.data} · {plan2.period || plan2.validity}d
                         </p>
-                        <p className="text-[11px] text-gray-500">
-                          {hasUnlimited ? t('deals.unlimited', 'Unlimited data') : t('deals.moreData', 'More data')}
-                        </p>
+                        <div className="flex items-center gap-1.5">
+                          <p className="text-[11px] text-gray-500">
+                            {hasUnlimited ? t('deals.unlimited', 'Unlimited data') : t('deals.moreData', 'More data')}
+                          </p>
+                          {(planHasSms(plan2) || planHasVoice(plan2)) && (
+                            <div className="flex items-center gap-1">
+                              {planHasVoice(plan2) && <PhoneIcon className="w-3 h-3 text-teal-500" />}
+                              {planHasSms(plan2) && <MessageSquareIcon className="w-3 h-3 text-purple-500" />}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <div className={`flex items-center gap-2 `}>

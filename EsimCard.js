@@ -172,12 +172,10 @@ function EsimCard({ esim, onPress, colors, isDark, isExpired = false, delayLoad 
         if (cached) {
           setUsageData(cached);
           setLoadingUsage(false);
-          console.log('💾 Using cached usage for', esim.iccid.slice(-4));
           return;
         }
 
         // If no cache, show "No data available" instead of fetching
-        console.log('📵 No cached usage data for', esim.iccid.slice(-4));
         setUsageData(null); // Will show "No data available"
         setLoadingUsage(false);
 
@@ -188,7 +186,6 @@ function EsimCard({ esim, onPress, colors, isDark, isExpired = false, delayLoad 
         // }
 
       } catch (error) {
-        console.log('Could not fetch usage:', error.message);
       } finally {
         setLoadingUsage(false);
       }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import BottomSheet from './BottomSheet';
 import { useRouter, usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
@@ -8,9 +8,9 @@ import { getLanguageDirection, detectLanguageFromPath } from '@esim/shared/utils
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
 import { formatPrice, parsePrice } from '@esim/shared/utils/priceUtils';
 import Image from 'next/image';
-import { getISOCode } from '@esim/shared/utils/countryCodeMap';
 import { db } from '@esim/shared/firebase/config';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+
 
 // Inline SVG icons to avoid lucide-react bundle overhead
 const GlobeIcon = ({ className }) => (
@@ -19,98 +19,118 @@ const GlobeIcon = ({ className }) => (
   </svg>
 );
 
-const SmartphoneIcon = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect width="14" height="20" x="5" y="2" rx="2" ry="2" /><path d="M12 18h.01" />
+const CheckIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12" />
   </svg>
 );
 
-const DollarSignIcon = ({ className }) => (
+const WifiIcon = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="12" x2="12" y1="2" y2="22" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+    <path d="M12 20h.01" />
+    <path d="M2 8.82a15 15 0 0 1 20 0" />
+    <path d="M5 12.859a10 10 0 0 1 14 0" />
+    <path d="M8.5 16.429a5 5 0 0 1 7 0" />
   </svg>
 );
 
-const ZapIcon = ({ className }) => (
+const PhoneCallIcon = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z" />
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
   </svg>
-);
+);  
 
-const InfinityIcon = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 12c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4Zm0 0c2 2.67 4 4 6 4a4 4 0 0 0 0-8c-2 0-4 1.33-6 4Z" />
-  </svg>
-);
+// Helper to check if plan has SMS
+const planHasSms = (plan) => {
+  const sms = parseInt(plan.sms) || 0;
+  return sms > 0;
+};
 
-const ArrowRightIcon = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
-  </svg>
-);
+// Helper to check if plan has Voice
+const planHasVoice = (plan) => {
+  const voice = parseInt(plan.voice) || parseInt(plan.calls) || 0;
+  return voice > 0;
+};
 
-const PlanCard = ({ plan, onClick, badge }) => {
+const PlanCard = ({ plan, badge, isSelected, onSelect }) => {
   const { t } = useI18n();
 
   const originalPrice = parsePrice(plan.price);
+  const hasSms = planHasSms(plan);
+  const hasVoice = planHasVoice(plan);
 
-  // Badge configurations matching RegionalDealCard
+  // Badge configurations - simple text badges
   const badgeConfig = {
     cheapest: {
-      bgColor: 'bg-green-50',
-      iconBg: 'bg-green-50',
-      Icon: DollarSignIcon,
-      iconColor: 'text-green-600',
-      label: t('deals.bestPrice', 'Best price')
+      bg: 'bg-green-100',
+      text: 'text-green-700',
+      label: t('deals.bestPrice', 'Best Price')
     },
     bestDeal: {
-      bgColor: 'bg-amber-50',
-      iconBg: 'bg-amber-50',
-      Icon: ZapIcon,
-      iconColor: 'text-amber-600',
-      label: t('deals.bestValue', 'Best value')
+      bg: 'bg-amber-100',
+      text: 'text-amber-700',
+      label: t('deals.bestValue', 'Best Value')
     },
     unlimited: {
-      bgColor: 'bg-purple-50',
-      iconBg: 'bg-purple-50',
-      Icon: InfinityIcon,
-      iconColor: 'text-purple-600',
-      label: t('deals.unlimited', 'Unlimited data')
+      bg: 'bg-purple-100',
+      text: 'text-purple-700',
+      label: t('deals.unlimited', 'Unlimited')
     }
   };
 
   const currentBadge = badge ? badgeConfig[badge] : null;
-  const BadgeIcon = currentBadge?.Icon;
 
   return (
     <button
-      className="group/plan w-full bg-white hover:bg-gray-50 rounded-lg p-3 text-left transition-all duration-200 hover:shadow-sm border border-gray-100"
-      onClick={onClick}
+      className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 ${
+        isSelected
+          ? 'border-tufts-blue bg-blue-50/50'
+          : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50'
+      }`}
+      onClick={onSelect}
     >
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
-          {/* Icon */}
-          <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${currentBadge?.iconBg || 'bg-gray-100'}`}>
-            {BadgeIcon ? (
-              <BadgeIcon className={`w-4 h-4 ${currentBadge?.iconColor || 'text-gray-600'}`} />
-            ) : (
-              <SmartphoneIcon className="w-4 h-4 text-gray-600" />
+      <div className="flex items-center justify-between gap-3">
+        {/* Left: Radio indicator */}
+        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+          isSelected
+            ? 'border-tufts-blue bg-tufts-blue'
+            : 'border-gray-300'
+        }`}>
+          {isSelected && <CheckIcon className="w-3 h-3 text-white" />}
+        </div>
+
+        {/* Center: Plan details */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-base font-semibold text-gray-900">
+              {plan.data}
+            </span>
+            <span className="text-gray-300">·</span>
+            <span className="text-sm text-gray-500">
+              {plan.period || plan.duration || 'N/A'} {t('planSelection.days', 'days')}
+            </span>
+            {/* Badges */}
+            {currentBadge && (
+              <span className={`${currentBadge.bg} ${currentBadge.text} text-xs font-medium px-2 py-0.5 rounded`}>
+                {currentBadge.label}
+              </span>
             )}
           </div>
-          <div>
-            <p className="text-sm font-medium text-eerie-black">
-              {plan.data} · {plan.period || plan.duration || 'N/A'}d
+          {/* SMS & Voice as text */}
+          {(hasSms || hasVoice) && (
+            <p className="text-xs text-gray-500 mt-1">
+              {hasVoice && <span>{plan.voice || plan.calls} {t('plan.minutes', 'min')}</span>}
+              {hasVoice && hasSms && <span> · </span>}
+              {hasSms && <span>{plan.sms} SMS</span>}
             </p>
-            <p className="text-[11px] text-gray-500">
-              {currentBadge?.label || plan.operator || plan.provider || t('deals.esimPlan', 'eSIM Plan')}
-            </p>
-          </div>
+          )}
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-base font-bold text-tufts-blue">
+
+        {/* Right: Price */}
+        <div className="flex-shrink-0 text-right">
+          <span className="text-lg font-bold text-gray-900">
             {formatPrice(originalPrice)}
           </span>
-          <ArrowRightIcon className="w-4 h-4 text-gray-300 group-hover/plan:text-tufts-blue group-hover/plan:translate-x-0.5 transition-all" />
         </div>
       </div>
     </button>
@@ -130,6 +150,8 @@ const PlanSelectionBottomSheet = ({
   const [regionColors, setRegionColors] = useState({});
   const [regionNames, setRegionNames] = useState({});
   const [sortBy, setSortBy] = useState('price'); // price, data, days
+  const [countryImage, setCountryImage] = useState(null);
+  const [selectedPlanId, setSelectedPlanId] = useState(null);
 
   // Get current language for RTL detection
   const currentLanguage = React.useMemo(() => {
@@ -184,6 +206,104 @@ const PlanSelectionBottomSheet = ({
       fetchRegionData();
     }
   }, [isOpen, currentLanguage]);
+
+  // Helper to extract image URL from Firebase document data
+  const extractImageUrl = (data) => {
+    return data?.image?.url || data?.photo || data?.imageUrl?.url || null;
+  };
+
+  // Fetch country image from Firebase when plans are available
+  // Following the same robust pattern as EsimCard.jsx
+  useEffect(() => {
+    const fetchCountryImage = async () => {
+      if (!availablePlans || availablePlans.length === 0) {
+        setCountryImage(null);
+        return;
+      }
+
+      const firstPlan = availablePlans[0];
+      const countryCode = firstPlan.country_codes?.[0] || firstPlan.country_code;
+      const countryName = firstPlan.country_name || firstPlan.name;
+      const isRegional = firstPlan.type === 'regional' || firstPlan.region_slug ||
+        (firstPlan.country_codes && firstPlan.country_codes.length > 1);
+
+      // Check if we already have the image from filteredCountries
+      const matchingCountry = filteredCountries?.find(c =>
+        c.code?.toLowerCase() === countryCode?.toLowerCase()
+      );
+
+      if (matchingCountry?.image?.url) {
+        setCountryImage(matchingCountry.image);
+        return;
+      }
+
+      // Fetch from Firebase using multiple strategies (like EsimCard.jsx)
+      try {
+        let imageUrl = null;
+
+        // Step 1: Try by country name as slug
+        if (countryName && typeof countryName === 'string') {
+          const nameSlug = countryName.toLowerCase().replace(/\s+/g, '-');
+          const countryDoc = await getDoc(doc(db, 'countries', nameSlug));
+          if (countryDoc.exists()) {
+            imageUrl = extractImageUrl(countryDoc.data());
+            if (imageUrl) {
+              setCountryImage({ url: imageUrl });
+              return;
+            }
+          }
+        }
+
+        // Step 2: Try by country code as slug (lowercase)
+        if (countryCode) {
+          const codeSlug = countryCode.toLowerCase().replace(/\s+/g, '-');
+          const countryDoc = await getDoc(doc(db, 'countries', codeSlug));
+          if (countryDoc.exists()) {
+            imageUrl = extractImageUrl(countryDoc.data());
+            if (imageUrl) {
+              setCountryImage({ url: imageUrl });
+              return;
+            }
+          }
+        }
+
+        // Step 3: If regional, try regions collection
+        if (isRegional && countryName) {
+          const regionSlug = countryName.toLowerCase().replace(/\s+/g, '-');
+          const regionDoc = await getDoc(doc(db, 'regions', regionSlug));
+          if (regionDoc.exists()) {
+            imageUrl = extractImageUrl(regionDoc.data());
+            if (imageUrl) {
+              setCountryImage({ url: imageUrl });
+              return;
+            }
+          }
+        }
+
+        // Step 4: Try by country code uppercase (ISO format)
+        if (countryCode) {
+          const countryDoc = await getDoc(doc(db, 'countries', countryCode.toUpperCase()));
+          if (countryDoc.exists()) {
+            imageUrl = extractImageUrl(countryDoc.data());
+            if (imageUrl) {
+              setCountryImage({ url: imageUrl });
+              return;
+            }
+          }
+        }
+
+        // No image found
+        setCountryImage(null);
+      } catch (error) {
+        console.error('Error fetching country image:', error);
+        setCountryImage(null);
+      }
+    };
+
+    if (isOpen) {
+      fetchCountryImage();
+    }
+  }, [isOpen, availablePlans, filteredCountries]);
 
   // Group countries by specific days (30, 7, 10, 15 days)
   const groupCountriesByDays = (countriesList) => {
@@ -297,33 +417,74 @@ const PlanSelectionBottomSheet = ({
     }));
   }, [availablePlans]);
 
-  // Sort plans based on selected sort method
-  const sortPlans = useMemo(() => {
-    if (!plansWithBadges || plansWithBadges.length === 0) return [];
-
-    return [...plansWithBadges].sort((a, b) => {
+  // Sort function for plans
+  const sortPlansList = useCallback((plans) => {
+    return [...plans].sort((a, b) => {
       switch (sortBy) {
         case 'price':
-          // Sort by price (cheapest first)
           return (parseFloat(a.price) || 999) - (parseFloat(b.price) || 999);
-
         case 'data':
-          // Sort by data amount (most data first)
           return getDataValueInMB(b) - getDataValueInMB(a);
-
         case 'days':
-          // Sort by validity period (longest first)
           const daysA = parseInt(a.period || a.duration) || 0;
           const daysB = parseInt(b.period || b.duration) || 0;
           return daysB - daysA;
-
         default:
           return 0;
       }
     });
-  }, [plansWithBadges, sortBy]);
+  }, [sortBy]);
 
-  // Get country info from first plan
+  // Separate plans into Data Only and Plans with Calls/SMS
+  const { dataOnlyPlans, plansWithFeatures } = useMemo(() => {
+    if (!plansWithBadges || plansWithBadges.length === 0) {
+      return { dataOnlyPlans: [], plansWithFeatures: [] };
+    }
+
+    const withFeatures = plansWithBadges.filter(plan => planHasSms(plan) || planHasVoice(plan));
+    const dataOnly = plansWithBadges.filter(plan => !planHasSms(plan) && !planHasVoice(plan));
+
+    // If both are empty (edge case), put all plans in dataOnly as fallback
+    if (withFeatures.length === 0 && dataOnly.length === 0) {
+      return {
+        dataOnlyPlans: sortPlansList(plansWithBadges),
+        plansWithFeatures: []
+      };
+    }
+
+    return {
+      dataOnlyPlans: sortPlansList(dataOnly),
+      plansWithFeatures: sortPlansList(withFeatures)
+    };
+  }, [plansWithBadges, sortPlansList]);
+
+  // Auto-select the first plan (cheapest) when plans are loaded
+  useEffect(() => {
+    // Only auto-select if no plan is currently selected
+    if (selectedPlanId) return;
+
+    // Prefer data-only plans first, then plans with features
+    if (dataOnlyPlans.length > 0) {
+      setSelectedPlanId(dataOnlyPlans[0].id);
+    } else if (plansWithFeatures.length > 0) {
+      setSelectedPlanId(plansWithFeatures[0].id);
+    }
+  }, [dataOnlyPlans, plansWithFeatures, selectedPlanId]);
+
+  // Reset selection when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setSelectedPlanId(null);
+    }
+  }, [isOpen]);
+
+  // Get the selected plan object
+  const selectedPlan = useMemo(() => {
+    if (!selectedPlanId) return null;
+    return [...dataOnlyPlans, ...plansWithFeatures].find(p => p.id === selectedPlanId);
+  }, [selectedPlanId, dataOnlyPlans, plansWithFeatures]);
+
+  // Get country info from first plan or filteredCountries
   const countryInfo = useMemo(() => {
     if (!availablePlans || availablePlans.length === 0) return null;
 
@@ -332,12 +493,16 @@ const PlanSelectionBottomSheet = ({
     const countryName = firstPlan.country_region || firstPlan.country_name || countryCode;
     const region = firstPlan.region;
 
+    // Use countryImage from state (fetched from Firebase) or fallback to plan image
+    const imageUrl = countryImage?.url || firstPlan.image?.url;
+
     return {
       code: countryCode,
       name: countryName,
-      region: region
+      region: region,
+      imageUrl: imageUrl
     };
-  }, [availablePlans]);
+  }, [availablePlans, countryImage]);
 
   const handlePlanSelect = (plan) => {
     // Track plan selection with Facebook Pixel including value
@@ -378,17 +543,21 @@ const PlanSelectionBottomSheet = ({
       title={
         countryInfo ? (
           <div className="flex items-center gap-x-2 my-4">
-            {/* Country Flag */}
+            {/* Country Image */}
             <div className="flex-shrink-0 w-10 aspect-[4/3] flex items-center justify-center border border-gray-200 overflow-hidden">
-              <Image
-                src={`/flags/4x3/${getISOCode(countryInfo.code)}.svg`}
-                alt={`${countryInfo.name} flag`}
-                width={40}
-                height={30}
-                className="w-full h-full object-cover"
-                loading="lazy"
-                unoptimized
-              />
+              {countryInfo.imageUrl && (
+                <div className="relative w-full h-full">
+                  <Image
+                    src={countryInfo.imageUrl}
+                    alt={`${countryInfo.name}`}
+                    fill
+                    sizes="40px"
+                    className="object-cover"
+                    quality={75}
+                    loading="lazy"
+                  />
+                </div>
+              )}
             </div>
             {/* Country Name */}
             <span className="font-light text-2xl text-gray-900">{countryInfo.name}</span>
@@ -417,41 +586,92 @@ const PlanSelectionBottomSheet = ({
             </div>
             <p className="text-center text-sm text-gray-500 mt-4">{t('planSelection.loadingPlans', 'Loading available plans...')}</p>
           </div>
-        ) : availablePlans.length > 0 ? (
+        ) : availablePlans && availablePlans.length > 0 ? (
           <div className="space-y-4">
-            {/* Header with Sort */}
+            {/* Sort Control */}
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-tufts-blue/10 flex items-center justify-center">
-                  <SmartphoneIcon className="w-4 h-4 text-tufts-blue" />
-                </div>
-                <h4 className="font-semibold text-eerie-black text-sm sm:text-base">
-                  {t('planSelection.availablePlans', 'Available Plans')} <span className="text-gray-400 font-normal">({availablePlans.length})</span>
-                </h4>
-              </div>
-              <div className="flex items-center gap-2">
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="text-xs sm:text-sm border-0 bg-gray-50 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-tufts-blue/20"
-                >
-                  <option value="price">{t('planSort.price', 'Price ↑')}</option>
-                  <option value="data">{t('planSort.data', 'Data ↓')}</option>
-                  <option value="days">{t('planSort.days', 'Days ↓')}</option>
-                </select>
-              </div>
+              <p className="text-sm text-gray-500">
+                {t('planSelection.selectPlan', 'Select a plan')}
+              </p>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="text-xs sm:text-sm border-0 bg-gray-100 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-tufts-blue/20"
+              >
+                <option value="price">{t('planSort.price', 'Price ↑')}</option>
+                <option value="data">{t('planSort.data', 'Data ↓')}</option>
+                <option value="days">{t('planSort.days', 'Days ↓')}</option>
+              </select>
             </div>
 
-            {/* Plans Grid - 2 per row on mobile, 3 on desktop */}
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-              {sortPlans.map((plan) => (
-                <PlanCard
-                  key={plan.id}
-                  plan={plan}
-                  badge={plan.badge}
-                  onClick={() => handlePlanSelect(plan)}
-                />
-              ))}
+            {/* Data Only Plans Section */}
+            {dataOnlyPlans.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center">
+                    <WifiIcon className="w-4 h-4 text-tufts-blue" />
+                  </div>
+                  <h4 className="text-sm font-semibold text-gray-700">
+                    {t('planSelection.dataOnlyPlans', 'Data Only')}
+                  </h4>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {dataOnlyPlans.map((plan) => (
+                    <PlanCard
+                      key={plan.id}
+                      plan={plan}
+                      badge={plan.badge}
+                      isSelected={selectedPlanId === plan.id}
+                      onSelect={() => setSelectedPlanId(plan.id)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Plans with Calls & SMS Section */}
+            {plansWithFeatures.length > 0 && (
+              <div className="space-y-3">
+                {dataOnlyPlans.length > 0 && (
+                  <div className="w-full h-px bg-gray-200 my-4" />
+                )}
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-green-50 flex items-center justify-center">
+                    <PhoneCallIcon className="w-4 h-4 text-green-600" />
+                  </div>
+                  <h4 className="text-sm font-semibold text-gray-700">
+                    {t('planSelection.plansWithCallsSms', 'With Calls & SMS')}
+                  </h4>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {plansWithFeatures.map((plan) => (
+                    <PlanCard
+                      key={plan.id}
+                      plan={plan}
+                      badge={plan.badge}
+                      isSelected={selectedPlanId === plan.id}
+                      onSelect={() => setSelectedPlanId(plan.id)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Continue Button - Fixed at bottom */}
+            <div className="sticky bottom-0 pt-4 pb-2 bg-white border-t border-gray-100 -mx-4 px-4 lg:-mx-6 lg:px-6 mt-6">
+              <button
+                onClick={() => selectedPlan && handlePlanSelect(selectedPlan)}
+                disabled={!selectedPlan}
+                className="w-full py-3.5 bg-tufts-blue text-white font-semibold rounded-xl hover:bg-blue-600 transition-colors disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+              >
+                {selectedPlan ? (
+                  <span className="flex items-center justify-center gap-2">
+                    {t('planSelection.continue', 'Continue')} · {formatPrice(parsePrice(selectedPlan.price))}
+                  </span>
+                ) : (
+                  t('planSelection.selectPlanToContinue', 'Select a plan to continue')
+                )}
+              </button>
             </div>
           </div>
         ) : filteredCountries && filteredCountries.length > 0 ? (
@@ -459,7 +679,7 @@ const PlanSelectionBottomSheet = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-tufts-blue/10 flex items-center justify-center">
-                  <SmartphoneIcon className="w-4 h-4 text-tufts-blue" />
+                  <GlobeIcon className="w-4 h-4 text-tufts-blue" />
                 </div>
                 <h4 className="font-semibold text-eerie-black text-sm sm:text-base">
                   {t('planSelection.availablePlans', 'Available Plans')}
@@ -518,18 +738,22 @@ const PlanSelectionBottomSheet = ({
                             }}
                           >
                             <div className="p-4 space-y-3">
-                              {/* Row 1: Flag + Country Name */}
+                              {/* Row 1: Image + Country Name */}
                               <div className="flex items-center gap-2">
                                 <div className="flex-shrink-0 w-8 h-6 overflow-hidden rounded bg-white">
-                                  <Image
-                                    src={`/flags/4x3/${getISOCode(countryCode)}.svg`}
-                                    alt={`${countryName} flag`}
-                                    width={32}
-                                    height={24}
-                                    className="w-full h-full object-cover"
-                                    loading="lazy"
-                                    unoptimized
-                                  />
+                                  {country.image?.url && (
+                                    <div className="relative w-full h-full">
+                                      <Image
+                                        src={country.image.url}
+                                        alt={countryName}
+                                        fill
+                                        sizes="32px"
+                                        className="object-cover"
+                                        quality={75}
+                                        loading="lazy"
+                                      />
+                                    </div>
+                                  )}
                                 </div>
                                 <h3 className="text-sm font-semibold text-eerie-black truncate flex-1">
                                   {countryName}

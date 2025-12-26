@@ -38,7 +38,6 @@ async function fetchAllPackages(baseUrl, accessToken, includeTopup = true) {
   let hasMore = true;
   const limit = 500; // High limit to reduce number of requests
 
-  console.log('[Airalo Sync] Starting to fetch all packages...');
 
   while (hasMore) {
     const url = new URL(`${baseUrl}/v2/packages`);
@@ -48,7 +47,6 @@ async function fetchAllPackages(baseUrl, accessToken, includeTopup = true) {
       url.searchParams.set('include', 'topup');
     }
 
-    console.log(`[Airalo Sync] Fetching page ${page}...`);
     
     const response = await fetch(url.toString(), { headers });
     
@@ -99,19 +97,16 @@ async function fetchAllPackages(baseUrl, accessToken, includeTopup = true) {
     const currentPage = meta.current_page || page;
     const lastPage = meta.last_page || 1;
     
-    console.log(`[Airalo Sync] Page ${currentPage}/${lastPage}, found ${countries.length} countries on this page`);
     
     hasMore = currentPage < lastPage;
     page++;
 
     // Safety limit to prevent infinite loops
     if (page > 100) {
-      console.warn('[Airalo Sync] Reached page limit (100), stopping pagination');
       break;
     }
   }
 
-  console.log(`[Airalo Sync] Total packages fetched: ${allPackages.length}`);
   return allPackages;
 }
 
@@ -148,7 +143,6 @@ async function handleSync(request, source = 'manual') {
       }, { status: 500 });
     }
     
-    console.log(`[Airalo Sync] Starting ${source} sync...`);
     
     // Authenticate with Airalo
     const accessToken = await getAiraloAccessToken(clientId, clientSecret, airaloBaseUrl);
@@ -338,7 +332,6 @@ async function handleSync(request, source = 'manual') {
       // Commit batch when reaching limit
       if (batchCount >= BATCH_SIZE) {
         await currentBatch.commit();
-        console.log(`[Airalo Sync] Committed batch of ${batchCount} packages`);
         currentBatch = db.batch();
         batchCount = 0;
       }
@@ -347,7 +340,6 @@ async function handleSync(request, source = 'manual') {
     // Commit remaining items
     if (batchCount > 0) {
       await currentBatch.commit();
-      console.log(`[Airalo Sync] Committed final batch of ${batchCount} packages`);
     }
     
     // Mark packages not in the response as out_of_stock (optional - can be expensive)
@@ -375,7 +367,6 @@ async function handleSync(request, source = 'manual') {
           
           // Safety limit - break out of loop to prevent exceeding Firestore batch limit
           if (deactivateCount >= BATCH_SIZE) {
-            console.log(`[Airalo Sync] Reached batch limit (${BATCH_SIZE}), stopping deactivation`);
             break;
           }
         }
@@ -384,7 +375,6 @@ async function handleSync(request, source = 'manual') {
       if (deactivateCount > 0) {
         await deactivateBatch.commit();
         totalSynced.deactivated = deactivateCount;
-        console.log(`[Airalo Sync] Deactivated ${deactivateCount} out-of-stock packages`);
       }
     }
     
@@ -405,7 +395,6 @@ async function handleSync(request, source = 'manual') {
     });
     
     const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-    console.log(`[Airalo Sync] Completed in ${duration}s - Packages: ${totalSynced.packages}, Topups: ${totalSynced.topups}, Deactivated: ${totalSynced.deactivated}`);
     
     return NextResponse.json({
       success: true,

@@ -11,11 +11,18 @@ const nextConfig = {
     minimumCacheTTL: 31536000, // 1 year
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // Allow external image domains
+    domains: ['cdn.airalo.com', 'firebasestorage.googleapis.com'],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'firebasestorage.googleapis.com',
         pathname: '/v0/b/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.airalo.com',
+        pathname: '/**',
       },
     ],
   },
@@ -37,6 +44,11 @@ const nextConfig = {
       '@tanstack/react-query',
       'react-hot-toast',
       'firebase',
+      'firebase/auth',
+      'firebase/firestore',
+      'firebase/storage',
+      '@stripe/stripe-js',
+      '@stripe/react-stripe-js',
     ],
   },
 
@@ -104,13 +116,37 @@ const nextConfig = {
     ];
   },
 
-  // Webpack optimizations - simplified to avoid build errors
-  webpack: (config) => {
+  // Webpack optimizations for better performance
+  webpack: (config, { isServer }) => {
     // Ensure consistent module IDs between builds
     config.optimization = {
       ...config.optimization,
       moduleIds: 'deterministic',
     };
+
+    // Client-side chunk splitting for better caching and parallel loading
+    if (!isServer) {
+      config.optimization.splitChunks = {
+        ...config.optimization.splitChunks,
+        cacheGroups: {
+          ...config.optimization.splitChunks?.cacheGroups,
+          // Separate Firebase into its own chunk (large library)
+          firebase: {
+            test: /[\\/]node_modules[\\/](firebase|@firebase)[\\/]/,
+            name: 'firebase',
+            chunks: 'all',
+            priority: 30,
+          },
+          // Separate Stripe into its own chunk
+          stripe: {
+            test: /[\\/]node_modules[\\/](@stripe)[\\/]/,
+            name: 'stripe',
+            chunks: 'all',
+            priority: 25,
+          },
+        },
+      };
+    }
 
     return config;
   },

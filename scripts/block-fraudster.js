@@ -39,9 +39,6 @@ const ATTACKER = {
 };
 
 async function blockAttacker() {
-  console.log('🚨 BLOCKING ATTACKER:', ATTACKER.email);
-  console.log('');
-
   try {
     // 1. Add to blocklist by email
     const blockId = `block_${Date.now()}`;
@@ -55,8 +52,6 @@ async function blockAttacker() {
       attackDetails: ATTACKER.attackDetails
     });
 
-    console.log('✅ Added to fraud_blocklist');
-
     // 2. Find and block the user account
     const usersQuery = await db.collection('users')
       .where('email', '==', ATTACKER.email)
@@ -66,8 +61,6 @@ async function blockAttacker() {
       const userDoc = usersQuery.docs[0];
       const userId = userDoc.id;
       
-      console.log(`📍 Found user account: ${userId}`);
-
       // Update the blocklist entry with userId
       await db.collection('fraud_blocklist').doc(blockId).update({
         userId: userId
@@ -84,9 +77,7 @@ async function blockAttacker() {
         }
       });
 
-      console.log('✅ User account flagged as blocked');
     } else {
-      console.log('⚠️  User account not found in users collection');
     }
 
     // 3. Log the incident
@@ -107,18 +98,7 @@ async function blockAttacker() {
       resolution: 'blocked'
     });
 
-    console.log('✅ Incident logged to fraud_incidents');
-    console.log('');
-    console.log('🔒 ATTACKER BLOCKED SUCCESSFULLY');
-    console.log('');
-    console.log('📋 NEXT STEPS:');
-    console.log('1. Contact Airalo to deactivate eSIM (ICCID: ' + ATTACKER.attackDetails.iccid + ')');
-    console.log('2. Report to Stripe (check for chargeback protection)');
-    console.log('3. Deploy the security fix to Vercel');
-    console.log('4. Monitor fraud_attempts collection for future attacks');
-
   } catch (error) {
-    console.error('❌ Error blocking attacker:', error);
   }
 
   process.exit(0);

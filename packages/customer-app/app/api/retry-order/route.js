@@ -45,7 +45,6 @@ export async function POST(request) {
     }
 
     const orderData = orderDoc.data();
-    console.log('📋 Retrying order:', orderId, 'Current status:', orderData.status);
 
     // Check if order is already completed
     if (orderData.status === 'completed' && orderData.esimCreated) {
@@ -87,7 +86,6 @@ export async function POST(request) {
       );
     }
 
-    console.log('🔐 Authenticating with Airalo...', airaloBaseUrl);
 
     // Step 1: Authenticate
     const authResponse = await fetch(`${airaloBaseUrl}/v2/token`, {
@@ -105,7 +103,6 @@ export async function POST(request) {
 
     if (!authResponse.ok) {
       const errorText = await authResponse.text();
-      console.error('❌ Airalo auth failed:', errorText);
       return NextResponse.json(
         { error: `Airalo authentication failed: ${errorText}` },
         { status: 500 }
@@ -122,10 +119,7 @@ export async function POST(request) {
       );
     }
 
-    console.log('✅ Authenticated with Airalo');
-
     // Step 2: Create eSIM order
-    console.log('📦 Creating Airalo order for package:', packageId);
     const orderResponse = await fetch(`${airaloBaseUrl}/v2/orders`, {
       method: 'POST',
       headers: {
@@ -143,7 +137,6 @@ export async function POST(request) {
 
     if (!orderResponse.ok) {
       const errorText = await orderResponse.text();
-      console.error('❌ Airalo order creation failed:', errorText);
       return NextResponse.json(
         { error: `Airalo order creation failed: ${errorText}` },
         { status: 500 }
@@ -162,7 +155,6 @@ export async function POST(request) {
       );
     }
 
-    console.log('✅ Airalo order created:', airaloOrderId);
 
     // Step 3: Update Firebase with eSIM data
     // IMPORTANT: Save both snake_case and camelCase for complete compatibility
@@ -215,7 +207,6 @@ export async function POST(request) {
           await updateDoc(userOrderRef, esimUpdateData);
         } else {
           // Document doesn't exist - create it with full order data
-          console.log('⚠️ User order doc did not exist, creating...');
           await setDoc(userOrderRef, {
             ...orderData,
             ...esimUpdateData,
@@ -224,7 +215,6 @@ export async function POST(request) {
           });
         }
       } catch (error) {
-        console.error('Error updating user order:', error);
         // Recovery attempt with setDoc merge
         try {
           const userOrderRef = doc(db, 'users', orderData.userId, 'esims', orderId);
@@ -233,14 +223,11 @@ export async function POST(request) {
             ...esimUpdateData,
             userId: orderData.userId
           }, { merge: true });
-          console.log('✅ User order recovered with setDoc merge');
         } catch (e) {
-          console.error('Recovery failed:', e);
         }
       }
     }
 
-    console.log('🎉 Order successfully retried:', orderId);
 
     return NextResponse.json({
       success: true,
@@ -252,7 +239,6 @@ export async function POST(request) {
     });
 
   } catch (error) {
-    console.error('❌ Retry order error:', error);
     return NextResponse.json(
       { error: `Failed to retry order: ${error.message}` },
       { status: 500 }

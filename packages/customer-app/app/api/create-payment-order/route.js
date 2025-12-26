@@ -127,8 +127,7 @@ async function logPaymentAttempt(data) {
       blocked: data.blocked || false,
       blockReason: data.blockReason || null
     });
-  } catch (error) {
-    console.error('Failed to log payment attempt:', error);
+  } catch (error) { 
   }
 }
 
@@ -404,7 +403,6 @@ export async function POST(request) {
     // Check if from high-risk region and log it
     const ipRisk = analyzeIpRisk(ip, ipCountryCode);
     if (ipRisk.isHighRisk) {
-      console.log(`⚠️ High-risk checkout: ${ipCountryCode} | IP: ${ip} | User: ${userId || email} | Risk: ${ipRisk.riskScore}`);
     }
 
     // ============================================

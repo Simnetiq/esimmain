@@ -80,16 +80,7 @@ export default function FeaturesSection() {
 
   // Debug logging
   useEffect(() => {
-    console.log('[FeaturesSection] RTL Debug:', {
-      pathname,
-      locale,
-      i18nLoading,
-      detectedLanguage,
-      direction,
-      isRTL,
-      mounted,
-      localStorage: typeof window !== 'undefined' ? localStorage.getItem('Simnetiq-language') : null
-    });
+
   }, [pathname, locale, i18nLoading, detectedLanguage, direction, isRTL, mounted]);
 
   // Grid pattern style

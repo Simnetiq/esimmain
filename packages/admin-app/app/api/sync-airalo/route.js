@@ -240,6 +240,24 @@ export async function POST(request) {
       // Replace apiPackages with flattened packages
       apiPackages = allPackages;
       console.log(`✅ Flattened to ${apiPackages.length} individual packages`);
+
+      // Debug: Log first package with SMS to see structure
+      const pkgWithSms = apiPackages.find(p => p.sms || p.voice || p.calls || p.operator?.plan_type === 'voice');
+      if (pkgWithSms) {
+        console.log('📱 Package with SMS/Voice found:', JSON.stringify({
+          slug: pkgWithSms.slug,
+          title: pkgWithSms.title,
+          sms: pkgWithSms.sms,
+          voice: pkgWithSms.voice,
+          calls: pkgWithSms.calls,
+          operator_plan_type: pkgWithSms.operator?.plan_type,
+          type: pkgWithSms.type,
+          short_info: pkgWithSms.short_info
+        }, null, 2));
+      } else {
+        console.log('📱 No package with SMS/Voice fields found directly. Sample package keys:',
+          apiPackages[0] ? Object.keys(apiPackages[0]) : 'none');
+      }
       
       // Try to fetch countries (may return 404 on some API versions)
       let countries = [];
@@ -432,12 +450,39 @@ export async function POST(request) {
       
       // Prepare package operations
       const packageOperations = [];
-      
-      // Add/Update packages from API - SKIP TOPUPS
+      const topupOperations = [];
+
+      // Helper function to parse SMS/Voice from short_info text
+      // Examples: "10 SMS, 10 Mins" or "20 SMS" or "100 voice minutes"
+      const parseSmsVoiceFromInfo = (shortInfo) => {
+        const result = { sms: 0, voice: 0 };
+        if (!shortInfo) return result;
+
+        const infoLower = shortInfo.toLowerCase();
+
+        // Parse SMS: "10 sms", "20 SMS", etc.
+        const smsMatch = infoLower.match(/(\d+)\s*sms/i);
+        if (smsMatch) {
+          result.sms = parseInt(smsMatch[1]) || 0;
+        }
+
+        // Parse Voice: "10 mins", "10 minutes", "10 voice", "100 voice minutes"
+        const voiceMatch = infoLower.match(/(\d+)\s*(mins?|minutes?|voice|calls?)/i);
+        if (voiceMatch) {
+          result.voice = parseInt(voiceMatch[1]) || 0;
+        }
+
+        return result;
+      };
+
+      // Separate counts for stats
+      let simPlansCount = 0;
+      let topupPlansCount = 0;
+
+      // Add/Update packages from API - INCLUDE TOPUPS (store in separate collection)
       for (const pkg of apiPackages) {
-        // Skip topup packages entirely - they break the app
-        if (pkg.type === 'topup') continue;
-        
+        const isTopup = pkg.type === 'topup';
+
         // Use slug as primary ID (matches existing Firebase document IDs)
         const packageId = pkg.slug || pkg.id?.toString();
         if (packageId && pkg.title) {
@@ -522,6 +567,37 @@ export async function POST(request) {
             validity_unit: 'days',
             day: validityDays,
             period: validityDays,
+
+            // SMS & Voice (from Airalo API - try direct fields first, then parse from short_info)
+            // Direct fields from API
+            ...((() => {
+              // Try direct API fields first
+              let smsValue = parseInt(pkg.sms) || 0;
+              let voiceValue = parseInt(pkg.voice) || parseInt(pkg.calls) || 0;
+
+              // If no direct values, parse from short_info (e.g., "10 SMS, 10 Mins")
+              if (smsValue === 0 && voiceValue === 0 && pkg.short_info) {
+                const parsed = parseSmsVoiceFromInfo(pkg.short_info);
+                smsValue = parsed.sms;
+                voiceValue = parsed.voice;
+              }
+
+              // Also check operator info array for SMS/Voice text
+              if (smsValue === 0 && voiceValue === 0 && pkg.operator?.info) {
+                const infoText = pkg.operator.info.map(i => i.text || i).join(' ');
+                const parsed = parseSmsVoiceFromInfo(infoText);
+                smsValue = parsed.sms || smsValue;
+                voiceValue = parsed.voice || voiceValue;
+              }
+
+              return {
+                sms: smsValue,
+                voice: voiceValue,
+                calls: voiceValue, // Alias for compatibility
+                has_sms: smsValue > 0,
+                has_voice: voiceValue > 0
+              };
+            })()),
             
             // Pricing
             net_price: netPrice,
@@ -588,20 +664,35 @@ export async function POST(request) {
           // Add updated_at AFTER cleaning to preserve FieldValue sentinel
           cleanedData.updated_at = admin.firestore.FieldValue.serverTimestamp();
           
-          packageOperations.push({
-            type: 'set',
-            ref: packageRef,
-            data: cleanedData,
-            options: { merge: true }
-          });
-          
-          if (isNew) {
-            syncStats.packages.added++;
+          // Store topups in separate 'topups' collection, regular plans in 'dataplans'
+          if (isTopup) {
+            const topupRef = db.collection('topups').doc(packageId);
+            topupOperations.push({
+              type: 'set',
+              ref: topupRef,
+              data: cleanedData,
+              options: { merge: true }
+            });
+            topupPlansCount++;
           } else {
-            syncStats.packages.updated++;
+            packageOperations.push({
+              type: 'set',
+              ref: packageRef,
+              data: cleanedData,
+              options: { merge: true }
+            });
+            simPlansCount++;
+
+            if (isNew) {
+              syncStats.packages.added++;
+            } else {
+              syncStats.packages.updated++;
+            }
           }
         }
       }
+
+      console.log(`📊 Plan breakdown: ${simPlansCount} SIM plans, ${topupPlansCount} topups`);
       
       // Remove deprecated packages (those in Firebase but not in API)
       if (removeDeprecated && packagesToRemove.length > 0) {
@@ -619,7 +710,10 @@ export async function POST(request) {
       if (!dryRun) {
         await commitInBatches(db, countryOperations);
         await commitInBatches(db, packageOperations);
-        
+        await commitInBatches(db, topupOperations);
+
+        console.log(`✅ Committed: ${packageOperations.length} dataplans, ${topupOperations.length} topups`);
+
         // Create sync log
         const logRef = db.collection('sync_logs').doc();
         await logRef.set({
@@ -628,6 +722,8 @@ export async function POST(request) {
           status: 'success',
           details: {
             ...syncStats,
+            topups_synced: topupPlansCount,
+            sim_plans_synced: simPlansCount,
             existing_in_firebase: existingPackageIds.size,
             from_airalo_api: apiPackageIds.size,
             deprecated_removed: packagesToRemove.length
@@ -638,9 +734,11 @@ export async function POST(request) {
       return NextResponse.json({
         success: true,
         dryRun,
-        message: `${dryRun ? '[DRY RUN] Would sync' : 'Successfully synced'} ${syncStats.countries.updated} countries, ${syncStats.packages.added + syncStats.packages.updated} packages (${syncStats.packages.added} new, ${syncStats.packages.updated} updated, ${syncStats.packages.removed} removed)`,
+        message: `${dryRun ? '[DRY RUN] Would sync' : 'Successfully synced'} ${syncStats.countries.updated} countries, ${simPlansCount} SIM plans, ${topupPlansCount} topups`,
         details: {
           ...syncStats,
+          sim_plans: simPlansCount,
+          topups: topupPlansCount,
           existing_in_firebase: existingPackageIds.size,
           from_airalo_api: apiPackageIds.size,
           deprecated_packages: dryRun ? packagesToRemove.slice(0, 20) : undefined, // Show first 20 in dry run

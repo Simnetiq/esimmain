@@ -5,8 +5,8 @@ import { getLanguageDirection, detectLanguageFromPath } from '@esim/shared/utils
 import { usePathname } from 'next/navigation';
 import EsimCard from './EsimCard';
 
-// Note: usageCache and loadingUsageMap are disabled to avoid Airalo API rate limiting
-// Usage data is loaded on-demand when user opens the QRCodeModal and clicks "Check Usage"
+// Usage data is preloaded when dashboard loads (up to 10 eSIMs)
+// Additional usage data can be loaded on-demand when user opens the QRCodeModal
 const RecentOrders = ({ orders, loading, onViewQRCode, usageCache = {}, loadingUsageMap = {} }) => {
   const { t, locale } = useI18n();
   const pathname = usePathname();

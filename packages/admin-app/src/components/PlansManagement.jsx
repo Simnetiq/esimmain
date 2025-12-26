@@ -6,7 +6,7 @@ import { collection, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firesto
 import { db } from '@esim/shared/firebase/config';
 import { esimService } from '@esim/shared/services/esimService';
 
-import { 
+import {
   Smartphone,
   Trash2,
   Search,
@@ -16,7 +16,13 @@ import {
   AlertTriangle,
   CheckCircle,
   Clock,
-  Download
+  Download,
+  Globe,
+  MapPin,
+  Flag,
+  Phone,
+  MessageSquare,
+  Filter
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
@@ -27,22 +33,74 @@ import { usePathname } from 'next/navigation';
 // Helper function to get flag emoji from country code
 const getFlagEmoji = (countryCode) => {
   if (!countryCode || countryCode.length !== 2) return '🌍';
-  
+
   // Handle special cases like PT-MA, multi-region codes, etc.
   if (countryCode.includes('-') || countryCode.length > 2) {
     return '🌍';
   }
-  
+
   try {
     const codePoints = countryCode
       .toUpperCase()
       .split('')
       .map(char => 127397 + char.charCodeAt());
-    
+
     return String.fromCodePoint(...codePoints);
   } catch {
     return '🌍';
   }
+};
+
+// Helper function to categorize a plan
+const categorizePlan = (plan) => {
+  // Check if it's a global plan (e.g., "Discover Global")
+  const name = (plan.name || plan.title || '').toLowerCase();
+  const countryRegion = (plan.country_region || plan.country_title || '').toLowerCase();
+  const countryCodes = plan.country_codes || plan.country_ids || [];
+  const isRegionalFlag = plan.is_regional || false;
+  const regionType = plan.region_type || '';
+
+  // Global plans
+  if (
+    name.includes('global') ||
+    name.includes('discover') ||
+    countryRegion.includes('global') ||
+    regionType === 'global' ||
+    plan.type === 'global'
+  ) {
+    return 'global';
+  }
+
+  // Regional plans (multiple countries, not global)
+  if (
+    isRegionalFlag ||
+    regionType === 'regional' ||
+    countryCodes.length > 1 ||
+    countryRegion.includes('europe') ||
+    countryRegion.includes('asia') ||
+    countryRegion.includes('africa') ||
+    countryRegion.includes('americas') ||
+    countryRegion.includes('oceania') ||
+    countryRegion.includes('european union') ||
+    countryRegion.includes('caribbean')
+  ) {
+    return 'regional';
+  }
+
+  // Single country plans
+  return 'country';
+};
+
+// Helper to check if plan has SMS
+const planHasSms = (plan) => {
+  const sms = parseInt(plan.sms) || 0;
+  return sms > 0;
+};
+
+// Helper to check if plan has Voice
+const planHasVoice = (plan) => {
+  const voice = parseInt(plan.voice) || parseInt(plan.calls) || 0;
+  return voice > 0;
 };
 
 const PlansManagement = () => {
@@ -82,7 +140,11 @@ const PlansManagement = () => {
   const [pendingPriceChanges, setPendingPriceChanges] = useState({});
   
   // Data source toggle
-  const [dataSource, setDataSource] = useState('firebase'); // 'firebase' or 'airalo'
+  const [dataSource, setDataSource] = useState('firebase'); // 'firebase', 'airalo', or 'topups'
+
+  // Topups state
+  const [topups, setTopups] = useState([]);
+  const [loadingTopups, setLoadingTopups] = useState(false);
   
   // Sync state
   const [syncStatus, setSyncStatus] = useState(null);
@@ -93,6 +155,13 @@ const PlansManagement = () => {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [plansPerPage] = useState(15);
+
+  // Category filter state
+  const [selectedCategory, setSelectedCategory] = useState('all'); // 'all', 'global', 'regional', 'country'
+
+  // SMS/Voice filter state
+  const [hasSmsFilter, setHasSmsFilter] = useState(false);
+  const [hasVoiceFilter, setHasVoiceFilter] = useState(false);
 
   // Plans Management Functions
   const loadAllPlans = useCallback(async () => {
@@ -124,6 +193,24 @@ const PlansManagement = () => {
     }
   }, [t]);
 
+  // Load topups from Firebase
+  const loadTopups = useCallback(async () => {
+    try {
+      setLoadingTopups(true);
+      const topupsSnapshot = await getDocs(collection(db, 'topups'));
+      const topupsData = topupsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setTopups(topupsData);
+    } catch (error) {
+      console.error('Error loading topups:', error);
+      toast.error(t('plansManagement.errorLoadingTopups', 'Failed to load topups'));
+    } finally {
+      setLoadingTopups(false);
+    }
+  }, [t]);
+
   // Load plans on component mount
   useEffect(() => {
     if (currentUser) {
@@ -131,23 +218,55 @@ const PlansManagement = () => {
     }
   }, [currentUser, loadAllPlans]);
 
-  // Filter plans based on search and country
+  // Load topups when switching to topups tab
   useEffect(() => {
-    const plansToFilter = dataSource === 'airalo' ? airaloPlans : allPlans;
+    if (dataSource === 'topups' && topups.length === 0 && !loadingTopups) {
+      loadTopups();
+    }
+  }, [dataSource, topups.length, loadingTopups, loadTopups]);
+
+  // Filter plans based on search, country, category, and SMS/Voice
+  useEffect(() => {
+    // Select data source
+    let plansToFilter;
+    if (dataSource === 'topups') {
+      plansToFilter = topups;
+    } else if (dataSource === 'airalo') {
+      plansToFilter = airaloPlans;
+    } else {
+      plansToFilter = allPlans;
+    }
     let filtered = [...plansToFilter];
 
-    // ALWAYS filter out topups - they should not be displayed
-    filtered = filtered.filter(plan => 
-      plan.type !== 'topup' && plan.is_topup !== true
-    );
+    // Filter out topups from non-topup views
+    if (dataSource !== 'topups') {
+      filtered = filtered.filter(plan =>
+        plan.type !== 'topup' && plan.is_topup !== true
+      );
+    }
+
+    // Filter by category
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(plan => categorizePlan(plan) === selectedCategory);
+    }
+
+    // Filter by SMS
+    if (hasSmsFilter) {
+      filtered = filtered.filter(plan => planHasSms(plan));
+    }
+
+    // Filter by Voice
+    if (hasVoiceFilter) {
+      filtered = filtered.filter(plan => planHasVoice(plan));
+    }
 
     // Filter by search term
     if (searchTerm.trim()) {
-      filtered = filtered.filter(plan => 
+      filtered = filtered.filter(plan =>
         plan.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         plan.operator?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         plan.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (plan.country_codes || plan.country_ids || []).some(code => 
+        (plan.country_codes || plan.country_ids || []).some(code =>
           code.toLowerCase().includes(searchTerm.toLowerCase())
         )
       );
@@ -155,7 +274,7 @@ const PlansManagement = () => {
 
     // Filter by country
     if (selectedCountry) {
-      filtered = filtered.filter(plan => 
+      filtered = filtered.filter(plan =>
         (plan.country_codes || []).includes(selectedCountry) ||
         (plan.country_ids || []).includes(selectedCountry) ||
         plan.country_code === selectedCountry
@@ -165,7 +284,7 @@ const PlansManagement = () => {
     setFilteredPlans(filtered);
     // Reset to page 1 when filters change
     setCurrentPage(1);
-  }, [allPlans, airaloPlans, searchTerm, selectedCountry, dataSource]);
+  }, [allPlans, airaloPlans, topups, searchTerm, selectedCountry, dataSource, selectedCategory, hasSmsFilter, hasVoiceFilter]);
 
   // Load Airalo plans and countries
   const loadAiraloData = async () => {
@@ -528,6 +647,16 @@ const PlansManagement = () => {
                 >
                   Airalo ({airaloPlans.length})
                 </button>
+                <button
+                  onClick={() => setDataSource('topups')}
+                  className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                    dataSource === 'topups'
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Topups ({topups.length})
+                </button>
               </div>
             </div>
           </div>
@@ -551,6 +680,150 @@ const PlansManagement = () => {
               </button>
             </div>
           )}
+
+          {/* Load Topups Button */}
+          {dataSource === 'topups' && (
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={loadTopups}
+                disabled={loadingTopups}
+                className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-purple-400 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+              >
+                {loadingTopups ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Loading Topups...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="w-4 h-4" />
+                    Refresh Topups
+                  </>
+                )}
+              </button>
+              <div className="text-sm text-gray-600 flex items-center">
+                Topups are synced to a separate collection for future topup functionality
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Category Tabs */}
+      <div className="bg-white border border-gray-200 rounded-lg p-4">
+        <div className="flex flex-col gap-4">
+          {/* Plan Type Tabs */}
+          <div className="flex items-center gap-2">
+            <Filter className="w-5 h-5 text-gray-500" />
+            <span className="text-sm font-medium text-gray-700">Plan Type:</span>
+            <div className="flex bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setSelectedCategory('all')}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${
+                  selectedCategory === 'all'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <Smartphone className="w-4 h-4" />
+                All Plans
+              </button>
+              <button
+                onClick={() => setSelectedCategory('global')}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${
+                  selectedCategory === 'global'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <Globe className="w-4 h-4 text-blue-500" />
+                Global
+              </button>
+              <button
+                onClick={() => setSelectedCategory('regional')}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${
+                  selectedCategory === 'regional'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <MapPin className="w-4 h-4 text-green-500" />
+                Regional
+              </button>
+              <button
+                onClick={() => setSelectedCategory('country')}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${
+                  selectedCategory === 'country'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <Flag className="w-4 h-4 text-orange-500" />
+                Country
+              </button>
+            </div>
+          </div>
+
+          {/* SMS/Voice Filters */}
+          <div className="flex items-center gap-4 border-t border-gray-100 pt-4">
+            <span className="text-sm font-medium text-gray-700">Features:</span>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={hasSmsFilter}
+                onChange={(e) => setHasSmsFilter(e.target.checked)}
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <MessageSquare className="w-4 h-4 text-purple-500" />
+              <span className="text-sm text-gray-600">Has SMS</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={hasVoiceFilter}
+                onChange={(e) => setHasVoiceFilter(e.target.checked)}
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <Phone className="w-4 h-4 text-teal-500" />
+              <span className="text-sm text-gray-600">Has Voice/Calls</span>
+            </label>
+            {(hasSmsFilter || hasVoiceFilter || selectedCategory !== 'all') && (
+              <button
+                onClick={() => {
+                  setSelectedCategory('all');
+                  setHasSmsFilter(false);
+                  setHasVoiceFilter(false);
+                }}
+                className="ml-auto px-3 py-1 text-xs text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Clear All Filters
+              </button>
+            )}
+          </div>
+
+          {/* Category Stats */}
+          <div className="flex items-center gap-4 text-xs text-gray-500 border-t border-gray-100 pt-3">
+            <span>
+              📊 Showing: <strong className="text-gray-700">{filteredPlans.length}</strong> plans
+            </span>
+            {selectedCategory !== 'all' && (
+              <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-full">
+                {selectedCategory === 'global' && '🌍 Global Plans'}
+                {selectedCategory === 'regional' && '🗺️ Regional Plans'}
+                {selectedCategory === 'country' && '🏳️ Country Plans'}
+              </span>
+            )}
+            {hasSmsFilter && (
+              <span className="px-2 py-1 bg-purple-50 text-purple-700 rounded-full">
+                💬 With SMS
+              </span>
+            )}
+            {hasVoiceFilter && (
+              <span className="px-2 py-1 bg-teal-50 text-teal-700 rounded-full">
+                📞 With Voice
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
@@ -610,21 +883,24 @@ const PlansManagement = () => {
                 <th className={`px-6 py-3 ${isRTL ? 'text-right' : 'text-left'} text-xs font-medium text-gray-500 uppercase tracking-wider`}>
                   {t('plansManagement.plan', 'Plan')}
                 </th>
-                <th className={`px-6 py-3 ${isRTL ? 'text-right' : 'text-left'} text-xs font-medium text-gray-500 uppercase tracking-wider`}>
-                  {t('plansManagement.slug', 'Slug')}
+                <th className={`px-4 py-3 ${isRTL ? 'text-right' : 'text-left'} text-xs font-medium text-gray-500 uppercase tracking-wider`}>
+                  Type
                 </th>
                 <th className={`px-6 py-3 ${isRTL ? 'text-right' : 'text-left'} text-xs font-medium text-gray-500 uppercase tracking-wider`}>
                   {t('plansManagement.dataDuration', 'Data & Duration')}
                 </th>
+                <th className={`px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider`}>
+                  SMS / Voice
+                </th>
                 <th className={`px-6 py-3 ${isRTL ? 'text-right' : 'text-left'} text-xs font-medium text-gray-500 uppercase tracking-wider`}>
                   {t('plansManagement.countries', 'Countries')}
                 </th>
-                          <th className={`px-6 py-3 ${isRTL ? 'text-right' : 'text-left'} text-xs font-medium text-gray-500 uppercase tracking-wider`}>
-                            {dataSource === 'airalo' ? 'Original / Discounted Price' : t('plansManagement.price', 'Price')}
-                          </th>
-                          <th className={`px-6 py-3 ${isRTL ? 'text-right' : 'text-left'} text-xs font-medium text-gray-500 uppercase tracking-wider`}>
-                            {t('plansManagement.actions', 'Actions')}
-                          </th>
+                <th className={`px-6 py-3 ${isRTL ? 'text-right' : 'text-left'} text-xs font-medium text-gray-500 uppercase tracking-wider`}>
+                  {dataSource === 'airalo' ? 'Original / Discounted Price' : t('plansManagement.price', 'Price')}
+                </th>
+                <th className={`px-6 py-3 ${isRTL ? 'text-right' : 'text-left'} text-xs font-medium text-gray-500 uppercase tracking-wider`}>
+                  {t('plansManagement.actions', 'Actions')}
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -655,10 +931,33 @@ const PlansManagement = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className={`text-sm text-gray-900 font-mono bg-gray-100 px-2 py-1 rounded ${isRTL ? 'text-right' : 'text-left'}`}>
-                        {plan.slug || plan.id || t('plansManagement.noSlug', 'No slug')}
-                      </div>
+                    {/* Plan Type/Category Column */}
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      {(() => {
+                        const category = categorizePlan(plan);
+                        if (category === 'global') {
+                          return (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              <Globe className="w-3 h-3" />
+                              Global
+                            </span>
+                          );
+                        } else if (category === 'regional') {
+                          return (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              <MapPin className="w-3 h-3" />
+                              Regional
+                            </span>
+                          );
+                        } else {
+                          return (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                              <Flag className="w-3 h-3" />
+                              Country
+                            </span>
+                          );
+                        }
+                      })()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className={`text-sm text-gray-900 ${isRTL ? 'text-right' : 'text-left'}`}>
@@ -676,6 +975,27 @@ const PlansManagement = () => {
                           plan.validity ? `${plan.validity} ${plan.validity_unit || 'days'}` : t('plansManagement.notAvailable', 'N/A')
                         ) : (
                           plan.period ? t('plansManagement.days', '{{days}} days', { days: plan.period }) : t('plansManagement.notAvailable', 'N/A')
+                        )}
+                      </div>
+                    </td>
+                    {/* SMS / Voice Column */}
+                    <td className="px-4 py-4 whitespace-nowrap text-center">
+                      <div className="flex flex-col items-center gap-1">
+                        {planHasSms(plan) ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
+                            <MessageSquare className="w-3 h-3" />
+                            {plan.sms || 0}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-gray-400">—</span>
+                        )}
+                        {planHasVoice(plan) ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-700">
+                            <Phone className="w-3 h-3" />
+                            {plan.voice || plan.calls || 0}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-gray-400">—</span>
                         )}
                       </div>
                     </td>
@@ -782,7 +1102,7 @@ const PlansManagement = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center">
+                  <td colSpan="7" className="px-6 py-12 text-center">
                     <div className="text-gray-500">
                       <Smartphone className="w-12 h-12 mx-auto mb-4 text-gray-300" />
                       <p className="text-lg font-medium">{t('plansManagement.noPlansFound', 'No plans found')}</p>

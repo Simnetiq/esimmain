@@ -46,15 +46,14 @@ if (firebaseConfig.apiKey && firebaseConfig.projectId) {
   storage = getStorage(app);
 }
 
-// Initialize Auth - only on client side
+// Auth is initialized lazily to avoid blocking initial page render
+// The Firebase Auth iframe (89.9 KiB) will only load when auth is actually needed
 let auth = null;
-if (typeof window !== 'undefined' && app) {
-  auth = getAuth(app);
-}
 
 /**
  * Get Firebase Auth instance.
- * For backward compatibility and lazy access patterns.
+ * Lazily initializes auth on first access to avoid blocking initial render.
+ * The Firebase Auth iframe will only load when this is called.
  */
 const getAuthInstance = () => {
   if (typeof window === 'undefined') return null;

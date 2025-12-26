@@ -115,7 +115,6 @@ export async function POST(request) {
       ? (process.env.AIRALO_BASE_URL_SANDBOX || 'https://sandbox-partners-api.airalo.com')
       : (process.env.AIRALO_BASE_URL || 'https://partners-api.airalo.com');
     
-    console.log(`[Airalo QR Code] Mode: ${airaloMode}, isSandbox: ${isSandbox}, URL: ${airaloBaseUrl}`);
     
     // Fallback to Firestore config if env vars not set
     if (!clientId || !clientSecret) {

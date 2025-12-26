@@ -129,7 +129,6 @@ const Settings = () => {
         setUserProfile(userSnap.data());
       }
     } catch (error) {
-      console.error('Error loading user profile:', error);
     } finally {
       setLoading(false);
     }

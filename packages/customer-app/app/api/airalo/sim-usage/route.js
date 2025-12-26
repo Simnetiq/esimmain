@@ -2,6 +2,14 @@ import { NextResponse } from 'next/server';
 import { db } from '@esim/shared/firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
 
+// In-memory token cache to reduce auth requests
+// Token is valid for ~1 hour, we cache for 50 minutes to be safe
+let tokenCache = {
+  token: null,
+  expiresAt: 0,
+  baseUrl: null
+};
+
 export async function POST(request) {
   try {
     const body = await request.json();
@@ -32,11 +40,9 @@ export async function POST(request) {
       ? (process.env.AIRALO_BASE_URL_SANDBOX || 'https://sandbox-partners-api.airalo.com')
       : (process.env.AIRALO_BASE_URL || 'https://partners-api.airalo.com');
     
-    console.log(`[Airalo Usage] Mode: ${airaloMode}, isSandbox: ${isSandbox}, URL: ${baseUrl}`);
     
     // Fallback to Firestore config if env vars not set
     if (!clientId || !clientSecret) {
-      console.log('[Airalo Usage] Env vars missing, checking Firestore config...');
       const airaloConfigRef = doc(db, 'config', 'airalo');
       const airaloConfig = await getDoc(airaloConfigRef);
       
@@ -48,7 +54,6 @@ export async function POST(request) {
     }
     
     if (!clientId || !clientSecret) {
-      console.error('[Airalo Usage] ❌ Missing credentials');
       return NextResponse.json({
         success: false,
         error: 'Airalo credentials not configured.',
@@ -56,40 +61,52 @@ export async function POST(request) {
       }, { status: 500 });
     }
 
-    // Authenticate with Airalo API
-    console.log('[Airalo Usage] Authenticating with Airalo API...');
-    
-    const authResponse = await fetch(`${baseUrl}/v2/token`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        client_id: clientId,
-        client_secret: clientSecret,
-        grant_type: 'client_credentials'
-      })
-    });
+    // Check if we have a valid cached token for this baseUrl
+    const now = Date.now();
+    let accessToken = null;
 
-    if (!authResponse.ok) {
-      const errorText = await authResponse.text();
-      console.error('[Airalo Usage] ❌ Auth failed:', authResponse.status, errorText);
-      return NextResponse.json({
-        success: false,
-        error: 'Unable to connect to eSIM provider. Please try again later.',
-        statusCode: 401
-      }, { status: 401 });
+    if (tokenCache.token && tokenCache.expiresAt > now && tokenCache.baseUrl === baseUrl) {
+      accessToken = tokenCache.token;
+    } else {
+      // Authenticate with Airalo API
+
+      const authResponse = await fetch(`${baseUrl}/v2/token`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          client_id: clientId,
+          client_secret: clientSecret,
+          grant_type: 'client_credentials'
+        })
+      });
+
+      if (!authResponse.ok) {
+        const errorText = await authResponse.text();
+        return NextResponse.json({
+          success: false,
+          error: 'Unable to connect to eSIM provider. Please try again later.',
+          statusCode: 401
+        }, { status: 401 });
+      }
+
+      const authData = await authResponse.json();
+      accessToken = authData.data?.access_token;
+
+      if (!accessToken) {
+        throw new Error('No access token received from Airalo API');
+      }
+
+      // Cache the token for 50 minutes (token is valid for ~1 hour)
+      tokenCache = {
+        token: accessToken,
+        expiresAt: now + (50 * 60 * 1000), // 50 minutes
+        baseUrl: baseUrl
+      };
+
     }
-
-    const authData = await authResponse.json();
-    const accessToken = authData.data?.access_token;
-
-    if (!accessToken) {
-      throw new Error('No access token received from Airalo API');
-    }
-
-    console.log('[Airalo Usage] Auth successful, fetching usage for ICCID:', iccid);
 
     // Get eSIM usage data using ICCID
     const usageResponse = await fetch(`${baseUrl}/v2/sims/${iccid}/usage`, {
@@ -136,7 +153,6 @@ export async function POST(request) {
 
     const usageData = await usageResponse.json();
     
-    console.log('[Airalo Usage] Raw API response:', JSON.stringify(usageData, null, 2));
 
     // Extract usage data - handle both nested and flat response structures
     const rawData = usageData?.data || usageData || {};
@@ -168,7 +184,6 @@ export async function POST(request) {
       _raw: rawData
     };
 
-    console.log('[Airalo Usage] Normalized data:', JSON.stringify(normalizedData, null, 2));
 
     return NextResponse.json({
       success: true,
@@ -178,7 +193,6 @@ export async function POST(request) {
     });
 
   } catch (error) {
-    console.error('[Airalo Usage] Error:', error.message);
     return NextResponse.json({
       success: false,
       error: error.message

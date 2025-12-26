@@ -209,7 +209,6 @@ const Dashboard = () => {
         }
       }
     } catch (error) {
-      console.error('Error loading referral stats:', error);
       // Silently fail - referral stats are not critical for dashboard functionality
       // Keep default stats state
     }
@@ -413,7 +412,6 @@ const Dashboard = () => {
             // Filter out test/sandbox orders to prevent 404 errors in production
             // Test orders don't exist in production Airalo API
             if (data.isTestMode === true || data.mode === 'sandbox' || data.test === true) {
-              console.log('[Dashboard] Skipping test/sandbox order:', doc.id);
               return false;
             }
 
@@ -443,23 +441,12 @@ const Dashboard = () => {
               let countryNameFromData = countryData?.countryName || null;
               let isRegionalPlan = countryData?.isRegional || false;
 
-              // Debug logging
-              console.log('📍 Order country data:', {
-                id: doc.id,
-                country_code: data.country_code,
-                country_region: data.country_region,
-                is_regional: data.is_regional,
-                countryCodeFromData,
-                countryNameFromData
-              });
-
               // Fallback: Use extractLocationInfo if direct fields not available
               if (!countryCodeFromData || !countryNameFromData) {
                 const locationInfo = extractLocationInfo(data);
                 countryCodeFromData = locationInfo?.code || 'GLOBAL';
                 countryNameFromData = locationInfo?.name || 'Global';
                 isRegionalPlan = locationInfo?.isRegional || false;
-                console.log('📍 Used fallback location info:', locationInfo);
               }
 
               // Extract plan details using shared utility
@@ -563,7 +550,6 @@ const Dashboard = () => {
           return dateB - dateA; // Newest first
         });
 
-        console.log('[Dashboard] Loaded', sortedOrders.length, 'orders (sorted newest first)');
 
         const visibleOrders = sortedOrders.filter(o => {
           const paid = (o.paymentStatus === 'completed' || o.paymentStatus === 'paid');
@@ -586,13 +572,10 @@ const Dashboard = () => {
       // If we already have the profile from AuthContext, we don't need to check/create it
       // This prevents redundant fetches and potential errors
       if (userProfile) {
-        console.log('[Dashboard] User profile already loaded from context');
         return;
       }
 
-      console.log('[Dashboard] Checking user profile for:', currentUser.uid);
       if (!db) {
-        console.error('[Dashboard] CRITICAL: Firestore DB instance is missing! Check firebase/config.js');
         return;
       }
 
@@ -602,7 +585,6 @@ const Dashboard = () => {
         const userDoc = await getDoc(userDocRef);
 
         if (!userDoc.exists()) {
-          console.log('[Dashboard] Creating new user profile');
           // Create user profile if it doesn't exist
           await setDoc(userDocRef, {
             email: currentUser.email,
@@ -617,7 +599,6 @@ const Dashboard = () => {
           await loadUserProfile();
         }
       } catch (error) {
-        console.error('[Dashboard] ensureUserProfile error:', error);
         // Only show toast if it's not a permission error or if we really need to know
         if (error.code !== 'permission-denied') {
           toast.error('Failed to fetch user data');
@@ -639,50 +620,93 @@ const Dashboard = () => {
   }, [authLoading, currentUser, router, currentLanguage]);
 
   // Preload usage data for visible eSIMs (for card previews)
-  // DISABLED: Causes rate limiting issues with Airalo API (429 errors)
-  // Usage data is now only loaded when user clicks "Check Usage" in the modal
-  // This prevents hitting Airalo's rate limit of ~100 requests/minute
-  /*
+  // Loads usage data sequentially with delays to avoid Airalo API rate limiting
+  // The Airalo API has a rate limit of 100 requests/minute per ICCID with 20-minute cache
+  // But authentication has a separate stricter limit, so we space out requests more
   useEffect(() => {
     if (orders.length === 0) return;
-    
+
+    let isCancelled = false;
+
     const preloadUsageData = async () => {
-      // Get ICCIDs that need usage data (limit to 2 to avoid rate limiting)
-      const iccidsToLoad = orders
+      // Get orders with ICCIDs that need usage data
+      const ordersToLoad = orders
         .filter(o => o.status === 'active' || o.status === 'completed')
-        .map(o => o.qrCode?.iccid || o.iccid || o.airaloOrderData?.sims?.[0]?.iccid)
-        .filter(iccid => iccid && !usageCache[iccid])
-        .slice(0, 2); // Only load first 2 to avoid rate limiting
-      
-      if (iccidsToLoad.length === 0) return;
-      
-      console.log('[Dashboard] Preloading usage for', iccidsToLoad.length, 'eSIMs (sequential)');
-      
-      // Load sequentially with delay to avoid rate limiting
-      for (const iccid of iccidsToLoad) {
-        setLoadingUsageMap(prev => ({ ...prev, [iccid]: true }));
-        
+        .map(o => ({
+          iccid: o.qrCode?.iccid || o.iccid || o.airaloOrderData?.sims?.[0]?.iccid,
+          order: o
+        }))
+        .filter(item => item.iccid && !usageCache[item.iccid])
+        .slice(0, 5); // Limit to 5 eSIMs to reduce auth rate limit hits
+
+      if (ordersToLoad.length === 0) return;
+
+
+      // Mark ALL eSIMs as loading at once for better UX (skeleton shows on all cards together)
+      const iccidsToLoad = ordersToLoad.map(item => item.iccid);
+      setLoadingUsageMap(prev => {
+        const newMap = { ...prev };
+        iccidsToLoad.forEach(iccid => { newMap[iccid] = true; });
+        return newMap;
+      });
+
+      // Load sequentially with longer delay to avoid auth rate limiting
+      for (const { iccid, order } of ordersToLoad) {
+        if (isCancelled) break;
+
         try {
           const result = await esimService.getEsimUsageByIccid(iccid);
-          if (result.success) {
-            setUsageCache(prev => ({ ...prev, [iccid]: result.data }));
+          if (result.success && !isCancelled) {
+            // Combine usage data with package details from the order
+            const planDetails = order.planDetails || {};
+            const airaloOrderData = order.airaloOrderData || {};
+            const simData = airaloOrderData.sims?.[0] || {};
+
+            const totalVoice = planDetails.voice || simData.voice || airaloOrderData.voice || 0;
+            const totalText = planDetails.sms || simData.text || airaloOrderData.text || 0;
+            const isUnlimited = planDetails.isUnlimited || airaloOrderData.is_unlimited || result.data?.is_unlimited || false;
+            const totalData = result.data?.total || planDetails.dataAmountMb || simData.data_amount_mb || 0;
+
+            const combinedUsageData = {
+              ...result.data,
+              total: result.data?.total || totalData,
+              total_voice: result.data?.total_voice || totalVoice,
+              total_text: result.data?.total_text || totalText,
+              is_unlimited: isUnlimited,
+            };
+
+            setUsageCache(prev => ({ ...prev, [iccid]: combinedUsageData }));
+          } else if (result.statusCode === 429) {
+            // Rate limited - stop preloading and wait longer
+            break;
           }
         } catch (error) {
-          console.log('[Dashboard] Failed to preload usage for', iccid.slice(-4), error.message);
+          // If we hit a rate limit error, stop trying
+          if (error.message?.includes('429') || error.message?.includes('Too Many')) {
+            break;
+          }
         } finally {
-          setLoadingUsageMap(prev => ({ ...prev, [iccid]: false }));
+          if (!isCancelled) {
+            setLoadingUsageMap(prev => ({ ...prev, [iccid]: false }));
+          }
         }
-        
-        // Wait 3 seconds between requests to avoid rate limiting
-        await new Promise(resolve => setTimeout(resolve, 3000));
+
+        // Wait 3 seconds between requests to avoid auth rate limiting
+        // Each request needs a fresh auth token, and auth has stricter limits
+        if (!isCancelled) {
+          await new Promise(resolve => setTimeout(resolve, 3000));
+        }
       }
     };
-    
-    // Delay preload to not block initial render
+
+    // Delay preload more to not block initial render and give auth time to recover
     const timer = setTimeout(preloadUsageData, 2000);
-    return () => clearTimeout(timer);
-  }, [orders, usageCache]);
-  */
+
+    return () => {
+      isCancelled = true;
+      clearTimeout(timer);
+    };
+  }, [orders]); // Only depend on orders, not usageCache to avoid infinite loop
 
   // Show skeleton while auth is loading or data is loading
   if (authLoading || loading) {
@@ -920,7 +944,6 @@ const Dashboard = () => {
         });
       } catch (globalError) {
         // Global order might not exist or already deleted - this is OK
-        console.log('Note: Global order not found or already updated:', globalError.message);
       }
 
       // Update local state - remove from orders list
@@ -935,7 +958,6 @@ const Dashboard = () => {
       });
 
     } catch (error) {
-      console.error('Error deleting order:', error);
       toast.error(t('dashboard.deleteOrderError', 'Failed to delete eSIM: {{error}}', { error: error.message }), {
         duration: 4000,
         style: {
@@ -966,9 +988,7 @@ const Dashboard = () => {
         return;
       }
 
-      console.log('[Dashboard] Fetching usage for ICCID:', iccid);
       const result = await esimService.getEsimUsageByIccid(iccid);
-      console.log('[Dashboard] Usage API result:', result);
 
       if (result.success) {
         // Combine usage data from Airalo API with package details from the order
@@ -996,7 +1016,6 @@ const Dashboard = () => {
           is_unlimited: isUnlimited,
         };
 
-        console.log('[Dashboard] Combined usage data:', combinedUsageData);
         setEsimUsage(combinedUsageData);
         setUsageCache(prev => ({ ...prev, [iccid]: combinedUsageData }));
         toast.success(t('dashboard.usageDataLoaded', 'Usage data loaded successfully'));

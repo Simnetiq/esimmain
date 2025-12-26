@@ -7,7 +7,6 @@ import Image from 'next/image';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
 import { useCountries } from '@esim/shared/hooks/useCountries';
-import { getISOCode } from '@esim/shared/utils/countryCodeMap';
 
 const CountrySearchBar = ({ onSearch = false, onCountrySelect = null }) => {
   const { t, locale } = useI18n();
@@ -240,12 +239,12 @@ const CountrySearchBar = ({ onSearch = false, onCountrySelect = null }) => {
                 onClick={() => handleCountryClick(country)}
                 className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left border-b border-gray-100 last:border-b-0 first:rounded-t-lg last:rounded-b-lg"
               >
-                {/* Country Flag - Rounded with 4:3 aspect ratio */}
+                {/* Country Image - 4:3 aspect ratio */}
                 <div className="flex-shrink-0 w-12 aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg flex items-center justify-center border border-gray-200 overflow-hidden">
-                  {country.photo && country.photo.includes('firebasestorage') ? (
+                  {country.image?.url && (
                     <div className="relative w-full h-full">
-                      <Image 
-                        src={country.photo} 
+                      <Image
+                        src={country.image.url}
                         alt={country.displayName}
                         fill
                         sizes="48px"
@@ -254,15 +253,6 @@ const CountrySearchBar = ({ onSearch = false, onCountrySelect = null }) => {
                         loading="lazy"
                       />
                     </div>
-                  ) : (
-                    <img
-                      src={`/flags/4x3/${getISOCode(country.code)}.svg`}
-                      alt={`${country.displayName} flag`}
-                      width="48"
-                      height="36"
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -326,12 +316,12 @@ const CountrySearchBar = ({ onSearch = false, onCountrySelect = null }) => {
               }}
               className="flex items-center gap-1.5 text-xs sm:text-sm px-2 py-1 rounded-sm bg-white/20 hover:shadow-sm hover:shadow-blue-200/60 transition-all duration-200 text-gray-700 hover:text-cobalt-blue font-bold"
             >
-              {/* Small Flag */}
+              {/* Small Image */}
               <div className="flex-shrink-0 w-5 aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 rounded flex items-center justify-center border border-gray-200/50 overflow-hidden">
-                {country.photo && country.photo.includes('firebasestorage') ? (
+                {country.image?.url && (
                   <div className="relative w-full h-full">
-                    <Image 
-                      src={country.photo} 
+                    <Image
+                      src={country.image.url}
                       alt={country.displayName}
                       fill
                       sizes="20px"
@@ -340,15 +330,6 @@ const CountrySearchBar = ({ onSearch = false, onCountrySelect = null }) => {
                       loading="lazy"
                     />
                   </div>
-                ) : (
-                  <img
-                    src={`/flags/4x3/${getISOCode(country.code)}.svg`}
-                    alt={`${country.displayName} flag`}
-                    width="20"
-                    height="15"
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
                 )}
               </div>
               {country.displayName}

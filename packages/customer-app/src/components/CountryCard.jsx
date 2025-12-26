@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import Image from 'next/image';
-import { getISOCode } from '@esim/shared/utils/countryCodeMap';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
 
 const CountryCard = ({
@@ -45,6 +44,10 @@ const CountryCard = ({
   const minPrice = country.minPrice;
   const isRegional = country.is_regional || false;
 
+  // Check if country has plans with SMS or Voice
+  const hasPlansWithSms = country.hasPlansWithSms || country.plans?.some(p => parseInt(p.sms) > 0);
+  const hasPlansWithVoice = country.hasPlansWithVoice || country.plans?.some(p => parseInt(p.voice) > 0 || parseInt(p.calls) > 0);
+
   return (
     <div
       onClick={onClick}
@@ -61,12 +64,12 @@ const CountryCard = ({
       <div className="p-4 flex flex-col">
         {/* Country Flag & Name */}
         <div className={`flex items-center gap-3 mb-3 `}>
-          {/* 4:3 Flag Container */}
-          <div className="flex-shrink-0 w-14 sm:w-16 aspect-[4/3] bg-white  flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-300">
-            {country.photo && country.photo.includes('firebasestorage') ? (
+          {/* 4:3 Country Image Container */}
+          <div className="flex-shrink-0 w-14 sm:w-16 aspect-[4/3] bg-white flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-300">
+            {country.image?.url && (
               <div className="relative w-full h-full">
                 <Image
-                  src={country.photo}
+                  src={country.image.url}
                   alt={fullName}
                   fill
                   sizes="64px"
@@ -76,28 +79,39 @@ const CountryCard = ({
                   loading="lazy"
                 />
               </div>
-            ) : (
-              <Image
-                src={`/flags/4x3/${getISOCode(country.code)}.svg`}
-                alt={`${fullName} flag`}
-                width={64}
-                height={48}
-                className="w-full h-full object-cover"
-                loading="lazy"
-                unoptimized
-              />
             )}
           </div>
           <div className={`flex-1 min-w-0 ${isRTL ? 'text-right' : 'text-left'}`}>
             <h3 className="text-sm sm:text-base font-semibold text-eerie-black truncate">
               {displayName}
             </h3>
-            <p className="text-xs text-gray-500 truncate">
-              {planCount > 0
-                ? `${planCount} ${planCount === 1 ? t('plans.plan', 'plan') : t('plans.plans', 'plans')}`
-                : t('plans.noPlansAvailable', 'No plans')
-              }
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="text-xs text-gray-500 truncate">
+                {planCount > 0
+                  ? `${planCount} ${planCount === 1 ? t('plans.plan', 'plan') : t('plans.plans', 'plans')}`
+                  : t('plans.noPlansAvailable', 'No plans')
+                }
+              </p>
+              {/* SMS & Voice indicators */}
+              {(hasPlansWithSms || hasPlansWithVoice) && (
+                <div className="flex items-center gap-1">
+                  {hasPlansWithVoice && (
+                    <span className="text-teal-600" title={t('plan.callsAvailable', 'Plans with calls available')}>
+                      <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                      </svg>
+                    </span>
+                  )}
+                  {hasPlansWithSms && (
+                    <span className="text-purple-600" title={t('plan.smsAvailable', 'Plans with SMS available')}>
+                      <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                      </svg>
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

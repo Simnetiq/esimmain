@@ -31,8 +31,6 @@ export async function POST(request) {
     const cutoffTime = new Date(Date.now() - hoursOld * 60 * 60 * 1000);
     const cutoffTimestamp = Timestamp.fromDate(cutoffTime);
     
-    console.log(`🧹 Cleanup: Finding pending orders older than ${hoursOld} hours (before ${cutoffTime.toISOString()})`);
-    console.log(`   Mode: ${dryRun ? 'DRY RUN (no deletions)' : 'LIVE (will delete)'}`);
     
     const results = {
       globalOrdersFound: 0,
@@ -55,7 +53,6 @@ export async function POST(request) {
     const pendingOrdersSnapshot = await getDocs(pendingOrdersQuery);
     results.globalOrdersFound = pendingOrdersSnapshot.size;
     
-    console.log(`   Found ${results.globalOrdersFound} stale pending orders in 'orders' collection`);
     
     // Process global orders
     for (const orderDoc of pendingOrdersSnapshot.docs) {
@@ -70,14 +67,12 @@ export async function POST(request) {
       
       // Skip if payment was actually completed (safety check)
       if (orderData.paymentStatus === 'completed' || orderData.paymentStatus === 'paid') {
-        console.log(`   ⚠️ Skipping ${orderId} - payment completed but status still 'pending'`);
         results.skippedOrderIds.push(orderId);
         continue;
       }
       
       // Skip if eSIM was created (safety check)
       if (orderData.esimCreated === true) {
-        console.log(`   ⚠️ Skipping ${orderId} - eSIM was created`);
         results.skippedOrderIds.push(orderId);
         continue;
       }
@@ -95,11 +90,9 @@ export async function POST(request) {
               results.userOrdersDeleted++;
             } catch {
               // User order might not exist or already deleted
-              console.log(`   Note: User order ${orderId} not found or already deleted`);
             }
           }
         } catch (deleteError) {
-          console.error(`   ❌ Error deleting ${orderId}:`, deleteError);
           results.errors.push({ orderId, error: deleteError.message });
         }
       } else {
@@ -120,7 +113,6 @@ export async function POST(request) {
       const userPendingSnapshot = await getDocs(userPendingQuery);
       results.userOrdersFound = userPendingSnapshot.size;
       
-      console.log(`   Found ${results.userOrdersFound} stale pending orders in user's 'esims' collection`);
       
       for (const userOrderDoc of userPendingSnapshot.docs) {
         const orderData = userOrderDoc.data();
@@ -155,7 +147,6 @@ export async function POST(request) {
       }
     }
     
-    console.log(`✅ Cleanup complete:`, results);
     
     return NextResponse.json({
       success: true,
@@ -168,7 +159,6 @@ export async function POST(request) {
     });
     
   } catch (error) {
-    console.error('❌ Cleanup error:', error);
     return NextResponse.json(
       { 
         success: false, 
@@ -226,7 +216,6 @@ export async function GET(request) {
     });
     
   } catch (error) {
-    console.error('❌ Error checking pending orders:', error);
     return NextResponse.json(
       { success: false, error: error.message },
       { status: 500 }

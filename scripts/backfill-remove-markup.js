@@ -25,12 +25,10 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 
 async function backfillDataPlans() {
-  console.log('🔧 Starting dataplan price backfill...\n');
   
   try {
     // Fetch all dataplans
     const dataplansSnapshot = await db.collection('dataplans').get();
-    console.log(`📊 Found ${dataplansSnapshot.size} dataplans\n`);
     
     const BATCH_SIZE = 400;
     let batch = db.batch();
@@ -45,7 +43,6 @@ async function backfillDataPlans() {
       const basePrice = parseFloat(data.net_price ?? data.original_price ?? data.price);
       
       if (!basePrice || Number.isNaN(basePrice) || basePrice <= 0) {
-        console.warn(`⚠️  Skipping ${doc.id}: invalid base price`);
         skippedCount++;
         continue;
       }
@@ -72,7 +69,6 @@ async function backfillDataPlans() {
       // Commit batch when reaching limit
       if (batchCount >= BATCH_SIZE) {
         await batch.commit();
-        console.log(`✅ Committed batch: ${updatedCount} plans updated so far...`);
         batch = db.batch();
         batchCount = 0;
       }
@@ -81,13 +77,7 @@ async function backfillDataPlans() {
     // Commit remaining items
     if (batchCount > 0) {
       await batch.commit();
-      console.log(`✅ Committed final batch`);
     }
-    
-    console.log(`\n✅ Dataplan backfill complete:`);
-    console.log(`   - Updated: ${updatedCount} plans`);
-    console.log(`   - Skipped: ${skippedCount} plans (already correct or invalid)`);
-    console.log(`   - Total: ${dataplansSnapshot.size} plans\n`);
     
     return { updatedCount, skippedCount };
     

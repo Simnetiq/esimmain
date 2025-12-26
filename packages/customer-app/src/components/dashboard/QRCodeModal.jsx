@@ -1,25 +1,29 @@
-import React, { useState } from 'react';
-import { 
+import React, { useState, useEffect } from 'react';
+import {
   QrCode, Smartphone, Clock, Wifi, Phone, MessageSquare,
-  Copy, Check, ChevronDown, ChevronUp, X, ExternalLink, 
-  Signal, AlertCircle, CheckCircle, Trash2, BookOpen
+  Copy, Check, ChevronDown, ChevronUp, X, ExternalLink,
+  Signal, AlertCircle, CheckCircle, Trash2, BookOpen, Globe
 } from 'lucide-react';
 import LPAQRCodeDisplay from './LPAQRCodeDisplay';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
-import { 
-  getQrCodeValue, 
-  getAppleInstallUrl, 
+import {
+  getQrCodeValue,
+  getAppleInstallUrl,
   getIccid,
-  mapPlanDetails 
+  mapPlanDetails,
+  mapPackageCountryData
 } from '@esim/shared/utils/esimFieldMapper';
+import { db } from '@esim/shared/firebase/config';
+import { doc, getDoc } from 'firebase/firestore';
+import Image from 'next/image';
 import toast from 'react-hot-toast';
 
-const QRCodeModal = ({ 
-  show, 
-  selectedOrder, 
-  onClose, 
-  onCheckEsimUsage, 
+const QRCodeModal = ({
+  show,
+  selectedOrder,
+  onClose,
+  onCheckEsimUsage,
   loadingEsimUsage,
   onDeleteOrder,
   esimUsage
@@ -28,7 +32,89 @@ const QRCodeModal = ({
   const [activeTab, setActiveTab] = useState('qrcode');
   const [showInstructions, setShowInstructions] = useState(false);
   const [copiedField, setCopiedField] = useState(null);
-  
+  const [countryImage, setCountryImage] = useState(null);
+
+  // Fetch country/region image from Firebase
+  useEffect(() => {
+    const fetchCountryImage = async () => {
+      if (!selectedOrder) {
+        setCountryImage(null);
+        return;
+      }
+
+      const countryData = mapPackageCountryData(selectedOrder);
+      const isRegional = countryData?.isRegional || selectedOrder.is_regional;
+
+      // Try to get country code from various sources
+      let code = countryData?.countryCode;
+
+      // Fallback: check country_codes array (for regional plans like "asia" or single-country)
+      if (!code && selectedOrder.country_codes?.length >= 1) {
+        code = selectedOrder.country_codes[0];
+      }
+
+      // Get country/region name for slug-based lookup (e.g., "Ecuador" -> "ecuador", "Asia" -> "asia")
+      const countryName = countryData?.countryName || selectedOrder.country_region;
+
+      if (!code && !countryName) {
+        setCountryImage(null);
+        return;
+      }
+
+      try {
+        let imageUrl = null;
+
+        // 1. Try countries collection first (works for both countries AND regions like "asia")
+        if (countryName && typeof countryName === 'string') {
+          const nameSlug = countryName.toLowerCase().replace(/\s+/g, '-');
+          const countryDoc = await getDoc(doc(db, 'countries', nameSlug));
+          if (countryDoc.exists()) {
+            const data = countryDoc.data();
+            imageUrl = data.image?.url || data.photo;
+          }
+        }
+
+        // 2. Try code as lowercase slug (e.g., "asia" from country_codes)
+        if (!imageUrl && code) {
+          const codeSlug = code.toLowerCase().replace(/\s+/g, '-');
+          const countryDoc = await getDoc(doc(db, 'countries', codeSlug));
+          if (countryDoc.exists()) {
+            const data = countryDoc.data();
+            imageUrl = data.image?.url || data.photo;
+          }
+        }
+
+        // 3. For regional plans, also check the regions collection
+        if (!imageUrl && isRegional && countryName) {
+          const regionSlug = countryName.toLowerCase().replace(/\s+/g, '-');
+          const regionDoc = await getDoc(doc(db, 'regions', regionSlug));
+          if (regionDoc.exists()) {
+            const data = regionDoc.data();
+            imageUrl = data.imageUrl?.url || data.image?.url;
+          }
+        }
+
+        // 4. Try uppercase ISO code as fallback (e.g., "DE")
+        if (!imageUrl && code && !isRegional) {
+          const countryDoc = await getDoc(doc(db, 'countries', code.toUpperCase()));
+          if (countryDoc.exists()) {
+            const data = countryDoc.data();
+            imageUrl = data.image?.url || data.photo;
+          }
+        }
+
+        setCountryImage(imageUrl || null);
+      } catch (error) {
+        console.error('Error fetching country image:', error);
+        setCountryImage(null);
+      }
+    };
+
+    if (show && selectedOrder) {
+      fetchCountryImage();
+    }
+  }, [show, selectedOrder]);
+
   const handleDelete = () => {
     if (window.confirm(t('dashboard.confirmDelete', 'Are you sure you want to delete this eSIM? This action cannot be undone.'))) {
       onDeleteOrder?.(selectedOrder);
@@ -187,9 +273,22 @@ const QRCodeModal = ({
           {/* Header Content */}
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
-              {/* Featured Icon */}
-              <div className="w-12 h-12 bg-tufts-blue rounded-xl flex items-center justify-center">
-                <QrCode className="w-6 h-6 text-white" />
+              {/* Country/Region Image or Fallback Icon */}
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden border border-white/20 shadow-sm">
+                {countryImage ? (
+                  <Image
+                    src={countryImage}
+                    alt={selectedOrder.countryName || selectedOrder.country_region || 'Country'}
+                    width={48}
+                    height={48}
+                    className="w-full h-full object-cover"
+                    unoptimized
+                  />
+                ) : (
+                  <div className="w-full h-full bg-tufts-blue flex items-center justify-center">
+                    <Globe className="w-6 h-6 text-white" />
+                  </div>
+                )}
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-white leading-tight">

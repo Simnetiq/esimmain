@@ -140,7 +140,6 @@ export async function POST(request) {
         // SECURITY: Prevent duplicate eSIM creation
         // ========================================
         if (orderData.esimCreated || orderData.status === 'completed' || orderData.processed) {
-          console.log('eSIM already created for Coinbase order:', orderId);
           return NextResponse.json({ success: true, message: 'Already processed' });
         }
         
@@ -151,11 +150,6 @@ export async function POST(request) {
         const expectedAmount = orderData.amount;
         
         if (paidAmount > 0 && Math.abs(paidAmount - expectedAmount) > 0.01) {
-          console.error('🚨 COINBASE PAYMENT AMOUNT MISMATCH!', {
-            orderId,
-            paidAmount,
-            expectedAmount
-          });
           
           // Log fraud attempt
           try {
@@ -170,7 +164,6 @@ export async function POST(request) {
               timestamp: serverTimestamp()
             });
           } catch (e) {
-            console.error('Failed to log fraud attempt:', e);
           }
           
           if (paidAmount < expectedAmount - 0.01) {
@@ -203,10 +196,8 @@ export async function POST(request) {
           ? (process.env.AIRALO_BASE_URL_SANDBOX || 'https://sandbox-partners-api.airalo.com')
           : (process.env.AIRALO_BASE_URL || 'https://partners-api.airalo.com');
         
-        console.log(`🌐 Airalo Mode: ${airaloMode}, URL: ${airaloBaseUrl}`);
         
         if (!clientId || !clientSecret) {
-          console.error('Airalo credentials not configured');
           return NextResponse.json({
             error: 'eSIM service not configured'
           }, { status: 503 });
@@ -322,7 +313,6 @@ export async function POST(request) {
               await updateDoc(userOrderRef, userUpdateData);
             } else {
               // Document doesn't exist - create it with full order data
-              console.log('⚠️ User order doc did not exist, creating...');
               await setDoc(userOrderRef, {
                 ...orderData,
                 ...userUpdateData,
@@ -331,7 +321,6 @@ export async function POST(request) {
               });
             }
           } catch (userError) {
-            console.error('Error updating user order:', userError);
             // Recovery attempt
             try {
               const userOrderRef = doc(db, 'users', userId, 'esims', orderId);
@@ -343,8 +332,7 @@ export async function POST(request) {
                 orderData: orderResult.data,
                 userId: userId
               }, { merge: true });
-            } catch (e) {
-              console.error('Recovery failed:', e);
+            } catch (e) { 
             }
           }
         }

@@ -134,7 +134,7 @@ export default function PlanDetailScreen() {
       const paymentResult = await processPayment(orderData);
 
       if (paymentResult.success) {
-        console.log('✅ Payment successful, waiting for order processing...');
+
 
         try {
           // Step 2: Wait for webhook to create the eSIM
@@ -148,11 +148,9 @@ export default function PlanDetailScreen() {
             orderId: orderId,
             onProgress: (progress) => {
               // Could show progress UI here if needed
-              console.log('📊 Order progress:', progress);
             },
           });
 
-          console.log('✅ Order completed via webhook:', orderResult);
 
           // Store order data for success page
           await AsyncStorage.setItem('lastOrder', JSON.stringify({
@@ -177,7 +175,6 @@ export default function PlanDetailScreen() {
             },
           });
         } catch (orderError) {
-          console.error('⚠️ Order processing error:', orderError);
 
           // Payment succeeded but order processing timed out
           // The webhook might still complete - user should check their orders
@@ -198,8 +195,6 @@ export default function PlanDetailScreen() {
         }
       }
     } catch (error) {
-      console.error('Payment error:', error);
-
       const errorMessage = error.message || 'Failed to process payment. Please try again.';
       const isDevBuildError = errorMessage.includes('development build') || errorMessage.includes('Expo Go');
 
@@ -210,7 +205,7 @@ export default function PlanDetailScreen() {
           { text: 'OK' },
           ...(isDevBuildError ? [{
             text: 'Learn More',
-            onPress: () => console.log('See DEVELOPMENT_BUILD.md for instructions')
+            onPress: () => {}
           }] : [])
         ]
       );

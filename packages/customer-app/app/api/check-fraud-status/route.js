@@ -50,7 +50,6 @@ export async function GET(request) {
     const blockStatus = await checkUserBlocked(db, userId, email, cardFingerprint, ipAddress);
 
     if (blockStatus.blocked) {
-      console.log(`🚫 User blocked from checkout: ${userId || email} (${blockStatus.blockType})`);
       
       return NextResponse.json({
         allowed: false,
@@ -96,7 +95,6 @@ export async function GET(request) {
 
     // 6. Check for high-risk region
     if (countryCode && FRAUD_SIGNALS_CONFIG.HIGH_RISK_REGIONS.includes(countryCode)) {
-      console.log(`⚠️ High-risk region checkout attempt: ${countryCode} - ${userId || email}`);
       // Don't block, but log for monitoring
     }
 
@@ -113,7 +111,6 @@ export async function GET(request) {
     });
 
   } catch (error) {
-    console.error('Error checking fraud status:', error);
     
     // Fail open - allow checkout on error but log
     return NextResponse.json({
@@ -150,7 +147,6 @@ export async function POST(request) {
     const blockStatus = await checkUserBlocked(db, userId, email, cardFingerprint, ipAddress);
 
     if (blockStatus.blocked) {
-      console.log(`🚫 User blocked from checkout (POST): ${userId || email}`);
       
       return NextResponse.json({
         allowed: false,
@@ -203,7 +199,6 @@ export async function POST(request) {
     });
 
   } catch (error) {
-    console.error('Error checking fraud status (POST):', error);
     
     return NextResponse.json({
       allowed: true,

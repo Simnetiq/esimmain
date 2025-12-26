@@ -16,7 +16,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '@esim/shared/firebase/config';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
+import {
   Globe,
   Edit3,
   Trash2,
@@ -31,7 +31,12 @@ import {
   FileText,
   MoreVertical,
   Info,
-  X
+  X,
+  Eye,
+  EyeOff,
+  ArrowUpDown,
+  SortAsc,
+  SortDesc
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
@@ -40,7 +45,7 @@ import { formatPrice } from '@esim/shared/utils/priceUtils';
 import { usePathname } from 'next/navigation';
 import CountryEditModal from './CountryEditModal';
 import TariffManagement from './TariffManagement';
-import FlagIcon from '@esim/shared/components/FlagIcon';
+import Image from 'next/image';
 
 const CountryManagement = () => {
   const { currentUser } = useAuth();
@@ -89,6 +94,12 @@ const CountryManagement = () => {
   // Dropdown state for translations menu
   const [showTranslationsMenu, setShowTranslationsMenu] = useState(false);
 
+  // Sorting and visibility states
+  const [sortBy, setSortBy] = useState('name'); // 'name', 'planCount', 'minPrice', 'code'
+  const [sortOrder, setSortOrder] = useState('asc'); // 'asc', 'desc'
+  const [showHidden, setShowHidden] = useState(false);
+  const [togglingVisibility, setTogglingVisibility] = useState(null); // country code being toggled
+
   // Load countries on component mount
   useEffect(() => {
     if (currentUser) {
@@ -96,22 +107,52 @@ const CountryManagement = () => {
     }
   }, [currentUser]);
 
-  // Filter countries based on search term
+  // Filter and sort countries based on search term, visibility, and sort options
   useEffect(() => {
     let filtered = [...countries];
 
+    // Filter by visibility (hidden countries)
+    if (!showHidden) {
+      filtered = filtered.filter(country => country.isHidden !== true);
+    }
+
+    // Filter by search term
     if (searchTerm.trim()) {
-      filtered = filtered.filter(country => 
+      filtered = filtered.filter(country =>
         country.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         country.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        Object.values(country.translations || {}).some(translation => 
+        Object.values(country.translations || {}).some(translation =>
           translation.toLowerCase().includes(searchTerm.toLowerCase())
         )
       );
     }
 
+    // Sort countries
+    filtered.sort((a, b) => {
+      let comparison = 0;
+
+      switch (sortBy) {
+        case 'name':
+          comparison = (a.name || '').localeCompare(b.name || '');
+          break;
+        case 'code':
+          comparison = (a.code || '').localeCompare(b.code || '');
+          break;
+        case 'planCount':
+          comparison = (a.planCount || 0) - (b.planCount || 0);
+          break;
+        case 'minPrice':
+          comparison = (a.minPrice || 0) - (b.minPrice || 0);
+          break;
+        default:
+          comparison = (a.name || '').localeCompare(b.name || '');
+      }
+
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+
     setFilteredCountries(filtered);
-  }, [countries, searchTerm]);
+  }, [countries, searchTerm, sortBy, sortOrder, showHidden]);
 
   // Load all countries from Firebase
   const loadCountries = async () => {
@@ -218,7 +259,7 @@ const CountryManagement = () => {
   // Download template JSON
   const downloadTemplate = () => {
     // Template with examples - code must be ISO 3166-1 alpha-2 (lowercase works too)
-    // Flag SVGs are served from /flags/4x3/{code}.svg
+    // Country images are fetched from Firebase (Airalo CDN)
     const template = [
       {
         code: "US",
@@ -266,12 +307,12 @@ const CountryManagement = () => {
       _README: {
         description: "Countries template for Simnetiq",
         fields: {
-          code: "ISO 3166-1 alpha-2 country code (e.g., US, GB, DE). Used for flag display (/flags/4x3/{code}.svg)",
+          code: "ISO 3166-1 alpha-2 country code (e.g., US, GB, DE)",
           name: "English name of the country (used as fallback)",
           translations: "Object with language codes as keys (en, es, fr, de, ar, he, ru)"
         },
         notes: [
-          "Flag SVGs must exist in /public/flags/4x3/ folder",
+          "Country images are automatically fetched from Airalo CDN via Firebase",
           "Translations are for UI display only - do not affect Stripe payments",
           "Use 'Translate All' button to auto-translate missing languages with AI"
         ]
@@ -461,6 +502,33 @@ const CountryManagement = () => {
     } finally {
       setTranslatingCountries(false);
       setTranslationProgress({ current: 0, total: 0 });
+    }
+  };
+
+  // Toggle country visibility (hide/show)
+  const toggleCountryVisibility = async (countryCode, currentlyHidden) => {
+    try {
+      setTogglingVisibility(countryCode);
+
+      const countryRef = doc(db, 'countries', countryCode);
+      await updateDoc(countryRef, {
+        isHidden: !currentlyHidden,
+        updated_at: serverTimestamp(),
+        updated_by: currentUser?.uid || 'admin'
+      });
+
+      toast.success(
+        currentlyHidden
+          ? `✅ ${countryCode} is now visible`
+          : `✅ ${countryCode} is now hidden`
+      );
+
+      await loadCountries();
+    } catch (error) {
+      console.error('Error toggling country visibility:', error);
+      toast.error(`Failed to update visibility for ${countryCode}`);
+    } finally {
+      setTogglingVisibility(null);
     }
   };
 
@@ -701,9 +769,64 @@ const CountryManagement = () => {
           )}
         </div>
         
+        {/* Sorting Dropdown */}
+        <div className="relative">
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="appearance-none px-4 py-2.5 pr-10 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-gray-900"
+          >
+            <option value="name">Sort by Name</option>
+            <option value="code">Sort by Code</option>
+            <option value="planCount">Sort by Plans</option>
+            <option value="minPrice">Sort by Price</option>
+          </select>
+          <ArrowUpDown className="w-4 h-4 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none" />
+        </div>
+
+        {/* Sort Order Toggle */}
+        <button
+          onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+          className="flex items-center gap-2 px-3 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm"
+          title={sortOrder === 'asc' ? 'Ascending order' : 'Descending order'}
+        >
+          {sortOrder === 'asc' ? (
+            <SortAsc className="w-4 h-4" />
+          ) : (
+            <SortDesc className="w-4 h-4" />
+          )}
+        </button>
+
+        {/* Show Hidden Toggle */}
+        <button
+          onClick={() => setShowHidden(!showHidden)}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-colors text-sm ${
+            showHidden
+              ? 'bg-amber-100 text-amber-800 border border-amber-300'
+              : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+          }`}
+        >
+          {showHidden ? (
+            <>
+              <Eye className="w-4 h-4" />
+              <span>Showing Hidden</span>
+            </>
+          ) : (
+            <>
+              <EyeOff className="w-4 h-4" />
+              <span>Show Hidden</span>
+            </>
+          )}
+        </button>
+
         {/* Countries Count */}
         <div className="ml-auto text-sm text-gray-500">
           {filteredCountries.length} {filteredCountries.length === 1 ? 'country' : 'countries'}
+          {showHidden && countries.filter(c => c.isHidden).length > 0 && (
+            <span className="ml-1 text-amber-600">
+              ({countries.filter(c => c.isHidden).length} hidden)
+            </span>
+          )}
         </div>
       </div>
 
@@ -727,7 +850,11 @@ const CountryManagement = () => {
             key={country.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+            className={`bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow ${
+              country.isHidden
+                ? 'border-amber-300 bg-amber-50/30'
+                : 'border-gray-200'
+            }`}
           >
             {/* Country Header */}
             <div className="p-4">
@@ -735,24 +862,56 @@ const CountryManagement = () => {
                 <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <div className="flex-shrink-0">
                     <div className="w-12 h-12 rounded-lg border-2 border-gray-200 overflow-hidden flex items-center justify-center bg-gray-50">
-                      <FlagIcon 
-                        countryCode={country.code} 
-                        size="lg" 
-                        squared={false}
-                      />
+                      {country.image?.url && (
+                        <Image
+                          src={country.image.url}
+                          alt={country.name}
+                          width={48}
+                          height={36}
+                          className="w-full h-full object-cover"
+                          unoptimized
+                        />
+                      )}
                     </div>
                   </div>
                   <div>
-                    <h3 className={`text-base font-semibold text-gray-900 ${isRTL ? 'text-right' : 'text-left'}`}>
-                      {country.translations?.[currentLanguage] || country.name}
-                    </h3>
+                    <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                      <h3 className={`text-base font-semibold text-gray-900 ${isRTL ? 'text-right' : 'text-left'}`}>
+                        {country.translations?.[currentLanguage] || country.name}
+                      </h3>
+                      {country.isHidden && (
+                        <span className="px-1.5 py-0.5 text-xs font-medium bg-amber-100 text-amber-700 rounded">
+                          HIDDEN
+                        </span>
+                      )}
+                    </div>
                     <p className={`text-sm text-gray-500 ${isRTL ? 'text-right' : 'text-left'}`}>
                       {country.code}
                     </p>
                   </div>
                 </div>
                 
-                <div className={`flex gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className={`flex gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  {/* Hide/Show Toggle */}
+                  <button
+                    onClick={() => toggleCountryVisibility(country.code, country.isHidden)}
+                    disabled={togglingVisibility === country.code}
+                    className={`p-2 rounded-lg transition-colors text-sm ${
+                      country.isHidden
+                        ? 'text-amber-600 hover:text-amber-700 hover:bg-amber-50'
+                        : 'text-gray-600 hover:text-gray-700 hover:bg-gray-50'
+                    }`}
+                    title={country.isHidden ? 'Show country' : 'Hide country'}
+                  >
+                    {togglingVisibility === country.code ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                    ) : country.isHidden ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+
                   <button
                     onClick={() => {
                       setEditingCountry(country);
@@ -763,7 +922,7 @@ const CountryManagement = () => {
                   >
                     <Edit3 className="w-4 h-4" />
                   </button>
-                  
+
                   <button
                     onClick={() => deleteCountry(country.code, country.name)}
                     className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors text-sm"

@@ -80,7 +80,6 @@ export async function getFraudSignal(db, userId, email) {
 
     return null;
   } catch (error) {
-    console.error('Error getting fraud signal:', error);
     return null;
   }
 }
@@ -150,7 +149,6 @@ export async function upsertFraudSignal(db, data) {
 
     return { success: true, docId };
   } catch (error) {
-    console.error('Error upserting fraud signal:', error);
     return { success: false, error: error.message };
   }
 }
@@ -228,12 +226,10 @@ export async function recordBlockedPayment(db, data) {
         blockedPaymentId: stripePaymentIntentId
       });
 
-      console.log(`🚨 AUTO-BLOCKED USER: ${userId || email} after ${fraudSignal.attempts} blocked attempts`);
     }
 
     return { success: true, attempts: fraudSignal?.attempts || 1 };
   } catch (error) {
-    console.error('Error recording blocked payment:', error);
     return { success: false, error: error.message };
   }
 }
@@ -318,7 +314,6 @@ export async function blockUser(db, userId, email, options = {}) {
       });
     }
 
-    console.log(`🔒 User blocked: ${userId || email} (${blockType})`);
 
     return { 
       success: true, 
@@ -327,7 +322,6 @@ export async function blockUser(db, userId, email, options = {}) {
       temporaryBlockCount
     };
   } catch (error) {
-    console.error('Error blocking user:', error);
     return { success: false, error: error.message };
   }
 }
@@ -427,7 +421,6 @@ export async function checkUserBlocked(db, userId, email, cardFingerprint = null
     // Not blocked
     return { blocked: false };
   } catch (error) {
-    console.error('Error checking if user is blocked:', error);
     // Fail open but log
     return { blocked: false, error: error.message };
   }
@@ -471,11 +464,9 @@ export async function unblockUser(db, userId, email) {
       }
     }
 
-    console.log(`🔓 User unblocked: ${userId || email}`);
 
     return { success: true };
   } catch (error) {
-    console.error('Error unblocking user:', error);
     return { success: false, error: error.message };
   }
 }
@@ -523,7 +514,6 @@ export async function getFraudStats(db, userId, email) {
       riskLevel
     };
   } catch (error) {
-    console.error('Error getting fraud stats:', error);
     return null;
   }
 }
@@ -535,7 +525,6 @@ export async function getFraudStats(db, userId, email) {
  */
 export async function syncToStripeRadar(db, stripe) {
   try {
-    console.log('🔄 Syncing fraud signals to Stripe Radar...');
 
     // Get or create Stripe Radar blocklist
     const lists = await stripe.radar.valueLists.list({ limit: 100 });
@@ -550,7 +539,6 @@ export async function syncToStripeRadar(db, stripe) {
         name: 'Fraud Card Fingerprints',
         item_type: 'card_fingerprint',
       });
-      console.log('✅ Created Stripe Radar blocklist:', blocklist.id);
     }
 
     // Get all fraud signals with card fingerprints
@@ -571,12 +559,10 @@ export async function syncToStripeRadar(db, stripe) {
               value: fingerprint,
             });
             synced++;
-            console.log(`✅ Added to Stripe Radar: ${fingerprint}`);
           } catch (err) {
             if (err.code === 'resource_already_exists') {
               skipped++;
             } else {
-              console.error(`❌ Failed to add ${fingerprint}:`, err.message);
             }
           }
         }
@@ -614,7 +600,6 @@ export async function syncToStripeRadar(db, stripe) {
       }
     }
 
-    console.log(`🔄 Stripe Radar sync complete: ${synced} added, ${skipped} already existed`);
 
     return { success: true, synced, skipped };
   } catch (error) {
@@ -652,11 +637,9 @@ export async function submitBlockAppeal(db, data) {
       updatedAt: serverTimestamp()
     });
 
-    console.log(`📨 Block appeal submitted: ${userId || email}`);
 
     return { success: true, appealId: appealRef.id };
   } catch (error) {
-    console.error('Error submitting block appeal:', error);
     return { success: false, error: error.message };
   }
 }

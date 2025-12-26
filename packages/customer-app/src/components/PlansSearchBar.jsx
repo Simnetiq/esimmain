@@ -5,7 +5,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Search, MapPin, X } from 'lucide-react';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { useCountries } from '@esim/shared/hooks/useCountries';
-import { getISOCode } from '@esim/shared/utils/countryCodeMap';
 import Image from 'next/image';
 
 const PlansSearchBar = ({ searchTerm, onSearchChange, onCountrySelect }) => {
@@ -132,12 +131,12 @@ const PlansSearchBar = ({ searchTerm, onSearchChange, onCountrySelect }) => {
                 onClick={() => handleCountryClick(country)}
                 className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left border-b border-gray-100 last:border-b-0 first:rounded-t-lg last:rounded-b-lg"
               >
-                {/* Country Flag - Rounded with 4:3 aspect ratio */}
+                {/* Country Image - 4:3 aspect ratio */}
                 <div className="flex-shrink-0 w-12 aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg flex items-center justify-center border border-gray-200 overflow-hidden">
-                  {country.photo && country.photo.includes('firebasestorage') ? (
+                  {country.image?.url && (
                     <div className="relative w-full h-full">
-                      <Image 
-                        src={country.photo} 
+                      <Image
+                        src={country.image.url}
                         alt={country.displayName}
                         fill
                         sizes="48px"
@@ -146,15 +145,6 @@ const PlansSearchBar = ({ searchTerm, onSearchChange, onCountrySelect }) => {
                         loading="lazy"
                       />
                     </div>
-                  ) : (
-                    <img
-                      src={`/flags/4x3/${getISOCode(country.code)}.svg`}
-                      alt={`${country.displayName} flag`}
-                      width="48"
-                      height="36"
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">

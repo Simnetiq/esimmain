@@ -12,9 +12,7 @@ export const trackFacebookPixel = (eventName, eventData = {}) => {
   if (typeof window !== 'undefined' && window.fbq) {
     try {
       window.fbq('track', eventName, eventData);
-      console.log(`[FB Pixel] ${eventName}:`, eventData);
     } catch (error) {
-      console.error('[FB Pixel] Error:', error);
     }
   }
 };
@@ -28,9 +26,7 @@ export const trackGoogleAnalytics = (eventName, eventData = {}) => {
   if (typeof window !== 'undefined' && window.gtag) {
     try {
       window.gtag('event', eventName, eventData);
-      console.log(`[GA] ${eventName}:`, eventData);
     } catch (error) {
-      console.error('[GA] Error:', error);
     }
   }
 };

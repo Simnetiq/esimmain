@@ -14,7 +14,7 @@ import {
   signInAnonymously
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
-import { auth, db } from '../firebase/config';
+import { getAuthInstance, db } from '../firebase/config';
 import { generateOTPWithTimestamp } from '../utils/otpUtils';
 import { sendVerificationEmail } from '../services/emailService';
 import { hasAdminAccess, hasSuperAdminAccess, hasAdminPermission } from '../services/adminService';
@@ -33,6 +33,7 @@ export function AuthProvider({ children }) {
 
   async function loginAsGuest() {
     try {
+      const auth = getAuthInstance();
       const { user } = await signInAnonymously(auth);
 
       // Create a guest profile in Firestore if needed
@@ -131,6 +132,7 @@ export function AuthProvider({ children }) {
         }
       }
 
+      const auth = getAuthInstance();
       const { user } = await signInWithEmailAndPassword(auth, email, password);
       return user;
     } catch (error) {
@@ -140,6 +142,7 @@ export function AuthProvider({ children }) {
 
   async function logout() {
     try {
+      const auth = getAuthInstance();
       await signOut(auth);
     } catch (error) {
       throw error;
@@ -148,6 +151,7 @@ export function AuthProvider({ children }) {
 
   async function resetPassword(email) {
     try {
+      const auth = getAuthInstance();
       await sendPasswordResetEmail(auth, email);
     } catch (error) {
       throw error;
@@ -156,6 +160,7 @@ export function AuthProvider({ children }) {
 
   async function signInWithGoogle() {
     try {
+      const auth = getAuthInstance();
       const provider = new GoogleAuthProvider();
       const { user } = await signInWithPopup(auth, provider);
 
@@ -194,6 +199,7 @@ export function AuthProvider({ children }) {
 
   async function signInWithApple() {
     try {
+      const auth = getAuthInstance();
       const provider = new OAuthProvider('apple.com');
       provider.addScope('email');
       provider.addScope('name');
@@ -242,6 +248,7 @@ export function AuthProvider({ children }) {
       }
 
       const userData = JSON.parse(pendingUserData);
+      const auth = getAuthInstance();
       const currentUser = auth?.currentUser;
 
       if (!currentUser) {
@@ -315,6 +322,7 @@ export function AuthProvider({ children }) {
       }
 
       // Create Firebase account only after successful verification
+      const auth = getAuthInstance();
       const { user } = await createUserWithEmailAndPassword(auth, pendingSignup.email, pendingSignup.password);
 
       // Update profile with display name
@@ -416,27 +424,53 @@ export function AuthProvider({ children }) {
   }, [currentUser]);
 
   useEffect(() => {
-    const authInstance = auth;
-    if (!authInstance) {
+    // Defer auth initialization to avoid blocking initial render
+    // This prevents the Firebase Auth iframe from loading during initial page load
+    let unsubscribe = null;
+    let isMounted = true;
+
+    const initAuth = () => {
+      if (!isMounted) return;
+
+      const authInstance = getAuthInstance();
+      if (!authInstance) {
+        setLoading(false);
+        return;
+      }
+
+      unsubscribe = onAuthStateChanged(authInstance, async (user) => {
+        if (!isMounted) return;
+        setCurrentUser(user);
+        if (user) {
+          try {
+            await loadUserProfile();
+          } catch {
+            // Silent error
+          }
+        } else {
+          setUserProfile(null);
+        }
+        setLoading(false);
+      });
+    };
+
+    // Defer auth init to after first paint using requestIdleCallback
+    // This significantly reduces Total Blocking Time (TBT)
+    if (typeof window !== 'undefined') {
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(initAuth, { timeout: 2000 });
+      } else {
+        // Fallback for Safari - use setTimeout after a small delay
+        setTimeout(initAuth, 100);
+      }
+    } else {
       setLoading(false);
-      return;
     }
 
-    const unsubscribe = onAuthStateChanged(authInstance, async (user) => {
-      setCurrentUser(user);
-      if (user) {
-        try {
-          await loadUserProfile();
-        } catch {
-          // Silent error
-        }
-      } else {
-        setUserProfile(null);
-      }
-      setLoading(false);
-    });
-
-    return unsubscribe;
+    return () => {
+      isMounted = false;
+      if (unsubscribe) unsubscribe();
+    };
   }, [loadUserProfile]);
 
   const value = {

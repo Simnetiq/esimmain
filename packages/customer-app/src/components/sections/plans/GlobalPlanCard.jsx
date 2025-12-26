@@ -3,7 +3,7 @@ import { usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
-import { ArrowRightIcon, GlobeIcon, InfinityIcon } from './PlanIcons';
+import { ArrowRightIcon, GlobeIcon, InfinityIcon, PhoneIcon, MessageSquareIcon } from './PlanIcons';
 
 const GlobalPlanCard = ({ plan, onClick, t }) => {
     const pathname = usePathname();
@@ -33,6 +33,10 @@ const GlobalPlanCard = ({ plan, onClick, t }) => {
     const isRTL = direction === 'rtl';
     const isUnlimited = (plan.data || '').toLowerCase().includes('unlimited') || plan.is_unlimited;
 
+    // Check if plan has SMS or Voice
+    const hasSms = parseInt(plan.sms) > 0;
+    const hasVoice = parseInt(plan.voice) > 0 || parseInt(plan.calls) > 0;
+
     return (
         <button
             onClick={onClick}
@@ -40,16 +44,30 @@ const GlobalPlanCard = ({ plan, onClick, t }) => {
             dir={direction}
             lang={detectedLanguage}
         >
-            {/* Icon & Badge */}
+            {/* Icon & Badges */}
             <div className={`flex items-start justify-between w-full mb-4 `}>
                 <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                     <GlobeIcon className="w-5 h-5 text-blue-600" />
                 </div>
-                {isUnlimited && (
-                    <span className="px-2 py-1 bg-purple-50 text-purple-700 text-[10px] font-bold uppercase tracking-wider rounded-full">
-                        {t('deals.unlimitedBadge', 'Unlimited')}
-                    </span>
-                )}
+                <div className="flex items-center gap-1">
+                    {isUnlimited && (
+                        <span className="px-2 py-1 bg-purple-50 text-purple-700 text-[10px] font-bold uppercase tracking-wider rounded-full">
+                            {t('deals.unlimitedBadge', 'Unlimited')}
+                        </span>
+                    )}
+                    {hasVoice && (
+                        <span className="px-2 py-1 bg-teal-50 text-teal-700 text-[10px] font-bold uppercase tracking-wider rounded-full flex items-center gap-1">
+                            <PhoneIcon className="w-3 h-3" />
+                            {t('deals.calls', 'Calls')}
+                        </span>
+                    )}
+                    {hasSms && (
+                        <span className="px-2 py-1 bg-purple-50 text-purple-700 text-[10px] font-bold uppercase tracking-wider rounded-full flex items-center gap-1">
+                            <MessageSquareIcon className="w-3 h-3" />
+                            SMS
+                        </span>
+                    )}
+                </div>
             </div>
 
             {/* Plan Details */}

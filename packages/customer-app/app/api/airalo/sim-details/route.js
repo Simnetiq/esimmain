@@ -32,12 +32,8 @@ export async function POST(request) {
       ? (process.env.AIRALO_BASE_URL_SANDBOX || 'https://sandbox-partners-api.airalo.com')
       : (process.env.AIRALO_BASE_URL || 'https://partners-api.airalo.com');
     
-    console.log(`[Airalo Details] Mode: ${airaloMode}, isSandbox: ${isSandbox}, URL: ${baseUrl}`);
-    console.log(`[Airalo Details] Has clientId: ${!!clientId}, Has clientSecret: ${!!clientSecret}`);
-    
     // Fallback to Firestore config if env vars not set
     if (!clientId || !clientSecret) {
-      console.log('[Airalo Details] Env vars missing, checking Firestore config...');
       const airaloConfigRef = doc(db, 'config', 'airalo');
       const airaloConfig = await getDoc(airaloConfigRef);
       
@@ -45,14 +41,11 @@ export async function POST(request) {
         const configData = airaloConfig.data();
         clientId = clientId || configData.client_id || configData.api_key;
         clientSecret = clientSecret || configData.client_secret;
-        console.log(`[Airalo Details] Firestore config loaded: hasClientId=${!!clientId}, hasSecret=${!!clientSecret}`);
       } else {
-        console.log('[Airalo Details] No Firestore config found');
       }
     }
     
     if (!clientId || !clientSecret) {
-      console.error('[Airalo Details] ❌ Missing credentials after all fallbacks');
       return NextResponse.json({
         success: false,
         error: 'Airalo credentials not configured. Please set AIRALO_CLIENT_ID and AIRALO_CLIENT_SECRET environment variables.'
@@ -60,7 +53,6 @@ export async function POST(request) {
     }
 
     // Authenticate with Airalo API
-    console.log(`[Airalo Details] Authenticating with Airalo at ${baseUrl}/v2/token...`);
     const authResponse = await fetch(`${baseUrl}/v2/token`, {
       method: 'POST',
       headers: {
@@ -76,7 +68,6 @@ export async function POST(request) {
 
     if (!authResponse.ok) {
       const errorText = await authResponse.text();
-      console.error(`[Airalo Details] ❌ Auth failed: ${authResponse.status} - ${errorText}`);
       
       // Return a more user-friendly error
       return NextResponse.json({

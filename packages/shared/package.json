@@ -51,7 +51,6 @@
     "./components/Loading": "./components/Loading.jsx",
     "./components/Providers": "./components/Providers.jsx",
     "./components/LightProviders": "./components/LightProviders.jsx",
-    "./components/FlagIcon": "./components/FlagIcon.jsx",
     "./components/AuthModal": "./components/AuthModal.jsx",
     "./data/mobileCountries": "./data/mobileCountries.js",
     "./lib/firebase": "./lib/firebase.js"
