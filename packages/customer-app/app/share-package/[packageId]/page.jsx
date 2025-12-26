@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import Script from 'next/script';
 import { Globe } from 'lucide-react';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { hasUserUsedReferralCode } from '@esim/shared/services/referralService';
@@ -367,6 +368,9 @@ const SharePackagePage = () => {
 
   return (
     <div className="bg-white min-h-screen flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
+      {/* Load Stripe.js only on this page where it's needed */}
+      <Script src="https://js.stripe.com/v3/" strategy="lazyOnload" />
+
       {/* Fraud Blocked Modal */}
       <FraudBlockedModal
         isOpen={isBlocked}
