@@ -169,7 +169,7 @@ const ReturnPolicy = () => {
         {/* Last Updated */}
         <div className="text-center mt-8">
           <p className="text-gray-500 text-sm">
-            Last updated: January 1, 2025
+            Last updated: December 30, 2025
           </p>
         </div>
       </div>

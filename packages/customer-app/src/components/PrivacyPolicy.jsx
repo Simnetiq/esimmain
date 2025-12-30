@@ -108,7 +108,7 @@ const PrivacyPolicy = () => {
             <div className="flex items-center justify-center mt-8">
               <Shield className="w-8 h-8 text-tufts-blue mr-2" />
               <p className="text-sm text-cool-black">
-                Last updated: January 1, 2025
+                Last updated: December 30, 2025
               </p>
             </div>
           </div>

@@ -87,7 +87,7 @@ const CookiePolicy = () => {
                 {t('cookies.intro', 'This Cookie Policy explains how Simnetiq Ltd ("we", "us", or "our") uses cookies and similar technologies when you visit our website and use our services. This policy complies with GDPR and other applicable privacy laws.')}
               </p>
               <p className={`text-sm text-gray-500 ${isRTL ? 'text-right' : 'text-left'}`}>
-                {t('cookies.lastUpdated', 'Last updated')}: January 1, 2025
+                {t('cookies.lastUpdated', 'Last updated')}: December 30, 2025
               </p>
             </div>
           </div>

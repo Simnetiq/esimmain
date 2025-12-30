@@ -161,7 +161,7 @@ const DopplerVPNTermsOfService = () => {
             <div className="flex items-center justify-center mt-8">
               <FileText className="w-8 h-8 text-tufts-blue mr-2" />
               <p className="text-sm text-cool-black">
-                Effective Date: January 1, 2025 | Last Updated: January 1, 2025
+                Effective Date: December 30, 2025 | Last Updated: December 30, 2025
               </p>
             </div>
           </div>
