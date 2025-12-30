@@ -605,8 +605,8 @@ const TermsOfService = () => {
                   </div>
                   <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-lg mt-6">
                     <p className="text-blue-800 text-sm">
-                      <strong>Legal Notice:</strong> By using our services, you acknowledge that you have read, 
-                      understood, and agree to be bound by all of these legal documents. If you have any questions 
+                      <strong>Legal Notice:</strong> By using our services, you acknowledge that you have read,
+                      understood, and agree to be bound by all of these legal documents. If you have any questions
                       about these terms, please contact our legal team before using our services.
                     </p>
                   </div>
@@ -614,6 +614,59 @@ const TermsOfService = () => {
               </div>
             </div>
             <div className="pointer-events-none absolute inset-px rounded-xl shadow-sm ring-1 ring-black/5"></div>
+          </div>
+
+          {/* Doppler VPN Card */}
+          <div className="relative isolate overflow-hidden rounded-2xl mb-8">
+            {/* Blurry gradient background - indigo/purple theme for VPN */}
+            <div className="absolute inset-0 -z-10">
+              {/* Base gradient */}
+              <div
+                className="absolute inset-0"
+                style={{
+                 background: 'linear-gradient(135deg, #5374CD 0%,rgb(129, 157, 234) 30%, #D4DCF4 50%, #F0F3FA 70%, #FFFFFF 85%, #5374CD 100%)'
+                }}
+              />
+              {/* Blur overlay for softer effect */}
+              <div
+                className="absolute inset-0 backdrop-blur-3xl"
+                style={{
+                  background: 'radial-gradient(ellipse at 30% 20%, rgba(79, 70, 229, 0.4) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(255, 255, 255, 0.6) 0%, transparent 50%)'
+                }}
+              />
+            </div>
+
+            <div className="px-6 py-12 md:px-12 md:py-16">
+              <div className="mx-auto max-w-2xl text-center">
+                {/* Logo */}
+                <div className="mx-auto mb-6 w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                  <img
+                    src="/WhiteLogoDoppler.png"
+                    alt="Doppler VPN"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <h2 className="text-2xl font-semibold tracking-tight text-balance text-gray-900 md:text-3xl">
+                  Doppler VPN
+                </h2>
+                <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+                  <Link
+                    href="/doppler-vpn-terms-of-service"
+                    className="group inline-flex items-center gap-3 rounded-full bg-gray-900 px-6 py-3 text-sm font-medium text-white shadow-lg transition-all duration-200 hover:bg-gray-800 hover:scale-105"
+                  >
+                    <FileText className="h-5 w-5" />
+                    <span className="text-base">VPN Terms of Service</span>
+                  </Link>
+                  <Link
+                    href="/doppler-vpn-privacy-policy"
+                    className="group inline-flex items-center gap-3 rounded-full bg-white px-6 py-3 text-sm font-medium text-gray-900 ring-1 ring-gray-200 shadow-sm transition-all duration-200 hover:bg-gray-50 hover:scale-105"
+                  >
+                    <Shield className="h-5 w-5" />
+                    <span className="text-base">VPN Privacy Policy</span>
+                  </Link>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* App Download CTA */}
