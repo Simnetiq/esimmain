@@ -25,6 +25,7 @@
     "./services/esimService": "./services/esimService.js",
     "./services/fcmService": "./services/fcmService.js",
     "./services/fraudDetectionService": "./services/fraudDetectionService.js",
+    "./services/fraudSignalsService": "./services/fraudSignalsService.js",
     "./services/imageUploadService": "./services/imageUploadService.js",
     "./services/jobsService": "./services/jobsService.js",
     "./services/newsletterService": "./services/newsletterService.js",
@@ -53,7 +54,8 @@
     "./components/LightProviders": "./components/LightProviders.jsx",
     "./components/AuthModal": "./components/AuthModal.jsx",
     "./data/mobileCountries": "./data/mobileCountries.js",
-    "./lib/firebase": "./lib/firebase.js"
+    "./lib/firebase": "./lib/firebase.js",
+    "./lib/firebaseAdmin": "./lib/firebaseAdmin.js"
   },
   "dependencies": {
     "firebase": "^12.2.1",
