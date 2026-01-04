@@ -60,7 +60,6 @@ function createSlug(name) {
 }
 
 async function importCSV() {
-  console.log('🚀 Starting Airalo CSV import...\n');
   
   const results = [];
   let countryPackages = 0;
@@ -75,7 +74,6 @@ async function importCSV() {
         results.push(row);
       })
       .on('end', () => {
-        console.log(`✅ CSV parsed: ${results.length} packages found\n`);
         resolve();
       })
       .on('error', reject);

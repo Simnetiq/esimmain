@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
 import { motion, AnimatePresence } from 'framer-motion';
+import { saveCountryComplete } from '../services/countryService';
 import { 
   X, 
   Save, 
@@ -184,7 +183,7 @@ const CountryEditModal = ({
     handleInputChange('photo', '');
   };
 
-  // Save country
+  // Save country to Supabase
   const handleSave = async () => {
     try {
       // Validation
@@ -192,12 +191,12 @@ const CountryEditModal = ({
         toast.error('Country code is required');
         return;
       }
-      
+
       if (!formData.name.trim()) {
         toast.error('Country name is required');
         return;
       }
-      
+
       // Only validate country code length when creating a new country
       if (!isEditing && (formData.code.length < 2 || formData.code.length > 50)) {
         toast.error('Country code must be between 2 and 50 characters');
@@ -205,15 +204,15 @@ const CountryEditModal = ({
       }
 
       setSaving(true);
-      
+
       // Upload photo if selected
       let photoURL = formData.photo;
       if (photoFile) {
         photoURL = await uploadPhoto();
       }
-      
-      // Prepare country data
-      const countryData = {
+
+      // Save to Supabase using the country service
+      await saveCountryComplete({
         code: formData.code.toUpperCase(),
         name: formData.name.trim(),
         translations: formData.translations,
@@ -221,37 +220,25 @@ const CountryEditModal = ({
         description: formData.description.trim(),
         isActive: formData.isActive,
         region: formData.region,
-        is_popular: formData.is_popular,
-        updated_at: serverTimestamp(),
-        updated_by: currentUser?.uid || 'admin'
-      };
-      
-      // Add created_at for new countries
-      if (!isEditing) {
-        countryData.created_at = serverTimestamp();
-        countryData.planCount = 0;
-        countryData.minPrice = null;
-      }
-      
-      // Save to Firebase
-      const countryRef = doc(db, 'countries', formData.code.toUpperCase());
-      await setDoc(countryRef, countryData, { merge: true });
-      
+        is_popular: formData.is_popular
+      }, currentUser?.uid || 'admin');
+
       toast.success(
-        isEditing 
-          ? `Updated ${formData.name} successfully!` 
+        isEditing
+          ? `Updated ${formData.name} successfully!`
           : `Created ${formData.name} successfully!`
       );
-      
-      // Call onSave callback
+
+      // Call onSave callback to refresh the list
       if (onSave) {
         await onSave();
       }
-      
+
       // Close modal
       onClose();
-      
+
     } catch (error) {
+      console.error('Error saving country:', error);
       toast.error(`Failed to save country: ${error.message}`);
     } finally {
       setSaving(false);

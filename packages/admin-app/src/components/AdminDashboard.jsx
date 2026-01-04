@@ -5,7 +5,7 @@ import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { useAdmin } from '@esim/shared/contexts/AdminContext';
 import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { 
+import {
   MapPin,
   Database,
   FileText,
@@ -19,7 +19,8 @@ import {
   Shield,
   ShieldX,
   Users,
-  DollarSign
+  DollarSign,
+  Globe2
 } from 'lucide-react';
 import AdminHome from './AdminHome';
 import CountryManagement from './CountryManagement';
@@ -33,6 +34,7 @@ import NewsletterManagement from './NewsletterManagement';
 import JobApplicationsManagement from './JobApplicationsManagement';
 import UserManagement from './UserManagement';
 import RegionManagement from './RegionManagement';
+import { RegionsManagement } from './RegionsManagement';
 import FraudManagement from './FraudManagement';
 
 
@@ -199,7 +201,7 @@ const AdminDashboard = () => {
                 { id: 'users', label: 'Users', icon: Users, permission: true },
                 { id: 'fraud', label: 'Fraud', icon: ShieldX, permission: canManageConfig },
                 { id: 'finances', label: 'Finances', icon: DollarSign, permission: canManageConfig },
-                { id: 'regions', label: 'Regions', icon: MapPin, permission: canManageConfig },
+                { id: 'regions', label: 'Regions', icon: Globe2, permission: canManageConfig },
                 { id: 'country-management', label: 'Countries', icon: MapPin, permission: canManageCountries },
                 { id: 'plans', label: 'Plans', icon: Smartphone, permission: canManagePlans },
                 { id: 'blog', label: 'Blog', icon: FileText, permission: canManageBlog },
@@ -300,9 +302,9 @@ const AdminDashboard = () => {
               <FinancesManagement />
             )}
 
-            {/* Regions Tab */}
+            {/* Regions Tab - Supabase-based */}
             {activeTab === 'regions' && canManageConfig && (
-              <RegionManagement />
+              <RegionsManagement />
             )}
 
             {/* Country Management Tab */}

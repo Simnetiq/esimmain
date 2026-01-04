@@ -1,18 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  collection, 
-  query, 
-  where, 
-  getDocs, 
-  doc, 
-  updateDoc, 
-  deleteDoc,
-  orderBy 
-} from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
-import { 
+import {
   Smartphone,
   Edit3,
   Trash2,
@@ -26,6 +15,11 @@ import {
 import toast from 'react-hot-toast';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { formatPrice, formatPriceNumber } from '@esim/shared/utils/priceUtils';
+import {
+  fetchCountryPlansWithRegional,
+  updatePlanPrice as updatePlanPriceService,
+  deletePlan as deletePlanService
+} from '../services/planService';
 
 const TariffManagement = ({ 
   countryCode, 
@@ -45,26 +39,16 @@ const TariffManagement = ({
   const [editingPrices, setEditingPrices] = useState({});
   const [pendingPriceChanges, setPendingPriceChanges] = useState({});
 
-  // Load all plans for this country
+  // Load all plans for this country from Supabase
   const loadCountryPlans = useCallback(async () => {
     try {
       setLoading(true);
-      
-      const plansQuery = query(
-        collection(db, 'dataplans'),
-        where('country_codes', 'array-contains', countryCode),
-        orderBy('price', 'asc')
-      );
-      
-      const plansSnapshot = await getDocs(plansQuery);
-      const plansData = plansSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      
+
+      const plansData = await fetchCountryPlansWithRegional(countryCode);
       setPlans(plansData);
-      
-    } catch {
+
+    } catch (error) {
+      console.error('Error loading plans:', error);
       toast.error('Failed to load plans');
     } finally {
       setLoading(false);
@@ -93,20 +77,16 @@ const TariffManagement = ({
     setFilteredPlans(filtered);
   }, [plans, searchTerm]);
 
-  // Update plan price
+  // Update plan price in Supabase
   const updatePlanPrice = async (planId, newPrice) => {
     try {
       setLoading(true);
-      const planRef = doc(db, 'dataplans', planId);
-      await updateDoc(planRef, {
-        price: parseFloat(newPrice),
-        updated_at: new Date(),
-        updated_by: currentUser?.uid || 'admin'
-      });
-      
+      await updatePlanPriceService(planId, newPrice, currentUser?.uid);
+
       toast.success(`Price updated to ${formatPrice(newPrice)}!`);
       await loadCountryPlans();
-    } catch {
+    } catch (error) {
+      console.error('Error updating price:', error);
       toast.error('Failed to update price');
     } finally {
       setLoading(false);
@@ -139,7 +119,7 @@ const TariffManagement = ({
     setEditingPrices(prev => ({ ...prev, [planId]: true }));
   };
 
-  // Delete plan
+  // Delete plan from Supabase
   const deletePlan = async (planId, planName) => {
     if (!window.confirm(`Are you sure you want to delete "${planName}"? This action cannot be undone.`)) {
       return;
@@ -147,10 +127,11 @@ const TariffManagement = ({
 
     try {
       setLoading(true);
-      await deleteDoc(doc(db, 'dataplans', planId));
+      await deletePlanService(planId);
       toast.success(`Plan "${planName}" deleted successfully!`);
       await loadCountryPlans();
-    } catch {
+    } catch (error) {
+      console.error('Error deleting plan:', error);
       toast.error('Failed to delete plan');
     } finally {
       setLoading(false);
