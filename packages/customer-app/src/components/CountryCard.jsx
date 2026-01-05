@@ -51,25 +51,26 @@ const CountryCard = ({
   return (
     <div
       onClick={onClick}
-      className="group relative bg-gray-50  overflow-hidden hover:bg-white transition-all duration-300 cursor-pointer"
+      className="group relative bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md overflow-hidden transition-all duration-300 cursor-pointer"
       title={fullName}
       data-country-name={fullName}
       data-country-code={country.code}
       dir={direction}
       lang={detectedLanguage}
     >
-
+      {/* Decorative corner element - same as plan cards */}
+      <div className="absolute top-0 right-0 w-16 h-16 bg-tufts-blue/5 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
 
       {/* Card Content */}
       <div className="p-4 flex flex-col">
         {/* Country Flag & Name */}
-        <div className={`flex items-center gap-3 mb-3 `}>
+        <div className={`flex items-center gap-3 mb-3`}>
           {/* 4:3 Country Image Container */}
-          <div className="flex-shrink-0 w-14 sm:w-16 aspect-[4/3] bg-white flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-300">
-            {country.image?.url && (
+          <div className="flex-shrink-0 w-14 sm:w-16 aspect-[4/3] bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-300">
+            {(country.imageUrl || country.image?.url) ? (
               <div className="relative w-full h-full">
                 <Image
-                  src={country.image.url}
+                  src={country.imageUrl || country.image?.url}
                   alt={fullName}
                   fill
                   sizes="64px"
@@ -79,6 +80,8 @@ const CountryCard = ({
                   loading="lazy"
                 />
               </div>
+            ) : (
+              <span className="text-2xl">{country.flagEmoji || '🌍'}</span>
             )}
           </div>
           <div className={`flex-1 min-w-0 ${isRTL ? 'text-right' : 'text-left'}`}>
@@ -120,7 +123,7 @@ const CountryCard = ({
           {minPrice ? (
             <div className={`flex items-baseline gap-1.5 ${isRTL ? 'flex-row-reverse' : ''}`}>
               <span className="text-xs text-gray-500">{t('plans.from', 'From')}</span>
-              <span className="text-base font-bold text-tufts-blue">
+              <span className="text-base font-bold text-eerie-black">
                 {formatPrice(minPrice)}
               </span>
             </div>
@@ -128,16 +131,14 @@ const CountryCard = ({
             <span className="text-xs text-gray-400">{t('plans.priceNotAvailable', 'Price N/A')}</span>
           )}
 
-          {/* Arrow indicator on hover */}
-          <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <svg className={`w-4 h-4 text-tufts-blue ${isRTL ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          {/* Arrow button - same style as plan cards */}
+          <div className={`w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-tufts-blue group-hover:text-white transition-colors ${isRTL ? 'rotate-180' : ''}`}>
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </div>
         </div>
       </div>
-
-
     </div>
   );
 };

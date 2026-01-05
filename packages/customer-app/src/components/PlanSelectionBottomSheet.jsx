@@ -52,12 +52,60 @@ const planHasVoice = (plan) => {
   return voice > 0;
 };
 
+// Helper function to format data amount correctly
+const formatDataDisplay = (plan) => {
+  // First priority: check for unlimited (strict boolean check from database)
+  if (plan.isUnlimited === true || plan.is_unlimited === true) {
+    return 'Unlimited';
+  }
+
+  // Second priority: calculate from dataAmountMb if available (most reliable)
+  const mb = plan.dataAmountMb || plan.data_amount_mb;
+  if (mb && mb > 0) {
+    if (mb >= 1024) {
+      const gb = mb / 1024;
+      return Number.isInteger(gb) ? `${gb} GB` : `${gb.toFixed(1)} GB`;
+    }
+    return `${mb} MB`;
+  }
+
+  // Third priority: use data_display or data string
+  const dataStr = plan.data_display || plan.data;
+  if (dataStr && typeof dataStr === 'string') {
+    // Only show "Unlimited" from string if is_unlimited boolean wasn't set
+    // This handles legacy data where is_unlimited might not exist
+    const lower = dataStr.toLowerCase();
+    if (lower.includes('unlimited') || lower === '∞') {
+      return 'Unlimited';
+    }
+    if (lower.includes('gb') || lower.includes('mb')) {
+      return dataStr;
+    }
+  }
+
+  return dataStr || 'Data';
+};
+
 const PlanCard = ({ plan, badge, isSelected, onSelect }) => {
   const { t } = useI18n();
 
   const originalPrice = parsePrice(plan.price);
   const hasSms = planHasSms(plan);
   const hasVoice = planHasVoice(plan);
+
+  // Format data display properly
+  const dataDisplay = formatDataDisplay(plan);
+
+  // Get validity days with fallback
+  const validityDays = plan.validity || plan.period || plan.duration || 0;
+
+  // Get additional plan metadata
+  const operatorName = plan.operatorName || plan.operator_name;
+  const operatorLogo = plan.operatorLogo || plan.operator_logo || plan.operator_image_url;
+  const fairUsagePolicy = plan.fair_usage_policy || plan.fairUsagePolicy;
+  const coveredCountryCount = plan.coveredCountryCount || 0;
+  const isRegional = plan.isRegional || plan.is_regional;
+  const currency = plan.currency || 'USD';
 
   // Badge configurations - simple text badges
   const badgeConfig = {
@@ -74,7 +122,7 @@ const PlanCard = ({ plan, badge, isSelected, onSelect }) => {
     unlimited: {
       bg: 'bg-purple-100',
       text: 'text-purple-700',
-      label: t('deals.unlimited', 'Unlimited')
+      label: t('deals.unlimitedData', 'Unlimited data')
     }
   };
 
@@ -89,9 +137,9 @@ const PlanCard = ({ plan, badge, isSelected, onSelect }) => {
       }`}
       onClick={onSelect}
     >
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-start justify-between gap-3">
         {/* Left: Radio indicator */}
-        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+        <div className={`w-5 h-5 mt-0.5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
           isSelected
             ? 'border-tufts-blue bg-tufts-blue'
             : 'border-gray-300'
@@ -101,14 +149,19 @@ const PlanCard = ({ plan, badge, isSelected, onSelect }) => {
 
         {/* Center: Plan details */}
         <div className="flex-1 min-w-0">
+          {/* Row 1: Data + Validity + Badge */}
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-base font-semibold text-gray-900">
-              {plan.data}
+              {dataDisplay}
             </span>
-            <span className="text-gray-300">·</span>
-            <span className="text-sm text-gray-500">
-              {plan.period || plan.duration || 'N/A'} {t('planSelection.days', 'days')}
-            </span>
+            {validityDays > 0 && (
+              <>
+                <span className="text-gray-300">·</span>
+                <span className="text-sm text-gray-500">
+                  {validityDays} {t('planSelection.days', 'days')}
+                </span>
+              </>
+            )}
             {/* Badges */}
             {currentBadge && (
               <span className={`${currentBadge.bg} ${currentBadge.text} text-xs font-medium px-2 py-0.5 rounded`}>
@@ -116,12 +169,52 @@ const PlanCard = ({ plan, badge, isSelected, onSelect }) => {
               </span>
             )}
           </div>
-          {/* SMS & Voice as text */}
+
+          {/* Row 2: SMS & Voice */}
           {(hasSms || hasVoice) && (
             <p className="text-xs text-gray-500 mt-1">
               {hasVoice && <span>{plan.voice || plan.calls} {t('plan.minutes', 'min')}</span>}
               {hasVoice && hasSms && <span> · </span>}
               {hasSms && <span>{plan.sms} SMS</span>}
+            </p>
+          )}
+
+          {/* Row 3: Operator + Country Coverage */}
+          {(operatorName || (isRegional && coveredCountryCount > 0)) && (
+            <div className="flex items-center gap-2 flex-wrap mt-1">
+              {operatorName && (
+                <div className="flex items-center gap-1">
+                  {operatorLogo && (
+                    <div className="relative w-4 h-4 flex-shrink-0">
+                      <Image
+                        src={operatorLogo}
+                        alt={operatorName}
+                        fill
+                        sizes="16px"
+                        className="rounded object-contain"
+                        quality={75}
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
+                  <span className="text-xs text-gray-400">{operatorName}</span>
+                </div>
+              )}
+              {isRegional && coveredCountryCount > 0 && (
+                <>
+                  {operatorName && <span className="text-gray-300">·</span>}
+                  <span className="text-xs text-tufts-blue/80">
+                    {coveredCountryCount} {coveredCountryCount === 1 ? t('deals.country', 'country') : t('deals.countries', 'countries')}
+                  </span>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Row 4: Fair Usage Policy (for unlimited plans) */}
+          {fairUsagePolicy && (
+            <p className="text-xs text-amber-600 mt-1">
+              {t('plan.fairUsage', 'Fair usage')}: {fairUsagePolicy}
             </p>
           )}
         </div>
@@ -131,6 +224,9 @@ const PlanCard = ({ plan, badge, isSelected, onSelect }) => {
           <span className="text-lg font-bold text-gray-900">
             {formatPrice(originalPrice)}
           </span>
+          {currency !== 'USD' && (
+            <p className="text-xs text-gray-400">{currency}</p>
+          )}
         </div>
       </div>
     </button>
@@ -380,9 +476,9 @@ const PlanSelectionBottomSheet = ({
       (parseFloat(plan.price) < parseFloat(min.price) ? plan : min)
     );
 
-    // Find unlimited plans
+    // Find unlimited plans (strict boolean check from database)
     const unlimitedPlans = availablePlans.filter(plan =>
-      getDataValueInMB(plan) === Infinity
+      plan.isUnlimited === true || plan.is_unlimited === true
     );
 
     // Find best deal - prioritize 10GB, 7GB, or 5GB plans
@@ -490,7 +586,7 @@ const PlanSelectionBottomSheet = ({
 
     const firstPlan = availablePlans[0];
     const countryCode = firstPlan.country_codes?.[0] || firstPlan.country_code;
-    const countryName = firstPlan.country_region || firstPlan.country_name || countryCode;
+    const countryName = firstPlan.country_name || firstPlan.country_title || countryCode;
     const region = firstPlan.region;
 
     // Use countryImage from state (fetched from Firebase) or fallback to plan image

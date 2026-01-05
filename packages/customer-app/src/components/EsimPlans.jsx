@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { Globe } from 'lucide-react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import CountriesGrid from './CountriesGrid';
 import RegionTabs from './RegionTabs';
-import { useCountries } from '@esim/shared/hooks/useCountries';
-import { db } from '@esim/shared/firebase/config';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { useCountriesSupabase } from '@esim/shared/hooks/useCountriesSupabase';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
-import { REGION_SLUGS, countCountriesFromPlans } from './sections/plans';
+import {
+    fetchRegionalPlans,
+    fetchCountryPlans,
+} from '@esim/shared/services/plansServiceSupabase';
 
 // Lazy load heavy modal component (reduces initial bundle)
 const PlanSelectionBottomSheet = dynamic(
@@ -18,15 +18,37 @@ const PlanSelectionBottomSheet = dynamic(
 );
 
 
-// Flexible Plan Card Component
-const FlexiblePlanCard = ({ plan, t, subtitle, onClick }) => {
-    const dataAmount = plan.dataAmountMb
-        ? (plan.dataAmountMb >= 1000 ? `${plan.dataAmountMb / 1000} GB` : `${plan.dataAmountMb} MB`)
-        : plan.data || 'Data';
+// Helper function to format data amount correctly
+const formatDataAmount = (mb) => {
+    if (!mb || mb <= 0) return null;
+    if (mb >= 1024) {
+        const gb = mb / 1024;
+        return Number.isInteger(gb) ? `${gb} GB` : `${gb.toFixed(1)} GB`;
+    }
+    return `${mb} MB`;
+};
+
+// Flexible Plan Card Component for Regional Plans
+const FlexiblePlanCard = ({ plan, t, onClick }) => {
+    // Use pre-formatted data if available, otherwise calculate from MB
+    const dataAmount = plan.isUnlimited
+        ? t('plans.unlimited', 'Unlimited')
+        : (plan.dataAmountMb ? formatDataAmount(plan.dataAmountMb) : plan.data) || t('plans.data', 'Data');
 
     const validity = plan.validity
         ? `${plan.validity} ${t('plans.days', 'Days')}`
         : '';
+
+    // Get voice minutes (from voice or calls field)
+    const voiceMinutes = parseInt(plan.voice || plan.calls || '0', 10);
+    const hasVoice = plan.hasVoice && voiceMinutes > 0;
+
+    // Get SMS count
+    const smsCount = parseInt(plan.sms || '0', 10);
+    const hasSms = plan.hasSms && smsCount > 0;
+
+    // Get country coverage count
+    const countryCount = plan.coveredCountryCount || 0;
 
     return (
         <div
@@ -36,23 +58,54 @@ const FlexiblePlanCard = ({ plan, t, subtitle, onClick }) => {
             <div className="absolute top-0 right-0 w-16 h-16 bg-tufts-blue/5 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
 
             <div>
-                <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-bold text-lg text-eerie-black">{dataAmount}</h4>
-                    {plan.isBestValue && (
-                        <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                {/* Header with data amount and validity on same line */}
+                <h4 className="font-bold text-lg text-eerie-black mb-2">
+                    {dataAmount}{validity && ` - ${validity}`}
+                </h4>
+
+                {/* All badges in one row */}
+                <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                    {/* Featured badge */}
+                    {plan.isFeatured && (
+                        <span className="inline-flex items-center gap-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                            {t('plans.featured', 'Featured')}
+                        </span>
+                    )}
+                    {/* Best Value badge */}
+                    {!plan.isFeatured && plan.isBestValue && (
+                        <span className="inline-flex items-center bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
                             {t('plans.bestValue', 'Best Value')}
+                        </span>
+                    )}
+                    {/* Voice minutes badge */}
+                    {hasVoice && (
+                        <span className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                            {voiceMinutes} {t('plans.mins', 'mins')}
+                        </span>
+                    )}
+                    {/* SMS badge */}
+                    {hasSms && (
+                        <span className="inline-flex items-center gap-1 bg-purple-50 text-purple-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                            </svg>
+                            {smsCount} SMS
                         </span>
                     )}
                 </div>
 
-                <div className="flex items-center gap-2 mb-2">
-                    <Globe className="w-4 h-4 text-tufts-blue" />
-                    <span className="text-sm text-gray-500 font-medium">{validity}</span>
-                </div>
-
-                <p className="text-xs text-tufts-blue/80 font-medium truncate pr-4">
-                    {subtitle}
-                </p>
+                {/* Country coverage */}
+                {countryCount > 0 && (
+                    <p className="text-xs text-tufts-blue/80 font-medium truncate pr-4">
+                        {t('deals.covers', 'Covers')} {countryCount} {countryCount === 1 ? t('deals.country', 'country') : t('deals.countries', 'countries')}
+                    </p>
+                )}
             </div>
 
             <div className="mt-4 flex items-center justify-between">
@@ -73,11 +126,9 @@ const EsimPlans = () => {
     const { t, locale } = useI18n();
     const searchParams = useSearchParams();
     const router = useRouter();
-    const pathname = usePathname();
 
-    // Detect current language from URL with fallback (matching EsimPlansSection logic)
+    // Detect current language from URL with fallback
     const currentLanguage = useMemo(() => {
-        // Simple fallback to locale from context if path detection isn't needed/available
         return locale || 'en';
     }, [locale]);
 
@@ -85,21 +136,16 @@ const EsimPlans = () => {
 
     // State
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedRegion, setSelectedRegion] = useState('popular');
-    const [globalPlans, setGlobalPlans] = useState([]);
-    const [allGlobalPlans, setAllGlobalPlans] = useState([]);
-    const [globalLoading, setGlobalLoading] = useState(true);
-    const [globalCountriesCount, setGlobalCountriesCount] = useState(130);
+    const [selectedRegion, setSelectedRegion] = useState('global');
     const [regionalPlans, setRegionalPlans] = useState([]);
-    const [regionalLoading, setRegionalLoading] = useState(false);
 
     // Checkout/Modal State
     const [showCheckoutModal, setShowCheckoutModal] = useState(false);
     const [selectedSheetPlans, setSelectedSheetPlans] = useState([]);
     const [loadingSheetPlans, setLoadingSheetPlans] = useState(false);
 
-    // Countries Data
-    const { countries, loading: countriesLoading } = useCountries();
+    // Countries Data - using Supabase
+    const { countries, isLoading: countriesLoading } = useCountriesSupabase(currentLanguage);
 
     // Hydration fix
     const [isMounted, setIsMounted] = useState(false);
@@ -107,32 +153,71 @@ const EsimPlans = () => {
         setIsMounted(true);
     }, []);
 
-    // Filter countries based on search
+    // Special "Discover Global" entry for global/discover searches
+    const discoverGlobalEntry = useMemo(() => ({
+        id: 'discover-global',
+        code: 'GLOBAL',
+        name: 'Discover Global',
+        displayName: t('plans.discoverGlobal', 'Discover Global'),
+        slug: 'discover-global',
+        flagEmoji: '🌍',
+        planCount: 50, // Approximate - will show "50+ plans"
+        isActive: true,
+        isPopular: true,
+        isRegional: true,
+        isGlobal: true,
+        region: 'global',
+        status: 'active'
+    }), [t]);
+
+    // Filter countries based on search and region
+    // Always exclude countries without tariffs (planCount === 0)
     const filteredCountries = useMemo(() => {
-        let filtered = countries;
+        // First, filter to only countries that have at least one plan (tariff)
+        const countriesWithPlans = countries.filter(c => (c.planCount || 0) > 0);
+        let filtered = countriesWithPlans;
 
         if (searchTerm) {
+            // Search mode - filter by search term (still only showing countries with plans)
             const term = searchTerm.toLowerCase();
-            filtered = countries.filter(c =>
+            filtered = countriesWithPlans.filter(c =>
                 (c.name && c.name.toLowerCase().includes(term)) ||
                 (c.displayName && c.displayName.toLowerCase().includes(term)) ||
                 (c.code && c.code.toLowerCase().includes(term))
             );
+
+            // Add "Discover Global" entry if searching for global/discover terms
+            const globalTerms = ['global', 'discover', 'world', 'worldwide', 'international'];
+            if (globalTerms.some(gt => gt.includes(term) || term.includes(gt))) {
+                filtered = [discoverGlobalEntry, ...filtered];
+            }
         } else {
-            // Filter by region
-            if (selectedRegion && selectedRegion !== 'all' && selectedRegion !== 'popular') {
-                filtered = countries.filter(c => {
-                    const region = (c.region || '').toLowerCase();
-                    const regions = (c.regions || []).map(r => r.toLowerCase());
-                    return region === selectedRegion || regions.includes(selectedRegion);
+            // Region filtering
+            if (selectedRegion === 'all' || selectedRegion === 'global') {
+                // Show all countries with plans for 'all' and 'global' regions
+                filtered = countriesWithPlans;
+            } else if (selectedRegion === 'popular') {
+                // Show only popular countries that have plans
+                filtered = countriesWithPlans.filter(c => c.isPopular === true);
+                // If no popular countries marked, show first 20 by plan count
+                if (filtered.length === 0) {
+                    filtered = [...countriesWithPlans]
+                        .sort((a, b) => (b.planCount || 0) - (a.planCount || 0))
+                        .slice(0, 20);
+                }
+            } else if (selectedRegion) {
+                // Filter by specific region - check region field (which contains continent/region_id)
+                filtered = countriesWithPlans.filter(c => {
+                    const countryRegion = (c.region || '').toLowerCase();
+                    return countryRegion === selectedRegion;
                 });
             }
         }
-        return filtered;
-    }, [countries, searchTerm, selectedRegion]);
 
-    // Derived counts
-    const regionCountriesCount = filteredCountries.length;
+        // Don't limit here - CountriesGrid handles pagination with "Load More"
+        return filtered;
+    }, [countries, searchTerm, selectedRegion, discoverGlobalEntry]);
+
 
     // Sync URL params
     useEffect(() => {
@@ -140,143 +225,43 @@ const EsimPlans = () => {
         if (search) setSearchTerm(search);
     }, [searchParams]);
 
-    // Fetch Global Plans
+    // Fetch Regional Plans from Supabase
     useEffect(() => {
-        const fetchGlobalPlans = async () => {
-            setGlobalLoading(true);
-            try {
-                const q = query(
-                    collection(db, 'dataplans'),
-                    where('country_title', '==', 'Discover Global')
-                );
-                const snapshot = await getDocs(q);
-                let plans = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-
-                plans = plans.filter(p =>
-                    p.enabled !== false &&
-                    p.is_topup !== true &&
-                    p.type !== 'topup'
-                );
-
-                const regularPlans = plans.filter(p => !(p.data || '').toLowerCase().includes('unlimited') && !p.is_unlimited);
-
-                // Sort regular plans by price for priority selection
-                regularPlans.sort((a, b) => (a.price || 0) - (b.price || 0));
-
-                // Prioritize plans with specific data amounts: 200MB, 1GB, 10GB, 20GB
-                const priorityPlans = [];
-                const dataPriorities = [
-                    { search: '200 mb', exact: true },
-                    { search: '1 gb', exact: true },
-                    { search: '10 gb', exact: true },
-                    { search: '20 gb', exact: true }
-                ];
-
-                for (const priority of dataPriorities) {
-                    const found = regularPlans.find(p => {
-                        const data = (p.data || '').toLowerCase().trim();
-                        if (priority.exact) {
-                            return data === priority.search;
-                        } else {
-                            return data.includes(priority.search);
-                        }
-                    });
-                    if (found && !priorityPlans.find(p => p.id === found.id)) {
-                        priorityPlans.push(found);
-                    }
-                }
-
-                // Fill remaining slots with cheapest plans
-                const remainingSlots = 4 - priorityPlans.length;
-                if (remainingSlots > 0) {
-                    const remainingPlans = regularPlans.filter(p =>
-                        !priorityPlans.find(pp => pp.id === p.id)
-                    ).slice(0, remainingSlots);
-                    priorityPlans.push(...remainingPlans);
-                }
-
-                // Count countries from first plan's operator_coverages
-                if (regularPlans.length > 0) {
-                    const count = countCountriesFromPlans([regularPlans[0]]);
-                    setGlobalCountriesCount(count);
-                }
-
-                // Store all plans for the "explore all" feature
-                setAllGlobalPlans(regularPlans);
-                setGlobalPlans(priorityPlans.slice(0, 4));
-            } catch (error) {
-                console.error('Error fetching global plans:', error);
-            } finally {
-                setGlobalLoading(false);
-            }
-        };
-
-        if (isMounted) fetchGlobalPlans();
-    }, [isMounted]);
-
-    // Fetch Regional Plans
-    useEffect(() => {
-        const fetchRegionalPlans = async () => {
+        const loadRegionalPlans = async () => {
             if (!selectedRegion || selectedRegion === 'all' || selectedRegion === 'popular') {
                 setRegionalPlans([]);
                 return;
             }
 
-            setRegionalLoading(true);
             try {
-                const slugs = REGION_SLUGS[selectedRegion] || [selectedRegion];
-                let allPlans = [];
-
-                for (const slug of slugs) {
-                    const q = query(
-                        collection(db, 'dataplans'),
-                        where('country_slug', '==', slug)
-                    );
-                    const snapshot = await getDocs(q);
-                    const plans = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                    allPlans = [...allPlans, ...plans];
-                }
-
-                allPlans = allPlans.filter(p =>
-                    p.enabled !== false &&
-                    p.is_topup !== true &&
-                    p.type !== 'topup'
-                );
-
-                setRegionalPlans(allPlans.slice(0, 4));
+                const plans = await fetchRegionalPlans(selectedRegion);
+                setRegionalPlans(plans.slice(0, 4));
             } catch (error) {
-                console.error('Error fetching regional plans:', error);
+                console.error('Error fetching regional plans from Supabase:', error);
                 setRegionalPlans([]);
-            } finally {
-                setRegionalLoading(false);
             }
         };
 
-        if (isMounted && selectedRegion) fetchRegionalPlans();
+        if (isMounted && selectedRegion) loadRegionalPlans();
     }, [selectedRegion, isMounted]);
 
-    // Handlers
+    // Handlers - Load plans from Supabase
     const handleCountrySelect = useCallback(async (country) => {
         setLoadingSheetPlans(true);
         setShowCheckoutModal(true);
 
         try {
-            const plansQuery = query(
-                collection(db, 'dataplans'),
-                where('country_codes', 'array-contains', country.code)
-            );
-            const snapshot = await getDocs(plansQuery);
-
-            let plans = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            plans = plans.filter(p =>
-                p.enabled !== false &&
-                p.is_topup !== true &&
-                p.type !== 'topup'
-            );
-
+            let plans;
+            // Handle "Discover Global" special entry
+            if (country.isGlobal || country.code === 'GLOBAL' || country.id === 'discover-global') {
+                // Fetch all global plans (not just featured 4)
+                plans = await fetchRegionalPlans('global');
+            } else {
+                plans = await fetchCountryPlans(country.code);
+            }
             setSelectedSheetPlans(plans);
         } catch (error) {
-            console.error('Error loading plans:', error);
+            console.error('Error loading plans from Supabase:', error);
             setSelectedSheetPlans([]);
         } finally {
             setLoadingSheetPlans(false);
@@ -307,11 +292,6 @@ const EsimPlans = () => {
             : `/${currentLanguage}/share-package/${encodeURIComponent(plan.id)}?country=${countryParam}`;
 
         router.push(planUrl);
-    };
-
-    const handleExploreAllGlobal = () => {
-        setSelectedSheetPlans(allGlobalPlans);
-        setShowCheckoutModal(true);
     };
 
     const isPlansPage = true;
@@ -360,58 +340,7 @@ const EsimPlans = () => {
                     />
                 ) : (
                     <>
-                        {/* 1. Discover Global */}
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-tufts-blue to-blue-600 flex items-center justify-center">
-                                    <Globe className="w-4 h-4 text-white" />
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-bold text-eerie-black">{t('deals.discoverGlobal', 'Discover Global')}</h3>
-                                    <p className="text-xs text-gray-500">
-                                        {globalCountriesCount}+ {t('deals.countries', 'countries')} · {t('deals.oneEsim', 'One eSIM, worldwide coverage')}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                                {globalLoading ? (
-                                    [...Array(4)].map((_, i) => <div key={i} className="bg-gray-50 rounded-xl p-4 h-32 animate-pulse" />)
-                                ) : globalPlans.map((plan) => (
-                                    <FlexiblePlanCard
-                                        key={plan.id}
-                                        plan={plan}
-                                        t={t}
-                                        subtitle={t('deals.globalCoverage', 'Coverage in 130+ countries')}
-                                        onClick={() => handlePlanClick(plan, 'global')}
-                                    />
-                                ))}
-                                {!globalLoading && globalPlans.length === 0 && (
-                                    <div className="col-span-full text-center py-8 text-gray-400 text-sm">
-                                        {t('deals.noGlobalPlans', 'Global plans coming soon')}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Explore All Button */}
-                            {!globalLoading && globalPlans.length > 0 && (
-                                <div className="flex justify-center mt-4">
-                                    <button
-                                        onClick={handleExploreAllGlobal}
-                                        className="btn-secondary flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all duration-300 hover:scale-105"
-                                    >
-                                        <span>{t('deals.exploreAll', 'Explore All')}</span>
-                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="w-full h-px bg-gray-100" />
-
-                        {/* 2. Region Tabs */}
+                        {/* Region Tabs */}
                         <div>
                             <RegionTabs
                                 selectedRegion={selectedRegion}
@@ -419,7 +348,7 @@ const EsimPlans = () => {
                             />
                         </div>
 
-                        {/* 3. Regional Plans */}
+                        {/* Regional Plans */}
                         {regionalPlans.length > 0 && (
                             <div className="mb-6">
                                 <h3 className="text-lg font-bold text-eerie-black mb-3">
@@ -431,15 +360,14 @@ const EsimPlans = () => {
                                             key={plan.id}
                                             plan={plan}
                                             t={t}
-                                            subtitle={`${t('deals.covers', 'Covers')} ${regionCountriesCount} ${t('deals.countries', 'countries')}`}
-                                            onClick={() => handlePlanClick(plan, 'regional')}
+                                            onClick={() => handlePlanClick(plan, selectedRegion === 'global' ? 'global' : 'regional')}
                                         />
                                     ))}
                                 </div>
                             </div>
                         )}
 
-                        {/* 4. Countries Grid */}
+                        {/* Countries Grid */}
                         <div>
                             <CountriesGrid
                                 countries={filteredCountries}
