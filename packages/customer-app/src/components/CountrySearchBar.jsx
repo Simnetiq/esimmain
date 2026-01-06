@@ -211,11 +211,11 @@ const CountrySearchBar = ({ onSearch = false, onCountrySelect = null }) => {
                 }
               }}
               placeholder={`${t('hero.countriesAvailable', 'Now available in 202+ countries')}`}
-              className={`w-full ${isRTL ? 'pl-12 sm:pl-16 pr-6' : 'pr-14 sm:pr-16 pl-6'} text-base sm:text-lg border-1 border-gray-200/40 rounded-lg transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-blue-200/10 bg-white/70 focus:border-blue-200/20 backdrop-blur-md placeholder:text-gray-500 focus:ring-blue-200/20 placeholder:font-medium outline-none ${isRTL ? 'text-right' : 'text-left'}`}
+              className={`w-full ${isRTL ? 'pl-12 sm:pl-16 pr-6' : 'pr-14 sm:pr-16 pl-6'} text-base sm:text-lg border-1 border-gray-200/40 transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-blue-200/10 bg-white/70 focus:border-blue-200/20 backdrop-blur-md placeholder:text-gray-500 focus:ring-blue-200/20 placeholder:font-medium outline-none ${isRTL ? 'text-right' : 'text-left'}`}
             />
             <button
               type="submit"
-              className={`absolute ${isRTL ? 'left-2 sm:left-3' : 'right-2 sm:right-3'} top-1/2 transform -translate-y-1/2 bg-white/80 backdrop-blur-md p-1 rounded-sm`}
+              className={`absolute ${isRTL ? 'left-2 sm:left-3' : 'right-2 sm:right-3'} top-1/2 transform -translate-y-1/2 bg-white/80 backdrop-blur-md p-1`}
               aria-label="Search"
             >
               <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
@@ -227,7 +227,7 @@ const CountrySearchBar = ({ onSearch = false, onCountrySelect = null }) => {
         {canShowDropdown && (
           <div
             ref={dropdownRef}
-            className="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-2xl max-h-80 overflow-y-auto z-[100]"
+            className="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-200 shadow-2xl max-h-80 overflow-y-auto z-[100]"
             style={{ 
               boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)' 
             }}
@@ -237,10 +237,10 @@ const CountrySearchBar = ({ onSearch = false, onCountrySelect = null }) => {
                 key={country.code}
                 type="button"
                 onClick={() => handleCountryClick(country)}
-                className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left border-b border-gray-100 last:border-b-0 first:rounded-t-lg last:rounded-b-lg"
+                className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left border-b border-gray-100 last:border-b-0"
               >
                 {/* Country Image - 4:3 aspect ratio */}
-                <div className="flex-shrink-0 w-12 aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg flex items-center justify-center border border-gray-200 overflow-hidden">
+                <div className="flex-shrink-0 w-12 aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center border border-gray-200 overflow-hidden">
                   {country.image?.url && (
                     <div className="relative w-full h-full">
                       <Image
@@ -314,7 +314,7 @@ const CountrySearchBar = ({ onSearch = false, onCountrySelect = null }) => {
                   }, 100);
                 }
               }}
-              className="flex items-center gap-1.5 text-xs sm:text-sm px-2 py-1 rounded-sm bg-white/20 hover:shadow-sm hover:shadow-blue-200/60 transition-all duration-200 text-gray-700 hover:text-cobalt-blue font-bold"
+              className="flex items-center gap-1.5 text-xs sm:text-sm px-2 py-1 bg-white/20 hover:shadow-sm hover:shadow-blue-200/60 transition-all duration-200 text-gray-700 hover:text-cobalt-blue font-bold"
             >
               {/* Small Image */}
               <div className="flex-shrink-0 w-5 aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 rounded flex items-center justify-center border border-gray-200/50 overflow-hidden">

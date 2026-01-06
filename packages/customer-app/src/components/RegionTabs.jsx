@@ -41,7 +41,7 @@ const RegionTabs = ({ selectedRegion, onRegionChange }) => {
         {[...Array(7)].map((_, i) => (
           <div
             key={i}
-            className="px-4 py-2 rounded-md h-9 w-24 bg-gray-100 animate-pulse"
+            className="px-4 py-2 h-9 w-24 bg-gray-100 animate-pulse"
           />
         ))}
       </div>
@@ -57,7 +57,7 @@ const RegionTabs = ({ selectedRegion, onRegionChange }) => {
           <button
             key={region.id}
             onClick={() => onRegionChange(region.id)}
-            className={`px-4 py-2 rounded-md font-medium text-sm border-2 flex items-center gap-2 `}
+            className={`px-4 py-2 font-medium text-sm border-2 flex items-center gap-2 `}
             style={{
               backgroundColor: selectedRegion === region.id
                 ? `${region.color}20`

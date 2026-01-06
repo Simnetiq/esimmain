@@ -17,8 +17,7 @@ const nextConfig = {
     minimumCacheTTL: 31536000, // 1 year
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    // Allow external image domains
-    domains: ['cdn.airalo.com', 'firebasestorage.googleapis.com'],
+    // Allow external image domains (using remotePatterns - domains is deprecated)
     remotePatterns: [
       {
         protocol: 'https',

@@ -281,15 +281,15 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
         if (!hasVoice && !hasSms) return null;
 
         return (
-          <div className="flex gap-2 mb-4">
+          <div className="flex gap-2 mb-4"> 
             {hasVoice && voiceMinutes > 0 && (
-              <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs font-medium px-2 py-1 rounded-md">
+              <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs font-medium px-2 py-1">
                 <Phone className="w-3 h-3" />
                 {voiceMinutes} {t('dashboard.min', 'min')}
               </span>
             )}
             {hasSms && smsCount > 0 && (
-              <span className="inline-flex items-center gap-1 bg-purple-50 text-purple-700 text-xs font-medium px-2 py-1 rounded-md">
+              <span className="inline-flex items-center gap-1 bg-purple-50 text-purple-700 text-xs font-medium px-2 py-1">
                 <MessageSquare className="w-3 h-3" />
                 {smsCount} SMS
               </span>

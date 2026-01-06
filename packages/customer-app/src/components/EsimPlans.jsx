@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import CountriesGrid from './CountriesGrid';
 import RegionTabs from './RegionTabs';
 import { useCountriesSupabase } from '@esim/shared/hooks/useCountriesSupabase';
+import { usePromotedCountriesSupabase } from '@esim/shared/hooks/usePromotedCountriesSupabase';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
 import {
     fetchRegionalPlans,
@@ -53,7 +54,7 @@ const FlexiblePlanCard = ({ plan, t, onClick }) => {
     return (
         <div
             onClick={onClick}
-            className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm hover:shadow-md transition-all cursor-pointer group h-full flex flex-col justify-between relative overflow-hidden"
+            className="bg-white border border-gray-100 p-4 shadow-sm hover:shadow-md transition-all cursor-pointer group h-full flex flex-col justify-between relative overflow-hidden"
         >
             <div className="absolute top-0 right-0 w-16 h-16 bg-tufts-blue/5 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
 
@@ -156,6 +157,13 @@ const EsimPlans = ({ isHomePage = false }) => {
     // Countries Data - using Supabase
     const { countries, isLoading: countriesLoading } = useCountriesSupabase(currentLanguage);
 
+    // Promoted Countries for selected region - fetched from region_promoted_countries table
+    const { promotedCountries, isLoading: promotedLoading } = usePromotedCountriesSupabase(
+        selectedRegion,
+        currentLanguage,
+        8 // Max 8 promoted countries per region
+    );
+
     // Hydration fix
     const [isMounted, setIsMounted] = useState(false);
     useEffect(() => {
@@ -181,6 +189,7 @@ const EsimPlans = ({ isHomePage = false }) => {
 
     // Filter countries based on search and region
     // Always exclude countries without tariffs (planCount === 0)
+    // Prioritize PROMOTED countries when a region is selected
     const filteredCountries = useMemo(() => {
         // First, filter to only countries that have at least one plan (tariff)
         const countriesWithPlans = countries.filter(c => (c.planCount || 0) > 0);
@@ -202,8 +211,8 @@ const EsimPlans = ({ isHomePage = false }) => {
             }
         } else {
             // Region filtering
-            if (selectedRegion === 'all' || selectedRegion === 'global') {
-                // Show all countries with plans for 'all' and 'global' regions
+            if (selectedRegion === 'all') {
+                // Show all countries with plans for 'all' region
                 filtered = countriesWithPlans;
             } else if (selectedRegion === 'popular') {
                 // Show only popular countries that have plans
@@ -214,18 +223,45 @@ const EsimPlans = ({ isHomePage = false }) => {
                         .sort((a, b) => (b.planCount || 0) - (a.planCount || 0))
                         .slice(0, 20);
                 }
+            } else if (selectedRegion === 'global') {
+                // For GLOBAL region: show promoted countries first, then all remaining countries
+                if (promotedCountries && promotedCountries.length > 0) {
+                    const promotedIds = new Set(promotedCountries.map(c => c.id));
+                    // Get all countries NOT in promoted list
+                    const remainingCountries = countriesWithPlans.filter(c => !promotedIds.has(c.id));
+                    // Combine: promoted first, then remaining alphabetically
+                    filtered = [...promotedCountries, ...remainingCountries];
+                } else {
+                    filtered = countriesWithPlans;
+                }
             } else if (selectedRegion) {
-                // Filter by specific region - check region field (which contains continent/region_id)
-                filtered = countriesWithPlans.filter(c => {
-                    const countryRegion = (c.region || '').toLowerCase();
-                    return countryRegion === selectedRegion;
-                });
+                // For specific regions (europe, asia, etc.), use PROMOTED countries first
+                // Promoted countries come from admin-configured region_promoted_countries table
+                if (promotedCountries && promotedCountries.length > 0) {
+                    // Get IDs of promoted countries
+                    const promotedIds = new Set(promotedCountries.map(c => c.id));
+
+                    // Get remaining countries in this region (not already promoted)
+                    const regionCountries = countriesWithPlans.filter(c => {
+                        const countryRegion = (c.region || '').toLowerCase();
+                        return countryRegion === selectedRegion && !promotedIds.has(c.id);
+                    });
+
+                    // Combine: promoted first, then remaining region countries
+                    filtered = [...promotedCountries, ...regionCountries];
+                } else {
+                    // Fallback: filter by region_id if no promoted countries configured
+                    filtered = countriesWithPlans.filter(c => {
+                        const countryRegion = (c.region || '').toLowerCase();
+                        return countryRegion === selectedRegion;
+                    });
+                }
             }
         }
 
         // Don't limit here - CountriesGrid handles pagination with "Load More"
         return filtered;
-    }, [countries, searchTerm, selectedRegion, discoverGlobalEntry]);
+    }, [countries, searchTerm, selectedRegion, discoverGlobalEntry, promotedCountries]);
 
 
     // Sync URL params

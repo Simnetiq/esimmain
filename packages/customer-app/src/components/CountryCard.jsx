@@ -51,7 +51,7 @@ const CountryCard = ({
   return (
     <div
       onClick={onClick}
-      className="group relative bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md overflow-hidden transition-all duration-300 cursor-pointer"
+      className="group relative bg-white border border-gray-100 shadow-sm hover:shadow-md overflow-hidden transition-all duration-300 cursor-pointer"
       title={fullName}
       data-country-name={fullName}
       data-country-code={country.code}
@@ -66,7 +66,7 @@ const CountryCard = ({
         {/* Country Flag & Name */}
         <div className={`flex items-center gap-3 mb-3`}>
           {/* 4:3 Country Image Container */}
-          <div className="flex-shrink-0 w-14 sm:w-16 aspect-[4/3] bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-300">
+          <div className="flex-shrink-0 w-14 sm:w-16 aspect-[4/3] bg-gray-50 rounded-md flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-300">
             {(country.imageUrl || country.image?.url) ? (
               <div className="relative w-full h-full">
                 <Image

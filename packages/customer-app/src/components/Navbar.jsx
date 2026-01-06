@@ -8,7 +8,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
-import { useRegions } from '@esim/shared/hooks/useRegions';
+import { useRegionsSupabase as useRegions } from '@esim/shared/hooks/useRegionsSupabase';
 import LanguageSelector from './LanguageSelector';
 import { detectLanguageFromPath, getLocalizedBlogListUrl, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
@@ -21,11 +21,9 @@ const Navbar = ({ hideLanguageSelector = false }) => {
   const pathname = usePathname();
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
   const [isStoreDropdownOpen, setIsStoreDropdownOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const moreDropdownRef = useRef(null);
   const storeDropdownRef = useRef(null);
   const userDropdownRef = useRef(null);
 
@@ -35,9 +33,6 @@ const Navbar = ({ hideLanguageSelector = false }) => {
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (moreDropdownRef.current && !moreDropdownRef.current.contains(event.target)) {
-        setIsMoreDropdownOpen(false);
-      }
       if (storeDropdownRef.current && !storeDropdownRef.current.contains(event.target)) {
         setIsStoreDropdownOpen(false);
       }
@@ -48,7 +43,6 @@ const Navbar = ({ hideLanguageSelector = false }) => {
 
     // Listen for custom close event from layout
     const handleCloseDropdowns = () => {
-      setIsMoreDropdownOpen(false);
       setIsStoreDropdownOpen(false);
       setIsUserDropdownOpen(false);
     };
@@ -144,7 +138,6 @@ const Navbar = ({ hideLanguageSelector = false }) => {
   // Close all dropdowns when navbar hides (scrolling down)
   useEffect(() => {
     if (!isVisible) {
-      setIsMoreDropdownOpen(false);
       setIsStoreDropdownOpen(false);
       setIsUserDropdownOpen(false);
       // Dispatch custom event for LanguageSelector to close
@@ -253,32 +246,19 @@ const Navbar = ({ hideLanguageSelector = false }) => {
             {isStoreDropdownOpen && (
               <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-200  shadow-xl shadow-gray-100/30 z-50">
                 <ul className="p-2 text-sm font-medium text-gray-700">
-                  <li>
-                    <Link 
-                      href={getLocalizedUrl('/esim-plans')} 
-                      className="inline-flex items-center w-full p-2 hover:bg-gray-100 hover:text-eerie-black rounded transition-colors font-semibold"
-                      onClick={() => setIsStoreDropdownOpen(false)}
-                    >
-                      {t('navbar.allPlans', 'All Plans')}
-                    </Link>
-                  </li>
-                  <li className="border-t border-gray-100 mt-1 pt-1">
-                    <span className="block px-2 py-1 text-xs text-gray-400 uppercase tracking-wider">
-                      {t('navbar.regions', 'Regions')}
-                    </span>
-                  </li>
-                  {regions.filter(r => r.id !== 'popular' && r.id !== 'all').map((region) => (
-                    <li key={region.id}>
-                      <Link 
-                        href={getLocalizedUrl(`/esim-plans?region=${region.id}`)} 
-                        className="inline-flex items-center gap-2 w-full p-2 hover:bg-gray-100 hover:text-eerie-black rounded transition-colors"
-                        onClick={() => setIsStoreDropdownOpen(false)}
-                      >
-                        <span>{region.icon}</span>
-                        <span>{region.displayName}</span>
-                      </Link>
-                    </li>
-                  ))}
+                  {regions
+                    .filter(r => r.id !== 'popular' && r.id !== 'all')
+                    .map((region) => (
+                      <li key={region.id}>
+                        <Link
+                          href={getLocalizedUrl(`/esim-plans?region=${region.id}`)}
+                          className="inline-flex items-center w-full p-2 hover:bg-gray-100 hover:text-eerie-black rounded transition-colors"
+                          onClick={() => setIsStoreDropdownOpen(false)}
+                        >
+                          {region.displayName}
+                        </Link>
+                      </li>
+                    ))}
                 </ul>
               </div>
             )}
@@ -291,70 +271,35 @@ const Navbar = ({ hideLanguageSelector = false }) => {
             </Link>
           )}
           
-          {/* More Dropdown */}
-          <div className="relative" ref={moreDropdownRef}>
-            <button
-              onClick={() => setIsMoreDropdownOpen(!isMoreDropdownOpen)}
-              className="flex items-center gap-1 text-sm font-semibold text-eerie-black hover:text-tufts-blue transition-colors"
-            >
-              {t('navbar.more', 'More')}
-              <ChevronDown
-                className={`w-4 h-4 transition-transform ${isMoreDropdownOpen ? 'rotate-180' : ''}`}
-                aria-hidden="true"
-              />
-            </button>
-            
-            {/* More Dropdown Menu */}
-            {isMoreDropdownOpen && (
-              <div className="absolute top-full left-0 mt-2 w-44 bg-white border border-gray-200  shadow-xl shadow-gray-100/30 z-50">
-                <ul className="p-2 text-sm font-medium text-gray-700">
-                  <li>
-                    <Link 
-                      href={getLocalizedBlogListUrl(currentLanguage)} 
-                      className="inline-flex items-center w-full p-2 hover:bg-gray-100 hover:text-eerie-black rounded transition-colors"
-                      onClick={() => setIsMoreDropdownOpen(false)}
-                    >
-                      {t('navbar.blog', 'Blog')}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link 
-                      href={getLocalizedUrl('/contact')} 
-                      className="inline-flex items-center w-full p-2 hover:bg-gray-100 hover:text-eerie-black rounded transition-colors"
-                      onClick={() => setIsMoreDropdownOpen(false)}
-                    >
-                      {t('navbar.contactUs', 'Contact Us')}
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            )}
-          </div>
-          
-          {/* Login link for non-authenticated users */}
+          {/* Help/Contact link */}
+          <Link
+            href={getLocalizedUrl('/contact')}
+            className="text-sm font-semibold text-eerie-black hover:text-tufts-blue transition-colors"
+          >
+            {t('navbar.help', 'Help')}
+          </Link>
+
+          {/* Blog link */}
+          <Link
+            href={getLocalizedBlogListUrl(currentLanguage)}
+            className="text-sm font-semibold text-eerie-black hover:text-tufts-blue transition-colors"
+          >
+            {t('navbar.blog', 'Blog')}
+          </Link>
+        </div>
+        
+        {/* Right side with language selector, login, and user avatar */}
+        <div className={`hidden lg:flex lg:flex-1 lg:items-center lg:gap-x-3 ${isRTL ? 'lg:justify-start' : 'lg:justify-end'}`}>
+          {/* Login button for non-authenticated users - styled with black bg */}
           {!currentUser && (
-            <Link href={getLocalizedUrl('/login')} className="text-sm font-semibold text-eerie-black hover:text-tufts-blue transition-colors">
+            <Link
+              href={getLocalizedUrl('/login')}
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm font-medium text-white bg-eerie-black rounded-full hover:bg-gray-800 transition-colors"
+            >
               {t('navbar.login', 'Login')}
             </Link>
           )}
-        </div>
-        
-        {/* Right side with language selector, download app, and user avatar */}
-        <div className={`hidden lg:flex lg:flex-1 lg:items-center lg:gap-x-3 ${isRTL ? 'lg:justify-start' : 'lg:justify-end'}`}>
-          {/* Download App link - only for non-authenticated users */}
-          {!currentUser && (
-            <a
-              href={getPlatformAppStoreLink()}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={handleDownloadApp}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-eerie-black rounded-full hover:bg-gray-800 transition-colors"
-            >
-              <Smartphone className="w-4 h-4" />
-              {t('navbar.getApp', 'Get App')}
-            </a>
-          )}
-          
+
           {!hideLanguageSelector && <LanguageSelector />}
           
           {/* User Avatar Dropdown - only show when logged in */}
