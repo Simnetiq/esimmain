@@ -2,7 +2,18 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, MapPin } from 'lucide-react';
+// Inline SVG icons to avoid lucide-react bundle overhead
+const SearchIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+  </svg>
+);
+
+const MapPin = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>
+  </svg>
+);
 import Image from 'next/image';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
@@ -218,7 +229,7 @@ const CountrySearchBar = ({ onSearch = false, onCountrySelect = null }) => {
               className={`absolute ${isRTL ? 'left-2 sm:left-3' : 'right-2 sm:right-3'} top-1/2 transform -translate-y-1/2 bg-white/80 backdrop-blur-md p-1`}
               aria-label="Search"
             >
-              <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+              <SearchIcon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
             </button>
           </div>
         </form>

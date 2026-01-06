@@ -13,7 +13,36 @@ import LanguageSelector from './LanguageSelector';
 import { detectLanguageFromPath, getLocalizedBlogListUrl, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
 import { getPlatformAppStoreLink } from '@esim/shared/utils/appStoreLinks';
-import { ChevronDown, Settings, LogOut, Headphones, Smartphone } from 'lucide-react';
+// Inline SVG icons to avoid lucide-react bundle overhead on every page
+const ChevronDown = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m6 9 6 6 6-6"/>
+  </svg>
+);
+
+const SettingsIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>
+  </svg>
+);
+
+const LogOut = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>
+  </svg>
+);
+
+const Headphones = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/>
+  </svg>
+);
+
+const Smartphone = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/>
+  </svg>
+);
 
 const Navbar = ({ hideLanguageSelector = false }) => {
   const { t, locale, isLoading: i18nLoading } = useI18n();
@@ -333,7 +362,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                         className={`inline-flex items-center gap-2 w-full p-2 hover:bg-gray-100 hover:text-eerie-black rounded transition-colors `}
                         onClick={() => setIsUserDropdownOpen(false)}
                       >
-                        <Settings className="w-4 h-4" />
+                        <SettingsIcon className="w-4 h-4" />
                         {t('navbar.settings', 'Settings')}
                       </Link>
                     </li>
@@ -556,7 +585,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                       className={`flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4 `}
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      <Settings className="w-5 h-5" />
+                      <SettingsIcon className="w-5 h-5" />
                       {t('navbar.settings', 'Settings')}
                     </Link>
                     
