@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
-import { useRegions } from '@esim/shared/hooks/useRegions';
+import { useRegionsSupabase as useRegions } from '@esim/shared/hooks/useRegionsSupabase';
 import { getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { Flame, Globe } from 'lucide-react';
 

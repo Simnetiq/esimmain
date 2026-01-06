@@ -9,7 +9,6 @@ import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { hasUserUsedReferralCode } from '@esim/shared/services/referralService';
 import { getReferralSettings } from '@esim/shared/services/settingsService';
 import toast from 'react-hot-toast';
-import { getCountryName, mobileCountries } from '@esim/shared/data/mobileCountries';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
 import { formatPrice, calculateDiscountedPrice } from '@esim/shared/utils/priceUtils';
 import FraudBlockedModal from '../../../src/components/FraudBlockedModal';
@@ -102,6 +101,7 @@ const SharePackagePage = () => {
   };
 
   // Get full country name
+  // PURE DATA FROM PROPS/STATE - NO HARDCODED FALLBACKS
   const getFullCountryName = useCallback((countryCode) => {
     if (!countryCode) return '';
 
@@ -109,24 +109,12 @@ const SharePackagePage = () => {
       return t('sharePackage.globalCoverage', 'Global');
     }
 
+    // Use translations from Supabase (passed via countryTranslations)
     if (countryTranslations && countryTranslations[currentLanguage]) {
       return countryTranslations[currentLanguage];
     }
 
-    const translatedName = getCountryName(countryCode, currentLanguage);
-    if (translatedName && translatedName !== countryCode) {
-      return translatedName;
-    }
-
-    const country = mobileCountries.find(c =>
-      c.code === countryCode.toUpperCase() ||
-      c.id === countryCode.toUpperCase()
-    );
-
-    if (country) {
-      return country.name;
-    }
-
+    // Fall back to capitalizing the country code
     return capitalizeWords(countryCode);
   }, [countryTranslations, currentLanguage, t]);
 
@@ -466,6 +454,7 @@ const SharePackagePage = () => {
             hasReferralDiscount={hasReferralDiscount}
             referralSettings={referralSettings}
             isRTL={isRTL}
+            currentLanguage={currentLanguage}
             t={t}
           />
 

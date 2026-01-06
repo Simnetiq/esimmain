@@ -13,14 +13,20 @@ const CountriesGrid = ({
   onCountrySelect,
   isLoading,
   selectedRegion,
-  showAllOverride = null // When provided, parent controls the countries list directly
+  showAllOverride = null, // When provided, parent controls the countries list directly
+  initialLimit = 16, // Default limit of 16 countries
+  isHomePage = false, // If true, "Show More" redirects to plans page instead of expanding
+  onShowMoreClick = null // Custom handler for "Show More" button (used for home page redirect)
 }) => {
   const pathname = usePathname();
   const { t, locale, isLoading: i18nLoading } = useI18n();
-  const [showAll, setShowAll] = useState(false);
+  const [displayCount, setDisplayCount] = useState(initialLimit); // Show initialLimit countries initially
   const [isExpanding, setIsExpanding] = useState(false);
   const [mounted, setMounted] = useState(false);
   const gridRef = useRef(null);
+
+  // Batch size for "Load More" - use initialLimit for consistency
+  const BATCH_SIZE = initialLimit;
 
   useEffect(() => {
     setMounted(true);
@@ -45,38 +51,29 @@ const CountriesGrid = ({
   const direction = mounted ? getLanguageDirection(detectedLanguage) : 'ltr';
   const isRTL = direction === 'rtl';
 
-  // Reset showAll when region changes
+  // Reset display count when region changes
   useEffect(() => {
-    setShowAll(false);
+    setDisplayCount(initialLimit);
     setIsExpanding(false);
-  }, [selectedRegion]);
-
-  // Limits for internal slicing (only used when showAllOverride is null)
-  const desktopLimit = 8;
-  const mobileLimit = 4;
+  }, [selectedRegion, initialLimit]);
 
   // When showAllOverride is provided, parent controls the list - just render what we receive
-  // When showAllOverride is null, we handle internal slicing
   const isParentControlled = showAllOverride !== null;
 
-  // For parent-controlled mode, just use countries as-is
-  // For internal mode, apply slicing based on showAll state
-  const displayedCountriesDesktop = isParentControlled
+  // Calculate displayed countries based on displayCount
+  const displayedCountries = isParentControlled
     ? countries
-    : (showAll ? countries : countries.slice(0, desktopLimit));
+    : countries.slice(0, displayCount);
 
-  const displayedCountriesMobile = isParentControlled
-    ? countries
-    : (showAll ? countries : countries.slice(0, mobileLimit));
+  // Check if there are more countries to load
+  const hasMoreCountries = !isParentControlled && countries.length > displayCount;
+  const remainingCount = countries.length - displayCount;
 
-  // Only show internal button when not parent-controlled
-  const showShowAllButton = !isParentControlled && !showAll && countries.length > desktopLimit;
-
-  // Handle expand animation
-  const handleShowAll = () => {
+  // Handle "Load More" click
+  const handleLoadMore = () => {
     setIsExpanding(true);
     requestAnimationFrame(() => {
-      setShowAll(true);
+      setDisplayCount(prev => prev + BATCH_SIZE);
       setTimeout(() => setIsExpanding(false), 500);
     });
   };
@@ -115,79 +112,55 @@ const CountriesGrid = ({
 
   return (
     <div ref={gridRef} dir={direction} lang={detectedLanguage}>
-      {/* Desktop Grid Layout - 4 columns */}
+      {/* Grid Layout - responsive columns */}
       <div
-        className={`hidden sm:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 ${isRTL ? 'direction-rtl' : ''}`}
+        className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 ${isRTL ? 'direction-rtl' : ''}`}
       >
-        {displayedCountriesDesktop.map((country, index) => (
+        {displayedCountries.map((country, index) => (
           <div
             key={country.id}
-            className={`transform transition-all duration-500 ease-out ${!isParentControlled && showAll && index >= desktopLimit
-              ? 'animate-slide-down'
-              : ''
-              }`}
+            className={`transform transition-all duration-500 ease-out ${
+              isExpanding && index >= displayCount - BATCH_SIZE
+                ? 'animate-slide-down'
+                : ''
+            }`}
             style={{
-              animationDelay: !isParentControlled && showAll && index >= desktopLimit
-                ? `${Math.floor((index - desktopLimit) / 4) * 100}ms`
+              animationDelay: isExpanding && index >= displayCount - BATCH_SIZE
+                ? `${Math.floor((index - (displayCount - BATCH_SIZE)) / 4) * 100}ms`
                 : '0ms'
             }}
           >
             <CountryCard
               country={country}
               onClick={() => onCountrySelect(country)}
-              isMobile={false}
             />
           </div>
         ))}
       </div>
 
-      {/* Show All Button for Desktop - Only when internally controlled */}
-      {showShowAllButton && (
-        <div className="hidden sm:block text-center mt-8">
-          <button
-            onClick={handleShowAll}
-            className="btn-secondary px-8 py-3 font-semibold rounded-lg transition-all duration-300 hover:scale-105"
-          >
-            {t('plans.showAll', 'Show All Countries')} ({countries.length})
-          </button>
-        </div>
-      )}
-
-      {/* Mobile List Layout - 2 columns */}
-      <div
-        className={`sm:hidden grid grid-cols-2 gap-3 ${isRTL ? 'direction-rtl' : ''}`}
-      >
-        {displayedCountriesMobile.map((country, index) => (
-          <div
-            key={country.id}
-            className={`transform transition-all duration-500 ease-out ${!isParentControlled && showAll && index >= mobileLimit
-              ? 'animate-slide-down'
-              : ''
-              }`}
-            style={{
-              animationDelay: !isParentControlled && showAll && index >= mobileLimit
-                ? `${Math.floor((index - mobileLimit) / 2) * 100}ms`
-                : '0ms'
-            }}
-          >
-            <CountryCard
-              country={country}
-              onClick={() => onCountrySelect(country)}
-              isMobile={true}
-            />
-          </div>
-        ))}
-      </div>
-
-      {/* Show All Button for Mobile - Only when internally controlled */}
-      {showShowAllButton && (
-        <div className="sm:hidden text-center mt-6">
-          <button
-            onClick={handleShowAll}
-            className="btn-secondary w-full px-6 py-3 font-semibold rounded-lg transition-all duration-300"
-          >
-            {t('plans.showAll', 'Show All Countries')} ({countries.length})
-          </button>
+      {/* Load More / Show More Button - Only when there are more countries */}
+      {hasMoreCountries && (
+        <div className="text-center mt-8">
+          {isHomePage && onShowMoreClick ? (
+            // Home page: "Show More" redirects to plans page
+            <button
+              onClick={onShowMoreClick}
+              className="btn-secondary px-8 py-3 font-semibold rounded-lg transition-all duration-300 hover:scale-105 inline-flex items-center gap-2"
+            >
+              {t('plans.showMore', 'Show More')}
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </button>
+          ) : (
+            // Plans page: "Load More" expands the grid
+            <button
+              onClick={handleLoadMore}
+              className="btn-secondary px-8 py-3 font-semibold rounded-lg transition-all duration-300 hover:scale-105"
+            >
+              {t('plans.loadMore', 'Load More')} ({remainingCount > BATCH_SIZE ? BATCH_SIZE : remainingCount} {t('plans.more', 'more')})
+            </button>
+          )}
         </div>
       )}
 

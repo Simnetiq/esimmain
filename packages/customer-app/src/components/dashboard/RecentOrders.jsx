@@ -7,7 +7,8 @@ import EsimCard from './EsimCard';
 
 // Usage data is preloaded when dashboard loads (up to 10 eSIMs)
 // Additional usage data can be loaded on-demand when user opens the QRCodeModal
-const RecentOrders = ({ orders, loading, onViewQRCode, usageCache = {}, loadingUsageMap = {} }) => {
+// planMetadataMap contains Supabase plan data (operator branding, coverage, etc.)
+const RecentOrders = ({ orders, loading, onViewQRCode, usageCache = {}, loadingUsageMap = {}, planMetadataMap = {}, plansLoading = false }) => {
   const { t, locale } = useI18n();
   const pathname = usePathname();
   
@@ -52,7 +53,11 @@ const RecentOrders = ({ orders, loading, onViewQRCode, usageCache = {}, loadingU
                   const iccid = order.qrCode?.iccid || order.iccid || order.airaloOrderData?.sims?.[0]?.iccid;
                   const orderUsageData = iccid ? usageCache[iccid] : undefined;
                   const isLoadingUsage = iccid ? loadingUsageMap[iccid] : false;
-                  
+
+                  // Get plan metadata from Supabase (operator branding, coverage, etc.)
+                  const packageId = order.packageId || order.planId || order.packageSlug;
+                  const planMetadata = packageId ? planMetadataMap[packageId] : null;
+
                   return (
                     <EsimCard
                       key={order.id || order.orderId || Math.random()}
@@ -61,6 +66,8 @@ const RecentOrders = ({ orders, loading, onViewQRCode, usageCache = {}, loadingU
                       loadingUsage={isLoadingUsage}
                       onViewQRCode={onViewQRCode}
                       isRTL={isRTL}
+                      planMetadata={planMetadata}
+                      planMetadataLoading={plansLoading}
                     />
                   );
                 })}

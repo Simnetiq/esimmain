@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@esim/shared": "*",
+    "@gsap/react": "^2.1.2",
     "@react-email/components": "^0.5.7",
     "@react-email/render": "^1.4.0",
     "@stripe/react-stripe-js": "^3.9.2",
@@ -26,6 +27,7 @@
     "firebase": "^12.2.1",
     "firebase-admin": "^13.5.0",
     "framer-motion": "^11.18.2",
+    "gsap": "^3.14.2",
     "i18next": "^25.5.2",
     "lucide-react": "^0.542.0",
     "marked": "^16.4.1",

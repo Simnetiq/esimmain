@@ -26,7 +26,8 @@ const QRCodeModal = ({
   onCheckEsimUsage,
   loadingEsimUsage,
   onDeleteOrder,
-  esimUsage
+  esimUsage,
+  planMetadata
 }) => {
   const { t, locale } = useI18n();
   const [activeTab, setActiveTab] = useState('qrcode');
@@ -443,6 +444,81 @@ const QRCodeModal = ({
           {/* Details Tab */}
           {activeTab === 'details' && (
             <div className="space-y-4">
+              {/* Operator Branding - from Supabase */}
+              {planMetadata?.operatorName && (
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                  <div className="flex items-center gap-3">
+                    {planMetadata.operatorLogo ? (
+                      <Image
+                        src={planMetadata.operatorLogo}
+                        alt={planMetadata.operatorName}
+                        width={48}
+                        height={40}
+                        className="h-10 w-auto object-contain rounded-lg"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="h-10 w-10 flex items-center justify-center bg-gray-200 rounded-lg text-gray-600 font-bold">
+                        {planMetadata.operatorName.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <p className="text-sm">
+                        <span className="text-gray-500">{t('dashboard.poweredBy', 'Powered by')} </span>
+                        <span
+                          className="font-semibold"
+                          style={{
+                            background: planMetadata.operatorGradientStart && planMetadata.operatorGradientEnd
+                              ? `linear-gradient(135deg, ${planMetadata.operatorGradientStart}, ${planMetadata.operatorGradientEnd})`
+                              : 'linear-gradient(135deg, #3B82F6, #1D4ED8)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            backgroundClip: 'text'
+                          }}
+                        >
+                          {planMetadata.operatorName}
+                        </span>
+                      </p>
+                      {planMetadata.activationPolicy && (
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          {planMetadata.activationPolicy === 'first-usage'
+                            ? t('dashboard.activatesOnFirstUse', 'Activates on first use')
+                            : planMetadata.activationPolicy === 'immediate'
+                            ? t('dashboard.activatesImmediately', 'Activates immediately')
+                            : t('dashboard.manualActivation', 'Manual activation required')}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Coverage info for regional plans */}
+                  {planMetadata.isRegional && planMetadata.coveredCountryCount > 0 && (
+                    <div className="mt-3 pt-3 border-t border-gray-200">
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Globe className="w-4 h-4" />
+                        <span>
+                          {planMetadata.coveredCountryCount} {planMetadata.coveredCountryCount === 1
+                            ? t('dashboard.country', 'country')
+                            : t('dashboard.countries', 'countries')} {t('dashboard.covered', 'covered')}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Fair Usage Policy for unlimited plans */}
+                  {planMetadata.fairUsagePolicy && (
+                    <div className="mt-3 pt-3 border-t border-gray-200">
+                      <p className="text-xs text-amber-600 font-medium">
+                        {t('dashboard.fairUsagePolicy', 'Fair Usage Policy')}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        {planMetadata.fairUsagePolicy}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* ICCID */}
               <div className="bg-gray-50 rounded-xl p-4">
                 <div className="flex items-center justify-between mb-1">

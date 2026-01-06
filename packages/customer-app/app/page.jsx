@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { usePathname, useRouter } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
@@ -9,12 +9,12 @@ import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils
 import { HeroSection } from '../src/components/sections';
 
 // Lazy load non-critical sections
-const FeaturesSection = dynamic(() => import('../src/components/sections').then(mod => ({ default: mod.FeaturesSection })), {
-  loading: () => <div className="h-96 bg-gray-50 animate-pulse" />,
-});
-
 const PlansSection = dynamic(() => import('../src/components/sections').then(mod => ({ default: mod.PlansSection })), {
   loading: () => <div className="h-96 bg-white animate-pulse" />,
+});
+
+const FeaturesSection = dynamic(() => import('../src/components/sections').then(mod => ({ default: mod.FeaturesSection })), {
+  loading: () => <div className="h-96 bg-gray-50 animate-pulse" />,
 });
 
 const ActivationSection = dynamic(() => import('../src/components/sections').then(mod => ({ default: mod.ActivationSection })), {
@@ -30,8 +30,6 @@ export default function HomePage() {
   const router = useRouter();
   const { locale } = useI18n();
   const { currentUser, loading: authLoading } = useAuth();
-  const [selectedCountryFromHero, setSelectedCountryFromHero] = useState(null);
-  const plansRef = useRef(null);
 
   // Detect current language (default to 'en' for root pages)
   const currentLanguage = locale || detectLanguageFromPath(pathname) || 'en';
@@ -44,15 +42,6 @@ export default function HomePage() {
       router.push(dashboardUrl);
     }
   }, [authLoading, currentUser, currentLanguage, router]);
-
-  const handleCountrySelect = (country) => {
-    setSelectedCountryFromHero(country);
-    // Scroll to plans section
-    // Scroll to plans section - REMOVED per user request
-    // if (plansRef.current) {
-    //   plansRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    // }
-  };
 
   // Show nothing while checking auth or redirecting
   if (authLoading || currentUser) {
@@ -67,25 +56,22 @@ export default function HomePage() {
     <>
       <div dir={isRTL ? 'rtl' : 'ltr'} lang={currentLanguage}>
         <main className="min-h-screen bg-white overflow-x-hidden">
-          {/* Hero Section - Only for non-authenticated users */}
-          <HeroSection onCountrySelect={handleCountrySelect} />
+          {/* Hero Section - Value proposition + CTAs */}
+          <HeroSection />
 
-          {/* Features Section */}
+          {/* Plans Section - Immediate value / social proof */}
+          <PlansSection />
+
+          {/* Features Section - Supporting information */}
           <FeaturesSection />
 
-          {/* Plans Section */}
-          <div ref={plansRef}>
-            <PlansSection selectedCountry={selectedCountryFromHero} />
-          </div>
-
-          {/* How It Works & Mobile Apps Section (Combined) */}
+          {/* Activation Section - FAQ */}
           <ActivationSection />
 
-          {/* Travel Blogs Section - Top 3 Travel Articles */}
+          {/* Travel Blogs Section - Content marketing */}
           <TravelBlogsSection />
         </main>
       </div>
-
     </>
   );
 }

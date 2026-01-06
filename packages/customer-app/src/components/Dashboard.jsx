@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
@@ -15,6 +15,7 @@ import {
   mapPackageCountryData,
   mapPlanDetails
 } from '@esim/shared/utils/esimFieldMapper';
+import { usePlansSupabase } from '@esim/shared/hooks/usePlanSupabase';
 import toast from 'react-hot-toast';
 
 // Dashboard Components
@@ -150,6 +151,30 @@ const Dashboard = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loadingUsageMap, setLoadingUsageMap] = useState({});
 
+  // Extract unique packageIds from orders for Supabase lookup
+  const packageIds = useMemo(() => {
+    if (!orders || orders.length === 0) return [];
+    const ids = orders
+      .map(order => order.packageId || order.planId || order.packageSlug)
+      .filter(Boolean)
+      .filter((id, index, self) => self.indexOf(id) === index); // unique
+    return ids;
+  }, [orders]);
+
+  // Fetch plan metadata from Supabase (operator branding, coverage, etc.)
+  const { plans: supabasePlans, isLoading: plansLoading } = usePlansSupabase(packageIds);
+
+  // Create a map for easy lookup: packageId -> plan metadata
+  const planMetadataMap = useMemo(() => {
+    if (!supabasePlans || supabasePlans.length === 0) return {};
+    const map = {};
+    supabasePlans.forEach(plan => {
+      if (plan?.id) {
+        map[plan.id] = plan;
+      }
+    });
+    return map;
+  }, [supabasePlans]);
 
   // Affiliate data (used by setReferralStats, will be used in future referral UI)
   const [, setReferralStats] = useState({
@@ -158,6 +183,75 @@ const Dashboard = () => {
     totalEarnings: 0,
     isActive: false
   });
+
+  // Helper: Check if an eSIM is likely expired based on Firebase data
+  // Returns { isExpired: boolean, reason: string, cachedUsage: object | null }
+  const checkEsimExpiration = useCallback((order, cachedUsage) => {
+    // 1. Check cached usage data first (from previous API calls)
+    if (cachedUsage) {
+      const expiredStatuses = ['EXPIRED', 'RECYCLED', 'FINISHED'];
+      if (expiredStatuses.includes(cachedUsage.status?.toUpperCase())) {
+        return { isExpired: true, reason: 'status', cachedUsage };
+      }
+      if (cachedUsage.expired_at && new Date(cachedUsage.expired_at) < new Date()) {
+        return { isExpired: true, reason: 'expired_at', cachedUsage };
+      }
+    }
+
+    // 2. Check order status
+    if (order.status === 'expired' || order.status === 'finished' || order.status === 'recycled') {
+      return { isExpired: true, reason: 'order_status', cachedUsage: null };
+    }
+
+    // 3. Calculate expiration from creation date + validity
+    const validity = order.planDetails?.validity || order.airaloOrderData?.validity || 0;
+    if (validity > 0 && order.createdAt) {
+      const createdDate = order.createdAt?.toDate?.() || new Date(order.createdAt);
+      const expirationDate = new Date(createdDate);
+      expirationDate.setDate(expirationDate.getDate() + validity);
+
+      if (new Date() > expirationDate) {
+        return { isExpired: true, reason: 'validity_expired', cachedUsage: null };
+      }
+    }
+
+    return { isExpired: false, reason: null, cachedUsage };
+  }, []);
+
+  // Helper: Create synthetic usage data for expired eSIMs from Firebase data
+  const createExpiredUsageData = useCallback((order) => {
+    const planDetails = order.planDetails || {};
+    const airaloOrderData = order.airaloOrderData || {};
+    const simData = airaloOrderData.sims?.[0] || {};
+
+    const totalData = planDetails.dataAmountMb || simData.data_amount_mb || airaloOrderData.data_amount_mb || 0;
+    const totalVoice = planDetails.voice || simData.voice || airaloOrderData.voice || 0;
+    const totalText = planDetails.sms || simData.text || airaloOrderData.text || 0;
+    const isUnlimited = planDetails.isUnlimited || airaloOrderData.is_unlimited || false;
+    const validity = planDetails.validity || airaloOrderData.validity || 0;
+
+    // Calculate expiration date
+    let expiredAt = null;
+    if (order.createdAt && validity > 0) {
+      const createdDate = order.createdAt?.toDate?.() || new Date(order.createdAt);
+      const expirationDate = new Date(createdDate);
+      expirationDate.setDate(expirationDate.getDate() + validity);
+      expiredAt = expirationDate.toISOString();
+    }
+
+    return {
+      status: 'EXPIRED',
+      remaining: 0,
+      total: totalData,
+      remaining_voice: 0,
+      total_voice: totalVoice,
+      remaining_text: 0,
+      total_text: totalText,
+      is_unlimited: isUnlimited,
+      expired_at: expiredAt,
+      fromFirebase: true // Flag to indicate this is synthetic data
+    };
+  }, []);
 
 
   const router = useRouter();
@@ -620,38 +714,65 @@ const Dashboard = () => {
   }, [authLoading, currentUser, router, currentLanguage]);
 
   // Preload usage data for visible eSIMs (for card previews)
-  // Loads usage data sequentially with delays to avoid Airalo API rate limiting
-  // The Airalo API has a rate limit of 100 requests/minute per ICCID with 20-minute cache
-  // But authentication has a separate stricter limit, so we space out requests more
+  // OPTIMIZED: First checks Firebase data to determine if eSIM is expired
+  // - Expired eSIMs: Use synthetic data from Firebase (no API call needed)
+  // - Active eSIMs: Fetch real-time usage from Airalo API
   useEffect(() => {
     if (orders.length === 0) return;
 
     let isCancelled = false;
 
     const preloadUsageData = async () => {
-      // Get orders with ICCIDs that need usage data
-      const ordersToLoad = orders
+      // Get orders with ICCIDs
+      const ordersWithIccid = orders
         .filter(o => o.status === 'active' || o.status === 'completed')
         .map(o => ({
           iccid: o.qrCode?.iccid || o.iccid || o.airaloOrderData?.sims?.[0]?.iccid,
           order: o
         }))
-        .filter(item => item.iccid && !usageCache[item.iccid])
-        .slice(0, 5); // Limit to 5 eSIMs to reduce auth rate limit hits
+        .filter(item => item.iccid && !usageCache[item.iccid]);
 
-      if (ordersToLoad.length === 0) return;
+      if (ordersWithIccid.length === 0) return;
 
+      // STEP 1: Categorize eSIMs as expired vs active based on Firebase data
+      const expiredOrders = [];
+      const activeOrders = [];
 
-      // Mark ALL eSIMs as loading at once for better UX (skeleton shows on all cards together)
-      const iccidsToLoad = ordersToLoad.map(item => item.iccid);
+      for (const item of ordersWithIccid) {
+        const expirationCheck = checkEsimExpiration(item.order, usageCache[item.iccid]);
+        if (expirationCheck.isExpired) {
+          expiredOrders.push({ ...item, expirationCheck });
+        } else {
+          activeOrders.push(item);
+        }
+      }
+
+      // STEP 2: For expired eSIMs - use synthetic data from Firebase (instant, no API call)
+      if (expiredOrders.length > 0 && !isCancelled) {
+        const expiredUsageUpdates = {};
+        for (const { iccid, order, expirationCheck } of expiredOrders) {
+          // Use cached data if available, otherwise create synthetic expired data
+          const usageData = expirationCheck.cachedUsage || createExpiredUsageData(order);
+          expiredUsageUpdates[iccid] = usageData;
+        }
+        setUsageCache(prev => ({ ...prev, ...expiredUsageUpdates }));
+      }
+
+      // STEP 3: For active eSIMs - fetch real-time usage from API
+      const ordersToFetch = activeOrders.slice(0, 5); // Limit API calls
+
+      if (ordersToFetch.length === 0) return;
+
+      // Mark active eSIMs as loading
+      const iccidsToLoad = ordersToFetch.map(item => item.iccid);
       setLoadingUsageMap(prev => {
         const newMap = { ...prev };
         iccidsToLoad.forEach(iccid => { newMap[iccid] = true; });
         return newMap;
       });
 
-      // Load sequentially with longer delay to avoid auth rate limiting
-      for (const { iccid, order } of ordersToLoad) {
+      // Load sequentially with delay to avoid auth rate limiting
+      for (const { iccid, order } of ordersToFetch) {
         if (isCancelled) break;
 
         try {
@@ -677,11 +798,11 @@ const Dashboard = () => {
 
             setUsageCache(prev => ({ ...prev, [iccid]: combinedUsageData }));
           } else if (result.statusCode === 429) {
-            // Rate limited - stop preloading and wait longer
+            // Rate limited - stop preloading
             break;
           }
         } catch (error) {
-          // If we hit a rate limit error, stop trying
+          // If rate limited, stop trying
           if (error.message?.includes('429') || error.message?.includes('Too Many')) {
             break;
           }
@@ -692,21 +813,20 @@ const Dashboard = () => {
         }
 
         // Wait 3 seconds between requests to avoid auth rate limiting
-        // Each request needs a fresh auth token, and auth has stricter limits
         if (!isCancelled) {
           await new Promise(resolve => setTimeout(resolve, 3000));
         }
       }
     };
 
-    // Delay preload more to not block initial render and give auth time to recover
+    // Delay preload to not block initial render
     const timer = setTimeout(preloadUsageData, 2000);
 
     return () => {
       isCancelled = true;
       clearTimeout(timer);
     };
-  }, [orders]); // Only depend on orders, not usageCache to avoid infinite loop
+  }, [orders, checkEsimExpiration, createExpiredUsageData]); // Include helper functions in deps
 
   // Show skeleton while auth is loading or data is loading
   if (authLoading || loading) {
@@ -988,6 +1108,17 @@ const Dashboard = () => {
         return;
       }
 
+      // OPTIMIZATION: Check if eSIM is expired before making API call
+      const expirationCheck = checkEsimExpiration(selectedOrder, null);
+      if (expirationCheck.isExpired) {
+        // Use synthetic data from Firebase for expired eSIMs
+        const expiredUsageData = createExpiredUsageData(selectedOrder);
+        setEsimUsage(expiredUsageData);
+        setUsageCache(prev => ({ ...prev, [iccid]: expiredUsageData }));
+        toast.success(t('dashboard.esimExpiredData', 'This eSIM has expired. Showing stored data.'));
+        return;
+      }
+
       const result = await esimService.getEsimUsageByIccid(iccid);
 
       if (result.success) {
@@ -1087,6 +1218,8 @@ const Dashboard = () => {
           onViewQRCode={handleViewQRCode}
           usageCache={usageCache}
           loadingUsageMap={loadingUsageMap}
+          planMetadataMap={planMetadataMap}
+          plansLoading={plansLoading}
         />
       </div>
 
@@ -1106,6 +1239,7 @@ const Dashboard = () => {
         onDeleteOrder={handleDeleteOrder}
         esimUsage={esimUsage}
         esimDetails={esimDetails}
+        planMetadata={selectedOrder ? planMetadataMap[selectedOrder.packageId || selectedOrder.planId || selectedOrder.packageSlug] : null}
       />
 
       {/* Referral Bottom Sheet */}

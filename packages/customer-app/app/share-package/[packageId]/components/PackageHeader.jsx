@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { Globe } from 'lucide-react';
-import { getCountryName, mobileCountries } from '@esim/shared/data/mobileCountries';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
+import { formatDataDisplay, getValidityDays } from '@esim/shared/utils/planDisplayUtils';
 
 // Helper to capitalize first letter of each word
 const capitalizeWords = (str) => {
@@ -25,18 +25,8 @@ const PackageHeader = ({
   isGlobalPlan,
   t
 }) => {
-  // Format data display
-  const formatData = (data, unit = 'GB') => {
-    if (data === 'Unlimited' || data === -1) {
-      return 'Unlimited';
-    }
-    if (typeof data === 'string' && data.includes(unit)) {
-      return data;
-    }
-    return `${data} ${unit}`;
-  };
-
   // Get full country name with translations
+  // PURE DATA FROM PROPS - NO HARDCODED FALLBACKS
   const getFullCountryName = (countryCode) => {
     if (!countryCode) return '';
 
@@ -50,27 +40,17 @@ const PackageHeader = ({
       return t('sharePackage.globalCoverage', 'Global');
     }
 
-    // Try Firebase translations first
+    // Use translations passed from parent (from Supabase)
     if (countryTranslations && countryTranslations[currentLanguage]) {
       return countryTranslations[currentLanguage];
     }
 
-    // Fallback to hardcoded translations
-    const translatedName = getCountryName(countryCode, currentLanguage);
-    if (translatedName && translatedName !== countryCode) {
-      return translatedName;
+    // Use country name from package data if available
+    if (packageData?.country_name) {
+      return packageData.country_name;
     }
 
-    // Fallback to mobileCountries
-    const country = mobileCountries.find(c =>
-      c.code === countryCode.toUpperCase() ||
-      c.id === countryCode.toUpperCase()
-    );
-
-    if (country) {
-      return country.name;
-    }
-
+    // Fall back to capitalizing the country code
     return capitalizeWords(countryCode);
   };
 
@@ -94,6 +74,10 @@ const PackageHeader = ({
 
   const displayCountryName = capitalizeWords(urlCountryName) || getFullCountryName(urlCountryCode || packageData.country_code);
   const isGlobal = isGlobalPlan ? isGlobalPlan(packageData) : false;
+
+  // Use shared formatDataDisplay for consistent data formatting
+  const dataDisplay = formatDataDisplay(packageData);
+  const validityDays = getValidityDays(packageData);
 
   return (
     <div className="mx-auto w-full max-w-9xl">
@@ -126,16 +110,22 @@ const PackageHeader = ({
                   {displayCountryName && (
                     <>{displayCountryName} - </>
                   )}
-                  {formatData(packageData.data || packageData.capacity, packageData.dataUnit || 'GB')}
+                  {dataDisplay}
                 </h2>
                 <div className="mt-1 flex items-baseline gap-2">
                   <p className="text-xl sm:text-2xl font-semibold text-eerie-black">
                     {formatPrice(packageData.price)}
                   </p>
-                  <span className="text-base sm:text-lg text-cool-black">
-                    - {packageData.day || packageData.period || packageData.duration || packageData.validity} {t('sharePackage.days', 'days')}
-                  </span>
+                  {validityDays > 0 && (
+                    <span className="text-base sm:text-lg text-cool-black">
+                      - {validityDays} {t('sharePackage.days', 'days')}
+                    </span>
+                  )}
                 </div>
+                {/* Data summary line */}
+                <p className="mt-1 text-sm text-gray-500">
+                  {dataDisplay} {t('sharePackage.for', 'for')} {validityDays} {t('sharePackage.days', 'days')}
+                </p>
               </div>
             </div>
           </div>

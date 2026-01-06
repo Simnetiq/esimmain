@@ -122,10 +122,17 @@ const FlexiblePlanCard = ({ plan, t, onClick }) => {
     );
 };
 
-const EsimPlans = () => {
+// Constants for country limits
+const HOME_PAGE_COUNTRY_LIMIT = 16;
+const PLANS_PAGE_COUNTRY_LIMIT = 40;
+
+const EsimPlans = ({ isHomePage = false }) => {
     const { t, locale } = useI18n();
     const searchParams = useSearchParams();
     const router = useRouter();
+
+    // Determine the country limit based on page context
+    const countryLimit = isHomePage ? HOME_PAGE_COUNTRY_LIMIT : PLANS_PAGE_COUNTRY_LIMIT;
 
     // Detect current language from URL with fallback
     const currentLanguage = useMemo(() => {
@@ -143,6 +150,8 @@ const EsimPlans = () => {
     const [showCheckoutModal, setShowCheckoutModal] = useState(false);
     const [selectedSheetPlans, setSelectedSheetPlans] = useState([]);
     const [loadingSheetPlans, setLoadingSheetPlans] = useState(false);
+    const [allRegionalPlans, setAllRegionalPlans] = useState([]); // Store all regional plans (not just top 4)
+    const [sheetContext, setSheetContext] = useState(null); // 'country' | 'regional' - context for the bottom sheet
 
     // Countries Data - using Supabase
     const { countries, isLoading: countriesLoading } = useCountriesSupabase(currentLanguage);
@@ -230,15 +239,18 @@ const EsimPlans = () => {
         const loadRegionalPlans = async () => {
             if (!selectedRegion || selectedRegion === 'all' || selectedRegion === 'popular') {
                 setRegionalPlans([]);
+                setAllRegionalPlans([]);
                 return;
             }
 
             try {
                 const plans = await fetchRegionalPlans(selectedRegion);
-                setRegionalPlans(plans.slice(0, 4));
+                setAllRegionalPlans(plans); // Store all plans for "Show All" button
+                setRegionalPlans(plans.slice(0, 4)); // Display only top 4
             } catch (error) {
                 console.error('Error fetching regional plans from Supabase:', error);
                 setRegionalPlans([]);
+                setAllRegionalPlans([]);
             }
         };
 
@@ -249,6 +261,7 @@ const EsimPlans = () => {
     const handleCountrySelect = useCallback(async (country) => {
         setLoadingSheetPlans(true);
         setShowCheckoutModal(true);
+        setSheetContext('country');
 
         try {
             let plans;
@@ -267,6 +280,21 @@ const EsimPlans = () => {
             setLoadingSheetPlans(false);
         }
     }, []);
+
+    // Handler for "Show All" regional plans button
+    const handleShowAllRegionalPlans = useCallback(() => {
+        setSheetContext('regional');
+        setSelectedSheetPlans(allRegionalPlans);
+        setShowCheckoutModal(true);
+    }, [allRegionalPlans]);
+
+    // Handler for "Show More" button on home page - redirects to plans page
+    const handleShowMoreCountries = useCallback(() => {
+        const plansUrl = (currentLanguage === 'en' || !currentLanguage)
+            ? '/esim-plans'
+            : `/${currentLanguage}/esim-plans`;
+        router.push(plansUrl);
+    }, [currentLanguage, router]);
 
     const handlePlanClick = (plan, type) => {
         if (typeof trackCustomFacebookEvent === 'function') {
@@ -287,9 +315,12 @@ const EsimPlans = () => {
             countryParam = plan.country_slug || selectedRegion || 'europe';
         }
 
+        // Note: Don't use encodeURIComponent for the plan ID in the path segment
+        // Next.js handles URL encoding automatically, and double-encoding causes issues
+        // with special characters like '+' in plan IDs (e.g., 'discover+-15days-2gb')
         const planUrl = (currentLanguage === 'en' || !currentLanguage)
-            ? `/share-package/${encodeURIComponent(plan.id)}?country=${countryParam}`
-            : `/${currentLanguage}/share-package/${encodeURIComponent(plan.id)}?country=${countryParam}`;
+            ? `/share-package/${plan.id}?country=${countryParam}`
+            : `/${currentLanguage}/share-package/${plan.id}?country=${countryParam}`;
 
         router.push(planUrl);
     };
@@ -337,6 +368,9 @@ const EsimPlans = () => {
                         onCountrySelect={handleCountrySelect}
                         isLoading={countriesLoading}
                         selectedRegion={selectedRegion}
+                        initialLimit={countryLimit}
+                        isHomePage={isHomePage}
+                        onShowMoreClick={isHomePage ? handleShowMoreCountries : null}
                     />
                 ) : (
                     <>
@@ -351,9 +385,25 @@ const EsimPlans = () => {
                         {/* Regional Plans */}
                         {regionalPlans.length > 0 && (
                             <div className="mb-6">
-                                <h3 className="text-lg font-bold text-eerie-black mb-3">
-                                    {t('plans.regionalPlans', 'Regional Plans')}
-                                </h3>
+                                <div className="flex items-center justify-between mb-3">
+                                    <h3 className="text-lg font-bold text-eerie-black">
+                                        {t('plans.regionalPlans', 'Regional Plans')}
+                                    </h3>
+                                    {allRegionalPlans.length > 4 && (
+                                        <button
+                                            onClick={handleShowAllRegionalPlans}
+                                            className="text-sm font-medium text-tufts-blue hover:text-blue-700 transition-colors flex items-center gap-1"
+                                        >
+                                            {t('plans.showAll', 'Show All')}
+                                            <span className="text-xs bg-tufts-blue/10 text-tufts-blue px-1.5 py-0.5 rounded-full">
+                                                {allRegionalPlans.length}
+                                            </span>
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </button>
+                                    )}
+                                </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                     {regionalPlans.map((plan) => (
                                         <FlexiblePlanCard
@@ -376,6 +426,9 @@ const EsimPlans = () => {
                                 onCountrySelect={handleCountrySelect}
                                 isLoading={countriesLoading}
                                 selectedRegion={selectedRegion}
+                                initialLimit={countryLimit}
+                                isHomePage={isHomePage}
+                                onShowMoreClick={isHomePage ? handleShowMoreCountries : null}
                             />
                         </div>
                     </>
@@ -388,6 +441,8 @@ const EsimPlans = () => {
                 availablePlans={selectedSheetPlans}
                 loadingPlans={loadingSheetPlans}
                 filteredCountries={filteredCountries}
+                context={sheetContext}
+                regionName={selectedRegion}
             />
         </div>
     );

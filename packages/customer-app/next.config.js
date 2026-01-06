@@ -30,6 +30,11 @@ const nextConfig = {
         hostname: 'cdn.airalo.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: '*.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      },
     ],
   },
 
@@ -110,7 +115,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' data: https://fonts.gstatic.com https://js.stripe.com https://r2cdn.perplexity.ai",
               "img-src 'self' data: blob: https: http:",
-              "connect-src 'self' https://api.stripe.com https://*.firebaseio.com https://*.googleapis.com https://www.google-analytics.com https://www.googletagmanager.com https://region1.google-analytics.com https://*.analytics.google.com https://www.google.com https://*.google.com https://*.doubleclick.net https://googleads.g.doubleclick.net https://vercel.live",
+              "connect-src 'self' https://api.stripe.com https://*.firebaseio.com https://*.googleapis.com https://www.google-analytics.com https://www.googletagmanager.com https://region1.google-analytics.com https://*.analytics.google.com https://www.google.com https://*.google.com https://*.doubleclick.net https://googleads.g.doubleclick.net https://vercel.live https://*.supabase.co",
               "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://td.doubleclick.net https://www.google.com https://www.googletagmanager.com https://www.recaptcha.net https://accounts.google.com https://*.firebaseapp.com",
               "object-src 'none'",
               "base-uri 'self'",

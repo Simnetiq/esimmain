@@ -10,6 +10,7 @@ import { formatPrice, parsePrice } from '@esim/shared/utils/priceUtils';
 import Image from 'next/image';
 import { db } from '@esim/shared/firebase/config';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import { GLOBAL_PLAN_IMAGE_URL } from '@esim/shared';
 
 
 // Inline SVG icons to avoid lucide-react bundle overhead
@@ -50,6 +51,28 @@ const planHasSms = (plan) => {
 const planHasVoice = (plan) => {
   const voice = parseInt(plan.voice) || parseInt(plan.calls) || 0;
   return voice > 0;
+};
+
+// Helper to check if plan is a global plan
+const isGlobalPlan = (plan) => {
+  if (!plan) return false;
+
+  // Check plan_type or type
+  if (plan.plan_type === 'global' || plan.type === 'global') return true;
+
+  // Check region_id
+  if (plan.region_id === 'global') return true;
+
+  // Check name patterns
+  const name = (plan.name || plan.country_name || '').toLowerCase();
+  if (name.includes('discover global') || name.includes('worldwide') || name === 'global') return true;
+
+  // Check if many covered countries (50+)
+  const coveredCount = plan.coveredCountryCount || plan.covered_countries_count ||
+    (plan.covered_countries?.length) || (plan.country_codes?.length) || 0;
+  if (coveredCount >= 50) return true;
+
+  return false;
 };
 
 // Helper function to format data amount correctly
@@ -103,8 +126,10 @@ const PlanCard = ({ plan, badge, isSelected, onSelect }) => {
   const operatorName = plan.operatorName || plan.operator_name;
   const operatorLogo = plan.operatorLogo || plan.operator_logo || plan.operator_image_url;
   const fairUsagePolicy = plan.fair_usage_policy || plan.fairUsagePolicy;
-  const coveredCountryCount = plan.coveredCountryCount || 0;
+  const coveredCountryCount = plan.coveredCountryCount || plan.covered_countries_count ||
+    (plan.covered_countries?.length) || (plan.country_codes?.length) || 0;
   const isRegional = plan.isRegional || plan.is_regional;
+  const isGlobal = isGlobalPlan(plan);
   const currency = plan.currency || 'USD';
 
   // Badge configurations - simple text badges
@@ -180,7 +205,7 @@ const PlanCard = ({ plan, badge, isSelected, onSelect }) => {
           )}
 
           {/* Row 3: Operator + Country Coverage */}
-          {(operatorName || (isRegional && coveredCountryCount > 0)) && (
+          {(operatorName || ((isRegional || isGlobal) && coveredCountryCount > 0)) && (
             <div className="flex items-center gap-2 flex-wrap mt-1">
               {operatorName && (
                 <div className="flex items-center gap-1">
@@ -200,10 +225,11 @@ const PlanCard = ({ plan, badge, isSelected, onSelect }) => {
                   <span className="text-xs text-gray-400">{operatorName}</span>
                 </div>
               )}
-              {isRegional && coveredCountryCount > 0 && (
+              {(isRegional || isGlobal) && coveredCountryCount > 0 && (
                 <>
                   {operatorName && <span className="text-gray-300">·</span>}
-                  <span className="text-xs text-tufts-blue/80">
+                  <span className="inline-flex items-center gap-1 text-xs text-tufts-blue">
+                    <GlobeIcon className="w-3 h-3" />
                     {coveredCountryCount} {coveredCountryCount === 1 ? t('deals.country', 'country') : t('deals.countries', 'countries')}
                   </span>
                 </>
@@ -238,7 +264,9 @@ const PlanSelectionBottomSheet = ({
   onClose,
   availablePlans,
   loadingPlans,
-  filteredCountries
+  filteredCountries,
+  context, // 'country' | 'regional' - determines how to display the sheet
+  regionName // e.g., 'europe', 'asia', 'global' - used for regional context title
 }) => {
   const { t, locale, isLoading: i18nLoading } = useI18n();
   const router = useRouter();
@@ -318,6 +346,13 @@ const PlanSelectionBottomSheet = ({
       }
 
       const firstPlan = availablePlans[0];
+
+      // Handle global plans - use hardcoded global image
+      if (isGlobalPlan(firstPlan)) {
+        setCountryImage({ url: GLOBAL_PLAN_IMAGE_URL, isOperator: true });
+        return;
+      }
+
       const countryCode = firstPlan.country_codes?.[0] || firstPlan.country_code;
       const countryName = firstPlan.country_name || firstPlan.name;
       const isRegional = firstPlan.type === 'regional' || firstPlan.region_slug ||
@@ -580,11 +615,47 @@ const PlanSelectionBottomSheet = ({
     return [...dataOnlyPlans, ...plansWithFeatures].find(p => p.id === selectedPlanId);
   }, [selectedPlanId, dataOnlyPlans, plansWithFeatures]);
 
-  // Get country info from first plan or filteredCountries
+  // Helper to format region name for display
+  const formatRegionName = (region) => {
+    if (!region) return '';
+    // Capitalize first letter of each word
+    return region.split(/[-_\s]/).map(word =>
+      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    ).join(' ');
+  };
+
+  // Get country/region info from first plan or filteredCountries
   const countryInfo = useMemo(() => {
     if (!availablePlans || availablePlans.length === 0) return null;
 
     const firstPlan = availablePlans[0];
+
+    // Handle regional context - show region name instead of country
+    if (context === 'regional' && regionName) {
+      const isGlobal = regionName === 'global';
+      return {
+        code: regionName,
+        name: isGlobal
+          ? t('planSelection.globalPlans', 'Global Plans')
+          : t('planSelection.regionalPlansFor', '{region} Plans', { region: formatRegionName(regionName) }).replace('{region}', formatRegionName(regionName)),
+        region: regionName,
+        imageUrl: isGlobal ? GLOBAL_PLAN_IMAGE_URL : null,
+        isGlobal: isGlobal,
+        isRegional: true
+      };
+    }
+
+    // Handle global plans - use hardcoded global image
+    if (isGlobalPlan(firstPlan)) {
+      return {
+        code: 'global',
+        name: firstPlan.country_name || t('planSelection.globalPlans', 'Global'),
+        region: 'global',
+        imageUrl: GLOBAL_PLAN_IMAGE_URL,
+        isGlobal: true
+      };
+    }
+
     const countryCode = firstPlan.country_codes?.[0] || firstPlan.country_code;
     const countryName = firstPlan.country_name || firstPlan.country_title || countryCode;
     const region = firstPlan.region;
@@ -596,9 +667,10 @@ const PlanSelectionBottomSheet = ({
       code: countryCode,
       name: countryName,
       region: region,
-      imageUrl: imageUrl
+      imageUrl: imageUrl,
+      isGlobal: false
     };
-  }, [availablePlans, countryImage]);
+  }, [availablePlans, countryImage, t, context, regionName]);
 
   const handlePlanSelect = (plan) => {
     // Track plan selection with Facebook Pixel including value
@@ -619,12 +691,14 @@ const PlanSelectionBottomSheet = ({
       timestamp: new Date().toISOString()
     });
 
-    // Get country code for the plan
-    const countryCode = plan.country_codes?.[0] || plan.country_code;
+    // Get country code for the plan - use 'global' for global plans
+    const planCountryCode = isGlobalPlan(plan)
+      ? 'global'
+      : (plan.country_codes?.[0] || plan.country_code);
 
     // Navigate to the share package page with country info
     const params = new URLSearchParams({
-      country: countryCode || ''
+      country: planCountryCode || ''
     });
 
     const sharePackageUrl = getLocalizedUrl(`/share-package/${plan.id}?${params.toString()}`);
@@ -639,23 +713,25 @@ const PlanSelectionBottomSheet = ({
       title={
         countryInfo ? (
           <div className="flex items-center gap-x-2 my-4">
-            {/* Country Image */}
-            <div className="flex-shrink-0 w-10 aspect-[4/3] flex items-center justify-center border border-gray-200 overflow-hidden">
-              {countryInfo.imageUrl && (
+            {/* Country/Global/Regional Image */}
+            <div className="flex-shrink-0 w-10 aspect-[4/3] flex items-center justify-center border border-gray-200 overflow-hidden rounded bg-gray-50">
+              {countryInfo.imageUrl ? (
                 <div className="relative w-full h-full">
                   <Image
                     src={countryInfo.imageUrl}
                     alt={`${countryInfo.name}`}
                     fill
                     sizes="40px"
-                    className="object-cover"
+                    className={countryInfo.isGlobal ? "object-contain p-1" : "object-cover"}
                     quality={75}
                     loading="lazy"
                   />
                 </div>
-              )}
+              ) : (countryInfo.isGlobal || countryInfo.isRegional) ? (
+                <GlobeIcon className="w-5 h-5 text-tufts-blue" />
+              ) : null}
             </div>
-            {/* Country Name */}
+            {/* Country/Region Name */}
             <span className="font-light text-2xl text-gray-900">{countryInfo.name}</span>
 
           </div>
@@ -820,7 +896,6 @@ const PlanSelectionBottomSheet = ({
 
                         if (!cheapestPlan) return null;
 
-                        const countryCode = country.code;
                         const countryName = country.displayName || country.name;
                         const region = country.region;
                         const regionColor = regionColors[region] || '#6B7280';

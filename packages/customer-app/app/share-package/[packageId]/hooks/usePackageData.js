@@ -7,17 +7,31 @@ import { db } from '@esim/shared/firebase/config';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { getProviderFromPlanData } from '@esim/shared/utils/providerUtils';
+import { fetchPlanById } from '@esim/shared/services/plansServiceSupabase';
+import { isSupabaseAvailable } from '@esim/shared/lib/supabase';
+import { GLOBAL_PLAN_IMAGE_URL } from '@esim/shared';
 import toast from 'react-hot-toast';
 
 /**
  * Custom hook to handle all package data fetching logic
- * Handles country plans, regional plans, and global tariffs
+ *
+ * DATA FLOW:
+ * - Plan data: Fetched from Supabase (single source of truth for display)
+ * - Images/Translations: Fetched from Firebase (countries/regions collections)
+ * - Payment validation: Server-side Firebase (handled by /api/create-payment-order)
+ *
+ * SECURITY NOTE:
+ * All plan data fetched here is for DISPLAY ONLY.
+ * The payment API re-validates price and plan data server-side from Firebase.
  */
 export const usePackageData = () => {
   const params = useParams();
   const pathname = usePathname();
   const { t, locale, isLoading: i18nLoading } = useI18n();
-  const packageId = params.packageId;
+
+  // Decode the packageId to handle URL-encoded special characters like '+' -> '%2B'
+  // Plan IDs can contain '+' (e.g., 'discover+-15days-2gb') which gets URL-encoded
+  const packageId = params.packageId ? decodeURIComponent(params.packageId) : null;
 
   // Language detection
   const currentLanguage = useMemo(() => {
@@ -64,9 +78,9 @@ export const usePackageData = () => {
   const isGlobalPlan = useCallback((planData) => {
     if (!planData) return false;
 
-    const countryCode = planData.country_code || planData.country_slug || '';
-    const regionSlug = planData.region_slug || '';
-    const type = planData.type || '';
+    const countryCode = planData.country_code || planData.country_slug || planData.countryId || '';
+    const regionSlug = planData.region_slug || planData.region || '';
+    const type = planData.type || planData.planType || '';
 
     // Check various patterns for global plans
     const globalPatterns = ['global', 'discover-global', 'worldwide', 'world'];
@@ -75,59 +89,47 @@ export const usePackageData = () => {
     return (
       type === 'global' ||
       globalPatterns.some(pattern => codeOrSlugLower.includes(pattern)) ||
-      (planData.country_codes && planData.country_codes.length > 50) // Many countries = global
+      (planData.country_codes && planData.country_codes.length > 50) ||
+      (planData.countryCodes && planData.countryCodes.length > 50) ||
+      (planData.coveredCountryCount && planData.coveredCountryCount > 50)
     );
   }, []);
 
   /**
    * Helper to extract image URL from Firebase document data
-   * Checks multiple possible field locations
    */
   const extractImageUrl = (data) => {
-    return data?.image?.url || data?.photo || data?.imageUrl?.url || null;
+    return data?.image?.url || data?.photo || data?.imageUrl?.url || data?.image_url || null;
   };
 
   /**
-   * Fetch image and translations for country/region/global plans
-   * Following the same robust pattern as EsimCard.jsx
+   * Fetch image and translations from Firebase (countries/regions collections)
    */
   const fetchImageAndTranslations = useCallback(async (planData, urlCode, urlName) => {
     try {
       let imageUrl = null;
       let translations = {};
 
-      // Handle global plans first
+      // Handle global plans first - use hardcoded image URL
       if (isGlobalPlan(planData)) {
-        const globalSlugs = ['discover-global', 'global', 'worldwide'];
-
-        for (const slug of globalSlugs) {
-          try {
-            const globalSnap = await getDoc(doc(db, 'regions', slug));
-            if (globalSnap.exists()) {
-              const globalData = globalSnap.data();
-              translations = globalData.translations || {};
-              imageUrl = extractImageUrl(globalData);
-              if (imageUrl) break;
-            }
-          } catch {
-            // Continue to next slug
-          }
-        }
-
-        setCountryTranslations(translations);
-        setCountryImage(imageUrl ? { url: imageUrl } : null);
+        // Use hardcoded global plan image - no need to fetch from Firebase
+        setCountryTranslations({});
+        setCountryImage({ url: GLOBAL_PLAN_IMAGE_URL, isOperator: true });
         return;
       }
 
       const isRegionalPlan = planData.type === 'regional' ||
+        planData.isRegional === true ||
         planData.region_slug ||
-        (planData.country_codes && planData.country_codes.length > 1);
+        planData.region ||
+        (planData.country_codes && planData.country_codes.length > 1) ||
+        (planData.countryCodes && planData.countryCodes.length > 1);
 
-      const regionSlug = planData.region_slug || planData.country_slug;
-      const countryCode = planData.country_code;
-      const countryName = planData.country_name || urlName;
+      const regionSlug = planData.region_slug || planData.region || planData.country_slug || planData.countryId;
+      const countryCode = planData.country_code || planData.countryId;
+      const countryName = planData.country_name || planData.country_title || urlName;
 
-      // Step 1: Try by country name as slug (e.g., "Algeria" -> "algeria")
+      // Step 1: Try by country name as slug
       if (countryName && typeof countryName === 'string') {
         const nameSlug = countryName.toLowerCase().replace(/\s+/g, '-');
         try {
@@ -210,7 +212,6 @@ export const usePackageData = () => {
       if (urlCode) {
         const urlSlug = urlCode.toLowerCase().replace(/\s+/g, '-');
         try {
-          // Try countries first
           let docSnap = await getDoc(doc(db, 'countries', urlSlug));
           if (docSnap.exists()) {
             const data = docSnap.data();
@@ -250,112 +251,74 @@ export const usePackageData = () => {
   }, [isGlobalPlan]);
 
   /**
-   * Transform API plan data to consistent format
-   */
-  const transformPlanData = useCallback((apiPlan) => {
-    return {
-      id: apiPlan.slug || apiPlan.id,
-      name: apiPlan.name,
-      description: apiPlan.description,
-      price: apiPlan.price,
-      currency: apiPlan.currency || 'USD',
-      data: apiPlan.capacity || apiPlan.data,
-      dataUnit: apiPlan.data_unit || 'GB',
-      period: apiPlan.period || apiPlan.validity,
-      duration: apiPlan.period || apiPlan.validity,
-      country_code: apiPlan.country_codes?.[0] || apiPlan.country_code,
-      country_codes: apiPlan.country_codes,
-      benefits: apiPlan.features || [],
-      speed: apiPlan.speed,
-      region_slug: apiPlan.region_slug,
-      provider: apiPlan.provider || 'airalo',
-      operator: apiPlan.operator || '',
-      slug: apiPlan.slug,
-      type: apiPlan.type
-    };
-  }, []);
-
-  /**
-   * Load package from Airalo API
-   */
-  const loadFromAiraloAPI = useCallback(async () => {
-    try {
-      const response = await fetch('/api/airalo/plans');
-      const data = await response.json();
-
-      if (data.success && data.plans) {
-        const foundPlan = data.plans.find(pkg =>
-          pkg.slug === packageId ||
-          pkg.id === packageId ||
-          pkg.name?.toLowerCase().includes(packageId.toLowerCase())
-        );
-
-        if (foundPlan) {
-          const transformedData = transformPlanData(foundPlan);
-          setPackageData(transformedData);
-          setProviderInfo(getProviderFromPlanData(transformedData));
-          await fetchImageAndTranslations(transformedData, urlCountryCode, urlCountryName);
-          setTranslationsLoaded(true);
-          return true;
-        }
-      }
-      return false;
-    } catch (error) {
-      console.error('Error loading from Airalo API:', error);
-      return false;
-    }
-  }, [packageId, transformPlanData, fetchImageAndTranslations, urlCountryCode, urlCountryName]);
-
-  /**
    * Main package data loading function
+   * Fetches from Supabase (primary) with Firebase fallback
    */
   const loadPackageData = useCallback(async () => {
     try {
       setLoading(true);
 
-      // Try Firebase dataplans collection first
-      const packageRef = doc(db, 'dataplans', packageId);
-      const packageSnap = await getDoc(packageRef);
-
-      if (packageSnap.exists()) {
-        const data = packageSnap.data();
-        const fullData = {
-          id: packageSnap.id,
-          ...data
-        };
-        setPackageData(fullData);
-        setProviderInfo(getProviderFromPlanData(fullData));
-        await fetchImageAndTranslations(fullData, urlCountryCode, urlCountryName);
-        setTranslationsLoaded(true);
-        return;
-      }
-
-      // If not in Firebase, try Airalo API
-      const foundInAPI = await loadFromAiraloAPI();
-
-      // Fallback: try to find a package for the country from URL
-      if (!foundInAPI && urlCountryCode) {
+      // PRIMARY: Try Supabase first (single source of truth for client display)
+      if (isSupabaseAvailable()) {
         try {
-          const response = await fetch(`/api/airalo/plans?country=${urlCountryCode}`);
-          const data = await response.json();
+          const supabasePlan = await fetchPlanById(packageId);
 
-          if (data.success && data.plans && data.plans.length > 0) {
-            const fallbackPlan = data.plans[0];
-            const fallbackData = transformPlanData(fallbackPlan);
-            setPackageData(fallbackData);
-            setProviderInfo(getProviderFromPlanData(fallbackData));
-            await fetchImageAndTranslations(fallbackData, urlCountryCode, urlCountryName);
+          if (supabasePlan) {
+            console.log('[usePackageData] Loaded from Supabase:', packageId);
+            setPackageData(supabasePlan);
+            setProviderInfo(getProviderFromPlanData(supabasePlan));
+            await fetchImageAndTranslations(supabasePlan, urlCountryCode, urlCountryName);
             setTranslationsLoaded(true);
             return;
           }
-        } catch {
-          // Silent fail for fallback
+        } catch (supabaseError) {
+          console.warn('[usePackageData] Supabase fetch failed, trying Firebase:', supabaseError);
         }
       }
 
-      if (!foundInAPI) {
-        setTranslationsLoaded(true);
+      // FALLBACK: Try Firebase dataplans collection
+      // This ensures backwards compatibility during migration
+      try {
+        const packageRef = doc(db, 'dataplans', packageId);
+        const packageSnap = await getDoc(packageRef);
+
+        if (packageSnap.exists()) {
+          const data = packageSnap.data();
+          const fullData = {
+            id: packageSnap.id,
+            ...data,
+            // Map Firebase fields to view model format
+            validity: data.validity_days || data.period || data.duration,
+            period: data.validity_days || data.period || data.duration,
+            duration: data.validity_days || data.period || data.duration,
+            data: data.data_display || data.data,
+            isUnlimited: data.is_unlimited === true,
+            isRegional: data.is_regional === true,
+            hasVoice: data.has_voice === true,
+            hasSms: data.has_sms === true,
+            operatorName: data.operator_name,
+            operatorLogo: data.operator_logo || data.operator_image_url,
+            operatorStyle: data.operator_style || 'light',
+            operatorGradientStart: data.operator_gradient_start,
+            operatorGradientEnd: data.operator_gradient_end,
+            fairUsagePolicy: data.fair_usage_policy,
+            activationPolicy: data.activation_policy || 'first-usage',
+            coveredCountryCount: data.covered_countries_count || (data.covered_countries?.length || 0)
+          };
+          console.log('[usePackageData] Loaded from Firebase:', packageId);
+          setPackageData(fullData);
+          setProviderInfo(getProviderFromPlanData(fullData));
+          await fetchImageAndTranslations(fullData, urlCountryCode, urlCountryName);
+          setTranslationsLoaded(true);
+          return;
+        }
+      } catch (firebaseError) {
+        console.warn('[usePackageData] Firebase fetch failed:', firebaseError);
       }
+
+      // No plan found in either source
+      console.warn('[usePackageData] Plan not found:', packageId);
+      setTranslationsLoaded(true);
     } catch (error) {
       console.error('Failed to load package information:', error);
       toast.error('Failed to load package information');
@@ -363,7 +326,7 @@ export const usePackageData = () => {
     } finally {
       setLoading(false);
     }
-  }, [packageId, loadFromAiraloAPI, urlCountryCode, urlCountryName, transformPlanData, fetchImageAndTranslations]);
+  }, [packageId, urlCountryCode, urlCountryName, fetchImageAndTranslations]);
 
   // Load package data on mount
   useEffect(() => {

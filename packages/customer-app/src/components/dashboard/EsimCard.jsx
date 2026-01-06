@@ -11,7 +11,7 @@ import { db } from '@esim/shared/firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
 import Image from 'next/image';
 
-const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode }) => {
+const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, planMetadataLoading }) => {
   const pathname = usePathname();
   const { t, locale, isLoading: i18nLoading } = useI18n();
   const [mounted, setMounted] = useState(false);
@@ -270,45 +270,63 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode }) => {
         </dl>
       </div>
 
-      {/* Usage Progress Bar */}
-      {usage && !usage.text.includes('Unlimited') && (
-        <div className="mb-4">
-          <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-            <div
-              className={`h-full rounded-full transition-all duration-500 ${
-                isExpired ? 'bg-gray-400' :
-                usage.remainingPercentage > 50 ? 'bg-emerald-500' :
-                usage.remainingPercentage > 20 ? 'bg-amber-500' : 'bg-red-500'
-              }`}
-              style={{ width: `${usage.remainingPercentage}%` }}
-            />
-          </div>
-          <div className="flex justify-between mt-1.5 text-xs text-gray-500">
-            <span>{usage.remainingPercentage}% {t('dashboard.remaining', 'remaining')}</span>
-            {isExpired && usageData?.expired_at && (
-              <span className="text-amber-600">
-                {t('dashboard.expiredOn', 'Expired')} {new Date(usageData.expired_at).toLocaleDateString()}
+
+      {/* Features Tags (only if present) - Use Supabase data if available, fallback to Firebase */}
+      {(() => {
+        const hasVoice = planMetadata?.hasVoice || planDetails.voice > 0;
+        const hasSms = planMetadata?.hasSms || planDetails.sms > 0;
+        const voiceMinutes = planMetadata?.voice || planDetails.voice || 0;
+        const smsCount = planMetadata?.sms || planDetails.sms || 0;
+
+        if (!hasVoice && !hasSms) return null;
+
+        return (
+          <div className="flex gap-2 mb-4">
+            {hasVoice && voiceMinutes > 0 && (
+              <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs font-medium px-2 py-1 rounded-md">
+                <Phone className="w-3 h-3" />
+                {voiceMinutes} {t('dashboard.min', 'min')}
+              </span>
+            )}
+            {hasSms && smsCount > 0 && (
+              <span className="inline-flex items-center gap-1 bg-purple-50 text-purple-700 text-xs font-medium px-2 py-1 rounded-md">
+                <MessageSquare className="w-3 h-3" />
+                {smsCount} SMS
               </span>
             )}
           </div>
-        </div>
-      )}
+        );
+      })()}
 
-      {/* Features Tags (only if present) */}
-      {(planDetails.voice > 0 || planDetails.sms > 0) && (
-        <div className="flex gap-2 mb-4">
-          {planDetails.voice > 0 && (
-            <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs font-medium px-2 py-1 rounded-md">
-              <Phone className="w-3 h-3" />
-              {planDetails.voice} {t('dashboard.min', 'min')}
+      {/* Operator Branding - from Supabase */}
+      {planMetadata?.operatorName && (
+        <div className="flex items-center gap-2 mb-4 p-2 bg-gray-50 rounded-lg">
+          {planMetadata.operatorLogo ? (
+            <Image
+              src={planMetadata.operatorLogo}
+              alt={planMetadata.operatorName}
+              width={24}
+              height={24}
+              className="h-6 w-auto object-contain"
+              unoptimized
+            />
+          ) : null}
+          <span className="text-xs text-gray-500">
+            {t('dashboard.poweredBy', 'Powered by')}{' '}
+            <span
+              className="font-medium"
+              style={{
+                background: planMetadata.operatorGradientStart && planMetadata.operatorGradientEnd
+                  ? `linear-gradient(135deg, ${planMetadata.operatorGradientStart}, ${planMetadata.operatorGradientEnd})`
+                  : 'linear-gradient(135deg, #3B82F6, #1D4ED8)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}
+            >
+              {planMetadata.operatorName}
             </span>
-          )}
-          {planDetails.sms > 0 && (
-            <span className="inline-flex items-center gap-1 bg-purple-50 text-purple-700 text-xs font-medium px-2 py-1 rounded-md">
-              <MessageSquare className="w-3 h-3" />
-              {planDetails.sms} SMS
-            </span>
-          )}
+          </span>
         </div>
       )}
 
