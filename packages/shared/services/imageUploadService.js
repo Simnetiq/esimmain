@@ -77,11 +77,10 @@ export const imageUploadService = {
       }
 
       // Generate unique filename
-      // The path is relative to the bucket root, not including the bucket name
+      // Files are stored directly in the bucket root (no subfolders needed)
       const timestamp = Date.now();
       const fileName = `${timestamp}-${fileToUpload.name}`;
-      // Use just the filename if path is the same as bucket name, otherwise use the path
-      const filePath = path === BUCKET_NAME ? fileName : `${path}/${fileName}`;
+      const filePath = fileName;
 
       const supabase = getSupabase();
 

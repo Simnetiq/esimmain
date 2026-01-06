@@ -16,7 +16,8 @@ const CountriesGrid = ({
   showAllOverride = null, // When provided, parent controls the countries list directly
   initialLimit = 16, // Default limit of 16 countries
   isHomePage = false, // If true, "Show More" redirects to plans page instead of expanding
-  onShowMoreClick = null // Custom handler for "Show More" button (used for home page redirect)
+  onShowMoreClick = null, // Custom handler for "Show More" button (used for home page redirect)
+  promotedCountryIds = [] // IDs of promoted countries to show badge
 }) => {
   const pathname = usePathname();
   const { t, locale, isLoading: i18nLoading } = useI18n();
@@ -133,6 +134,7 @@ const CountriesGrid = ({
             <CountryCard
               country={country}
               onClick={() => onCountrySelect(country)}
+              isPromoted={promotedCountryIds.includes(country.id)}
             />
           </div>
         ))}

@@ -9,7 +9,8 @@ import { formatPrice } from '@esim/shared/utils/priceUtils';
 
 const CountryCard = ({
   country,
-  onClick
+  onClick,
+  isPromoted = false
 }) => {
   const pathname = usePathname();
   const { t, locale, isLoading: i18nLoading } = useI18n();
@@ -60,6 +61,16 @@ const CountryCard = ({
     >
       {/* Decorative corner element - same as plan cards */}
       <div className="absolute top-0 right-0 w-16 h-16 bg-tufts-blue/5 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
+
+      {/* Top Choice Badge for promoted countries - positioned opposite to flag */}
+      {isPromoted && (
+        <div className={`absolute top-2 ${isRTL ? 'left-2' : 'right-2'} z-10`}>
+          <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
+        
+            {t('plans.topChoice', 'Most Popular')}
+          </span>
+        </div>
+      )}
 
       {/* Card Content */}
       <div className="p-4 flex flex-col">

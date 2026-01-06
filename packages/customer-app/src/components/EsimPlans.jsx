@@ -161,7 +161,7 @@ const EsimPlans = ({ isHomePage = false }) => {
     const { promotedCountries, isLoading: promotedLoading } = usePromotedCountriesSupabase(
         selectedRegion,
         currentLanguage,
-        8 // Max 8 promoted countries per region
+        16 // Max 16 promoted countries per region
     );
 
     // Hydration fix
@@ -455,6 +455,16 @@ const EsimPlans = ({ isHomePage = false }) => {
 
                         {/* Countries Grid */}
                         <div>
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="text-lg font-bold text-eerie-black">
+                                    {t('plans.countries', 'Countries')}
+                                </h3>
+                                {filteredCountries.length > 0 && (
+                                    <span className="text-sm text-gray-500">
+                                        {filteredCountries.length} {t('plans.available', 'available')}
+                                    </span>
+                                )}
+                            </div>
                             <CountriesGrid
                                 countries={filteredCountries}
                                 isPlansPage={isPlansPage}
@@ -465,6 +475,7 @@ const EsimPlans = ({ isHomePage = false }) => {
                                 initialLimit={countryLimit}
                                 isHomePage={isHomePage}
                                 onShowMoreClick={isHomePage ? handleShowMoreCountries : null}
+                                promotedCountryIds={promotedCountries?.map(c => c.id) || []}
                             />
                         </div>
                     </>
