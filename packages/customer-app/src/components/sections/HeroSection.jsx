@@ -1,23 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
-import dynamic from 'next/dynamic';
+import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { PlatformDownloadCTA, ExploreStoreCTA } from '../cta';
 
-// Dynamically import SplitText to avoid SSR issues with GSAP
-const SplitText = dynamic(() => import('../animations/SplitText'), {
-  ssr: false,
-  loading: () => null
-});
-
-// Dynamically import Antigravity to avoid SSR issues with Three.js
-const Antigravity = dynamic(() => import('../animations/Antigravity'), {
-  ssr: false,
-  loading: () => null
-});
+// Lazy load Antigravity - only after LCP to not block initial render
+const Antigravity = lazy(() => import('../animations/Antigravity'));
 
 // Inline SVG icons to avoid lucide-react bundle overhead
 const GlobeIcon = ({ className }) => (
@@ -44,101 +34,55 @@ const gridPatternStyle = {
   backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
 };
 
-// Skeleton component for consistent loading state
-function HeroSkeleton({ direction, detectedLanguage }) {
+// Deferred background component - loads after LCP
+function DeferredBackground({ isMobile }) {
+  const [shouldRender, setShouldRender] = useState(false);
+
+  useEffect(() => {
+    // Defer background animation until after LCP (use requestIdleCallback or setTimeout)
+    const timer = requestIdleCallback
+      ? requestIdleCallback(() => setShouldRender(true), { timeout: 2000 })
+      : setTimeout(() => setShouldRender(true), 100);
+
+    return () => {
+      if (requestIdleCallback && typeof timer === 'number') {
+        cancelIdleCallback(timer);
+      } else {
+        clearTimeout(timer);
+      }
+    };
+  }, []);
+
+  if (!shouldRender) return null;
+
   return (
-    <div
-      className="hero-section relative min-h-screen flex flex-col bg-white"
-      dir={direction}
-      lang={detectedLanguage}
-    >
-      {/* Antigravity Background Animation - interactive with mouse */}
-      <div className="absolute inset-0 opacity-20" aria-hidden="true">
-        <Antigravity
-          color="#4975D4"
-          autoAnimate={true}
-          count={150}
-          magnetRadius={6}
-          ringRadius={7}
-          waveSpeed={0.3}
-          waveAmplitude={1.2}
-          particleSize={1.0}
-          lerpSpeed={0.04}
-          particleVariance={1}
-        />
-      </div>
-
-      <div className="relative flex-1 flex flex-col pointer-events-none">
-        {/* Grid Pattern - Left Side */}
-        <div className="hidden xl:block absolute left-0 top-0 bottom-0 w-32" style={gridPatternStyle} />
-        {/* Grid Pattern - Right Side */}
-        <div className="hidden xl:block absolute right-0 top-0 bottom-0 w-32" style={gridPatternStyle} />
-
-        <div className="relative flex-1 flex flex-col items-center justify-center px-4 py-20 lg:py-24">
-          <div className="mx-auto w-full max-w-7xl">
-            <div className="px-4 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl text-center">
-
-              {/* Headline skeleton */}
-              <div className="space-y-4 mb-8">
-                <div className="h-10 sm:h-14 lg:h-16 w-full max-w-3xl bg-gray-200/60 rounded-xl mx-auto animate-pulse" />
-                <div className="h-10 sm:h-14 lg:h-16 w-3/4 max-w-2xl bg-gray-200/50 rounded-xl mx-auto animate-pulse" />
-              </div>
-
-              {/* Subtitle skeleton */}
-              <div className="space-y-3 mb-12 max-w-2xl mx-auto">
-                <div className="h-5 w-full bg-gray-100/70 rounded-lg animate-pulse" />
-                <div className="h-5 w-5/6 bg-gray-100/60 rounded-lg mx-auto animate-pulse" />
-                <div className="h-5 w-2/3 bg-gray-100/50 rounded-lg mx-auto animate-pulse" />
-              </div>
-
-              {/* CTA buttons skeleton */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-                <div className="h-14 w-56 bg-tufts-blue/20 rounded-full animate-pulse" />
-                <div className="h-14 w-56 bg-gray-800/15 rounded-full animate-pulse" />
-                <div className="h-14 w-56 bg-white/80 rounded-full border border-gray-200 animate-pulse" />
-              </div>
-
-              {/* Trust indicators skeleton */}
-              <div className="flex flex-wrap items-center gap-6 sm:gap-10 justify-center">
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 bg-gray-200/60 rounded animate-pulse" />
-                  <div className="h-4 w-28 bg-gray-100/70 rounded animate-pulse" />
-                </div>
-                <div className="hidden sm:block w-px h-4 bg-gray-200" />
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 bg-gray-200/60 rounded animate-pulse" />
-                  <div className="h-4 w-32 bg-gray-100/70 rounded animate-pulse" />
-                </div>
-                <div className="hidden sm:block w-px h-4 bg-gray-200" />
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 bg-gray-200/60 rounded animate-pulse" />
-                  <div className="h-4 w-28 bg-gray-100/70 rounded animate-pulse" />
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <Suspense fallback={null}>
+      <Antigravity
+        color="#4975D4"
+        autoAnimate={true}
+        count={isMobile ? 100 : 200}
+        magnetRadius={isMobile ? 5 : 7}
+        ringRadius={isMobile ? 6 : 8}
+        waveSpeed={0.3}
+        waveAmplitude={1.2}
+        particleSize={isMobile ? 0.7 : 1.0}
+        lerpSpeed={0.04}
+        particleVariance={1}
+      />
+    </Suspense>
   );
 }
 
 export default function HeroSection() {
   const pathname = usePathname();
-  const { locale, t, translations, isLoading: i18nLoading } = useI18n();
+  const { locale, t, isLoading: i18nLoading } = useI18n();
   const [mounted, setMounted] = useState(false);
-  const [titleReady, setTitleReady] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(true); // Default to mobile (no animations) for SSR
 
   useEffect(() => {
     setMounted(true);
-    // Detect mobile devices - disable animation on smaller screens
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    // No need to listen for resize - initial check is enough for animation decision
+    // Detect mobile devices - used to reduce animation complexity
+    setIsMobile(window.innerWidth < 768);
   }, []);
 
   const detectedLanguage = useMemo(() => {
@@ -164,9 +108,6 @@ export default function HeroSection() {
     ? 'inline italic text-tufts-blue font-ibm-plex-sans'
     : 'inline italic text-tufts-blue';
 
-  // Check if translations are loaded
-  const hasTranslations = translations && Object.keys(translations).length > 0 && translations.hero;
-
   // Trust indicators data - using inline SVG icons
   const trustIndicators = [
     { Icon: GlobeIcon, label: t('hero.countries', '200+ Countries'), key: 'countries' },
@@ -175,32 +116,17 @@ export default function HeroSection() {
   ];
 
   // Get translated text - headline split into parts for styling
+  // Use fallbacks immediately for LCP - don't wait for translations
   const headlinePart1 = t('hero.headlinePart1', 'The easiest way to get mobile data');
   const headlineHighlight = t('hero.headlineHighlight', 'anywhere');
   const headlinePart2 = t('hero.headlinePart2', 'in the world');
   const subtitleText = t('hero.subtitle', 'Activate your eSIM in minutes and stay connected in 200+ destinations worldwide.');
 
-  // Show skeleton until translations are loaded
-  if (!hasTranslations) {
-    return <HeroSkeleton direction={direction} detectedLanguage={detectedLanguage} />;
-  }
-
   return (
     <div className="hero-section relative min-h-screen flex flex-col bg-white" dir={direction} lang={detectedLanguage}>
-      {/* Antigravity Background Animation - interactive with mouse */}
+      {/* Antigravity Background Animation - deferred to after LCP */}
       <div className="absolute inset-0 opacity-20" aria-hidden="true">
-        <Antigravity
-          color="#4975D4"
-          autoAnimate={true}
-          count={isMobile ? 150 : 250}
-          magnetRadius={isMobile ? 6 : 8}
-          ringRadius={isMobile ? 7 : 9}
-          waveSpeed={0.3}
-          waveAmplitude={1.2}
-          particleSize={isMobile ? 0.8 : 1.2}
-          lerpSpeed={0.04}
-          particleVariance={1}
-        />
+        {mounted && <DeferredBackground isMobile={isMobile} />}
       </div>
 
       <div className="relative flex-1 flex flex-col pointer-events-none">
@@ -215,75 +141,20 @@ export default function HeroSection() {
           <div className="mx-auto w-full max-w-7xl">
             <div className="px-4 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl text-center">
 
-              {/* Headline with highlighted word */}
+              {/* Headline - ALWAYS render immediately for LCP, animations are purely decorative */}
               <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-8xl font-bold tracking-tight text-eerie-black mb-6 lg:mb-8 leading-[1.1]">
-                {isMobile ? (
-                  // Mobile: No animation, instant render
-                  <>
-                    <span className="inline">{headlinePart1}</span>{' '}
-                    <span className={highlightClassName}>{headlineHighlight}</span>{' '}
-                    <span className="inline">{headlinePart2}</span>
-                  </>
-                ) : (
-                  // Desktop: Animated with SplitText
-                  <>
-                    <SplitText
-                      text={headlinePart1}
-                      tag="span"
-                      className="inline"
-                      splitType="words"
-                      delay={80}
-                      duration={0.8}
-                      ease="power3.out"
-                      from={{ opacity: 0, y: 50 }}
-                      to={{ opacity: 1, y: 0 }}
-                      threshold={0.1}
-                      rootMargin="0px"
-                      onReady={() => setTitleReady(true)}
-                    />{' '}
-                    <SplitText
-                      text={headlineHighlight}
-                      tag="span"
-                      className={highlightClassName}
-                      splitType="chars"
-                      delay={40}
-                      duration={0.6}
-                      ease="power3.out"
-                      from={{ opacity: 0, y: 30, rotateX: -90 }}
-                      to={{ opacity: 1, y: 0, rotateX: 0 }}
-                      threshold={0.1}
-                      rootMargin="0px"
-                    />{' '}
-                    <SplitText
-                      text={headlinePart2}
-                      tag="span"
-                      className="inline"
-                      splitType="words"
-                      delay={80}
-                      duration={0.8}
-                      ease="power3.out"
-                      from={{ opacity: 0, y: 50 }}
-                      to={{ opacity: 1, y: 0 }}
-                      threshold={0.1}
-                      rootMargin="0px"
-                    />
-                  </>
-                )}
+                <span className="inline">{headlinePart1}</span>{' '}
+                <span className={highlightClassName}>{headlineHighlight}</span>{' '}
+                <span className="inline">{headlinePart2}</span>
               </h1>
 
-              {/* Subtitle */}
-              <p
-                className="text-base sm:text-lg lg:text-xl xl:text-2xl text-gray-600 mb-10 lg:mb-12 max-w-2xl lg:max-w-3xl mx-auto leading-relaxed"
-                style={{ visibility: (isMobile || titleReady) ? 'visible' : 'hidden' }}
-              >
+              {/* Subtitle - render immediately */}
+              <p className="text-base sm:text-lg lg:text-xl xl:text-2xl text-gray-600 mb-10 lg:mb-12 max-w-2xl lg:max-w-3xl mx-auto leading-relaxed">
                 {subtitleText}
               </p>
 
-              {/* CTA Buttons - Explore Store is now PRIMARY */}
-              <div
-                className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 lg:mb-12 pointer-events-auto"
-                style={{ visibility: (isMobile || titleReady) ? 'visible' : 'hidden' }}
-              >
+              {/* CTA Buttons - Explore Store is PRIMARY */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 lg:mb-12 pointer-events-auto">
                 {/* Primary CTA - Explore eSIM Store */}
                 <ExploreStoreCTA
                   variant="dark"
@@ -300,10 +171,7 @@ export default function HeroSection() {
               </div>
 
               {/* Trust Indicators */}
-              <div
-                className="flex flex-wrap items-center gap-6 sm:gap-10 text-sm text-gray-500 justify-center"
-                style={{ visibility: (isMobile || titleReady) ? 'visible' : 'hidden' }}
-              >
+              <div className="flex flex-wrap items-center gap-6 sm:gap-10 text-sm text-gray-500 justify-center">
                 {trustIndicators.map(({ Icon, label, key }, index) => (
                   <React.Fragment key={key}>
                     <div className="flex items-center gap-2 text-eerie-black">
