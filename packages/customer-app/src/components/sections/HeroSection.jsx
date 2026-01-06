@@ -40,13 +40,19 @@ function DeferredBackground({ isMobile }) {
 
   useEffect(() => {
     // Defer background animation until after LCP (use requestIdleCallback or setTimeout)
-    const timer = requestIdleCallback
-      ? requestIdleCallback(() => setShouldRender(true), { timeout: 2000 })
-      : setTimeout(() => setShouldRender(true), 100);
+    // Note: requestIdleCallback is not supported on Safari/iOS, so we need to check window
+    const hasIdleCallback = typeof window !== 'undefined' && 'requestIdleCallback' in window;
+
+    let timer;
+    if (hasIdleCallback) {
+      timer = window.requestIdleCallback(() => setShouldRender(true), { timeout: 2000 });
+    } else {
+      timer = setTimeout(() => setShouldRender(true), 100);
+    }
 
     return () => {
-      if (requestIdleCallback && typeof timer === 'number') {
-        cancelIdleCallback(timer);
+      if (hasIdleCallback && typeof timer === 'number') {
+        window.cancelIdleCallback(timer);
       } else {
         clearTimeout(timer);
       }
