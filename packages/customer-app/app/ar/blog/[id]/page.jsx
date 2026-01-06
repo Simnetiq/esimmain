@@ -1,5 +1,5 @@
 import BlogPost from '../../../../src/components/BlogPost';
-import blogServiceSeparate from '@esim/shared/services/blogServiceSeparate';
+import blogServiceSupabase from '@esim/shared/services/blogServiceSupabase';
 
 // Supported languages for hreflang
 const SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'ar', 'he', 'ru'];
@@ -30,7 +30,7 @@ function generateBlogAlternates(baseUrl, slug, currentLang, availableLanguages =
 export async function generateMetadata({ params }) {
   try {
     // Fetch the actual blog post data for Arabic
-    const post = await blogServiceSeparate.getPostBySlug(params.id, 'ar');
+    const post = await blogServiceSupabase.getPostBySlug(params.id, 'ar');
     
     if (!post) {
       return {

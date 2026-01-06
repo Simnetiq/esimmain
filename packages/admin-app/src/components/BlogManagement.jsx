@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { useAdmin } from '@esim/shared/contexts/AdminContext';
-import blogServiceSeparate from '@esim/shared/services/blogServiceSeparate';
+import blogServiceSupabase from '@esim/shared/services/blogServiceSupabase';
 import imageUploadService from '@esim/shared/services/imageUploadService';
 import { 
   Plus, 
@@ -142,10 +142,10 @@ const BlogManagement = () => {
       console.log('Loading posts...', { searchTerm, filterCategory });
       
       if (searchTerm) {
-        postsData = await blogServiceSeparate.searchPosts(searchTerm);
+        postsData = await blogServiceSupabase.searchPosts(searchTerm);
         console.log('Search results:', postsData);
       } else {
-        const result = await blogServiceSeparate.getAllPosts(50);
+        const result = await blogServiceSupabase.getAllPosts(50);
         postsData = result.posts;
         console.log('All posts loaded:', postsData.length, 'posts');
       }
@@ -170,7 +170,7 @@ const BlogManagement = () => {
 
   const loadCategories = async () => {
     try {
-      const cats = await blogServiceSeparate.getCategories();
+      const cats = await blogServiceSupabase.getCategories();
       setCategories(cats);
     } catch (error) {
       console.error('Error loading categories:', error);
@@ -184,7 +184,7 @@ const BlogManagement = () => {
     }
 
     try {
-      const isAvailable = await blogServiceSeparate.isSlugAvailable(slug, excludeId);
+      const isAvailable = await blogServiceSupabase.isSlugAvailable(slug, excludeId);
       return isAvailable;
     } catch (error) {
       console.error('Error checking slug availability:', error);
@@ -293,7 +293,7 @@ const BlogManagement = () => {
   const handleEditPost = async (post) => {
     try {
       // Fetch full post data with all translations
-      const fullPost = await blogServiceSeparate.getPostById(post.id);
+      const fullPost = await blogServiceSupabase.getPostById(post.id);
       
       if (!fullPost) {
         toast.error('Failed to load post data');
@@ -349,20 +349,20 @@ const BlogManagement = () => {
         featuredImage: formData.featuredImage,
         status: formData.status,
         seoKeywords: formData.seoKeywords,
-        translations: formData.translations,
-        authorId: currentUser?.uid
+        translations: formData.translations
+        // Note: authorId removed - Firebase UIDs are not compatible with Supabase UUID
       };
 
       console.log('Saving post with data:', postData);
 
       if (showCreateModal) {
         console.log('Creating new post...');
-        const postId = await blogServiceSeparate.createPost(postData);
+        const postId = await blogServiceSupabase.createPost(postData);
         console.log('Post created with ID:', postId);
         toast.success('Blog post created successfully!');
       } else {
         console.log('Updating existing post:', selectedPost.id);
-        await blogServiceSeparate.updatePost(selectedPost.id, postData);
+        await blogServiceSupabase.updatePost(selectedPost.id, postData);
         toast.success('Blog post updated successfully!');
       }
       
@@ -383,7 +383,7 @@ const BlogManagement = () => {
   const handleDeletePost = async () => {
     try {
       setLoading(true);
-      await blogServiceSeparate.deletePost(postToDelete.id);
+      await blogServiceSupabase.deletePost(postToDelete.id);
       toast.success('Blog post deleted successfully!');
       setShowDeleteModal(false);
       setPostToDelete(null);
@@ -400,7 +400,7 @@ const BlogManagement = () => {
   const handleTranslateToAllLanguages = async (post) => {
     try {
       // Fetch full post data with all translations
-      const fullPost = await blogServiceSeparate.getPostById(post.id);
+      const fullPost = await blogServiceSupabase.getPostById(post.id);
       
       if (!fullPost) {
         toast.error('Failed to load post data');
@@ -479,7 +479,7 @@ const BlogManagement = () => {
           };
 
           // Save updated post
-          await blogServiceSeparate.updatePost(post.id, {
+          await blogServiceSupabase.updatePost(post.id, {
             translations: updatedTranslations
           });
 

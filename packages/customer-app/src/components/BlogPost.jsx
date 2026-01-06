@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { marked } from 'marked';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
-import blogServiceSeparate from '@esim/shared/services/blogServiceSeparate';
+import blogServiceSupabase from '@esim/shared/services/blogServiceSupabase';
 import { detectLanguageFromPath, getLocalizedBlogListUrl, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { formatBlogDate } from '@esim/shared/utils/blogUtils';
 import BlogCategoryTag from './BlogCategoryTag';
@@ -134,11 +134,11 @@ const BlogPost = ({ slug }) => {
           return;
         }
 
-        const postData = await blogServiceSeparate.getPostBySlug(slug, detectedLanguage);
+        const postData = await blogServiceSupabase.getPostBySlug(slug, detectedLanguage);
         
         if (postData) {
           setPost(postData);
-          await blogServiceSeparate.incrementViews(postData.id);
+          await blogServiceSupabase.incrementViews(postData.id);
           const source = detectTrafficSource();
           trackBlogPostView(postData, source);
         } else {

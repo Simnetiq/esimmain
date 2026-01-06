@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
-import blogServiceSeparate from '@esim/shared/services/blogServiceSeparate';
+import blogServiceSupabase from '@esim/shared/services/blogServiceSupabase';
 import { detectLanguageFromPath, getLocalizedBlogUrl, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { formatBlogDate } from '@esim/shared/utils/blogUtils';
 
@@ -230,7 +230,7 @@ const Blog = () => {
   const loadBlogPosts = useCallback(async () => {
     try {
       setLoading(true);
-      const result = await blogServiceSeparate.getPublishedPosts(50, null, detectedLanguage);
+      const result = await blogServiceSupabase.getPublishedPosts(50, 0, detectedLanguage);
       setBlogPosts(result.posts);
       
       // Track view after loading (non-blocking)
@@ -247,7 +247,7 @@ const Blog = () => {
   // Load categories
   const loadCategories = useCallback(async () => {
     try {
-      const cats = await blogServiceSeparate.getCategories();
+      const cats = await blogServiceSupabase.getCategories();
       setCategories(cats);
     } catch {
       // silently fail

@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import BlogPost from '../../../src/components/BlogPost'
 import Loading from '../../../src/components/Loading'
-import blogServiceSeparate from '@esim/shared/services/blogServiceSeparate'
+import blogServiceSupabase from '@esim/shared/services/blogServiceSupabase'
 
 // Supported languages for hreflang
 const SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'ar', 'he', 'ru'];
@@ -33,7 +33,7 @@ function generateBlogAlternates(baseUrl, slug, availableLanguages = []) {
 export async function generateMetadata({ params }) {
   try {
     // Fetch the actual blog post data
-    const post = await blogServiceSeparate.getPostBySlug(params.id);
+    const post = await blogServiceSupabase.getPostBySlug(params.id);
     
     if (!post) {
       return {

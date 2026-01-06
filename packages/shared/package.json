@@ -17,6 +17,7 @@
     "./services/blacklistService": "./services/blacklistService.js",
     "./services/blogService": "./services/blogService.js",
     "./services/blogServiceSeparate": "./services/blogServiceSeparate.js",
+    "./services/blogServiceSupabase": "./services/blogServiceSupabase.js",
     "./services/coinbasePaymentService": "./services/coinbasePaymentService.js",
     "./services/configService": "./services/configService.js",
     "./services/contactService": "./services/contactService.js",

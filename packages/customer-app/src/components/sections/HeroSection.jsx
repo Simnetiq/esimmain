@@ -112,9 +112,16 @@ export default function HeroSection() {
   const { locale, t, translations, isLoading: i18nLoading } = useI18n();
   const [mounted, setMounted] = useState(false);
   const [titleReady, setTitleReady] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    // Detect mobile devices - disable animation on smaller screens
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    // No need to listen for resize - initial check is enough for animation decision
   }, []);
 
   const detectedLanguage = useMemo(() => {
@@ -185,52 +192,64 @@ export default function HeroSection() {
 
               {/* Headline with highlighted word */}
               <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-8xl font-bold tracking-tight text-eerie-black mb-6 lg:mb-8 leading-[1.1]">
-                <SplitText
-                  text={headlinePart1}
-                  tag="span"
-                  className="inline"
-                  splitType="words"
-                  delay={80}
-                  duration={0.8}
-                  ease="power3.out"
-                  from={{ opacity: 0, y: 50 }}
-                  to={{ opacity: 1, y: 0 }}
-                  threshold={0.1}
-                  rootMargin="0px"
-                  onReady={() => setTitleReady(true)}
-                />{' '}
-                <SplitText
-                  text={headlineHighlight}
-                  tag="span"
-                  className="inline italic text-tufts-blue"
-                  splitType="chars"
-                  delay={40}
-                  duration={0.6}
-                  ease="power3.out"
-                  from={{ opacity: 0, y: 30, rotateX: -90 }}
-                  to={{ opacity: 1, y: 0, rotateX: 0 }}
-                  threshold={0.1}
-                  rootMargin="0px"
-                />{' '}
-                <SplitText
-                  text={headlinePart2}
-                  tag="span"
-                  className="inline"
-                  splitType="words"
-                  delay={80}
-                  duration={0.8}
-                  ease="power3.out"
-                  from={{ opacity: 0, y: 50 }}
-                  to={{ opacity: 1, y: 0 }}
-                  threshold={0.1}
-                  rootMargin="0px"
-                />
+                {isMobile ? (
+                  // Mobile: No animation, instant render
+                  <>
+                    <span className="inline">{headlinePart1}</span>{' '}
+                    <span className="inline italic text-tufts-blue">{headlineHighlight}</span>{' '}
+                    <span className="inline">{headlinePart2}</span>
+                  </>
+                ) : (
+                  // Desktop: Animated with SplitText
+                  <>
+                    <SplitText
+                      text={headlinePart1}
+                      tag="span"
+                      className="inline"
+                      splitType="words"
+                      delay={80}
+                      duration={0.8}
+                      ease="power3.out"
+                      from={{ opacity: 0, y: 50 }}
+                      to={{ opacity: 1, y: 0 }}
+                      threshold={0.1}
+                      rootMargin="0px"
+                      onReady={() => setTitleReady(true)}
+                    />{' '}
+                    <SplitText
+                      text={headlineHighlight}
+                      tag="span"
+                      className="inline italic text-tufts-blue"
+                      splitType="chars"
+                      delay={40}
+                      duration={0.6}
+                      ease="power3.out"
+                      from={{ opacity: 0, y: 30, rotateX: -90 }}
+                      to={{ opacity: 1, y: 0, rotateX: 0 }}
+                      threshold={0.1}
+                      rootMargin="0px"
+                    />{' '}
+                    <SplitText
+                      text={headlinePart2}
+                      tag="span"
+                      className="inline"
+                      splitType="words"
+                      delay={80}
+                      duration={0.8}
+                      ease="power3.out"
+                      from={{ opacity: 0, y: 50 }}
+                      to={{ opacity: 1, y: 0 }}
+                      threshold={0.1}
+                      rootMargin="0px"
+                    />
+                  </>
+                )}
               </h1>
 
               {/* Subtitle */}
               <p
                 className="text-base sm:text-lg lg:text-xl xl:text-2xl text-gray-600 mb-10 lg:mb-12 max-w-2xl lg:max-w-3xl mx-auto leading-relaxed"
-                style={{ visibility: titleReady ? 'visible' : 'hidden' }}
+                style={{ visibility: (isMobile || titleReady) ? 'visible' : 'hidden' }}
               >
                 {subtitleText}
               </p>
@@ -238,7 +257,7 @@ export default function HeroSection() {
               {/* CTA Buttons - Explore Store is now PRIMARY */}
               <div
                 className={`flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 lg:mb-12 ${isRTL ? 'sm:flex-row-reverse' : ''}`}
-                style={{ visibility: titleReady ? 'visible' : 'hidden' }}
+                style={{ visibility: (isMobile || titleReady) ? 'visible' : 'hidden' }}
               >
                 {/* Primary CTA - Explore eSIM Store */}
                 <ExploreStoreCTA
@@ -259,7 +278,7 @@ export default function HeroSection() {
               {/* Trust Indicators */}
               <div
                 className="flex flex-wrap items-center gap-6 sm:gap-10 text-sm text-gray-500 justify-center"
-                style={{ visibility: titleReady ? 'visible' : 'hidden' }}
+                style={{ visibility: (isMobile || titleReady) ? 'visible' : 'hidden' }}
               >
                 {trustIndicators.map(({ Icon, label, key }, index) => (
                   <React.Fragment key={key}>

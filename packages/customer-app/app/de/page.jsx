@@ -43,10 +43,10 @@ export default function GermanPage() {
     <div dir="ltr" lang="de">
       <main className="min-h-screen bg-white">
         <HeroSection onCountrySelect={handleCountrySelect} />
-        <FeaturesSection />
         <div ref={plansRef}>
           <PlansSection selectedCountry={selectedCountryFromHero} />
         </div>
+        <FeaturesSection />
         <ActivationSection />
       </main>
     </div>

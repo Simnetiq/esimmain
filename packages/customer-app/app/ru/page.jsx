@@ -43,10 +43,10 @@ export default function RussianPage() {
     <div dir="ltr" lang="ru">
       <main className="min-h-screen bg-white">
         <HeroSection onCountrySelect={handleCountrySelect} />
-        <FeaturesSection />
         <div ref={plansRef}>
           <PlansSection selectedCountry={selectedCountryFromHero} />
         </div>
+        <FeaturesSection />
         <ActivationSection />
       </main>
     </div>

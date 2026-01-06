@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
-import blogServiceSeparate from '@esim/shared/services/blogServiceSeparate';
+import blogServiceSupabase from '@esim/shared/services/blogServiceSupabase';
 import { detectLanguageFromPath, getLocalizedBlogUrl, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { formatBlogDate } from '@esim/shared/utils/blogUtils';
 
@@ -122,7 +122,7 @@ export default function TravelBlogsSection() {
     try {
       setLoading(true);
       // Fetch all posts and filter by Travel category
-      const result = await blogServiceSeparate.getPublishedPosts(20, null, detectedLanguage);
+      const result = await blogServiceSupabase.getPublishedPosts(20, 0, detectedLanguage);
       const travelPosts = result.posts
         .filter(post => post.category === 'Travel')
         .slice(0, 3); // Get only top 3

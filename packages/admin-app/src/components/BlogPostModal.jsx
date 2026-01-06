@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { generateSlug } from '@esim/shared/services/blogServiceSeparate';
+import { generateSlug } from '@esim/shared/services/blogServiceSupabase';
 import Image from 'next/image';
 import { X, Languages } from 'lucide-react';
 import toast from 'react-hot-toast';
