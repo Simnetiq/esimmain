@@ -4,298 +4,265 @@
 export const metadata = {
   en: {
     title: {
-      default: 'Simnetiq | Global eSIM for Seamless Travel Connectivity',
+      default: 'eSIM for Travel — Simnetiq | Mobile Data Without Roaming',
       template: '%s | Simnetiq'
     },
-    description: 'Stay connected worldwide with Simnetiq. Instant eSIM activation for iPhone & Android in 200+ countries. Premium coverage, transparent pricing, 24/7 support. The smarter way to travel.',
+    description: 'Forget expensive roaming. Simnetiq eSIM: internet in 200+ countries, instant activation, plans from $3. Perfect for travelers and digital nomads.',
     keywords: [
-      // High-volume primary keywords (74k-246k searches)
-      'esim',
-      'e sim',
-      'esim card',
-      'esim iphone',
-      'global esim',
-      'travel esim',
-      
-      // Brand alternatives (keep for SEO discovery)
-      'airalo esim',
-      'airalo alternative',
-      'holafly esim',
-      'nomad esim',
-      'best esim',
-      
-      // Travel-specific (1.9k-5.4k searches)
-      'esim for international travel',
-      'best esim for international travel',
-      'travel esim',
+      // Primary keywords
+      'buy esim online',
       'esim for travel',
-      'international esim',
-      'global esim',
-      
-      // Device-specific (1.3k-18k searches)
+      'travel esim instant activation',
+      'best esim digital nomads',
+      'esim no roaming fees',
+      'international data plan esim',
+
+      // Geo-specific keywords
+      'esim europe travel',
+      'esim usa tourist',
+      'esim japan unlimited',
+      'esim thailand tourist',
+      'esim turkey vacation',
+
+      // Blog content keywords
+      'airalo vs holafly',
+      'how to setup esim iphone',
+      'esim vs physical sim travel',
+      'avoid roaming charges abroad',
+
+      // Device-specific
       'esim iphone',
-      'esim for iphone',
-      'esim iphone 17',
-      'esim iphone 16',
-      'esim iphone 15',
-      'esim iphone 14',
-      'esim iphone 13',
-      'esim iphone 12',
-      'esim iphone 11',
       'esim android',
       'esim samsung',
-      'esim samsung galaxy',
-      'esim pixel',
-      
-      // Feature-based (1k-8k searches)
+
+      // Feature-based
       'prepaid esim',
       'instant esim',
-      'electronic sim card',
       'virtual sim card',
       'digital sim card',
-      'esim service',
-      
-      // Location-specific (720-4.4k searches)
-      'esim eu',
-      'eu esim',
+
+      // Location-specific
       'esim europe',
       'esim usa',
       'esim asia',
-      'esim africa',
-      'esim oceania',
-      'esim south america',
-      'esim north america',
-      'esim caribbean',
-      'esim mexico',
-      'esim brazil',
-      
-      // Problem-solving
-      'no physical sim',
-      'instant esim activation',
-      'esim phone',
-      'international data plans',
-      'avoid roaming fees',
-      'esim no roaming',
-      
-      // Long-tail keywords
-      'best travel esim',
-      'esim compatible iphone',
-      'esim international travel',
-      'worldwide mobile data'
+      'global esim'
     ],
     openGraph: {
-      title: 'Simnetiq | Global eSIM — Stay Connected Anywhere',
-      description: 'Instant eSIM activation in 200+ countries. Premium global coverage for iPhone & Android. The smarter way to stay connected while traveling.',
+      title: 'eSIM for Travel — Simnetiq | Mobile Data Without Roaming',
+      description: 'Forget expensive roaming. Simnetiq eSIM: internet in 200+ countries, instant activation, plans from $3. Perfect for travelers and digital nomads.',
     }
   },
   
   es: {
     title: {
-      default: 'Simnetiq | eSIM Global para Viajes sin Límites',
+      default: 'eSIM para Viajar — Simnetiq | Datos Móviles sin Roaming',
       template: '%s | Simnetiq'
     },
-    description: 'Mantente conectado en todo el mundo con Simnetiq. Activación instantánea de eSIM para iPhone y Android en 200+ países. Cobertura premium, precios transparentes, soporte 24/7.',
+    description: 'Olvídate del roaming caro. Simnetiq eSIM: internet en 200+ países, activación instantánea, planes desde $3. Perfecto para viajeros y nómadas digitales.',
     keywords: [
-      'esim',
-      'e sim',
-      'tarjeta esim',
-      'esim iphone',
-      'esim para iphone',
-      'airalo esim',
-      'holafly esim',
-      'mejor esim',
+      // Primary keywords
+      'comprar esim online',
       'esim para viajar',
-      'esim viaje internacional',
-      'esim internacional',
-      'esim global',
-      'esim europa',
-      'esim prepago',
-      'tarjeta sim virtual',
-      'tarjeta sim digital',
-      'esim android',
-      'datos internacionales',
-      'sin roaming',
-      'activación instantánea',
-      'internet para viajes'
+      'internet en el extranjero sin roaming',
+      'esim datos ilimitados viaje',
+      'tarjeta sim virtual viajeros',
+      'nómadas digitales internet',
+
+      // Geo-specific keywords
+      'esim europa viaje',
+      'esim estados unidos turista',
+      'esim mexico turista',
+      'esim japon viaje',
+      'esim tailandia ilimitado',
+      'esim argentina brasil',
+
+      // Blog content keywords
+      'como activar esim iphone',
+      'airalo vs holafly cual es mejor',
+      'evitar cargos roaming',
+      'esim o sim fisica que es mejor'
     ],
     openGraph: {
-      title: 'Simnetiq | eSIM Global — Conectado en Cualquier Lugar',
-      description: 'Activación instantánea de eSIM en 200+ países. Cobertura global premium para iPhone y Android. La forma más inteligente de viajar conectado.',
+      title: 'eSIM para Viajar — Simnetiq | Datos Móviles sin Roaming',
+      description: 'Olvídate del roaming caro. Simnetiq eSIM: internet en 200+ países, activación instantánea, planes desde $3. Perfecto para viajeros y nómadas digitales.',
     }
   },
   
   fr: {
     title: {
-      default: 'Simnetiq | eSIM Mondial pour Voyager Connecté',
+      default: 'eSIM Voyage — Simnetiq | Internet Mobile sans Frais de Roaming',
       template: '%s | Simnetiq'
     },
-    description: 'Restez connecté partout avec Simnetiq. Activation instantanée eSIM pour iPhone et Android dans 200+ pays. Couverture premium, tarifs transparents, support 24/7.',
+    description: 'Oubliez le roaming coûteux. eSIM Simnetiq: internet dans 200+ pays, activation instantanée, forfaits dès 3€. Parfait pour voyageurs et nomades digitaux.',
     keywords: [
-      'esim',
-      'e sim',
-      'carte esim',
-      'esim iphone',
-      'esim pour iphone',
-      'airalo esim',
-      'holafly esim',
-      'meilleure esim',
+      // Primary keywords
+      'acheter esim en ligne',
       'esim voyage',
-      'esim voyage international',
-      'esim international',
-      'esim mondial',
-      'esim europe',
-      'esim prépayée',
-      'carte sim virtuelle',
-      'carte sim numérique',
-      'esim android',
-      'données internationales',
-      'sans frais roaming',
-      'activation instantanée',
-      'internet pour voyage'
+      'internet étranger sans roaming',
+      'carte sim virtuelle voyage',
+      'esim données illimitées',
+      'forfait international esim',
+      'nomades digitaux internet',
+
+      // Geo-specific keywords
+      'esim états-unis voyage',
+      'esim japon touriste',
+      'esim thaïlande',
+      'esim maroc tunisie',
+      'esim canada québec',
+      'esim asie du sud-est',
+
+      // Blog content keywords
+      'comment installer esim iphone',
+      'airalo vs holafly avis',
+      'éviter frais roaming voyage',
+      'esim ou carte sim classique'
     ],
     openGraph: {
-      title: 'Simnetiq | eSIM Mondial — Connecté Partout',
-      description: 'Activation instantanée eSIM dans 200+ pays. Couverture mondiale premium pour iPhone et Android. La façon intelligente de voyager connecté.',
+      title: 'eSIM Voyage — Simnetiq | Internet Mobile sans Frais de Roaming',
+      description: 'Oubliez le roaming coûteux. eSIM Simnetiq: internet dans 200+ pays, activation instantanée, forfaits dès 3€. Parfait pour voyageurs et nomades digitaux.',
     }
   },
   
   de: {
     title: {
-      default: 'Simnetiq | Globale eSIM für Nahtloses Reisen',
+      default: 'eSIM für Reisen — Simnetiq | Mobile Daten ohne Roaming',
       template: '%s | Simnetiq'
     },
-    description: 'Bleiben Sie weltweit verbunden mit Simnetiq. Sofortige eSIM-Aktivierung für iPhone & Android in 200+ Ländern. Premium-Abdeckung, transparente Preise, 24/7 Support.',
+    description: 'Schluss mit teurem Roaming. Simnetiq eSIM: Internet in 200+ Ländern, Aktivierung in einer Minute, Tarife ab 3€. Ideal für Reisende und digitale Nomaden.',
     keywords: [
-      'esim',
-      'e sim',
-      'esim karte',
-      'esim iphone',
-      'esim für iphone',
-      'airalo esim',
-      'holafly esim',
-      'beste esim',
-      'reise esim',
-      'esim internationale reisen',
-      'internationale esim',
-      'globale esim',
-      'esim europa',
-      'prepaid esim',
-      'virtuelle sim karte',
-      'digitale sim karte',
-      'esim android',
-      'internationale daten',
-      'ohne roaming',
-      'sofortige aktivierung',
-      'internet für reisen'
+      // Primary keywords
+      'esim kaufen online',
+      'esim für reisen',
+      'reise esim sofort aktivierung',
+      'mobiles internet urlaub ohne roaming',
+      'prepaid esim ausland',
+      'digitale nomaden internet lösung',
+
+      // Geo-specific keywords
+      'esim spanien urlaub',
+      'esim italien touristen',
+      'esim türkei all inclusive',
+      'esim usa roadtrip',
+      'esim thailand backpacking',
+      'esim griechenland inseln',
+
+      // Blog content keywords
+      'esim einrichten iphone anleitung',
+      'roaming kosten vermeiden',
+      'esim vs normale sim karte',
+      'airalo erfahrungen test'
     ],
     openGraph: {
-      title: 'Simnetiq | Globale eSIM — Überall Verbunden',
-      description: 'Sofortige eSIM-Aktivierung in 200+ Ländern. Premium weltweite Abdeckung für iPhone & Android. Die intelligente Art zu reisen.',
+      title: 'eSIM für Reisen — Simnetiq | Mobile Daten ohne Roaming',
+      description: 'Schluss mit teurem Roaming. Simnetiq eSIM: Internet in 200+ Ländern, Aktivierung in einer Minute, Tarife ab 3€. Ideal für Reisende und digitale Nomaden.',
     }
   },
   
   ar: {
     title: {
-      default: 'Simnetiq | eSIM عالمية للسفر بدون انقطاع',
+      default: 'eSIM للسفر — Simnetiq | إنترنت متنقل بدون رسوم التجوال',
       template: '%s | Simnetiq'
     },
-    description: 'ابق متصلاً في جميع أنحاء العالم مع Simnetiq. تفعيل فوري لـ eSIM على آيفون وأندرويد في 200+ دولة. تغطية متميزة، أسعار شفافة، دعم على مدار الساعة.',
+    description: 'انسَ رسوم التجوال الباهظة. Simnetiq eSIM: إنترنت في أكثر من 200 دولة، تفعيل فوري، باقات تبدأ من 3$. مثالي للمسافرين والرحالة الرقميين.',
     keywords: [
-      'esim',
-      'e sim',
-      'بطاقة esim',
-      'esim ايفون',
-      'esim للايفون',
-      'airalo esim',
-      'holafly esim',
-      'أفضل esim',
+      // Primary keywords
+      'شراء esim اونلاين',
       'esim للسفر',
-      'esim سفر دولي',
-      'esim دولي',
-      'esim عالمي',
+      'انترنت بدون تجوال',
+      'شريحة الكترونية للسياحة',
+      'باقة انترنت للسفر',
+      'esim بيانات غير محدودة',
+
+      // Geo-specific keywords
       'esim أوروبا',
-      'esim مسبق الدفع',
-      'بطاقة sim افتراضية',
-      'بطاقة sim رقمية',
-      'esim اندرويد',
-      'بيانات دولية',
-      'بدون تجوال',
-      'تفعيل فوري',
-      'انترنت للسفر'
+      'esim بريطانيا لندن',
+      'esim تركيا اسطنبول',
+      'esim ماليزيا سنغافورة',
+      'esim أمريكا',
+      'esim مصر للسياح',
+
+      // Blog content keywords
+      'طريقة تفعيل esim ايفون',
+      'esim vs شريحة عادية',
+      'تجنب رسوم التجوال',
+      'افضل شريحة للسفر'
     ],
     openGraph: {
-      title: 'Simnetiq | eSIM عالمية — متصل في كل مكان',
-      description: 'تفعيل فوري لـ eSIM في 200+ دولة. تغطية عالمية متميزة لآيفون وأندرويد. الطريقة الذكية للسفر.',
+      title: 'eSIM للسفر — Simnetiq | إنترنت متنقل بدون رسوم التجوال',
+      description: 'انسَ رسوم التجوال الباهظة. Simnetiq eSIM: إنترنت في أكثر من 200 دولة، تفعيل فوري، باقات تبدأ من 3$. مثالي للمسافرين والرحالة الرقميين.',
     }
   },
   
   he: {
     title: {
-      default: 'Simnetiq | eSIM גלובלית לנסיעות ללא הפרעות',
+      default: 'eSIM לטיולים — Simnetiq | אינטרנט סלולרי בלי רומינג',
       template: '%s | Simnetiq'
     },
-    description: 'הישאר מחובר בכל העולם עם Simnetiq. הפעלה מיידית של eSIM לאייפון ואנדרואיד ב-200+ מדינות. כיסוי פרימיום, מחירים שקופים, תמיכה 24/7.',
+    description: 'שכחו מרומינג יקר. Simnetiq eSIM: אינטרנט ב-200+ מדינות, הפעלה תוך דקה, מחירים מ-$3. מושלם למטיילים ונוודים דיגיטליים.',
     keywords: [
-      'esim',
-      'e sim',
-      'כרטיס esim',
-      'esim אייפון',
-      'esim לאייפון',
-      'airalo esim',
-      'holafly esim',
-      'esim הטוב ביותר',
-      'esim לנסיעות',
-      'esim נסיעות בינלאומיות',
-      'esim בינלאומי',
-      'esim גלובלי',
+      // Primary keywords
+      'esim לטיולים',
+      'לקנות esim אונליין',
+      'אינטרנט בחול בלי רומינג',
+      'סים לחול',
+      'חבילת גלישה לחול',
+      'esim ישראל',
+
+      // Geo-specific keywords
       'esim אירופה',
-      'esim בתשלום מראש',
-      'כרטיס sim וירטואלי',
-      'כרטיס sim דיגיטלי',
-      'esim אנדרואיד',
-      'נתונים בינלאומיים',
-      'ללא נדידה',
-      'הפעלה מיידית',
-      'אינטרנט לנסיעות'
+      'esim ארצות הברית',
+      'esim תאילנד',
+      'esim יוון',
+      'esim טורקיה',
+      'esim קפריסין',
+
+      // Blog content keywords
+      'איך להתקין esim באייפון',
+      'esim או סים רגיל',
+      'לחסוך ברומינג',
+      'אינטרנט לנוודים דיגיטליים'
     ],
     openGraph: {
-      title: 'Simnetiq | eSIM גלובלית — מחובר בכל מקום',
-      description: 'הפעלה מיידית של eSIM ב-200+ מדינות. כיסוי עולמי פרימיום לאייפון ואנדרואיד. הדרך החכמה לנסוע מחובר.',
+      title: 'eSIM לטיולים — Simnetiq | אינטרנט סלולרי בלי רומינג',
+      description: 'שכחו מרומינג יקר. Simnetiq eSIM: אינטרנט ב-200+ מדינות, הפעלה תוך דקה, מחירים מ-$3. מושלם למטיילים ונוודים דיגיטליים.',
     }
   },
   
   ru: {
     title: {
-      default: 'Simnetiq | Глобальная eSIM для Путешествий без Границ',
+      default: 'eSIM для путешествий — Simnetiq | Интернет без роуминга',
       template: '%s | Simnetiq'
     },
-    description: 'Оставайтесь на связи по всему миру с Simnetiq. Мгновенная активация eSIM для iPhone и Android в 200+ странах. Премиум-покрытие, прозрачные цены, поддержка 24/7.',
+    description: 'Забудьте о дорогом роуминге. eSIM Simnetiq: интернет в 200+ странах, активация за минуту, тарифы от $3. Идеально для путешественников и удалёнщиков.',
     keywords: [
-      'esim',
-      'e sim',
-      'карта esim',
-      'esim iphone',
-      'esim для iphone',
-      'airalo esim',
-      'holafly esim',
-      'лучшая esim',
+      // Primary keywords
+      'купить esim онлайн',
       'esim для путешествий',
-      'esim международные поездки',
-      'международная esim',
-      'глобальная esim',
-      'esim европа',
-      'предоплаченная esim',
-      'виртуальная sim карта',
-      'цифровая sim карта',
-      'esim android',
-      'международные данные',
-      'без роуминга',
-      'мгновенная активация',
-      'интернет для путешествий'
+      'интернет за границей без роуминга',
+      'мобильный интернет для путешественников',
+      'esim безлимитный интернет',
+      'цифровые кочевники интернет',
+      'туристическая сим карта',
+
+      // Geo-specific keywords
+      'esim Турция для туристов',
+      'esim Таиланд безлимит',
+      'esim ОАЭ Дубай',
+      'esim Грузия интернет',
+      'esim Армения',
+      'esim Европа для россиян',
+      'esim Египет Шарм-эль-Шейх',
+
+      // Blog content keywords
+      'как подключить esim на айфон',
+      'esim или обычная симка что лучше',
+      'как сэкономить на роуминге',
+      'интернет для удалённой работы за границей'
     ],
     openGraph: {
-      title: 'Simnetiq | Глобальная eSIM — На связи везде',
-      description: 'Мгновенная активация eSIM в 200+ странах. Премиум глобальное покрытие для iPhone и Android. Умный способ путешествовать.',
+      title: 'eSIM для путешествий — Simnetiq | Интернет без роуминга',
+      description: 'Забудьте о дорогом роуминге. eSIM Simnetiq: интернет в 200+ странах, активация за минуту, тарифы от $3. Идеально для путешественников и удалёнщиков.',
     }
   }
 };
