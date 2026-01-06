@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import dynamic from 'next/dynamic'
-import { Heebo, IBM_Plex_Sans_Arabic, Rubik, DM_Sans } from 'next/font/google'
+import { Heebo, IBM_Plex_Sans_Arabic, Rubik, DM_Sans, IBM_Plex_Sans } from 'next/font/google'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import Providers from '../src/components/Providers'
 import ConditionalNavbar from '../src/components/ConditionalNavbar'
@@ -61,6 +61,17 @@ const rubik = Rubik({
   variable: '--font-rubik',
   display: 'optional',
   preload: false,
+  fallback: ['system-ui', 'sans-serif'],
+})
+
+// IBM Plex Sans Italic for "anywhere" text in EN/DE hero headlines
+const ibmPlexSans = IBM_Plex_Sans({
+  subsets: ['latin'],
+  weight: ['400'],
+  style: ['italic'],
+  variable: '--font-ibm-plex-sans',
+  display: 'swap',
+  preload: true,
   fallback: ['system-ui', 'sans-serif'],
 })
 
@@ -210,7 +221,7 @@ export default function RootLayout({ children }) {
           }}
         />
       </head>
-      <body suppressHydrationWarning className={`${dmSans.variable} ${heebo.variable} ${ibmPlexArabic.variable} ${rubik.variable}`}>
+      <body suppressHydrationWarning className={`${dmSans.variable} ${heebo.variable} ${ibmPlexArabic.variable} ${rubik.variable} ${ibmPlexSans.variable}`}>
         <Providers>
           <LanguageWrapper>
             <DynamicHtmlLang />

@@ -90,14 +90,12 @@ function DownloadButton({ platform, variant, size, source, className = '' }) {
  * @param {'sm' | 'md' | 'lg'} props.size - Button size
  * @param {string} props.className - Additional CSS classes
  * @param {string} props.source - Analytics source identifier
- * @param {boolean} props.isRTL - Right-to-left layout
  */
 export default function PlatformDownloadCTA({
   variant = 'primary',
   size = 'md',
   className = '',
-  source = 'hero_primary_cta',
-  isRTL = false
+  source = 'hero_primary_cta'
 }) {
   const platform = usePlatform();
   const isMobile = platform === 'ios' || platform === 'android';
@@ -116,8 +114,9 @@ export default function PlatformDownloadCTA({
   }
 
   // On desktop, show both buttons (both use the same variant)
+  // Use flex-row on all screen sizes to keep buttons on same line
   return (
-    <div className={`flex flex-col sm:flex-row items-center gap-3 ${isRTL ? 'sm:flex-row-reverse' : ''} ${className}`}>
+    <div className={`flex flex-row items-center gap-3 ${className}`}>
       <DownloadButton
         platform="ios"
         variant={variant}

@@ -5,11 +5,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Gift, CheckCircle, AlertCircle } from 'lucide-react';
 import { isValidReferralCode, hasUserUsedReferralCode } from '@esim/shared/services/referralService';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
+import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@esim/shared/firebase/config';
 import toast from 'react-hot-toast';
 
 const ReferralBottomSheet = ({ isOpen, onClose }) => {
+  const { t } = useI18n();
   const [referralCode, setReferralCode] = useState('');
   const [isValidating, setIsValidating] = useState(false);
   const [isValid, setIsValid] = useState(false);
@@ -48,14 +50,14 @@ const ReferralBottomSheet = ({ isOpen, onClose }) => {
     try {
       const isValidCode = await isValidReferralCode(code.trim().toUpperCase());
       setIsValid(isValidCode);
-      
+
       if (!isValidCode) {
-        setValidationError('Invalid or expired referral code');
+        setValidationError(t('referral.invalidOrExpired', 'Invalid or expired referral code'));
       }
     } catch (error) {
       console.error('Error validating referral code:', error);
       setIsValid(false);
-      setValidationError('Error validating referral code');
+      setValidationError(t('referral.validatingError', 'Error validating referral code'));
     } finally {
       setIsValidating(false);
     }
@@ -81,12 +83,12 @@ const ReferralBottomSheet = ({ isOpen, onClose }) => {
 
   const handleApply = async () => {
     if (!referralCode.trim()) {
-      toast.error('Please enter a referral code');
+      toast.error(t('referral.pleaseEnterCode', 'Please enter a referral code'));
       return;
     }
 
     if (!isValid) {
-      toast.error('Please enter a valid referral code');
+      toast.error(t('referral.pleaseEnterValidCode', 'Please enter a valid referral code'));
       return;
     }
 
@@ -103,18 +105,18 @@ const ReferralBottomSheet = ({ isOpen, onClose }) => {
           referralCodeUsed: true,
           referredBy: referralCode.trim().toUpperCase()
         });
-        
+
         // Reload user profile to reflect changes
         await loadUserProfile();
-        
-        toast.success('Referral code applied successfully!');
+
+        toast.success(t('referral.appliedSuccessfully', 'Referral code applied successfully!'));
         onClose();
       } else {
-        toast.error(result.error || 'Failed to apply referral code');
+        toast.error(result.error || t('referral.failedToApply', 'Failed to apply referral code'));
       }
     } catch {
-      console.error('Error applying referral code:', error);
-      toast.error('Failed to apply referral code');
+      console.error('Error applying referral code:');
+      toast.error(t('referral.failedToApply', 'Failed to apply referral code'));
     } finally {
       setIsSubmitting(false);
     }
@@ -153,8 +155,8 @@ const ReferralBottomSheet = ({ isOpen, onClose }) => {
                 <div className="bg-tufts-blue/10 p-3 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                   <Gift className="w-8 h-8 text-tufts-blue" />
                 </div>
-                <h2 className="text-xl font-medium tracking-tight text-eerie-black mb-2">Apply Referral Code</h2>
-                <p className="text-cool-black">Enter a referral code to get rewards</p>
+                <h2 className="text-xl font-medium tracking-tight text-eerie-black mb-2">{t('referral.applyReferralCode', 'Apply Referral Code')}</h2>
+                <p className="text-cool-black">{t('referral.enterCodeForRewards', 'Enter a referral code to get rewards')}</p>
               </div>
 
               {/* Content */}
@@ -163,14 +165,14 @@ const ReferralBottomSheet = ({ isOpen, onClose }) => {
                   {/* Referral Code Input */}
                   <div>
                     <label className="block text-sm font-medium text-cool-black mb-2">
-                      Referral Code
+                      {t('referral.referralCode', 'Referral Code')}
                     </label>
                     <div className="relative">
                       <input
                         type="text"
                         value={referralCode}
                         onChange={handleCodeChange}
-                        placeholder="Enter referral code"
+                        placeholder={t('referral.enterReferralCode', 'Enter referral code')}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-tufts-blue focus:border-transparent text-center text-lg font-mono tracking-wider"
                         maxLength={8}
                         disabled={hasUsedReferral}
@@ -197,7 +199,7 @@ const ReferralBottomSheet = ({ isOpen, onClose }) => {
                     )}
                     
                     {isValid && (
-                      <p className="text-green-600 text-sm mt-2">✓ Valid referral code!</p>
+                      <p className="text-green-600 text-sm mt-2">✓ {t('referral.validCode', 'Valid referral code!')}</p>
                     )}
                   </div>
 
@@ -209,15 +211,15 @@ const ReferralBottomSheet = ({ isOpen, onClose }) => {
                         disabled={isSubmitting || isValidating || (referralCode && !isValid)}
                         className="w-full bg-tufts-blue hover:bg-cobalt-blue disabled:opacity-50 disabled:cursor-not-allowed px-6 py-3 rounded-lg text-white font-medium transition-colors"
                       >
-                        {isSubmitting ? 'Applying...' : 'Apply Referral Code'}
+                        {isSubmitting ? t('referral.applying', 'Applying...') : t('referral.apply', 'Apply Referral Code')}
                       </button>
                     )}
-                    
+
                     <button
                       onClick={handleClose}
                       className="w-full bg-gray-100 hover:bg-gray-200 px-6 py-3 rounded-lg text-cool-black font-medium transition-colors"
                     >
-                      Cancel
+                      {t('referral.cancel', 'Cancel')}
                     </button>
                   </div>
                 </div>

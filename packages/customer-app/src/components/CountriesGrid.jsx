@@ -147,7 +147,7 @@ const CountriesGrid = ({
             // Home page: "Show More" redirects to plans page
             <button
               onClick={onShowMoreClick}
-              className="btn-secondary px-8 py-3 font-semibold rounded-lg transition-all duration-300 hover:scale-105 inline-flex items-center gap-2"
+              className="btn-secondary px-8 py-3 font-semibold rounded-full transition-all duration-300 hover:scale-105 inline-flex items-center gap-2"
             >
               {t('plans.showMore', 'Show More')}
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -158,7 +158,7 @@ const CountriesGrid = ({
             // Plans page: "Load More" expands the grid
             <button
               onClick={handleLoadMore}
-              className="btn-secondary px-8 py-3 font-semibold rounded-lg transition-all duration-300 hover:scale-105"
+              className="btn-secondary px-8 py-3 font-semibold rounded-full transition-all duration-300 hover:scale-105"
             >
               {t('plans.loadMore', 'Load More')} ({remainingCount > BATCH_SIZE ? BATCH_SIZE : remainingCount} {t('plans.more', 'more')})
             </button>

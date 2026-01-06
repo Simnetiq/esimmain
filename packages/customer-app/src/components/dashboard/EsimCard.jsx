@@ -7,6 +7,7 @@ import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
 import { mapPackageCountryData, mapPlanDetails } from '@esim/shared/utils/esimFieldMapper';
+import { useCountryNames } from '@esim/shared/hooks/useCountriesSupabase';
 import { db } from '@esim/shared/firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
 import Image from 'next/image';
@@ -16,6 +17,9 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
   const { t, locale, isLoading: i18nLoading } = useI18n();
   const [mounted, setMounted] = useState(false);
   const [countryImage, setCountryImage] = useState(null);
+
+  // Get localized country names from Supabase
+  const { getLocalizedName } = useCountryNames(locale || 'en');
 
   useEffect(() => {
     setMounted(true);
@@ -103,7 +107,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
     }
   }, [locale, pathname, i18nLoading]);
 
-  const direction = mounted ? getLanguageDirection(detectedLanguage) : 'ltr';
+  const direction = getLanguageDirection(detectedLanguage);
   const isRTL = direction === 'rtl';
 
   // Format data usage
@@ -183,7 +187,14 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
   const StatusIcon = statusInfo.icon;
 
   const countryData = mapPackageCountryData(order);
-  const countryName = countryData?.countryName || null;
+  const countryCode = countryData?.countryCode || order.countryCode || order.country_code;
+  const fallbackName = countryData?.countryName || order.country_region || '';
+
+  // Get localized country name from Supabase, fallback to stored name
+  const localizedCountryName = useMemo(() => {
+    if (!countryCode) return fallbackName;
+    return getLocalizedName(countryCode, fallbackName);
+  }, [countryCode, fallbackName, getLocalizedName]);
 
   const usage = usageData ? formatDataUsage(usageData.remaining, usageData.total, usageData.is_unlimited) : null;
 
@@ -193,7 +204,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
   const dataDisplay = planDetails.data || `${planDetails.dataAmountMb || 0} MB`;
   const validityDisplay = planDetails.validity || null;
 
-  const fullName = countryName || order.country_region || '';
+  const fullName = localizedCountryName || fallbackName;
 
   return (
     <div
@@ -201,50 +212,90 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
         isExpired ? 'opacity-75 hover:opacity-100' : ''
       }`}
       onClick={() => onViewQRCode(order)}
-      dir={direction}
       lang={detectedLanguage}
     >
       {/* Header Section */}
-      <div className="flex justify-between pb-4 mb-4 border-b border-gray-100">
-        <div className="flex items-center">
-          {/* Country/Region Image */}
-          <div className="w-12 h-12 bg-gray-100 border border-gray-200 flex items-center justify-center rounded-full me-3 overflow-hidden">
-            {countryImage ? (
-              <Image
-                src={countryImage}
-                alt={fullName}
-                width={48}
-                height={48}
-                className="w-full h-full object-cover"
-                unoptimized
-              />
-            ) : (
-              <Globe className="w-6 h-6 text-gray-500" />
-            )}
-          </div>
-          <div>
-            <h5 className="text-lg font-semibold text-gray-900 leading-tight">
-              {fullName || t('dashboard.unknownRegion', 'Unknown')}
-            </h5>
-            <p className="text-sm text-gray-500 truncate max-w-[180px]">
-              {order.planName || t('dashboard.unknownPlan', 'Unknown Plan')}
-            </p>
-          </div>
-        </div>
-        {/* Status Badge */}
-        <div>
-          <span className={`inline-flex items-center ${statusInfo.bgColor} border ${statusInfo.borderColor} ${statusInfo.textColor} text-xs font-medium px-2 py-1 rounded-lg`}>
-            <StatusIcon className="w-3.5 h-3.5 me-1" />
-            {statusInfo.label}
-          </span>
-        </div>
+      <div className="flex justify-between pb-4 mb-4 border-b border-gray-100" dir={direction}>
+        {/* In RTL: Status badge first (appears on right), then country info (appears on left) */}
+        {isRTL ? (
+          <>
+            {/* Status Badge - renders first, appears on RIGHT in RTL due to justify-between + dir=rtl */}
+            <div>
+              <span className={`inline-flex items-center flex-row-reverse ${statusInfo.bgColor} border ${statusInfo.borderColor} ${statusInfo.textColor} text-xs font-medium px-2 py-1 rounded-lg`}>
+                <StatusIcon className="w-3.5 h-3.5 ms-1" />
+                {statusInfo.label}
+              </span>
+            </div>
+            {/* Country Info - renders second, appears on LEFT in RTL */}
+            {/* In RTL: text first, then image (so image appears on LEFT of text visually) */}
+            <div className="flex items-center gap-3">
+              <div>
+                <h5 className="text-lg font-semibold text-gray-900 leading-tight">
+                  {fullName || t('dashboard.unknownRegion', 'Unknown')}
+                </h5>
+                <p className="text-sm text-gray-500 truncate max-w-[180px]">
+                  {order.planName || t('dashboard.unknownPlan', 'Unknown Plan')}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-gray-100 border border-gray-200 flex items-center justify-center rounded-full overflow-hidden flex-shrink-0">
+                {countryImage ? (
+                  <Image
+                    src={countryImage}
+                    alt={fullName}
+                    width={48}
+                    height={48}
+                    className="w-full h-full object-cover"
+                    unoptimized
+                  />
+                ) : (
+                  <Globe className="w-6 h-6 text-gray-500" />
+                )}
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Country Info - renders first, appears on LEFT in LTR */}
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gray-100 border border-gray-200 flex items-center justify-center rounded-full overflow-hidden flex-shrink-0">
+                {countryImage ? (
+                  <Image
+                    src={countryImage}
+                    alt={fullName}
+                    width={48}
+                    height={48}
+                    className="w-full h-full object-cover"
+                    unoptimized
+                  />
+                ) : (
+                  <Globe className="w-6 h-6 text-gray-500" />
+                )}
+              </div>
+              <div>
+                <h5 className="text-lg font-semibold text-gray-900 leading-tight">
+                  {fullName || t('dashboard.unknownRegion', 'Unknown')}
+                </h5>
+                <p className="text-sm text-gray-500 truncate max-w-[180px]">
+                  {order.planName || t('dashboard.unknownPlan', 'Unknown Plan')}
+                </p>
+              </div>
+            </div>
+            {/* Status Badge - renders second, appears on RIGHT in LTR */}
+            <div>
+              <span className={`inline-flex items-center ${statusInfo.bgColor} border ${statusInfo.borderColor} ${statusInfo.textColor} text-xs font-medium px-2 py-1 rounded-lg`}>
+                <StatusIcon className="w-3.5 h-3.5 me-1" />
+                {statusInfo.label}
+              </span>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-4 mb-4">
         {/* Data Usage */}
-        <dl className="flex flex-col">
-          <dt className="text-gray-500 text-xs font-normal mb-1 flex items-center gap-1">
+        <dl className={`flex flex-col ${isRTL ? 'items-end' : 'items-start'}`}>
+          <dt className={`text-gray-500 text-xs font-normal mb-1 flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
             <Wifi className="w-3.5 h-3.5" />
             {t('dashboard.dataRemaining', 'Data Remaining')}
           </dt>
@@ -259,8 +310,8 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
         </dl>
 
         {/* Validity */}
-        <dl className="flex flex-col items-end">
-          <dt className="text-gray-500 text-xs font-normal mb-1 flex items-center gap-1">
+        <dl className={`flex flex-col ${isRTL ? 'items-start' : 'items-end'}`}>
+          <dt className={`text-gray-500 text-xs font-normal mb-1 flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
             <Clock className="w-3.5 h-3.5" />
             {t('dashboard.validity', 'Validity')}
           </dt>
@@ -281,15 +332,15 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
         if (!hasVoice && !hasSms) return null;
 
         return (
-          <div className="flex gap-2 mb-4"> 
+          <div className={`flex flex-wrap gap-2 mb-4 ${isRTL ? 'justify-end' : 'justify-start'}`}>
             {hasVoice && voiceMinutes > 0 && (
-              <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs font-medium px-2 py-1">
+              <span className={`inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs font-medium px-2 py-1 rounded ${isRTL ? 'flex-row-reverse' : ''}`}>
                 <Phone className="w-3 h-3" />
                 {voiceMinutes} {t('dashboard.min', 'min')}
               </span>
             )}
             {hasSms && smsCount > 0 && (
-              <span className="inline-flex items-center gap-1 bg-purple-50 text-purple-700 text-xs font-medium px-2 py-1">
+              <span className={`inline-flex items-center gap-1 bg-purple-50 text-purple-700 text-xs font-medium px-2 py-1 rounded ${isRTL ? 'flex-row-reverse' : ''}`}>
                 <MessageSquare className="w-3 h-3" />
                 {smsCount} SMS
               </span>
@@ -300,7 +351,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
 
       {/* Operator Branding - from Supabase */}
       {planMetadata?.operatorName && (
-        <div className="flex items-center gap-2 mb-4 p-2 bg-gray-50 rounded-lg">
+        <div className={`flex items-center gap-2 mb-4 p-2 bg-gray-50 rounded-lg ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
           {planMetadata.operatorLogo ? (
             <Image
               src={planMetadata.operatorLogo}
@@ -331,7 +382,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
       )}
 
       {/* Footer */}
-      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+      <div className={`flex items-center justify-between pt-4 border-t border-gray-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
         <div>
           <span className="text-xs text-gray-500">{t('dashboard.price', 'Price')}</span>
           <p className="text-lg font-bold text-gray-900">{formatPrice(order.amount || 0)}</p>
@@ -342,10 +393,10 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
             e.stopPropagation();
             onViewQRCode(order);
           }}
-          className="inline-flex items-center text-tufts-blue bg-transparent border border-transparent hover:bg-gray-50 font-medium rounded-lg text-sm px-3 py-2 transition-colors"
+          className={`inline-flex items-center text-tufts-blue bg-transparent border border-transparent hover:bg-gray-50 font-medium rounded-lg text-sm px-3 py-2 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
         >
           {t('dashboard.viewDetails', 'View Details')}
-          <ArrowRight className="w-4 h-4 ms-1.5 rtl:rotate-180" />
+          <ArrowRight className={`w-4 h-4 ${isRTL ? 'me-1.5 rotate-180' : 'ms-1.5'}`} />
         </button>
       </div>
     </div>

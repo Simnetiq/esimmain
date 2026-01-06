@@ -325,4 +325,44 @@ export const useCountryPlansSupabase = (countryCode) => {
   return { plans, isLoading, error };
 };
 
+/**
+ * Hook to get localized country/region names for dashboard display
+ * Uses Supabase country_translations for localization
+ * @param {string} locale - Current locale (e.g., 'en', 'es', 'de')
+ * @returns {{
+ *   getLocalizedName: (code: string, fallback: string) => string,
+ *   isLoading: boolean
+ * }}
+ */
+export const useCountryNames = (locale = 'en') => {
+  const { countries, isLoading } = useCountriesSupabase(locale);
+
+  /**
+   * Get localized country/region name by ISO code
+   * @param {string} code - Country ISO code (e.g., 'DE', 'US') or region slug
+   * @param {string} fallback - Fallback name if not found
+   * @returns {string} Localized name or fallback
+   */
+  const getLocalizedName = (code, fallback) => {
+    if (!code) return fallback || '';
+
+    const normalizedCode = code.toUpperCase();
+
+    // Find country by code
+    const country = countries.find(c =>
+      c.code?.toUpperCase() === normalizedCode ||
+      c.id?.toUpperCase() === normalizedCode
+    );
+
+    if (country) {
+      // Return localized displayName (already set by transformCountryToViewModel)
+      return country.displayName || country.name || fallback || '';
+    }
+
+    return fallback || code;
+  };
+
+  return { getLocalizedName, isLoading };
+};
+
 export default useCountriesSupabase;

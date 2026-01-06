@@ -437,16 +437,18 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                 {/* User info - only show when logged in */}
                 {currentUser && (
                   <>
-                    <div className="flex flex-col items-center justify-center py-4 px-4">
-                      <div className="w-16 h-16 rounded-full bg-tufts-blue text-white text-xl font-semibold flex items-center justify-center mb-2">
+                    <div className={`flex items-center justify-center gap-4 py-4 px-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                      <div className="w-14 h-14 rounded-full bg-tufts-blue text-white text-lg font-semibold flex items-center justify-center flex-shrink-0">
                         {getUserInitials()}
                       </div>
-                      <p className="text-base font-medium text-eerie-black">
-                        {currentUser.displayName || t('navbar.user', 'User')}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {currentUser.email}
-                      </p>
+                      <div className={isRTL ? 'text-right' : 'text-left'}>
+                        <p className="text-base font-medium text-eerie-black">
+                          {currentUser.displayName || t('navbar.user', 'User')}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {currentUser.email}
+                        </p>
+                      </div>
                     </div>
                     <div className="border-t border-gray-200 my-4 mx-8" />
                   </>

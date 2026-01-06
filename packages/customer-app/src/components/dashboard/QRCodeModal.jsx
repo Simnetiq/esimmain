@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   QrCode, Smartphone, Clock, Wifi, Phone, MessageSquare,
   Copy, Check, ChevronDown, ChevronUp, X, ExternalLink,
@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import LPAQRCodeDisplay from './LPAQRCodeDisplay';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
+import { getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
 import {
   getQrCodeValue,
@@ -14,6 +15,7 @@ import {
   mapPlanDetails,
   mapPackageCountryData
 } from '@esim/shared/utils/esimFieldMapper';
+import { useCountryNames } from '@esim/shared/hooks/useCountriesSupabase';
 import { db } from '@esim/shared/firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
 import Image from 'next/image';
@@ -34,6 +36,26 @@ const QRCodeModal = ({
   const [showInstructions, setShowInstructions] = useState(false);
   const [copiedField, setCopiedField] = useState(null);
   const [countryImage, setCountryImage] = useState(null);
+
+  // Detect language direction
+  const direction = useMemo(() => {
+    return getLanguageDirection(locale || 'en');
+  }, [locale]);
+  const isRTL = direction === 'rtl';
+
+  // Get localized country names from Supabase
+  const { getLocalizedName } = useCountryNames(locale || 'en');
+
+  // Get localized country name for the selected order
+  const localizedCountryName = useMemo(() => {
+    if (!selectedOrder) return '';
+    const countryData = mapPackageCountryData(selectedOrder);
+    const countryCode = countryData?.countryCode || selectedOrder.countryCode || selectedOrder.country_code;
+    const fallbackName = countryData?.countryName || selectedOrder.country_region || '';
+
+    if (!countryCode) return fallbackName;
+    return getLocalizedName(countryCode, fallbackName);
+  }, [selectedOrder, getLocalizedName]);
 
   // Fetch country/region image from Firebase
   useEffect(() => {
@@ -267,19 +289,19 @@ const QRCodeModal = ({
   ];
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" dir={direction}>
       <div className="w-full max-w-lg max-h-[90vh] overflow-hidden bg-white rounded-2xl shadow-2xl">
         {/* Header - Clean Style */}
         <div className="relative bg-gray-900 px-6 py-5">
           {/* Header Content */}
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-4">
+          <div className={`flex items-start justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`flex items-center gap-4 ${isRTL ? 'flex-row-reverse text-right' : ''}`}>
               {/* Country/Region Image or Fallback Icon */}
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden border border-white/20 shadow-sm">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden border border-white/20 shadow-sm flex-shrink-0">
                 {countryImage ? (
                   <Image
                     src={countryImage}
-                    alt={selectedOrder.countryName || selectedOrder.country_region || 'Country'}
+                    alt={localizedCountryName || 'Country'}
                     width={48}
                     height={48}
                     className="w-full h-full object-cover"
@@ -296,7 +318,7 @@ const QRCodeModal = ({
                   {selectedOrder.planName || t('dashboard.esim', 'eSIM')}
                 </h3>
                 <p className="text-sm text-gray-400 mt-0.5">
-                  {selectedOrder.countryName || selectedOrder.countryCode || ''}
+                  {localizedCountryName || ''}
                 </p>
               </div>
             </div>
@@ -307,9 +329,9 @@ const QRCodeModal = ({
               <X className="w-5 h-5 text-gray-400 hover:text-white" />
             </button>
           </div>
-          
+
           {/* Tabs */}
-          <div className="flex gap-1 mt-5 bg-gray-800 rounded-lg p-1">
+          <div className={`flex gap-1 mt-5 bg-gray-800 rounded-lg p-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
             {tabs.map(tab => (
               <button
                 key={tab.id}
@@ -366,7 +388,7 @@ const QRCodeModal = ({
               {/* Quick Info Cards */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-gray-50 rounded-xl p-3">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className={`flex items-center gap-2 mb-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
                     <Wifi className="w-4 h-4 text-tufts-blue" />
                     <span className="text-xs text-gray-500">{t('dashboard.data', 'Data')}</span>
                   </div>
@@ -374,9 +396,9 @@ const QRCodeModal = ({
                     {planDetails.data || `${planDetails.dataAmountMb || 0} MB`}
                   </p>
                 </div>
-                
-                <div className="bg-gray-50 rounded-xl p-3">
-                  <div className="flex items-center gap-2 mb-1">
+
+                <div className={`bg-gray-50 rounded-xl p-3 ${isRTL ? 'text-start' : 'text-end'}`}>
+                  <div className={`flex items-center gap-2 mb-1 ${isRTL ? 'flex-row-reverse justify-start' : 'justify-end'}`}>
                     <Clock className="w-4 h-4 text-emerald-500" />
                     <span className="text-xs text-gray-500">{t('dashboard.validity', 'Validity')}</span>
                   </div>
@@ -417,9 +439,9 @@ const QRCodeModal = ({
                   <button
                     type="button"
                     onClick={() => setShowInstructions(!showInstructions)}
-                    className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                    className={`w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                       <BookOpen className="w-5 h-5 text-gray-500" />
                       <span className="font-medium text-gray-900">{t('dashboard.installationInstructions', 'Installation Guide')}</span>
                     </div>
@@ -447,18 +469,18 @@ const QRCodeModal = ({
               {/* Operator Branding - from Supabase */}
               {planMetadata?.operatorName && (
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                  <div className="flex items-center gap-3">
+                  <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse text-right' : ''}`}>
                     {planMetadata.operatorLogo ? (
                       <Image
                         src={planMetadata.operatorLogo}
                         alt={planMetadata.operatorName}
                         width={48}
                         height={40}
-                        className="h-10 w-auto object-contain rounded-lg"
+                        className="h-10 w-auto object-contain rounded-lg flex-shrink-0"
                         unoptimized
                       />
                     ) : (
-                      <div className="h-10 w-10 flex items-center justify-center bg-gray-200 rounded-lg text-gray-600 font-bold">
+                      <div className="h-10 w-10 flex items-center justify-center bg-gray-200 rounded-lg text-gray-600 font-bold flex-shrink-0">
                         {planMetadata.operatorName.charAt(0).toUpperCase()}
                       </div>
                     )}
@@ -494,7 +516,7 @@ const QRCodeModal = ({
                   {/* Coverage info for regional plans */}
                   {planMetadata.isRegional && planMetadata.coveredCountryCount > 0 && (
                     <div className="mt-3 pt-3 border-t border-gray-200">
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <div className={`flex items-center gap-2 text-sm text-gray-600 ${isRTL ? 'flex-row-reverse' : ''}`}>
                         <Globe className="w-4 h-4" />
                         <span>
                           {planMetadata.coveredCountryCount} {planMetadata.coveredCountryCount === 1
@@ -521,26 +543,26 @@ const QRCodeModal = ({
 
               {/* ICCID */}
               <div className="bg-gray-50 rounded-xl p-4">
-                <div className="flex items-center justify-between mb-1">
+                <div className={`flex items-center justify-between mb-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <span className="text-sm text-gray-500">{t('dashboard.iccid', 'ICCID')}</span>
-                  <button 
+                  <button
                     onClick={() => copyToClipboard(iccid, 'iccid')}
                     className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors"
                   >
                     {copiedField === 'iccid' ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4 text-gray-400" />}
                   </button>
                 </div>
-                <p className="text-sm font-mono font-medium text-gray-900 break-all">
+                <p className={`text-sm font-mono font-medium text-gray-900 break-all ${isRTL ? 'text-right' : 'text-left'}`}>
                   {iccid || '—'}
                 </p>
               </div>
 
               {/* Matching ID */}
               <div className="bg-gray-50 rounded-xl p-4">
-                <div className="flex items-center justify-between mb-1">
+                <div className={`flex items-center justify-between mb-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <span className="text-sm text-gray-500">{t('dashboard.matchingId', 'Matching ID')}</span>
                   {matchingId && (
-                    <button 
+                    <button
                       onClick={() => copyToClipboard(matchingId, 'matchingId')}
                       className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors"
                     >
@@ -548,7 +570,7 @@ const QRCodeModal = ({
                     </button>
                   )}
                 </div>
-                <p className="text-sm font-mono font-medium text-gray-900 break-all">
+                <p className={`text-sm font-mono font-medium text-gray-900 break-all ${isRTL ? 'text-right' : 'text-left'}`}>
                   {matchingId || '—'}
                 </p>
               </div>
@@ -556,16 +578,16 @@ const QRCodeModal = ({
               {/* LPA / Activation Code */}
               {qrCodeString && (
                 <div className="bg-gray-50 rounded-xl p-4">
-                  <div className="flex items-center justify-between mb-1">
+                  <div className={`flex items-center justify-between mb-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
                     <span className="text-sm text-gray-500">{t('dashboard.activationCode', 'Activation Code (LPA)')}</span>
-                    <button 
+                    <button
                       onClick={() => copyToClipboard(qrCodeString, 'lpa2')}
                       className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors"
                     >
                       {copiedField === 'lpa2' ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4 text-gray-400" />}
                     </button>
                   </div>
-                  <p className="text-xs font-mono text-gray-700 break-all bg-white p-2 rounded-lg border border-gray-200">
+                  <p className={`text-xs font-mono text-gray-700 break-all bg-white p-2 rounded-lg border border-gray-200 ${isRTL ? 'text-right' : 'text-left'}`}>
                     {qrCodeString}
                   </p>
                 </div>
@@ -579,21 +601,21 @@ const QRCodeModal = ({
                     {formatDate(selectedOrder.createdAt)}
                   </p>
                 </div>
-                
+
                 <div className="bg-gray-50 rounded-xl p-4">
                   <span className="text-sm text-gray-500">{t('dashboard.price', 'Price')}</span>
                   <p className="text-sm font-medium text-gray-900 mt-1">
                     {formatPrice(selectedOrder.amount || 0)}
                   </p>
                 </div>
-                
+
                 <div className="bg-gray-50 rounded-xl p-4">
                   <span className="text-sm text-gray-500">{t('dashboard.status', 'Status')}</span>
                   <p className="text-sm font-medium text-emerald-600 mt-1 capitalize">
                     {selectedOrder.status || selectedOrder.paymentStatus || '—'}
                   </p>
                 </div>
-                
+
                 <div className="bg-gray-50 rounded-xl p-4">
                   <span className="text-sm text-gray-500">{t('dashboard.orderId', 'Order ID')}</span>
                   <p className="text-xs font-mono text-gray-900 mt-1 truncate">
@@ -608,9 +630,9 @@ const QRCodeModal = ({
                   href={appleInstallUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+                  className={`flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                     <Smartphone className="w-5 h-5 text-gray-500" />
                     <span className="font-medium text-gray-900">{t('dashboard.appleInstall', 'Apple Direct Install')}</span>
                   </div>
@@ -624,9 +646,9 @@ const QRCodeModal = ({
                   href={getGuideUrl()}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+                  className={`flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                     <BookOpen className="w-5 h-5 text-gray-500" />
                     <span className="font-medium text-gray-900">{t('dashboard.viewGuide', 'View Installation Guide')}</span>
                   </div>
@@ -664,10 +686,10 @@ const QRCodeModal = ({
                 <>
                   {/* Status Badge */}
                   {usageData.status && (
-                    <div className={`flex items-center justify-between p-4 rounded-xl border ${getStatusBadge(usageData.status).bg} ${getStatusBadge(usageData.status).border}`}>
-                      <div className="flex items-center gap-3">
-                        {React.createElement(getStatusBadge(usageData.status).icon, { 
-                          className: `w-5 h-5 ${getStatusBadge(usageData.status).text}` 
+                    <div className={`flex items-center justify-between p-4 rounded-xl border ${getStatusBadge(usageData.status).bg} ${getStatusBadge(usageData.status).border} ${isRTL ? 'flex-row-reverse' : ''}`}>
+                      <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        {React.createElement(getStatusBadge(usageData.status).icon, {
+                          className: `w-5 h-5 ${getStatusBadge(usageData.status).text}`
                         })}
                         <div>
                           <p className="text-sm text-gray-500">{t('dashboard.status', 'Status')}</p>
@@ -677,7 +699,7 @@ const QRCodeModal = ({
                         </div>
                       </div>
                       {usageData.expiredAt && (
-                        <div className="text-right">
+                        <div className={isRTL ? 'text-start' : 'text-end'}>
                           <p className="text-sm text-gray-500">{t('dashboard.expires', 'Expires')}</p>
                           <p className="text-sm font-medium text-gray-700">{formatDate(usageData.expiredAt)}</p>
                         </div>
@@ -687,8 +709,8 @@ const QRCodeModal = ({
 
                   {/* Data Usage */}
                   <div className="bg-gray-50 rounded-xl p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-3">
+                    <div className={`flex items-center justify-between mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                      <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                         <div className="w-10 h-10 bg-tufts-blue/10 rounded-xl flex items-center justify-center">
                           <Wifi className="w-5 h-5 text-tufts-blue" />
                         </div>
@@ -702,16 +724,16 @@ const QRCodeModal = ({
                         </span>
                       )}
                     </div>
-                    
+
                     {!usageData.isUnlimited && usageData.total > 0 && (
                       <>
-                        <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-                          <div 
+                        <div className={`h-3 bg-gray-200 rounded-full overflow-hidden ${isRTL ? 'transform scale-x-[-1]' : ''}`}>
+                          <div
                             className="h-full bg-gradient-to-r from-tufts-blue to-blue-500 rounded-full transition-all duration-500"
                             style={{ width: `${100 - usageData.dataPercentage}%` }}
                           />
                         </div>
-                        <div className="flex justify-between mt-2 text-xs text-gray-500">
+                        <div className={`flex justify-between mt-2 text-xs text-gray-500 ${isRTL ? 'flex-row-reverse' : ''}`}>
                           <span>{formatData(usageData.dataUsed)} {t('dashboard.used', 'used')}</span>
                           <span>{usageData.dataPercentage}% {t('dashboard.consumed', 'consumed')}</span>
                         </div>
@@ -722,8 +744,8 @@ const QRCodeModal = ({
                   {/* Voice Usage - Only show if plan has voice */}
                   {usageData.hasVoice && (
                     <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-100">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-3">
+                      <div className={`flex items-center justify-between mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                           <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center">
                             <Phone className="w-5 h-5 text-emerald-600" />
                           </div>
@@ -733,16 +755,16 @@ const QRCodeModal = ({
                           {usageData.remainingVoice} / {usageData.totalVoice} {t('dashboard.min', 'min')}
                         </span>
                       </div>
-                      
+
                       {usageData.totalVoice > 0 && (
                         <>
-                          <div className="h-3 bg-emerald-200 rounded-full overflow-hidden">
-                            <div 
+                          <div className={`h-3 bg-emerald-200 rounded-full overflow-hidden ${isRTL ? 'transform scale-x-[-1]' : ''}`}>
+                            <div
                               className="h-full bg-gradient-to-r from-emerald-500 to-green-500 rounded-full transition-all duration-500"
                               style={{ width: `${100 - usageData.voicePercentage}%` }}
                             />
                           </div>
-                          <div className="flex justify-between mt-2 text-xs text-emerald-700">
+                          <div className={`flex justify-between mt-2 text-xs text-emerald-700 ${isRTL ? 'flex-row-reverse' : ''}`}>
                             <span>{usageData.voiceUsed} {t('dashboard.min', 'min')} {t('dashboard.used', 'used')}</span>
                             <span>{usageData.voicePercentage}% {t('dashboard.consumed', 'consumed')}</span>
                           </div>
@@ -754,8 +776,8 @@ const QRCodeModal = ({
                   {/* SMS Usage - Only show if plan has SMS */}
                   {usageData.hasText && (
                     <div className="bg-purple-50 rounded-xl p-4 border border-purple-100">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-3">
+                      <div className={`flex items-center justify-between mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                           <div className="w-10 h-10 bg-purple-500/10 rounded-xl flex items-center justify-center">
                             <MessageSquare className="w-5 h-5 text-purple-600" />
                           </div>
@@ -765,16 +787,16 @@ const QRCodeModal = ({
                           {usageData.remainingText} / {usageData.totalText} SMS
                         </span>
                       </div>
-                      
+
                       {usageData.totalText > 0 && (
                         <>
-                          <div className="h-3 bg-purple-200 rounded-full overflow-hidden">
-                            <div 
+                          <div className={`h-3 bg-purple-200 rounded-full overflow-hidden ${isRTL ? 'transform scale-x-[-1]' : ''}`}>
+                            <div
                               className="h-full bg-gradient-to-r from-purple-500 to-violet-500 rounded-full transition-all duration-500"
                               style={{ width: `${100 - usageData.textPercentage}%` }}
                             />
                           </div>
-                          <div className="flex justify-between mt-2 text-xs text-purple-700">
+                          <div className={`flex justify-between mt-2 text-xs text-purple-700 ${isRTL ? 'flex-row-reverse' : ''}`}>
                             <span>{usageData.textUsed} SMS {t('dashboard.used', 'used')}</span>
                             <span>{usageData.textPercentage}% {t('dashboard.consumed', 'consumed')}</span>
                           </div>
@@ -799,7 +821,7 @@ const QRCodeModal = ({
 
         {/* Footer */}
         <div className="border-t border-gray-200 p-4 bg-gray-50">
-          <div className="flex gap-3">
+          <div className={`flex gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
             {/* Main Action */}
             {activeTab === 'qrcode' && iccid && (
               <button

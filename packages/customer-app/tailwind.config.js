@@ -26,6 +26,7 @@ module.exports = {
         sans: ['var(--font-dm-sans)', 'var(--font-heebo)', 'var(--font-ibm-plex-arabic)', 'var(--font-rubik)', 'system-ui', 'sans-serif'],
         hebrew: ['var(--font-heebo)', 'var(--font-rubik)', 'system-ui', 'sans-serif'],
         arabic: ['var(--font-ibm-plex-arabic)', 'system-ui', 'sans-serif'],
+        'ibm-plex-sans': ['var(--font-ibm-plex-sans)', 'system-ui', 'sans-serif'],
       },
     },
   },

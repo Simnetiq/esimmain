@@ -13,6 +13,12 @@ const SplitText = dynamic(() => import('../animations/SplitText'), {
   loading: () => null
 });
 
+// Dynamically import Antigravity to avoid SSR issues with Three.js
+const Antigravity = dynamic(() => import('../animations/Antigravity'), {
+  ssr: false,
+  loading: () => null
+});
+
 // Inline SVG icons to avoid lucide-react bundle overhead
 const GlobeIcon = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -42,16 +48,27 @@ const gridPatternStyle = {
 function HeroSkeleton({ direction, detectedLanguage }) {
   return (
     <div
-      className="hero-section relative min-h-screen flex flex-col"
-      style={{ background: 'linear-gradient(to bottom right, rgba(83, 116, 205, 0.15), rgba(240, 249, 255, 0.4), rgba(255, 255, 255, 1))' }}
+      className="hero-section relative min-h-screen flex flex-col bg-white"
       dir={direction}
       lang={detectedLanguage}
     >
-      {/* Gradient Orbs */}
-      <div className="absolute top-0 left-0 w-[600px] h-[600px] rounded-full blur-[100px] -translate-x-1/3 -translate-y-1/3 opacity-60" style={{ backgroundColor: 'rgba(83, 116, 205, 0.2)' }} />
-      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full blur-[80px] translate-x-1/4 translate-y-1/4 opacity-50" style={{ backgroundColor: 'rgba(83, 116, 205, 0.15)' }} />
+      {/* Antigravity Background Animation - interactive with mouse */}
+      <div className="absolute inset-0 opacity-20" aria-hidden="true">
+        <Antigravity
+          color="#4975D4"
+          autoAnimate={true}
+          count={150}
+          magnetRadius={6}
+          ringRadius={7}
+          waveSpeed={0.3}
+          waveAmplitude={1.2}
+          particleSize={1.0}
+          lerpSpeed={0.04}
+          particleVariance={1}
+        />
+      </div>
 
-      <div className="relative flex-1 flex flex-col">
+      <div className="relative flex-1 flex flex-col pointer-events-none">
         {/* Grid Pattern - Left Side */}
         <div className="hidden xl:block absolute left-0 top-0 bottom-0 w-32" style={gridPatternStyle} />
         {/* Grid Pattern - Right Side */}
@@ -140,7 +157,12 @@ export default function HeroSection() {
   }, [locale, pathname, i18nLoading]);
 
   const direction = mounted ? getLanguageDirection(detectedLanguage) : 'ltr';
-  const isRTL = direction === 'rtl';
+
+  // Apply IBM Plex Sans Italic for "anywhere" only in EN and DE
+  const useIbmPlexSansItalic = detectedLanguage === 'en' || detectedLanguage === 'de';
+  const highlightClassName = useIbmPlexSansItalic
+    ? 'inline italic text-tufts-blue font-ibm-plex-sans'
+    : 'inline italic text-tufts-blue';
 
   // Check if translations are loaded
   const hasTranslations = translations && Object.keys(translations).length > 0 && translations.hero;
@@ -164,28 +186,31 @@ export default function HeroSection() {
   }
 
   return (
-    <div className="hero-section relative min-h-screen flex flex-col" dir={direction} lang={detectedLanguage}>
-      {/* Gradient Orbs - Fixed positioning to prevent CLS */}
-      <div
-        className="absolute top-1/4 right-1/4 w-[400px] h-[400px] rounded-full blur-[60px] opacity-50 pointer-events-none"
-        style={{ backgroundColor: 'rgba(83, 116, 205, 0.2)', contain: 'layout paint' }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute w-[500px] h-[500px] bg-white/30 rounded-full blur-[70px] pointer-events-none"
-        style={{ top: 'calc(50% - 250px)', left: 'calc(50% - 250px)', contain: 'layout paint' }}
-        aria-hidden="true"
-      />
+    <div className="hero-section relative min-h-screen flex flex-col bg-white" dir={direction} lang={detectedLanguage}>
+      {/* Antigravity Background Animation - interactive with mouse */}
+      <div className="absolute inset-0 opacity-20" aria-hidden="true">
+        <Antigravity
+          color="#4975D4"
+          autoAnimate={true}
+          count={isMobile ? 150 : 250}
+          magnetRadius={isMobile ? 6 : 8}
+          ringRadius={isMobile ? 7 : 9}
+          waveSpeed={0.3}
+          waveAmplitude={1.2}
+          particleSize={isMobile ? 0.8 : 1.2}
+          lerpSpeed={0.04}
+          particleVariance={1}
+        />
+      </div>
 
-      <div className="relative flex-1 flex flex-col">
-
+      <div className="relative flex-1 flex flex-col pointer-events-none">
         {/* Grid Pattern - Left Side */}
         <div className="hidden xl:block absolute left-0 top-0 bottom-0 w-32" style={gridPatternStyle} />
 
         {/* Grid Pattern - Right Side */}
         <div className="hidden xl:block absolute right-0 top-0 bottom-0 w-32" style={gridPatternStyle} />
 
-        {/* Main Content */}
+        {/* Main Content - pointer-events-none to allow mouse to reach canvas */}
         <div className="relative flex-1 flex flex-col items-center justify-center px-4 py-20 lg:py-24">
           <div className="mx-auto w-full max-w-7xl">
             <div className="px-4 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl text-center">
@@ -196,7 +221,7 @@ export default function HeroSection() {
                   // Mobile: No animation, instant render
                   <>
                     <span className="inline">{headlinePart1}</span>{' '}
-                    <span className="inline italic text-tufts-blue">{headlineHighlight}</span>{' '}
+                    <span className={highlightClassName}>{headlineHighlight}</span>{' '}
                     <span className="inline">{headlinePart2}</span>
                   </>
                 ) : (
@@ -219,7 +244,7 @@ export default function HeroSection() {
                     <SplitText
                       text={headlineHighlight}
                       tag="span"
-                      className="inline italic text-tufts-blue"
+                      className={highlightClassName}
                       splitType="chars"
                       delay={40}
                       duration={0.6}
@@ -256,7 +281,7 @@ export default function HeroSection() {
 
               {/* CTA Buttons - Explore Store is now PRIMARY */}
               <div
-                className={`flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 lg:mb-12 ${isRTL ? 'sm:flex-row-reverse' : ''}`}
+                className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 lg:mb-12 pointer-events-auto"
                 style={{ visibility: (isMobile || titleReady) ? 'visible' : 'hidden' }}
               >
                 {/* Primary CTA - Explore eSIM Store */}
@@ -271,7 +296,6 @@ export default function HeroSection() {
                   variant="secondary"
                   size="md"
                   source="hero_secondary_cta"
-                  isRTL={isRTL}
                 />
               </div>
 

@@ -52,17 +52,17 @@ const AndroidIcon = memo(() => (
 AndroidIcon.displayName = 'AndroidIcon';
 
 // Footer link component
-const FooterLink = memo(({ href, children, external = false, icon: Icon = null }) => {
-  const linkProps = external 
+const FooterLink = memo(({ href, children, external = false, icon: Icon = null, isRTL = false }) => {
+  const linkProps = external
     ? { target: '_blank', rel: 'noopener noreferrer' }
     : {};
-  
+
   const Component = external ? 'a' : Link;
-  
+
   return (
     <Component
       href={href}
-      className="text-gray-500 hover:text-gray-900 transition-colors duration-200 text-sm py-1 flex items-center gap-2"
+      className={`text-gray-500 hover:text-gray-900 transition-colors duration-200 text-sm py-1 flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}
       {...linkProps}
     >
       {Icon && <Icon />}
@@ -73,12 +73,12 @@ const FooterLink = memo(({ href, children, external = false, icon: Icon = null }
 FooterLink.displayName = 'FooterLink';
 
 // Footer column component
-const FooterColumn = memo(({ title, children }) => (
-  <div className="flex flex-col gap-3">
-    <h3 className="text-xs font-semibold text-gray-900 uppercase tracking-wider">
+const FooterColumn = memo(({ title, children, isRTL = false }) => (
+  <div className={`flex flex-col gap-3 ${isRTL ? 'items-end' : 'items-start'}`}>
+    <h3 className={`text-xs font-semibold text-gray-900 uppercase tracking-wider ${isRTL ? 'rtl:tracking-tight' : ''}`}>
       {title}
     </h3>
-    <div className="flex flex-col gap-1">
+    <div className={`flex flex-col gap-1 ${isRTL ? 'items-end' : 'items-start'}`}>
       {children}
     </div>
   </div>
@@ -145,6 +145,8 @@ const Footer = () => {
       links: [
         { name: getText('footer.about', 'About'), path: '/about' },
         { name: getText('footer.blog', 'Blog'), path: '/blog' },
+        { name: getText('footer.simnetiq', 'Simnetiq'), path: '/simnetiq' },
+        { name: getText('footer.dopplerVpn', 'Doppler VPN'), path: '/doppler-vpn' },
       ]
     },
     legal: {
@@ -189,17 +191,17 @@ const Footer = () => {
         <div className="py-12 lg:py-16">
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 lg:gap-12">
             {/* Brand Column with decorative image */}
-            <div className="col-span-2 lg:col-span-2 relative">
+            <div className={`col-span-2 lg:col-span-2 relative flex flex-col ${isRTL ? 'items-end text-right' : 'items-start text-left'}`}>
               <Link href="/" className="inline-block mb-4">
                 <span className="text-2xl font-bold text-gray-900">
                   {getText('footer.brandName', 'Simnetiq')}
                 </span>
-                          </Link>
+              </Link>
               <p className="text-gray-600 text-sm max-w-xs mb-6 leading-relaxed">
                 {getText('footer.tagline', 'Stay connected wherever you travel. Instant eSIM activation for 150+ countries.')}
               </p>
               {/* Social Icons */}
-              <div className={`flex gap-1 `}>
+              <div className="flex gap-1">
                 {socialLinks.map((social, index) => (
                   <SocialLink
                     key={index}
@@ -209,43 +211,42 @@ const Footer = () => {
                   />
                 ))}
               </div>
-
-              
             </div>
 
             {/* Link Columns */}
-            <FooterColumn title={footerSections.product.title}>
+            <FooterColumn title={footerSections.product.title} isRTL={isRTL}>
               {footerSections.product.links.map((link, index) => (
-                <FooterLink 
-                  key={index} 
-                  href={link.path} 
+                <FooterLink
+                  key={index}
+                  href={link.path}
                   external={link.external}
                   icon={link.icon}
+                  isRTL={isRTL}
                 >
                   {link.name}
                 </FooterLink>
               ))}
             </FooterColumn>
 
-            <FooterColumn title={footerSections.support.title}>
+            <FooterColumn title={footerSections.support.title} isRTL={isRTL}>
               {footerSections.support.links.map((link, index) => (
-                <FooterLink key={index} href={link.path}>
+                <FooterLink key={index} href={link.path} isRTL={isRTL}>
                   {link.name}
                 </FooterLink>
               ))}
             </FooterColumn>
 
-            <FooterColumn title={footerSections.company.title}>
+            <FooterColumn title={footerSections.company.title} isRTL={isRTL}>
               {footerSections.company.links.map((link, index) => (
-                <FooterLink key={index} href={link.path}>
+                <FooterLink key={index} href={link.path} isRTL={isRTL}>
                   {link.name}
                 </FooterLink>
               ))}
             </FooterColumn>
 
-            <FooterColumn title={footerSections.legal.title}>
+            <FooterColumn title={footerSections.legal.title} isRTL={isRTL}>
               {footerSections.legal.links.map((link, index) => (
-                <FooterLink key={index} href={link.path}>
+                <FooterLink key={index} href={link.path} isRTL={isRTL}>
                   {link.name}
                 </FooterLink>
               ))}
