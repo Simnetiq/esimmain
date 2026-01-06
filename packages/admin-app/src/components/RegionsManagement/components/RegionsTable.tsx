@@ -53,8 +53,7 @@ const SortableHeader: React.FC<SortableHeaderProps> = ({
   onSort,
   denseMode
 }) => (
-  <th
-    className={`${denseMode ? 'px-2 py-2' : 'px-4 py-3'} text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-blue-50 select-none whitespace-nowrap`}
+  <th className={`${denseMode ? 'px-2 py-2' : 'px-4 py-3'} text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-blue-50 select-none whitespace-nowrap`}
     onClick={() => onSort(column)}
   >
     <div className="flex items-center gap-1">

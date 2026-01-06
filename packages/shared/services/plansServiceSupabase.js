@@ -92,8 +92,21 @@ export const transformPlanToViewModel = (plan, regionalPlanData = null) => {
     // Operator info
     operatorName: plan.operator_name,
     operatorLogo: plan.operator_logo || plan.operator_image_url,
+    operatorStyle: plan.operator_style || 'light',
+    operatorGradientStart: plan.operator_gradient_start,
+    operatorGradientEnd: plan.operator_gradient_end,
     // Fair usage policy (for unlimited plans)
     fairUsagePolicy: plan.fair_usage_policy,
+    // Activation policy
+    activationPolicy: plan.activation_policy || 'first-usage',
+    // APN info
+    apnType: plan.apn_type || 'automatic',
+    apnValue: plan.apn_value,
+    // Provider info
+    provider: plan.provider || 'airalo',
+    // Short info/description
+    shortInfo: plan.short_info,
+    description: plan.short_info || `${plan.data_display || formatDataAmount(plan.data_amount_mb)} for ${plan.validity_days} days`,
     country_slug: plan.country_id,
     // Legacy fields for compatibility with existing components
     package: plan.name,
@@ -104,6 +117,49 @@ export const transformPlanToViewModel = (plan, regionalPlanData = null) => {
     operator_coverages: countryCodes.map(code => ({ country_code: code }))
   };
 };
+
+/**
+ * Fetch a single plan by ID from Supabase
+ * Used by share-package page for pre-checkout display
+ *
+ * SECURITY NOTE: This is for DISPLAY ONLY.
+ * The payment API re-validates all plan data server-side.
+ *
+ * @param {string} planId - The plan ID (e.g., "connect-cambodia-in-5days-unlimited")
+ * @returns {Promise<Object|null>} Plan view model or null if not found
+ */
+export async function fetchPlanById(planId) {
+  if (!planId || !isSupabaseAvailable()) {
+    return null;
+  }
+
+  const supabase = getSupabase();
+
+  // Fetch plan with all fields including operator info
+  const { data, error } = await supabase
+    .from('dataplans')
+    .select('*')
+    .eq('id', planId)
+    .eq('status', 'active')
+    .eq('is_enabled', true)
+    .single();
+
+  if (error) {
+    // Handle "no rows returned" gracefully (PGRST116)
+    if (error.code === 'PGRST116') {
+      console.warn(`[fetchPlanById] Plan not found or disabled: ${planId}`);
+      return null;
+    }
+    console.error('[fetchPlanById] Error:', error);
+    throw error;
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  return transformPlanToViewModel(data);
+}
 
 /**
  * Fetch plans for a specific country
@@ -211,11 +267,14 @@ export async function fetchGlobalPlans() {
  */
 export async function fetchRegionalPlans(regionSlug) {
   if (!regionSlug || !isSupabaseAvailable()) {
+    console.log('[fetchRegionalPlans] No regionSlug or Supabase not available');
     return [];
   }
 
   const supabase = getSupabase();
   const isGlobal = regionSlug === 'global';
+
+  console.log('[fetchRegionalPlans] Fetching plans for region:', regionSlug, 'isGlobal:', isGlobal);
 
   // Fetch plans with regional_plans metadata (contains actual country_count)
   // Join with regional_plans table to get the actual coverage count per plan
@@ -237,32 +296,36 @@ export async function fetchRegionalPlans(regionSlug) {
     .eq('is_enabled', true);
 
   if (isGlobal) {
-    // For global region, fetch plans that have:
-    // - region_id = 'global' (the actual field used for global plans)
-    // - is_regional = true
-    // Global plans have plan_type='regional' but region_id='global'
-    query = query
-      .eq('is_regional', true)
-      .eq('region_id', 'global');
+    // For global region, fetch plans that have region_id = 'global'
+    // Note: is_regional might be stored as string 'true' or boolean true
+    // So we filter by region_id which is more reliable
+    query = query.eq('region_id', 'global');
   } else {
-    // For other regions, fetch regional plans
-    query = query
-      .eq('is_regional', true)
-      .or(`region_id.eq.${regionSlug},country_id.ilike.%${regionSlug}%`);
+    // For other regions, fetch regional plans by region_id
+    query = query.or(`region_id.eq.${regionSlug},country_id.ilike.%${regionSlug}%`);
   }
 
   // Order by price as base ordering (we'll re-sort for featured plans below)
   const { data, error } = await query.order('price', { ascending: true });
 
   if (error) {
-    console.error('Error fetching regional plans:', error);
+    console.error('[fetchRegionalPlans] Error:', error);
     throw error;
   }
 
+  console.log('[fetchRegionalPlans] Raw data count:', data?.length || 0);
+
   // Transform and filter plans
+  // Filter for regional plans (handle both boolean true and string 'true')
   let plans = (data || [])
-    .filter(p => !p.is_topup && p.type !== 'topup')
+    .filter(p => {
+      const isRegional = p.is_regional === true || p.is_regional === 'true';
+      const notTopup = !p.is_topup && p.type !== 'topup';
+      return isRegional && notTopup;
+    })
     .map(plan => transformPlanToViewModel(plan, plan.regional_plans));
+
+  console.log('[fetchRegionalPlans] Transformed plans count:', plans.length);
 
   // Sort plans: featured first (by priority_rank), then non-featured (by price)
   plans.sort((a, b) => {
@@ -283,6 +346,8 @@ export async function fetchRegionalPlans(regionSlug) {
     // Among non-featured plans, sort by price
     return (a.price || 0) - (b.price || 0);
   });
+
+  console.log('[fetchRegionalPlans] Final plans:', plans.slice(0, 4).map(p => ({ id: p.id, name: p.name, isFeatured: p.isFeatured })));
 
   return plans;
 }
@@ -387,6 +452,7 @@ export async function searchPlans(query, options = {}) {
 }
 
 export default {
+  fetchPlanById,
   fetchCountryPlans,
   fetchGlobalPlans,
   fetchRegionalPlans,

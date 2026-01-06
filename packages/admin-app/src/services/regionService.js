@@ -247,3 +247,110 @@ export function getRegionTypeColor(type) {
       return 'bg-gray-100 text-gray-800';
   }
 }
+
+// ============================================
+// PROMOTED COUNTRIES
+// ============================================
+
+/**
+ * Fetch promoted countries for a region
+ * @param {string} regionId - Region ID
+ * @returns {Promise<Array>} Promoted countries
+ */
+export async function fetchPromotedCountries(regionId) {
+  const response = await fetch(`/api/regions/promoted-countries?regionId=${encodeURIComponent(regionId)}`);
+  const result = await response.json();
+
+  if (!result.success) {
+    throw new Error(result.error || 'Failed to fetch promoted countries');
+  }
+
+  return result.data;
+}
+
+/**
+ * Add a country to the promoted list
+ * @param {string} regionId - Region ID
+ * @param {string} countryId - Country ID
+ * @param {number} position - Position (0-7)
+ * @returns {Promise<Object>} Created/updated record
+ */
+export async function addPromotedCountry(regionId, countryId, position = 0) {
+  const response = await fetch('/api/regions/promoted-countries', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ regionId, countryId, position })
+  });
+
+  const result = await response.json();
+
+  if (!result.success) {
+    throw new Error(result.error || 'Failed to add promoted country');
+  }
+
+  return result.data;
+}
+
+/**
+ * Update promoted countries for a region (bulk update with reordering)
+ * @param {string} regionId - Region ID
+ * @param {Array<{countryId: string, position: number}>} countries - Countries with positions
+ * @returns {Promise<Array>} Updated records
+ */
+export async function updatePromotedCountries(regionId, countries) {
+  const response = await fetch('/api/regions/promoted-countries', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ regionId, countries })
+  });
+
+  const result = await response.json();
+
+  if (!result.success) {
+    throw new Error(result.error || 'Failed to update promoted countries');
+  }
+
+  return result.data;
+}
+
+/**
+ * Remove a country from the promoted list
+ * @param {string} regionId - Region ID
+ * @param {string} countryId - Country ID
+ * @returns {Promise<void>}
+ */
+export async function removePromotedCountry(regionId, countryId) {
+  const response = await fetch(
+    `/api/regions/promoted-countries?regionId=${encodeURIComponent(regionId)}&countryId=${encodeURIComponent(countryId)}`,
+    { method: 'DELETE' }
+  );
+
+  const result = await response.json();
+
+  if (!result.success) {
+    throw new Error(result.error || 'Failed to remove promoted country');
+  }
+}
+
+/**
+ * Fetch all countries (for selection)
+ * @param {Object} filters - Optional filters
+ * @returns {Promise<Array>} Countries
+ */
+export async function fetchAllCountries(filters = {}) {
+  const params = new URLSearchParams();
+
+  if (filters.regionId) params.append('regionId', filters.regionId);
+  if (filters.search) params.append('search', filters.search);
+  if (filters.hasPlans) params.append('hasPlans', 'true');
+  params.append('limit', '500');
+
+  const response = await fetch(`/api/plans/countries?${params.toString()}`);
+  const result = await response.json();
+
+  if (!result.success) {
+    throw new Error(result.error || 'Failed to fetch countries');
+  }
+
+  return result.data;
+}

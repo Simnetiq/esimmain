@@ -1,109 +1,246 @@
--- eSIM Service Database Schema for Supabase
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
 
--- Enable UUID extension
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
--- Transactions table
-CREATE TABLE IF NOT EXISTS transactions (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    payment_id VARCHAR(255) UNIQUE NOT NULL,
-    provider VARCHAR(50) NOT NULL, -- 'stripe' or 'paypal'
-    amount DECIMAL(10, 2) NOT NULL,
-    currency VARCHAR(3) DEFAULT 'USD',
-    status VARCHAR(50) NOT NULL, -- 'pending', 'completed', 'failed', 'refunded'
-    metadata JSONB,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    completed_at TIMESTAMP WITH TIME ZONE,
-    failed_at TIMESTAMP WITH TIME ZONE
+CREATE TABLE public.countries (
+  id text NOT NULL,
+  name text NOT NULL,
+  iso_code text,
+  slug text,
+  image_url text,
+  region_id text,
+  is_active boolean DEFAULT true,
+  is_popular boolean DEFAULT false,
+  is_regional boolean DEFAULT false,
+  plan_count integer DEFAULT 0,
+  min_price numeric,
+  synced_at timestamp with time zone DEFAULT now(),
+  airalo_id text,
+  iso_code_3 character,
+  flag_emoji text,
+  continent text,
+  topup_count integer DEFAULT 0,
+  max_data_gb numeric,
+  popularity_rank integer,
+  timezone text,
+  currency_code character,
+  phone_prefix text,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT countries_pkey PRIMARY KEY (id),
+  CONSTRAINT countries_region_id_fkey FOREIGN KEY (region_id) REFERENCES public.regions(id)
 );
-
--- Email logs table
-CREATE TABLE IF NOT EXISTS email_logs (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    to_email VARCHAR(255) NOT NULL,
-    subject VARCHAR(500) NOT NULL,
-    status VARCHAR(50) NOT NULL, -- 'sent', 'failed'
-    message_id VARCHAR(255),
-    error TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+CREATE TABLE public.country_translations (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  country_id text NOT NULL,
+  language_code character varying NOT NULL,
+  name text NOT NULL,
+  description text,
+  travel_tips text,
+  source text NOT NULL CHECK (source = ANY (ARRAY['chatgpt'::text, 'manual'::text, 'imported'::text, 'machine'::text])),
+  source_model text,
+  is_verified boolean DEFAULT false,
+  is_locked boolean DEFAULT false,
+  version integer DEFAULT 1,
+  previous_version_id uuid,
+  translated_at timestamp with time zone DEFAULT now(),
+  verified_at timestamp with time zone,
+  last_updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT country_translations_pkey PRIMARY KEY (id),
+  CONSTRAINT country_translations_country_id_fkey FOREIGN KEY (country_id) REFERENCES public.countries(id)
 );
-
--- OTP logs table (optional, for tracking)
-CREATE TABLE IF NOT EXISTS otp_logs (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    phone_number VARCHAR(20) NOT NULL,
-    purpose VARCHAR(100) DEFAULT 'verification',
-    status VARCHAR(50) NOT NULL, -- 'sent', 'verified', 'failed', 'expired'
-    message_sid VARCHAR(255),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    verified_at TIMESTAMP WITH TIME ZONE
+CREATE TABLE public.dataplans (
+  id text NOT NULL,
+  name text NOT NULL,
+  title text,
+  country_id text,
+  country_name text,
+  country_iso text,
+  region_id text,
+  is_regional boolean DEFAULT false,
+  covered_countries ARRAY DEFAULT '{}'::text[],
+  covered_countries_count integer DEFAULT 0,
+  data_display text,
+  data_amount_mb integer DEFAULT 0,
+  is_unlimited boolean DEFAULT false,
+  validity_days integer NOT NULL,
+  has_voice boolean DEFAULT false,
+  voice_minutes integer DEFAULT 0,
+  has_sms boolean DEFAULT false,
+  sms_count integer DEFAULT 0,
+  price numeric NOT NULL,
+  net_price numeric,
+  currency text DEFAULT 'USD'::text,
+  operator_id text,
+  operator_name text,
+  operator_image_url text,
+  operator_style text,
+  operator_gradient_start text,
+  operator_gradient_end text,
+  activation_policy text,
+  fair_usage_policy text,
+  short_info text,
+  apn_type text,
+  apn_value text,
+  status text DEFAULT 'active'::text,
+  provider text DEFAULT 'airalo'::text,
+  synced_at timestamp with time zone DEFAULT now(),
+  plan_type text DEFAULT 'country'::text CHECK (plan_type = ANY (ARRAY['country'::text, 'regional'::text, 'global'::text])),
+  package_type text DEFAULT 'sim'::text CHECK (package_type = ANY (ARRAY['sim'::text, 'topup'::text])),
+  is_enabled boolean DEFAULT true,
+  airalo_package_id text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT dataplans_pkey PRIMARY KEY (id),
+  CONSTRAINT dataplans_region_id_fkey FOREIGN KEY (region_id) REFERENCES public.regions(id)
 );
-
--- System health logs table
-CREATE TABLE IF NOT EXISTS health_logs (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    service VARCHAR(100) NOT NULL, -- 'api', 'redis', 'supabase', 'docker'
-    status VARCHAR(50) NOT NULL, -- 'healthy', 'degraded', 'down'
-    details JSONB,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+CREATE TABLE public.plan_topups (
+  id text NOT NULL,
+  parent_plan_id text,
+  country_id text,
+  region_id text,
+  name text NOT NULL,
+  data_amount_mb integer NOT NULL,
+  data_display text NOT NULL,
+  is_unlimited boolean DEFAULT false,
+  validity_days integer NOT NULL,
+  price numeric NOT NULL,
+  net_price numeric NOT NULL,
+  currency character DEFAULT 'USD'::bpchar,
+  requires_active_plan boolean DEFAULT true,
+  compatible_plans ARRAY,
+  status text DEFAULT 'active'::text,
+  is_enabled boolean DEFAULT true,
+  synced_at timestamp with time zone,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT plan_topups_pkey PRIMARY KEY (id),
+  CONSTRAINT plan_topups_parent_plan_id_fkey FOREIGN KEY (parent_plan_id) REFERENCES public.dataplans(id),
+  CONSTRAINT plan_topups_country_id_fkey FOREIGN KEY (country_id) REFERENCES public.countries(id),
+  CONSTRAINT plan_topups_region_id_fkey FOREIGN KEY (region_id) REFERENCES public.regions(id)
 );
-
--- API usage logs table
-CREATE TABLE IF NOT EXISTS api_logs (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    endpoint VARCHAR(255) NOT NULL,
-    method VARCHAR(10) NOT NULL,
-    status_code INTEGER,
-    response_time INTEGER, -- in milliseconds
-    ip_address INET,
-    user_agent TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+CREATE TABLE public.plan_translations (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  plan_id text NOT NULL,
+  language_code character varying NOT NULL,
+  name text NOT NULL,
+  title text,
+  short_info text,
+  highlights ARRAY,
+  activation_instructions text,
+  fair_usage_description text,
+  source text NOT NULL CHECK (source = ANY (ARRAY['chatgpt'::text, 'manual'::text, 'imported'::text, 'machine'::text])),
+  source_model text,
+  is_verified boolean DEFAULT false,
+  is_locked boolean DEFAULT false,
+  version integer DEFAULT 1,
+  previous_version_id uuid,
+  translated_at timestamp with time zone DEFAULT now(),
+  verified_at timestamp with time zone,
+  last_updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT plan_translations_pkey PRIMARY KEY (id),
+  CONSTRAINT plan_translations_plan_id_fkey FOREIGN KEY (plan_id) REFERENCES public.dataplans(id)
 );
-
--- Indexes for better performance
-CREATE INDEX IF NOT EXISTS idx_transactions_payment_id ON transactions(payment_id);
-CREATE INDEX IF NOT EXISTS idx_transactions_status ON transactions(status);
-CREATE INDEX IF NOT EXISTS idx_transactions_created_at ON transactions(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_transactions_provider ON transactions(provider);
-
-CREATE INDEX IF NOT EXISTS idx_email_logs_to_email ON email_logs(to_email);
-CREATE INDEX IF NOT EXISTS idx_email_logs_status ON email_logs(status);
-CREATE INDEX IF NOT EXISTS idx_email_logs_created_at ON email_logs(created_at DESC);
-
-CREATE INDEX IF NOT EXISTS idx_otp_logs_phone_number ON otp_logs(phone_number);
-CREATE INDEX IF NOT EXISTS idx_otp_logs_created_at ON otp_logs(created_at DESC);
-
-CREATE INDEX IF NOT EXISTS idx_health_logs_service ON health_logs(service);
-CREATE INDEX IF NOT EXISTS idx_health_logs_created_at ON health_logs(created_at DESC);
-
-CREATE INDEX IF NOT EXISTS idx_api_logs_endpoint ON api_logs(endpoint);
-CREATE INDEX IF NOT EXISTS idx_api_logs_created_at ON api_logs(created_at DESC);
-
--- Function to update updated_at timestamp
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = NOW();
-    RETURN NEW;
-END;
-$$ language 'plpgsql';
-
--- Trigger for transactions table
-CREATE TRIGGER update_transactions_updated_at 
-    BEFORE UPDATE ON transactions 
-    FOR EACH ROW 
-    EXECUTE FUNCTION update_updated_at_column();
-
--- Row Level Security (RLS) - Enable if needed
--- ALTER TABLE transactions ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE email_logs ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE otp_logs ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE health_logs ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE api_logs ENABLE ROW LEVEL SECURITY;
-
--- Create policies as needed
--- Example: Allow service role to do everything
--- CREATE POLICY "Service role can do everything" ON transactions
---     FOR ALL USING (auth.role() = 'service_role');
-
+CREATE TABLE public.region_translations (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  region_id text NOT NULL,
+  language_code character varying NOT NULL,
+  name text NOT NULL,
+  display_name text,
+  description text,
+  source text NOT NULL CHECK (source = ANY (ARRAY['chatgpt'::text, 'manual'::text, 'imported'::text, 'machine'::text])),
+  source_model text,
+  is_verified boolean DEFAULT false,
+  is_locked boolean DEFAULT false,
+  translated_at timestamp with time zone DEFAULT now(),
+  last_updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT region_translations_pkey PRIMARY KEY (id),
+  CONSTRAINT region_translations_region_id_fkey FOREIGN KEY (region_id) REFERENCES public.regions(id)
+);
+CREATE TABLE public.regional_plan_countries (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  regional_plan_id text NOT NULL,
+  country_id text NOT NULL,
+  network_info text,
+  speed_cap text,
+  data_cap_mb integer,
+  display_order integer DEFAULT 0,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT regional_plan_countries_pkey PRIMARY KEY (id),
+  CONSTRAINT regional_plan_countries_regional_plan_id_fkey FOREIGN KEY (regional_plan_id) REFERENCES public.dataplans(id),
+  CONSTRAINT regional_plan_countries_country_id_fkey FOREIGN KEY (country_id) REFERENCES public.countries(id)
+);
+CREATE TABLE public.regional_plan_translations (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  regional_plan_id text NOT NULL,
+  language_code character varying NOT NULL,
+  display_name text NOT NULL,
+  marketing_name text,
+  description text,
+  highlights ARRAY,
+  best_for text,
+  coverage_summary text,
+  source text NOT NULL CHECK (source = ANY (ARRAY['chatgpt'::text, 'manual'::text, 'imported'::text, 'machine'::text])),
+  source_model text,
+  is_verified boolean DEFAULT false,
+  is_locked boolean DEFAULT false,
+  version integer DEFAULT 1,
+  translated_at timestamp with time zone DEFAULT now(),
+  last_updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT regional_plan_translations_pkey PRIMARY KEY (id),
+  CONSTRAINT regional_plan_translations_regional_plan_id_fkey FOREIGN KEY (regional_plan_id) REFERENCES public.regional_plans(id)
+);
+CREATE TABLE public.regional_plans (
+  id text NOT NULL,
+  display_name text,
+  marketing_name text,
+  coverage_type text CHECK (coverage_type = ANY (ARRAY['regional'::text, 'global'::text, 'discover_plus'::text, 'europe_special'::text])),
+  country_count integer DEFAULT 0,
+  continent_count integer DEFAULT 0,
+  is_discover_plus boolean DEFAULT false,
+  is_featured boolean DEFAULT false,
+  priority_rank integer DEFAULT 0,
+  highlights ARRAY,
+  best_for text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT regional_plans_pkey PRIMARY KEY (id),
+  CONSTRAINT regional_plans_id_fkey FOREIGN KEY (id) REFERENCES public.dataplans(id)
+);
+CREATE TABLE public.regions (
+  id text NOT NULL,
+  name text NOT NULL,
+  display_name text,
+  type text DEFAULT 'region'::text,
+  display_order integer DEFAULT 0,
+  country_count integer DEFAULT 0,
+  plan_count integer DEFAULT 0,
+  synced_at timestamp with time zone DEFAULT now(),
+  slug text NOT NULL UNIQUE,
+  image_url text,
+  min_price numeric,
+  is_active boolean DEFAULT true,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT regions_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.translation_jobs (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  entity_type text NOT NULL CHECK (entity_type = ANY (ARRAY['country'::text, 'plan'::text, 'regional_plan'::text, 'region'::text])),
+  entity_id text NOT NULL,
+  target_languages ARRAY NOT NULL,
+  status text DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'processing'::text, 'completed'::text, 'failed'::text, 'partial'::text])),
+  priority integer DEFAULT 5,
+  languages_completed ARRAY DEFAULT '{}'::text[],
+  languages_failed ARRAY DEFAULT '{}'::text[],
+  error_message text,
+  force_overwrite boolean DEFAULT false,
+  source_language character varying DEFAULT 'en'::character varying,
+  created_at timestamp with time zone DEFAULT now(),
+  started_at timestamp with time zone,
+  completed_at timestamp with time zone,
+  triggered_by text,
+  batch_id uuid,
+  CONSTRAINT translation_jobs_pkey PRIMARY KEY (id)
+);

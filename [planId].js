@@ -4,7 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { ArrowLeft, CreditCard, Shield, Zap, Globe, Wifi, Clock, Smartphone, Check, Info, X, Phone, MessageSquare, ChevronRight, Radio } from 'lucide-react-native';
+import { ArrowLeft, CreditCard, Shield, Zap, Globe, Wifi, Clock, Smartphone, Check, Info, X, Phone, MessageSquare, ChevronRight, ChevronDown, Radio, MapPin } from 'lucide-react-native';
 import { Card, Button, ScrollShadow } from 'heroui-native';
 import { GlassView, isLiquidGlassAvailable } from 'expo-glass-effect';
 import Animated from 'react-native-reanimated';
@@ -44,6 +44,7 @@ export default function PlanDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [processingPayment, setProcessingPayment] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showCoverage, setShowCoverage] = useState(false);
 
   useEffect(() => {
     const loadPlanData = async () => {
@@ -221,7 +222,7 @@ export default function PlanDetailScreen() {
   const handleLoginPress = useCallback(() => router.push('/login'), [router]);
 
   // Memoize computed values - must be before early returns
-  const { originalPrice, days, operator, data, formattedData, formattedPrice, voiceMinutes, smsCount, hasVoice, hasSms, operators } = useMemo(() => {
+  const { originalPrice, days, operator, data, formattedData, formattedPrice, voiceMinutes, smsCount, hasVoice, hasSms, operators, coveredCountries } = useMemo(() => {
     if (!plan) {
       return {
         originalPrice: 0,
@@ -235,6 +236,7 @@ export default function PlanDetailScreen() {
         hasVoice: false,
         hasSms: false,
         operators: [],
+        coveredCountries: [],
       };
     }
     const price = getDisplayPrice(plan);
@@ -248,8 +250,17 @@ export default function PlanDetailScreen() {
 
     // Extract operators from operator_coverages if available
     const operatorsList = [];
+    // Extract covered countries from operator_coverages
+    const countriesList = [];
     if (plan.operator_coverages && Array.isArray(plan.operator_coverages)) {
       plan.operator_coverages.forEach(coverage => {
+        // Add country to covered countries list
+        if (coverage.code && coverage.name) {
+          countriesList.push({
+            code: coverage.code,
+            name: coverage.name,
+          });
+        }
         if (coverage.networks && Array.isArray(coverage.networks)) {
           coverage.networks.forEach(network => {
             if (network.name && !operatorsList.some(op => op.name === network.name)) {
@@ -276,6 +287,7 @@ export default function PlanDetailScreen() {
       hasVoice: voice > 0,
       hasSms: sms > 0,
       operators: operatorsList.slice(0, 10), // Limit to first 10 operators for display
+      coveredCountries: countriesList,
     };
   }, [plan]);
 
@@ -738,6 +750,80 @@ export default function PlanDetailScreen() {
             </Card>
           )}
 
+          {/* Covered Countries - Collapsible Dropdown */}
+          {coveredCountries.length > 0 && (
+            <Card style={[
+              styles.operatorsCard,
+              {
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.8)',
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+                borderWidth: 1,
+              },
+              styles.cardShadow
+            ]}>
+              <TouchableOpacity
+                onPress={() => setShowCoverage(!showCoverage)}
+                activeOpacity={0.7}
+                style={styles.coverageHeader}
+              >
+                <View style={styles.coverageHeaderLeft}>
+                  <View style={[styles.operatorIconContainer, { backgroundColor: isDark ? 'rgba(59, 130, 246, 0.15)' : 'rgba(59, 130, 246, 0.1)' }]}>
+                    <MapPin size={18} color={colors.primary} />
+                  </View>
+                  <View>
+                    <Text style={[styles.sectionTitle, { color: colors.text, marginBottom: 0 }]}>
+                      Covered Countries
+                    </Text>
+                    <Text style={[styles.operatorsSubtitle, { color: colors.textSecondary, marginBottom: 0, marginTop: 2 }]}>
+                      {coveredCountries.length} {coveredCountries.length === 1 ? 'country' : 'countries'} included
+                    </Text>
+                  </View>
+                </View>
+                <ChevronDown
+                  size={20}
+                  color={colors.textSecondary}
+                  style={{ transform: [{ rotate: showCoverage ? '180deg' : '0deg' }] }}
+                />
+              </TouchableOpacity>
+
+              {showCoverage && (
+                <View style={styles.operatorsList}>
+                  {coveredCountries.map((countryItem, index) => (
+                    <View
+                      key={`${countryItem.code}-${index}`}
+                      style={[
+                        styles.operatorRow,
+                        {
+                          borderBottomWidth: index < coveredCountries.length - 1 ? 1 : 0,
+                          borderBottomColor: colors.divider,
+                        }
+                      ]}
+                    >
+                      <View style={[styles.operatorIconContainer, { backgroundColor: colors.input }]}>
+                        <FlagIcon countryCode={countryItem.code} size={20} />
+                      </View>
+                      <View style={styles.operatorContent}>
+                        <Text style={[styles.operatorName, { color: colors.text }]}>
+                          {countryItem.name}
+                        </Text>
+                      </View>
+                      <View style={[
+                        styles.networkTypeBadge,
+                        {
+                          backgroundColor: isDark ? 'rgba(156, 163, 175, 0.2)' : 'rgba(156, 163, 175, 0.1)',
+                        }
+                      ]}>
+                        <Text style={[styles.networkTypeText, { color: colors.textSecondary }]}>
+                          {countryItem.code}
+                        </Text>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </Card>
+          )}
+
           {/* Security Features */}
           <Card style={[
             styles.securityCard,
@@ -1190,6 +1276,18 @@ const styles = StyleSheet.create({
   networkTypeText: {
     fontSize: 12,
     fontWeight: '600',
+  },
+  // Coverage dropdown styles
+  coverageHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  coverageHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   securityCard: {
     flexDirection: 'row',

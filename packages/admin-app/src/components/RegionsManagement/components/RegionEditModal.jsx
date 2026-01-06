@@ -1,20 +1,29 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   X,
   Save,
   Globe,
   Image as ImageIcon,
-  Upload,
   Loader2,
   MapPin,
   Languages,
   Settings,
-  Sparkles
+  Sparkles,
+  Star,
+  GripVertical,
+  Plus,
+  Trash2,
+  Search
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { getRegionTypes } from '../../../services/regionService';
+import {
+  getRegionTypes,
+  fetchPromotedCountries,
+  updatePromotedCountries,
+  fetchAllCountries
+} from '../../../services/regionService';
 
 const SUPPORTED_LANGUAGES = [
   { code: 'en', name: 'English' },
@@ -53,6 +62,14 @@ const RegionEditModal = ({
   const [activeTab, setActiveTab] = useState('basic');
   const [errors, setErrors] = useState({});
   const [translating, setTranslating] = useState(false);
+
+  // Promoted countries state
+  const [promotedCountries, setPromotedCountries] = useState([]);
+  const [allCountries, setAllCountries] = useState([]);
+  const [loadingCountries, setLoadingCountries] = useState(false);
+  const [countrySearchTerm, setCountrySearchTerm] = useState('');
+  const [savingPromoted, setSavingPromoted] = useState(false);
+  const [draggedIndex, setDraggedIndex] = useState(null);
 
   // Auto-translate region name using ChatGPT
   const handleAutoTranslate = async () => {
@@ -116,6 +133,32 @@ const RegionEditModal = ({
     }
   };
 
+  // Load promoted countries for this region
+  const loadPromotedCountries = useCallback(async (regionId) => {
+    if (!regionId) return;
+
+    try {
+      setLoadingCountries(true);
+      const data = await fetchPromotedCountries(regionId);
+      setPromotedCountries(data);
+    } catch (error) {
+      console.error('Error loading promoted countries:', error);
+      // Don't show error toast - table might not exist yet
+    } finally {
+      setLoadingCountries(false);
+    }
+  }, []);
+
+  // Load all countries for selection
+  const loadAllCountries = useCallback(async () => {
+    try {
+      const data = await fetchAllCountries({ hasPlans: true });
+      setAllCountries(data);
+    } catch (error) {
+      console.error('Error loading countries:', error);
+    }
+  }, []);
+
   // Initialize form with region data
   useEffect(() => {
     if (region) {
@@ -131,6 +174,9 @@ const RegionEditModal = ({
         translations: region.translations || {},
         metadata: region.metadata || {}
       });
+
+      // Load promoted countries
+      loadPromotedCountries(region.id);
     } else {
       // Reset for new region
       setFormData({
@@ -145,10 +191,18 @@ const RegionEditModal = ({
         translations: {},
         metadata: {}
       });
+      setPromotedCountries([]);
     }
     setErrors({});
     setActiveTab('basic');
-  }, [region, isOpen]);
+  }, [region, isOpen, loadPromotedCountries]);
+
+  // Load all countries when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      loadAllCountries();
+    }
+  }, [isOpen, loadAllCountries]);
 
   // Handle field changes
   const handleChange = (field, value) => {
@@ -219,6 +273,100 @@ const RegionEditModal = ({
     });
   };
 
+  // ============================================
+  // PROMOTED COUNTRIES HANDLERS
+  // ============================================
+
+  // Add country to promoted list
+  const handleAddPromotedCountry = (country) => {
+    if (promotedCountries.length >= 8) {
+      toast.error('Maximum 8 promoted countries per region');
+      return;
+    }
+
+    if (promotedCountries.some(p => p.countryId === country.id)) {
+      toast.error('Country already in promoted list');
+      return;
+    }
+
+    const newPromoted = {
+      countryId: country.id,
+      countryCode: country.iso_code,
+      countryName: country.name,
+      countryImage: country.image_url,
+      planCount: country.plan_count || 0,
+      position: promotedCountries.length
+    };
+
+    setPromotedCountries(prev => [...prev, newPromoted]);
+    setCountrySearchTerm('');
+  };
+
+  // Remove country from promoted list
+  const handleRemovePromotedCountry = (countryId) => {
+    setPromotedCountries(prev =>
+      prev.filter(p => p.countryId !== countryId)
+        .map((p, index) => ({ ...p, position: index }))
+    );
+  };
+
+  // Drag and drop handlers
+  const handleDragStart = (index) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e, index) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
+
+    const newPromoted = [...promotedCountries];
+    const [draggedItem] = newPromoted.splice(draggedIndex, 1);
+    newPromoted.splice(index, 0, draggedItem);
+
+    // Update positions
+    const updated = newPromoted.map((p, i) => ({ ...p, position: i }));
+    setPromotedCountries(updated);
+    setDraggedIndex(index);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+  };
+
+  // Save promoted countries
+  const handleSavePromotedCountries = async () => {
+    if (!region?.id) {
+      toast.error('Please save the region first');
+      return;
+    }
+
+    try {
+      setSavingPromoted(true);
+      const countries = promotedCountries.map((p, index) => ({
+        countryId: p.countryId,
+        position: index
+      }));
+
+      await updatePromotedCountries(region.id, countries);
+      toast.success('Promoted countries updated successfully');
+    } catch (error) {
+      console.error('Error saving promoted countries:', error);
+      toast.error(error.message || 'Failed to save promoted countries');
+    } finally {
+      setSavingPromoted(false);
+    }
+  };
+
+  // Filter countries for search
+  const filteredCountries = allCountries.filter(country => {
+    if (!countrySearchTerm) return false;
+    const term = countrySearchTerm.toLowerCase();
+    return (
+      country.name?.toLowerCase().includes(term) ||
+      country.iso_code?.toLowerCase().includes(term)
+    );
+  }).slice(0, 10);
+
   if (!isOpen) return null;
 
   return (
@@ -261,6 +409,24 @@ const RegionEditModal = ({
               <div className="flex items-center gap-2">
                 <Globe className="w-4 h-4" />
                 Basic Info
+              </div>
+            </button>
+            <button
+              onClick={() => setActiveTab('promoted')}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === 'promoted'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Star className="w-4 h-4" />
+                Promoted Countries
+                {promotedCountries.length > 0 && (
+                  <span className="px-1.5 py-0.5 text-xs bg-amber-100 text-amber-700 rounded-full">
+                    {promotedCountries.length}/8
+                  </span>
+                )}
               </div>
             </button>
             <button
@@ -417,6 +583,165 @@ const RegionEditModal = ({
                   min="0"
                 />
               </div>
+            </div>
+          )}
+
+          {/* Promoted Countries Tab */}
+          {activeTab === 'promoted' && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-medium text-gray-900">Promoted Countries</h4>
+                  <p className="text-sm text-gray-500">
+                    Select up to 8 countries to feature on the Hero page for this region.
+                    Drag to reorder.
+                  </p>
+                </div>
+                {isEditing && promotedCountries.length > 0 && (
+                  <button
+                    onClick={handleSavePromotedCountries}
+                    disabled={savingPromoted}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm"
+                  >
+                    {savingPromoted ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4" />
+                        Save Order
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+
+              {/* Search to add countries */}
+              <div className="relative">
+                <div className="flex items-center gap-2">
+                  <Search className="w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    value={countrySearchTerm}
+                    onChange={(e) => setCountrySearchTerm(e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Search countries to add..."
+                    disabled={promotedCountries.length >= 8}
+                  />
+                </div>
+
+                {/* Search Results Dropdown */}
+                {filteredCountries.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {filteredCountries.map(country => (
+                      <button
+                        key={country.id}
+                        onClick={() => handleAddPromotedCountry(country)}
+                        disabled={promotedCountries.some(p => p.countryId === country.id)}
+                        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {country.image_url ? (
+                          <img
+                            src={country.image_url}
+                            alt={country.name}
+                            className="w-8 h-6 object-cover rounded border border-gray-200"
+                          />
+                        ) : (
+                          <div className="w-8 h-6 bg-gray-100 rounded flex items-center justify-center">
+                            <MapPin className="w-4 h-4 text-gray-400" />
+                          </div>
+                        )}
+                        <div className="flex-1 text-left">
+                          <div className="font-medium text-gray-900">{country.name}</div>
+                          <div className="text-xs text-gray-500">
+                            {country.iso_code} • {country.plan_count || 0} plans
+                          </div>
+                        </div>
+                        <Plus className="w-4 h-4 text-blue-600" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Promoted Countries List */}
+              {loadingCountries ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+                  <span className="ml-2 text-gray-500">Loading...</span>
+                </div>
+              ) : promotedCountries.length === 0 ? (
+                <div className="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                  <Star className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                  <p className="text-gray-500">No promoted countries yet</p>
+                  <p className="text-sm text-gray-400">Search and add countries above</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {promotedCountries.map((country, index) => (
+                    <div
+                      key={country.countryId}
+                      draggable
+                      onDragStart={() => handleDragStart(index)}
+                      onDragOver={(e) => handleDragOver(e, index)}
+                      onDragEnd={handleDragEnd}
+                      className={`flex items-center gap-3 p-3 bg-white border rounded-lg cursor-move transition-all ${
+                        draggedIndex === index ? 'opacity-50 border-blue-300' : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      {/* Drag Handle */}
+                      <GripVertical className="w-4 h-4 text-gray-400 flex-shrink-0" />
+
+                      {/* Position Badge */}
+                      <div className="w-6 h-6 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">
+                        {index + 1}
+                      </div>
+
+                      {/* Country Image */}
+                      {country.countryImage ? (
+                        <img
+                          src={country.countryImage}
+                          alt={country.countryName}
+                          className="w-10 h-7 object-cover rounded border border-gray-200 flex-shrink-0"
+                        />
+                      ) : (
+                        <div className="w-10 h-7 bg-gray-100 rounded flex items-center justify-center flex-shrink-0">
+                          <MapPin className="w-4 h-4 text-gray-400" />
+                        </div>
+                      )}
+
+                      {/* Country Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-gray-900 truncate">
+                          {country.countryName}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {country.countryCode} • {country.planCount || 0} plans
+                        </div>
+                      </div>
+
+                      {/* Remove Button */}
+                      <button
+                        onClick={() => handleRemovePromotedCountry(country.countryId)}
+                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors flex-shrink-0"
+                        title="Remove from promoted"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {!isEditing && (
+                <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                  <p className="text-sm text-amber-800">
+                    <strong>Note:</strong> Save the region first to enable promoted countries management.
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
