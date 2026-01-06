@@ -62,11 +62,10 @@ const CountryCard = ({
       {/* Decorative corner element - same as plan cards */}
       <div className={`absolute top-0 w-16 h-16 bg-tufts-blue/5 transition-transform group-hover:scale-110 ${isRTL ? 'left-0 rounded-br-full -ml-8 -mt-8' : 'right-0 rounded-bl-full -mr-8 -mt-8'}`} />
 
-      {/* Top Choice Badge for promoted countries - positioned opposite to flag */}
+      {/* Top Choice Badge for promoted countries - hidden on mobile, positioned opposite to flag */}
       {isPromoted && (
-        <div className={`absolute top-2 ${isRTL ? 'left-2' : 'right-2'} z-10`}>
+        <div className={`hidden sm:block absolute top-2 ${isRTL ? 'left-2' : 'right-2'} z-10`}>
           <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
-        
             {t('plans.topChoice', 'Most Popular')}
           </span>
         </div>
@@ -90,9 +89,9 @@ const CountryCard = ({
                       : t('plans.noPlansAvailable', 'No plans')
                     }
                   </p>
-                  {/* SMS & Voice indicators */}
+                  {/* SMS & Voice indicators - hidden on mobile */}
                   {(hasPlansWithSms || hasPlansWithVoice) && (
-                    <div className="flex items-center gap-1 flex-row-reverse">
+                    <div className="hidden sm:flex items-center gap-1 flex-row-reverse">
                       {hasPlansWithVoice && (
                         <span className="text-teal-600" title={t('plan.callsAvailable', 'Plans with calls available')}>
                           <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -164,9 +163,9 @@ const CountryCard = ({
                       : t('plans.noPlansAvailable', 'No plans')
                     }
                   </p>
-                  {/* SMS & Voice indicators */}
+                  {/* SMS & Voice indicators - hidden on mobile */}
                   {(hasPlansWithSms || hasPlansWithVoice) && (
-                    <div className="flex items-center gap-1">
+                    <div className="hidden sm:flex items-center gap-1">
                       {hasPlansWithVoice && (
                         <span className="text-teal-600" title={t('plan.callsAvailable', 'Plans with calls available')}>
                           <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
