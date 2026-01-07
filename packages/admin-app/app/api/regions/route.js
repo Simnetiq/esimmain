@@ -392,7 +392,7 @@ export async function PUT(request) {
     });
 
     const body = await request.json();
-    const { id, ...updateData } = body;
+    const { id, translations, ...updateData } = body;
 
     if (!id) {
       return NextResponse.json({
@@ -401,10 +401,8 @@ export async function PUT(request) {
       }, { status: 400 });
     }
 
-    // Remove fields that shouldn't be updated directly
-    // Note: translations is stored in region_translations table, not in regions
+    // Remove fields that shouldn't be updated directly in regions table
     delete updateData.created_at;
-    delete updateData.translations;
     delete updateData.countries;
     delete updateData.top_tariffs;
     delete updateData.tariff_count;
@@ -423,6 +421,66 @@ export async function PUT(request) {
         success: false,
         error: error.message
       }, { status: 500 });
+    }
+
+    // Save translations to region_translations table if provided
+    if (translations && typeof translations === 'object') {
+      const translationErrors = [];
+
+      for (const [langCode, langData] of Object.entries(translations)) {
+        // Skip if no name provided
+        if (!langData || (!langData.name && !langData.display_name)) continue;
+
+        const translationRecord = {
+          region_id: id,
+          language_code: langCode,
+          name: langData.name || '',
+          display_name: langData.display_name || langData.name || '',
+          source: langData.source || 'manual',
+          last_updated_at: new Date().toISOString()
+        };
+
+        // Check if translation already exists
+        const { data: existing } = await supabase
+          .from('region_translations')
+          .select('id')
+          .eq('region_id', id)
+          .eq('language_code', langCode)
+          .single();
+
+        if (existing) {
+          // Update existing translation
+          const { error: updateError } = await supabase
+            .from('region_translations')
+            .update({
+              name: translationRecord.name,
+              display_name: translationRecord.display_name,
+              source: translationRecord.source,
+              last_updated_at: translationRecord.last_updated_at
+            })
+            .eq('id', existing.id);
+
+          if (updateError) {
+            console.error(`Error updating translation for ${langCode}:`, updateError);
+            translationErrors.push({ lang: langCode, error: updateError.message });
+          }
+        } else {
+          // Insert new translation
+          translationRecord.translated_at = new Date().toISOString();
+          const { error: insertError } = await supabase
+            .from('region_translations')
+            .insert(translationRecord);
+
+          if (insertError) {
+            console.error(`Error inserting translation for ${langCode}:`, insertError);
+            translationErrors.push({ lang: langCode, error: insertError.message });
+          }
+        }
+      }
+
+      if (translationErrors.length > 0) {
+        console.warn('Some translations failed to save:', translationErrors);
+      }
     }
 
     return NextResponse.json({

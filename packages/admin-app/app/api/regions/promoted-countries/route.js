@@ -107,11 +107,11 @@ export async function POST(request) {
       );
     }
 
-    // Validate position (0-7)
+    // Validate position (0-15)
     const pos = parseInt(position) || 0;
-    if (pos < 0 || pos > 7) {
+    if (pos < 0 || pos > 15) {
       return NextResponse.json(
-        { success: false, error: 'Position must be between 0 and 7' },
+        { success: false, error: 'Position must be between 0 and 15' },
         { status: 400 }
       );
     }
@@ -145,9 +145,9 @@ export async function POST(request) {
       .eq('region_id', regionId)
       .eq('is_active', true);
 
-    if (count >= 8) {
+    if (count >= 16) {
       return NextResponse.json(
-        { success: false, error: 'Maximum 8 promoted countries per region' },
+        { success: false, error: 'Maximum 16 promoted countries per region' },
         { status: 400 }
       );
     }
@@ -202,10 +202,10 @@ export async function PUT(request) {
       );
     }
 
-    // Validate max 8 countries
-    if (countries.length > 8) {
+    // Validate max 16 countries
+    if (countries.length > 16) {
       return NextResponse.json(
-        { success: false, error: 'Maximum 8 promoted countries per region' },
+        { success: false, error: 'Maximum 16 promoted countries per region' },
         { status: 400 }
       );
     }

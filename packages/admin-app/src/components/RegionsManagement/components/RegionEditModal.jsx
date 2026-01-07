@@ -279,8 +279,8 @@ const RegionEditModal = ({
 
   // Add country to promoted list
   const handleAddPromotedCountry = (country) => {
-    if (promotedCountries.length >= 8) {
-      toast.error('Maximum 8 promoted countries per region');
+    if (promotedCountries.length >= 16) {
+      toast.error('Maximum 16 promoted countries per region');
       return;
     }
 
@@ -424,7 +424,7 @@ const RegionEditModal = ({
                 Promoted Countries
                 {promotedCountries.length > 0 && (
                   <span className="px-1.5 py-0.5 text-xs bg-amber-100 text-amber-700 rounded-full">
-                    {promotedCountries.length}/8
+                    {promotedCountries.length}/16
                   </span>
                 )}
               </div>
@@ -593,7 +593,7 @@ const RegionEditModal = ({
                 <div>
                   <h4 className="font-medium text-gray-900">Promoted Countries</h4>
                   <p className="text-sm text-gray-500">
-                    Select up to 8 countries to feature on the Hero page for this region.
+                    Select up to 16 countries to feature on the Hero page for this region.
                     Drag to reorder.
                   </p>
                 </div>
@@ -628,7 +628,7 @@ const RegionEditModal = ({
                     onChange={(e) => setCountrySearchTerm(e.target.value)}
                     className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Search countries to add..."
-                    disabled={promotedCountries.length >= 8}
+                    disabled={promotedCountries.length >= 16}
                   />
                 </div>
 
