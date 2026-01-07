@@ -1,5 +1,5 @@
 -- Migration: Create region_promoted_countries table
--- Purpose: Allow admins to select up to 8 promoted countries per region with explicit ordering
+-- Purpose: Allow admins to select up to 16 promoted countries per region with explicit ordering
 -- Run this migration in Supabase SQL Editor
 
 -- Create the region_promoted_countries table
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS public.region_promoted_countries (
   CONSTRAINT region_promoted_countries_unique
     UNIQUE (region_id, country_id),
   CONSTRAINT region_promoted_countries_position_check
-    CHECK (position >= 0 AND position < 8)
+    CHECK (position >= 0 AND position < 16)
 ) TABLESPACE pg_default;
 
 -- Create index for fast lookups by region
@@ -53,10 +53,10 @@ CREATE POLICY "Allow admin full access"
 
 -- Add comment for documentation
 COMMENT ON TABLE public.region_promoted_countries IS
-  'Admin-controlled promoted countries per region. Max 8 countries per region with explicit position ordering.';
+  'Admin-controlled promoted countries per region. Max 16 countries per region with explicit position ordering.';
 
 COMMENT ON COLUMN public.region_promoted_countries.position IS
-  'Display order (0-7). Lower numbers appear first.';
+  'Display order (0-15). Lower numbers appear first.';
 
 -- Seed initial data for popular region (optional - remove if you want to start empty)
 -- INSERT INTO public.region_promoted_countries (region_id, country_id, position) VALUES

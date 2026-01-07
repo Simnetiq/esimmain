@@ -132,9 +132,13 @@ const fetchPromotedCountries = async (regionId, locale = 'en', limit = 8) => {
   }
 
   // Extract and transform promoted countries (only those with plans)
+  // Mark these as explicitly promoted so they get the badge
   const promoted = (promotedData || [])
     .filter(p => p.country && p.country.plan_count > 0 && p.country.is_active !== false)
-    .map(p => transformCountryToViewModel(p.country, locale));
+    .map(p => ({
+      ...transformCountryToViewModel(p.country, locale),
+      isExplicitlyPromoted: true // Flag to distinguish from fallbacks
+    }));
 
   // 2. If we have enough promoted countries, return them
   if (promoted.length >= limit) {
@@ -187,9 +191,12 @@ const fetchPromotedCountries = async (regionId, locale = 'en', limit = 8) => {
     console.error('[fetchPromotedCountries] Error fetching fallback:', fallbackError);
   }
 
-  // Transform fallback countries
+  // Transform fallback countries - NOT explicitly promoted (no badge)
   const fallback = (fallbackData || [])
-    .map(c => transformCountryToViewModel(c, locale));
+    .map(c => ({
+      ...transformCountryToViewModel(c, locale),
+      isExplicitlyPromoted: false // Fallbacks don't get the badge
+    }));
 
   return [...promoted, ...fallback];
 };
