@@ -107,6 +107,7 @@ export default function HeroSection() {
   }, [locale, pathname, i18nLoading]);
 
   const direction = mounted ? getLanguageDirection(detectedLanguage) : 'ltr';
+  const isRTL = direction === 'rtl';
 
   // Apply IBM Plex Sans Italic for "anywhere" only in EN and DE
   const useIbmPlexSansItalic = detectedLanguage === 'en' || detectedLanguage === 'de';
@@ -160,7 +161,7 @@ export default function HeroSection() {
               </p>
 
               {/* CTA Buttons - Explore Store is PRIMARY */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 lg:mb-12 pointer-events-auto">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 lg:mb-12 pointer-events-auto" style={isRTL && isMobile ? { display: 'flex', flexDirection: 'column' } : undefined}>
                 {/* Primary CTA - Explore eSIM Store */}
                 <ExploreStoreCTA
                   variant="dark"
@@ -176,15 +177,15 @@ export default function HeroSection() {
                 />
               </div>
 
-              {/* Trust Indicators */}
-              <div className="flex flex-wrap items-center gap-6 sm:gap-10 text-sm text-gray-500 justify-center">
+              {/* Trust Indicators - lighter visual weight on mobile */}
+              <div className="flex flex-wrap items-center gap-4 sm:gap-8 text-xs sm:text-sm text-gray-500 justify-center">
                 {trustIndicators.map(({ Icon, label, key }, index) => (
                   <React.Fragment key={key}>
-                    <div className="flex items-center gap-2 text-eerie-black">
-                      <Icon className="w-5 h-5 text-eerie-black" />
-                      <span className="text-eerie-black">{label}</span>
+                    <div className="flex items-center gap-1.5 sm:gap-2 text-gray-600 sm:text-eerie-black">
+                      <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 sm:text-eerie-black" />
+                      <span>{label}</span>
                     </div>
-                    {/* Vertical separator between items */}
+                    {/* Vertical separator between items - hidden on mobile */}
                     {index < trustIndicators.length - 1 && (
                       <div className="hidden sm:block w-px h-4 bg-gray-300" />
                     )}

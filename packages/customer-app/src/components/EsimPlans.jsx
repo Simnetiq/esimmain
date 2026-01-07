@@ -549,7 +549,7 @@ const EsimPlans = ({ isHomePage = false }) => {
                                 initialLimit={countryLimit}
                                 isHomePage={isHomePage}
                                 onShowMoreClick={isHomePage ? handleShowMoreCountries : null}
-                                promotedCountryIds={promotedCountries?.map(c => c.id) || []}
+                                promotedCountryIds={promotedCountries?.filter(c => c.isExplicitlyPromoted)?.map(c => c.id) || []}
                             />
                         </div>
                     </>

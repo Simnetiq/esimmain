@@ -657,11 +657,21 @@ const PlanSelectionBottomSheet = ({
     }
 
     const countryCode = firstPlan.country_codes?.[0] || firstPlan.country_code;
-    const countryName = firstPlan.country_name || firstPlan.country_title || countryCode;
     const region = firstPlan.region;
 
-    // Use countryImage from state (fetched from Firebase) or fallback to plan image
-    const imageUrl = countryImage?.url || firstPlan.image?.url;
+    // Try to get TRANSLATED country name from filteredCountries (which has translations)
+    // filteredCountries comes from useCountriesSupabase hook which includes country_translations
+    const matchingCountry = filteredCountries?.find(c =>
+      c.code?.toLowerCase() === countryCode?.toLowerCase() ||
+      c.id?.toLowerCase() === countryCode?.toLowerCase()
+    );
+
+    // Use translated displayName if available, otherwise fallback to plan's country_name
+    const countryName = matchingCountry?.displayName || matchingCountry?.name ||
+      firstPlan.country_name || firstPlan.country_title || countryCode;
+
+    // Use countryImage from state (fetched from Firebase) or fallback to plan/country image
+    const imageUrl = countryImage?.url || matchingCountry?.imageUrl || matchingCountry?.image?.url || firstPlan.image?.url;
 
     return {
       code: countryCode,
@@ -670,7 +680,7 @@ const PlanSelectionBottomSheet = ({
       imageUrl: imageUrl,
       isGlobal: false
     };
-  }, [availablePlans, countryImage, t, context, regionName]);
+  }, [availablePlans, countryImage, t, context, regionName, filteredCountries]);
 
   const handlePlanSelect = (plan) => {
     // Track plan selection with Facebook Pixel including value

@@ -113,10 +113,10 @@ export default function PlatformDownloadCTA({
     );
   }
 
-  // On desktop, show both buttons (both use the same variant)
-  // Use flex-row on all screen sizes to keep buttons on same line
+  // On desktop, show both buttons side by side
+  // The wrapper inherits className for consistent sizing with sibling CTAs
   return (
-    <div className={`flex flex-row items-center gap-3 ${className}`}>
+    <div className={`flex flex-row items-center justify-center gap-3 ${className}`}>
       <DownloadButton
         platform="ios"
         variant={variant}
