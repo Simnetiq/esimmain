@@ -25,6 +25,12 @@ dist/
 **/credentials.json
 **/data.txt
 
+# Apple Wallet pass certificates
+certs/
+*.pem
+*.p12
+*.pkpass
+
 # OS generated files
 .DS_Store
 .DS_Store?

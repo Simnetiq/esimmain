@@ -1,0 +1,28 @@
+{
+  "formatVersion": 1,
+  "passTypeIdentifier": "pass.com.foundmiles.event",
+  "teamIdentifier": "YOUR_APPLE_TEAM_ID",
+  "organizationName": "FoundMiles",
+  "description": "Running Event Pass",
+  "logoText": "FoundMiles",
+  "foregroundColor": "rgb(255, 255, 255)",
+  "backgroundColor": "rgb(0, 0, 0)",
+  "labelColor": "rgb(155, 155, 155)",
+  "eventTicket": {
+    "primaryFields": [],
+    "secondaryFields": [],
+    "auxiliaryFields": [],
+    "backFields": [
+      {
+        "key": "instructions",
+        "label": "CHECK-IN",
+        "value": "Show this pass at the registration desk 30 minutes before the event starts."
+      },
+      {
+        "key": "contact",
+        "label": "CONTACT",
+        "value": "support@foundmiles.com"
+      }
+    ]
+  }
+}

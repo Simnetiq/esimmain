@@ -360,7 +360,7 @@ const Contact = () => {
               {t('contact.title', 'Help Center')}
             </p>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-eerie-black tracking-tight mb-4">
-              {t('contact.subtitle', "We're here to help with all your eSIM needs")}
+              {t('contact.subtitle', "We're here to help with all your needs")}
             </h1>
             <p className="text-gray-600 text-base sm:text-lg">
               {t('contact.description', 'Find answers to common questions or send us a message. Our support team typically responds within a few hours.')}

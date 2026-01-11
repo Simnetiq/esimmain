@@ -65,6 +65,8 @@
     "./lib/firebase": "./lib/firebase.js",
     "./lib/firebaseAdmin": "./lib/firebaseAdmin.js",
     "./lib/supabase": "./lib/supabase.js",
+    "./lib/supabaseServer": "./lib/supabaseServer.js",
+    "./lib/passkit": "./lib/passkit.js",
     "./types/supabase": "./types/supabase.ts"
   },
   "dependencies": {
@@ -73,6 +75,7 @@
     "firebase-admin": "^13.5.0",
     "axios": "^1.11.0",
     "date-fns": "^4.1.0",
+    "passkit-generator": "^3.2.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.6.0"
