@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { supportedLanguages, languageNameMap } from '@esim/shared/utils/languageUtils';
 
 // Create Supabase client with service role for API routes
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -12,30 +13,12 @@ function getSupabase() {
   return createClient(supabaseUrl, supabaseServiceKey);
 }
 
-// Supported languages for region translations
-const SUPPORTED_LANGUAGES = [
-  { code: 'en', name: 'English' },
-  { code: 'es', name: 'Spanish' },
-  { code: 'fr', name: 'French' },
-  { code: 'de', name: 'German' },
-  { code: 'ar', name: 'Arabic' },
-  { code: 'he', name: 'Hebrew' },
-  { code: 'ru', name: 'Russian' }
-];
+// Use centralized language configuration from shared utils
+const SUPPORTED_LANGUAGES = supportedLanguages;
 
 // Translate a region name using OpenAI
 async function translateRegionName(openaiApiKey, regionName, targetLanguage) {
-  const languageNames = {
-    'en': 'English',
-    'es': 'Spanish',
-    'fr': 'French',
-    'de': 'German',
-    'ar': 'Arabic',
-    'he': 'Hebrew',
-    'ru': 'Russian'
-  };
-
-  const targetLanguageName = languageNames[targetLanguage] || targetLanguage;
+  const targetLanguageName = languageNameMap[targetLanguage] || targetLanguage;
 
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -100,40 +83,56 @@ async function getOpenAIKey(supabase) {
 async function getRegionTranslations(supabase, regionId) {
   const { data, error } = await supabase
     .from('region_translations')
-    .select('language_code, name, display_name, source, source_model')
+    .select('language_code, name, display_name, source, source_model, is_locked, is_verified')
     .eq('region_id', regionId);
 
   if (error) {
     console.error('Error fetching region translations:', error);
-    return {};
+    return { translations: {}, protectedLanguages: new Set() };
   }
 
   // Convert to object keyed by language code
   const translations = {};
+  const protectedLanguages = new Set();
+
   data?.forEach(t => {
     translations[t.language_code] = {
       name: t.name,
       display_name: t.display_name,
       source: t.source,
-      source_model: t.source_model
+      source_model: t.source_model,
+      is_locked: t.is_locked,
+      is_verified: t.is_verified
     };
+
+    // Track locked or verified translations - these should NEVER be overwritten
+    if (t.is_locked || t.is_verified) {
+      protectedLanguages.add(t.language_code);
+    }
   });
 
-  return translations;
+  return { translations, protectedLanguages };
 }
 
 // Upsert a translation in region_translations table
+// IMPORTANT: This function should only be called for non-protected translations
 async function upsertRegionTranslation(supabase, regionId, languageCode, name, source, sourceModel) {
-  // Check if translation exists
+  // Check if translation exists and is protected
   const { data: existing } = await supabase
     .from('region_translations')
-    .select('id')
+    .select('id, is_locked, is_verified')
     .eq('region_id', regionId)
     .eq('language_code', languageCode)
     .maybeSingle();
 
+  // NEVER overwrite locked or verified translations
+  if (existing && (existing.is_locked || existing.is_verified)) {
+    console.log(`Skipping protected translation: ${regionId}/${languageCode}`);
+    return;
+  }
+
   if (existing) {
-    // Update existing
+    // Update existing (only if not protected)
     const { error } = await supabase
       .from('region_translations')
       .update({
@@ -146,7 +145,7 @@ async function upsertRegionTranslation(supabase, regionId, languageCode, name, s
 
     if (error) throw error;
   } else {
-    // Insert new
+    // Insert new with proper metadata
     const { error } = await supabase
       .from('region_translations')
       .insert({
@@ -155,6 +154,8 @@ async function upsertRegionTranslation(supabase, regionId, languageCode, name, s
         name,
         source,
         source_model: sourceModel,
+        is_verified: false,
+        is_locked: false,
         translated_at: new Date().toISOString(),
         last_updated_at: new Date().toISOString()
       });
@@ -191,11 +192,12 @@ export async function POST(request) {
       let successCount = 0;
       let skipCount = 0;
       let errorCount = 0;
+      let protectedCount = 0;
       const results = [];
 
       for (const region of regions) {
-        // Get existing translations from region_translations table
-        const existingTranslations = await getRegionTranslations(supabase, region.id);
+        // Get existing translations from region_translations table (includes protected status)
+        const { translations: existingTranslations, protectedLanguages } = await getRegionTranslations(supabase, region.id);
         const englishName = existingTranslations.en?.name || region.name;
 
         if (!englishName) {
@@ -203,29 +205,40 @@ export async function POST(request) {
           continue;
         }
 
-        // Find missing languages
+        // Find missing languages (exclude protected translations)
         const existingLanguages = Object.keys(existingTranslations).filter(
           lang => existingTranslations[lang]?.name
         );
         const missingLanguages = SUPPORTED_LANGUAGES
           .map(lang => lang.code)
-          .filter(code => !existingLanguages.includes(code));
+          .filter(code => !existingLanguages.includes(code) && !protectedLanguages.has(code));
 
         if (missingLanguages.length === 0) {
           skipCount++;
-          results.push({ region: region.id, status: 'skipped', reason: 'All languages exist' });
+          results.push({
+            region: region.id,
+            status: 'skipped',
+            reason: protectedLanguages.size > 0
+              ? `All languages exist (${protectedLanguages.size} protected)`
+              : 'All languages exist'
+          });
           continue;
         }
 
         try {
-          // Ensure English exists
-          if (!existingTranslations.en?.name) {
+          // Ensure English exists (only if not protected)
+          if (!existingTranslations.en?.name && !protectedLanguages.has('en')) {
             await upsertRegionTranslation(supabase, region.id, 'en', englishName, 'manual', null);
           }
 
-          // Translate to each missing language (skip 'en' since we handle it above)
+          // Translate to each missing language (skip 'en' and protected languages)
           for (const targetLang of missingLanguages) {
             if (targetLang === 'en') continue;
+            if (protectedLanguages.has(targetLang)) {
+              protectedCount++;
+              continue; // NEVER overwrite locked or verified translations
+            }
+
             try {
               const translated = await translateRegionName(openaiApiKey, englishName, targetLang);
               await upsertRegionTranslation(supabase, region.id, targetLang, translated, 'chatgpt', 'gpt-4o-mini');
@@ -241,7 +254,8 @@ export async function POST(request) {
           results.push({
             region: region.id,
             status: 'success',
-            languagesAdded: missingLanguages.filter(l => l !== 'en').length
+            languagesAdded: missingLanguages.filter(l => l !== 'en').length,
+            protectedSkipped: protectedLanguages.size
           });
 
         } catch (err) {
@@ -257,7 +271,8 @@ export async function POST(request) {
           total: regions.length,
           translated: successCount,
           skipped: skipCount,
-          errors: errorCount
+          errors: errorCount,
+          protectedSkipped: protectedCount
         },
         results
       });

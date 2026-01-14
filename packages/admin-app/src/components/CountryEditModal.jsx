@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { saveCountryComplete } from '../services/countryService';
-import { 
-  X, 
-  Save, 
-  Upload, 
+import {
+  X,
+  Save,
+  Upload,
   Image as ImageIcon,
   Languages,
   Trash2
@@ -15,67 +15,59 @@ import toast from 'react-hot-toast';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import Image from 'next/image';
 import imageUploadService from '@esim/shared/services/imageUploadService';
+import { supportedLanguages } from '@esim/shared/utils/languageUtils';
 
-const CountryEditModal = ({ 
-  isOpen, 
-  onClose, 
-  country = null, 
-  onSave 
+const CountryEditModal = ({
+  isOpen,
+  onClose,
+  country = null,
+  onSave
 }) => {
   const { currentUser } = useAuth();
   const isEditing = !!country;
-  
+
+  // Use centralized language configuration
+  const languages = supportedLanguages;
+
+  // Build empty translations object dynamically from supported languages
+  const emptyTranslations = useMemo(() => {
+    return Object.fromEntries(languages.map(lang => [lang.code, '']));
+  }, [languages]);
+
   // Form state
   const [formData, setFormData] = useState({
     code: '',
     name: '',
-    translations: {
-      en: '',
-      es: '',
-      fr: '',
-      de: '',
-      ar: '',
-      he: '',
-      ru: ''
-    },
+    translations: emptyTranslations,
     photo: '',
     description: '',
     isActive: true,
     region: 'other',
     is_popular: false
   });
-  
+
   const [loading, setSaving] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [photoFile, setPhotoFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState('');
 
-  // Language options
-  const languages = [
-    { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'es', name: 'Spanish', flag: '🇪🇸' },
-    { code: 'fr', name: 'French', flag: '🇫🇷' },
-    { code: 'de', name: 'German', flag: '🇩🇪' },
-    { code: 'ar', name: 'Arabic', flag: '🇸🇦' },
-    { code: 'he', name: 'Hebrew', flag: '🇮🇱' },
-    { code: 'ru', name: 'Russian', flag: '🇷🇺' }
-  ];
-
   // Initialize form data when country changes
   useEffect(() => {
     if (country) {
+      // Build translations object dynamically from supported languages
+      const translations = {};
+      languages.forEach(lang => {
+        if (lang.code === 'en') {
+          translations[lang.code] = country.translations?.en || country.name || '';
+        } else {
+          translations[lang.code] = country.translations?.[lang.code] || '';
+        }
+      });
+
       setFormData({
         code: country.code || '',
         name: country.name || '',
-        translations: {
-          en: country.translations?.en || country.name || '',
-          es: country.translations?.es || '',
-          fr: country.translations?.fr || '',
-          de: country.translations?.de || '',
-          ar: country.translations?.ar || '',
-          he: country.translations?.he || '',
-          ru: country.translations?.ru || ''
-        },
+        translations,
         photo: country.photo || '',
         description: country.description || '',
         isActive: country.isActive !== false,
@@ -88,15 +80,7 @@ const CountryEditModal = ({
       setFormData({
         code: '',
         name: '',
-        translations: {
-          en: '',
-          es: '',
-          fr: '',
-          de: '',
-          ar: '',
-          he: '',
-          ru: ''
-        },
+        translations: emptyTranslations,
         photo: '',
         description: '',
         isActive: true,
@@ -106,7 +90,7 @@ const CountryEditModal = ({
       setPhotoPreview('');
     }
     setPhotoFile(null);
-  }, [country, isOpen]);
+  }, [country, isOpen, languages, emptyTranslations]);
 
   // Handle form input changes
   const handleInputChange = (field, value) => {

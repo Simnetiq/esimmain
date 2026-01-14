@@ -6,6 +6,8 @@
  * and easier maintenance.
  */
 
+import { supportedLanguages as sharedSupportedLanguages } from '@esim/shared/utils/languageUtils';
+
 // ============================================================================
 // CONSTANTS
 // ============================================================================
@@ -18,15 +20,11 @@ export const ENTITY_TAGS = {
   POPULAR: 'Popular'
 };
 
-export const SUPPORTED_LANGUAGES = [
-  { code: 'en', name: 'English', flag: '🇺🇸' },
-  { code: 'es', name: 'Spanish', flag: '🇪🇸' },
-  { code: 'fr', name: 'French', flag: '🇫🇷' },
-  { code: 'de', name: 'German', flag: '🇩🇪' },
-  { code: 'ar', name: 'Arabic', flag: '🇸🇦' },
-  { code: 'he', name: 'Hebrew', flag: '🇮🇱' },
-  { code: 'ru', name: 'Russian', flag: '🇷🇺' }
-];
+/**
+ * Re-export shared supported languages for backward compatibility.
+ * All language configuration is now centralized in @esim/shared/utils/languageUtils.js
+ */
+export const SUPPORTED_LANGUAGES = sharedSupportedLanguages;
 
 // ============================================================================
 // TAG DETERMINATION

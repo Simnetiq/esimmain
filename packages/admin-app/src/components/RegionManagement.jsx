@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { storage } from '@esim/shared/firebase/config';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import toast from 'react-hot-toast';
@@ -21,11 +21,14 @@ import {
   RefreshCw,
   Flag,
   Search,
-  Trash2
+  Trash2,
+  Languages,
+  Sparkles
 } from 'lucide-react';
 import Image from 'next/image';
 import { RegionCard } from './regions';
 import supabase from '../lib/supabase';
+import { supportedLanguages } from '@esim/shared/utils/languageUtils';
 
 const RegionManagement = () => {
   const [regions, setRegions] = useState([]);
@@ -44,11 +47,20 @@ const RegionManagement = () => {
   const [togglingVisibility, setTogglingVisibility] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Translation states
+  const [translatingRegion, setTranslatingRegion] = useState(false);
+  const [translatingAll, setTranslatingAll] = useState(false);
+
   // Expanded region details
   const [expandedRegion, setExpandedRegion] = useState(null);
 
   // Country search in modal
   const [countrySearchTerm, setCountrySearchTerm] = useState('');
+
+  // Build empty translations object dynamically from supported languages
+  const emptyTranslations = useMemo(() => {
+    return Object.fromEntries(supportedLanguages.map(lang => [lang.code, '']));
+  }, []);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -61,9 +73,7 @@ const RegionManagement = () => {
     topPlanIds: [],
     popularCountries: [],
     type: 'continent',
-    translations: {
-      en: '', ru: '', es: '', fr: '', de: '', ar: '', he: ''
-    }
+    translations: emptyTranslations
   });
 
   // ============================================================================
@@ -339,7 +349,7 @@ const RegionManagement = () => {
       topPlanIds: [],
       popularCountries: [],
       type: 'continent',
-      translations: { en: '', ru: '', es: '', fr: '', de: '', ar: '', he: '' }
+      translations: emptyTranslations
     });
     setEditingRegion(null);
     setCountrySearchTerm('');
@@ -347,14 +357,16 @@ const RegionManagement = () => {
   };
 
   const handleEdit = (region) => {
+    // Build translations object from region data
     const translations = {};
     if (region.translations) {
       Object.entries(region.translations).forEach(([lang, data]) => {
         translations[lang] = typeof data === 'string' ? data : (data?.name || '');
       });
     }
-    ['en', 'ru', 'es', 'fr', 'de', 'ar', 'he'].forEach(lang => {
-      if (!translations[lang]) translations[lang] = '';
+    // Ensure all supported languages have an entry (use dynamic language list)
+    supportedLanguages.forEach(lang => {
+      if (!translations[lang.code]) translations[lang.code] = '';
     });
 
     setFormData({
@@ -525,6 +537,108 @@ const RegionManagement = () => {
     : allCountries;
 
   // ============================================================================
+  // TRANSLATION HANDLERS
+  // ============================================================================
+
+  /**
+   * Auto-translate missing languages for the current region being edited
+   */
+  const handleAutoTranslate = async () => {
+    if (!formData.name) {
+      toast.error('Please enter a region name first');
+      return;
+    }
+
+    setTranslatingRegion(true);
+    try {
+      const response = await fetch('/api/translate-regions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          regionId: formData.id || 'temp',
+          regionName: formData.name,
+          targetLanguages: supportedLanguages
+            .filter(lang => !formData.translations[lang.code]?.trim())
+            .map(lang => lang.code)
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.translations) {
+        // Update form with new translations
+        setFormData(prev => ({
+          ...prev,
+          translations: {
+            ...prev.translations,
+            ...result.translations
+          }
+        }));
+        toast.success('Translations generated successfully!');
+      } else {
+        throw new Error(result.error || 'Translation failed');
+      }
+    } catch (error) {
+      console.error('Translation error:', error);
+      toast.error(`Translation failed: ${error.message}`);
+    } finally {
+      setTranslatingRegion(false);
+    }
+  };
+
+  /**
+   * Translate all regions that have missing translations
+   */
+  const handleTranslateAllRegions = async () => {
+    setTranslatingAll(true);
+    try {
+      const response = await fetch('/api/translate-regions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ translateAll: true })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success(
+          `Translated ${result.summary.translated} regions. ` +
+          `${result.summary.skipped} skipped, ${result.summary.protectedSkipped || 0} protected.`
+        );
+        // Refresh the regions list
+        await fetchRegions();
+      } else {
+        throw new Error(result.error || 'Translation failed');
+      }
+    } catch (error) {
+      console.error('Translation error:', error);
+      toast.error(`Translation failed: ${error.message}`);
+    } finally {
+      setTranslatingAll(false);
+    }
+  };
+
+  /**
+   * Handle individual translation field change
+   */
+  const handleTranslationChange = (langCode, value) => {
+    setFormData(prev => ({
+      ...prev,
+      translations: {
+        ...prev.translations,
+        [langCode]: value
+      }
+    }));
+  };
+
+  /**
+   * Count how many translations are filled
+   */
+  const filledTranslationsCount = useMemo(() => {
+    return Object.values(formData.translations || {}).filter(v => v?.trim()).length;
+  }, [formData.translations]);
+
+  // ============================================================================
   // RENDER
   // ============================================================================
 
@@ -604,6 +718,31 @@ const RegionManagement = () => {
           <RefreshCw className="w-4 h-4" />
           Refresh
         </button>
+
+        {/* Translate All Regions Button */}
+        <div className="relative group">
+          <button
+            onClick={handleTranslateAllRegions}
+            disabled={translatingAll}
+            className="flex items-center gap-2 px-4 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-purple-300 transition-colors text-sm"
+          >
+            {translatingAll ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                <span>Translating...</span>
+              </>
+            ) : (
+              <>
+                <Languages className="w-4 h-4" />
+                <span>Translate All</span>
+              </>
+            )}
+          </button>
+          <div className="absolute bottom-full left-0 mb-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none w-64 z-10 shadow-lg p-3">
+            <p className="font-semibold mb-1">Auto-translate all regions</p>
+            <p className="text-gray-300">Uses AI to translate region names to all {supportedLanguages.length} supported languages. Protected translations are preserved.</p>
+          </div>
+        </div>
 
         <div className="ml-auto text-sm text-gray-500">
           {filteredRegions.length} regions
@@ -854,6 +993,67 @@ const RegionManagement = () => {
                       </div>
                     </label>
                   ))}
+                </div>
+              </div>
+
+              {/* Translations */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                    <Languages className="w-4 h-4" /> Translations ({filledTranslationsCount}/{supportedLanguages.length})
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={handleAutoTranslate}
+                    disabled={translatingRegion || !formData.name}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 disabled:bg-purple-300 transition-colors"
+                  >
+                    {translatingRegion ? (
+                      <>
+                        <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white" />
+                        <span>Translating...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-3 h-3" />
+                        <span>Auto-translate</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <p className="text-xs text-gray-500">
+                  Region name translations for different languages. Use Auto-translate to fill missing translations using AI.
+                </p>
+
+                <div className="grid grid-cols-2 gap-4">
+                  {supportedLanguages.map((lang) => (
+                    <div key={lang.code}>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        {lang.flag} {lang.name} {lang.code === 'en' && <span className="text-gray-400">(primary)</span>}
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.translations?.[lang.code] || ''}
+                        onChange={(e) => handleTranslationChange(lang.code, e.target.value)}
+                        placeholder={`Region name in ${lang.name}`}
+                        className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                          lang.isRTL ? 'text-right' : 'text-left'
+                        } ${
+                          formData.translations?.[lang.code]?.trim()
+                            ? 'border-green-300 bg-green-50'
+                            : 'border-gray-300'
+                        }`}
+                        dir={lang.isRTL ? 'rtl' : 'ltr'}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-xs text-blue-700">
+                    <strong>Tip:</strong> Enter the English name first, then click &quot;Auto-translate&quot; to generate translations for all other languages using AI.
+                  </p>
                 </div>
               </div>
             </div>

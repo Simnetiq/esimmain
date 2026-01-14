@@ -24,16 +24,10 @@ import {
   updatePromotedCountries,
   fetchAllCountries
 } from '../../../services/regionService';
+import { supportedLanguages } from '@esim/shared/utils/languageUtils';
 
-const SUPPORTED_LANGUAGES = [
-  { code: 'en', name: 'English' },
-  { code: 'ru', name: 'Russian' },
-  { code: 'es', name: 'Spanish' },
-  { code: 'fr', name: 'French' },
-  { code: 'de', name: 'German' },
-  { code: 'ar', name: 'Arabic' },
-  { code: 'he', name: 'Hebrew' },
-];
+// Use centralized language configuration
+const SUPPORTED_LANGUAGES = supportedLanguages;
 
 const RegionEditModal = ({
   isOpen,
@@ -775,8 +769,11 @@ const RegionEditModal = ({
                 {SUPPORTED_LANGUAGES.map((lang) => (
                   <div key={lang.code} className="bg-gray-50 rounded-lg p-4">
                     <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                      <span className="text-lg">{lang.code === 'ar' ? '🇸🇦' : lang.code === 'he' ? '🇮🇱' : lang.code === 'ru' ? '🇷🇺' : lang.code === 'es' ? '🇪🇸' : lang.code === 'fr' ? '🇫🇷' : lang.code === 'de' ? '🇩🇪' : '🇺🇸'}</span>
+                      <span className="text-lg">{lang.flag}</span>
                       {lang.name}
+                      {lang.nativeName !== lang.name && (
+                        <span className="text-sm text-gray-500">({lang.nativeName})</span>
+                      )}
                     </h4>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
@@ -789,7 +786,7 @@ const RegionEditModal = ({
                           onChange={(e) => handleTranslationChange(lang.code, 'name', e.target.value)}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           placeholder={`${formData.name || 'Region name'} in ${lang.name}`}
-                          dir={lang.code === 'ar' || lang.code === 'he' ? 'rtl' : 'ltr'}
+                          dir={lang.isRTL ? 'rtl' : 'ltr'}
                         />
                       </div>
                       <div>
@@ -802,7 +799,7 @@ const RegionEditModal = ({
                           onChange={(e) => handleTranslationChange(lang.code, 'description', e.target.value)}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           placeholder="Optional description"
-                          dir={lang.code === 'ar' || lang.code === 'he' ? 'rtl' : 'ltr'}
+                          dir={lang.isRTL ? 'rtl' : 'ltr'}
                         />
                       </div>
                     </div>
