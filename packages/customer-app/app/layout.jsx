@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import dynamic from 'next/dynamic'
+// dynamic import moved to ClientOnlyScripts
 import { Heebo, IBM_Plex_Sans_Arabic, Rubik, DM_Sans, IBM_Plex_Sans } from 'next/font/google'
 import { Analytics as VercelAnalytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
@@ -13,15 +13,7 @@ import DynamicHtmlLang from '../src/components/DynamicHtmlLang'
 import { metadata as metadataConfig, generateAlternates } from '../src/config/metadata'
 import './globals.css'
 
-// Lazy load non-critical components that appear after delay or user interaction
-const CookieConsent = dynamic(() => import('../src/components/CookieConsent'), {
-  ssr: false,
-  loading: () => null
-})
-const FacebookPixel = dynamic(() => import('../src/components/FacebookPixel'), {
-  ssr: false,
-  loading: () => null
-})
+import ClientOnlyScripts from '../src/components/ClientOnlyScripts'
 // RTL CSS is now loaded dynamically only when needed by DynamicHtmlLang component
 // This reduces render-blocking CSS for 97% of users (LTR languages)
 
@@ -239,8 +231,7 @@ export default function RootLayout({ children }) {
                 {children}
               </main>
               <ConditionalFooter/>
-              <CookieConsent />
-              <FacebookPixel />
+              <ClientOnlyScripts />
             </div>
           </LanguageWrapper>
         </Providers>
