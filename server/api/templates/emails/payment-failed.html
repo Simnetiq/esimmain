@@ -1,0 +1,20 @@
+<h2 style="margin:0 0 16px;font-family:'DM Sans',sans-serif;font-size:22px;font-weight:700;color:#172C2E;">Payment Failed ❌</h2>
+<p style="margin:0 0 16px;">Hi {{NAME}},</p>
+<p style="margin:0 0 24px;">We were unable to process your payment. Here are the details:</p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#fef7f7;border-radius:8px;border:1px solid #f5c6c6;margin:0 0 24px;">
+  <tr><td style="padding:20px 24px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr><td style="padding:6px 0;font-family:'DM Sans',sans-serif;font-size:13px;color:#5f6b7a;">Amount</td><td style="padding:6px 0;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:#172C2E;text-align:right;">{{AMOUNT}}</td></tr>
+      <tr><td style="padding:6px 0;font-family:'DM Sans',sans-serif;font-size:13px;color:#5f6b7a;">Product</td><td style="padding:6px 0;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:#172C2E;text-align:right;">{{PRODUCT}}</td></tr>
+      <tr><td style="padding:6px 0;font-family:'DM Sans',sans-serif;font-size:13px;color:#5f6b7a;">Reason</td><td style="padding:6px 0;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:#c0392b;text-align:right;">{{FAILURE_REASON}}</td></tr>
+    </table>
+  </td></tr>
+</table>
+<p style="margin:0 0 24px;">Please update your payment method and try again.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0">
+  <tr>
+    <td align="center" style="border-radius:8px;background-color:#4975D4;">
+      <a href="{{RETRY_URL}}" style="display:inline-block;padding:14px 32px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:8px;">Retry Payment</a>
+    </td>
+  </tr>
+</table>

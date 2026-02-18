@@ -1,4 +1,6 @@
 const nodemailer = require('nodemailer');
+const fs = require('fs');
+const path = require('path');
 const supabase = require('../config/supabase');
 const logger = require('../utils/logger');
 
@@ -13,13 +15,37 @@ class EmailService {
         pass: process.env.SMTP_PASSWORD
       }
     });
+
+    // Cache base template
+    this.baseTemplate = fs.readFileSync(
+      path.join(__dirname, '../templates/emails/base.html'),
+      'utf8'
+    );
+  }
+
+  // Load template, wrap in base, replace variables
+  loadTemplate(templateName, vars = {}) {
+    const templatePath = path.join(__dirname, '../templates/emails', `${templateName}.html`);
+    let content = fs.readFileSync(templatePath, 'utf8');
+    let html = this.baseTemplate.replace('{{CONTENT}}', content);
+
+    // Replace all variables
+    for (const [key, value] of Object.entries(vars)) {
+      const regex = new RegExp(`{{${key}}}`, 'g');
+      html = html.replace(regex, value || '');
+    }
+
+    // Clean up any remaining unreplaced vars
+    html = html.replace(/{{UNSUBSCRIBE_URL}}/g, vars.UNSUBSCRIBE_URL || '#');
+
+    return html;
   }
 
   // Send email
   async sendEmail({ to, subject, html, text, attachments = [] }) {
     try {
       const mailOptions = {
-        from: `"eSIM Service" <${process.env.SMTP_USER}>`,
+        from: `"Simnetiq" <support@simnetiq.store>`,
         to,
         subject,
         html,
@@ -29,7 +55,6 @@ class EmailService {
 
       const info = await this.transporter.sendMail(mailOptions);
 
-      // Log email to Supabase
       await this.logEmail({
         to,
         subject,
@@ -37,20 +62,12 @@ class EmailService {
         message_id: info.messageId
       });
 
-      logger.info('Email sent successfully', { 
-        to, 
-        subject, 
-        messageId: info.messageId 
-      });
+      logger.info('Email sent successfully', { to, subject, messageId: info.messageId });
 
-      return {
-        success: true,
-        messageId: info.messageId
-      };
+      return { success: true, messageId: info.messageId };
     } catch (error) {
       logger.error('Email send error', error);
 
-      // Log failed email
       await this.logEmail({
         to,
         subject,
@@ -62,140 +79,142 @@ class EmailService {
     }
   }
 
-  // Send verification email
+  // --- Email methods for all 12 templates ---
+
+  async sendWelcomeEmail(email, vars) {
+    const html = this.loadTemplate('welcome', vars);
+    return this.sendEmail({
+      to: email,
+      subject: 'Welcome to Simnetiq! 🎉',
+      html,
+      text: `Welcome to Simnetiq, ${vars.NAME}! Start exploring eSIM plans at https://simnetiq.store`
+    });
+  }
+
+  async sendPasswordResetEmail(email, vars) {
+    const html = this.loadTemplate('password-reset', vars);
+    return this.sendEmail({
+      to: email,
+      subject: 'Reset Your Password — Simnetiq',
+      html,
+      text: `Reset your password: ${vars.RESET_URL}`
+    });
+  }
+
+  async sendPurchaseConfirmation(email, vars) {
+    const html = this.loadTemplate('esim-purchase-confirmation', vars);
+    return this.sendEmail({
+      to: email,
+      subject: `Order Confirmed — ${vars.DESTINATION} eSIM`,
+      html,
+      text: `Order ${vars.ORDER_ID} confirmed! ${vars.PLAN_NAME} for ${vars.DESTINATION}.`
+    });
+  }
+
+  async sendActivationSuccess(email, vars) {
+    const html = this.loadTemplate('esim-activation-success', vars);
+    return this.sendEmail({
+      to: email,
+      subject: `eSIM Activated — ${vars.DESTINATION} 🌍`,
+      html,
+      text: `Your eSIM for ${vars.DESTINATION} is now active. Plan: ${vars.PLAN_NAME}`
+    });
+  }
+
+  async sendTopupConfirmation(email, vars) {
+    const html = this.loadTemplate('esim-topup-confirmation', vars);
+    return this.sendEmail({
+      to: email,
+      subject: `Top-Up Confirmed — ${vars.DESTINATION}`,
+      html,
+      text: `Top-up of ${vars.TOPUP_AMOUNT} confirmed for ${vars.DESTINATION}. New balance: ${vars.NEW_BALANCE}`
+    });
+  }
+
+  async sendDataLowWarning(email, vars) {
+    const html = this.loadTemplate('data-low-warning', vars);
+    return this.sendEmail({
+      to: email,
+      subject: `Data Running Low — ${vars.DESTINATION} ⚠️`,
+      html,
+      text: `Your eSIM for ${vars.DESTINATION} has ${vars.DATA_REMAINING} remaining of ${vars.DATA_TOTAL}.`
+    });
+  }
+
+  async sendSupportTicketReceived(email, vars) {
+    const html = this.loadTemplate('support-ticket-received', vars);
+    return this.sendEmail({
+      to: email,
+      subject: `Support Ticket #${vars.TICKET_ID} Received`,
+      html,
+      text: `We received your support request (Ticket #${vars.TICKET_ID}: ${vars.SUBJECT}).`
+    });
+  }
+
+  async sendSupportTicketResolved(email, vars) {
+    const html = this.loadTemplate('support-ticket-resolved', vars);
+    return this.sendEmail({
+      to: email,
+      subject: `Support Ticket #${vars.TICKET_ID} Resolved ✅`,
+      html,
+      text: `Your ticket #${vars.TICKET_ID} has been resolved: ${vars.RESOLUTION}`
+    });
+  }
+
+  async sendPaymentFailed(email, vars) {
+    const html = this.loadTemplate('payment-failed', vars);
+    return this.sendEmail({
+      to: email,
+      subject: 'Payment Failed — Action Required',
+      html,
+      text: `Payment of ${vars.AMOUNT} for ${vars.PRODUCT} failed: ${vars.FAILURE_REASON}. Retry: ${vars.RETRY_URL}`
+    });
+  }
+
+  async sendRefundProcessed(email, vars) {
+    const html = this.loadTemplate('refund-processed', vars);
+    return this.sendEmail({
+      to: email,
+      subject: `Refund Processed — ${vars.REFUND_AMOUNT}`,
+      html,
+      text: `Refund of ${vars.REFUND_AMOUNT} for order ${vars.ORDER_ID} has been processed to ${vars.PAYMENT_METHOD}.`
+    });
+  }
+
+  async sendVpnSubscriptionConfirmation(email, vars) {
+    const html = this.loadTemplate('vpn-subscription-confirmation', vars);
+    return this.sendEmail({
+      to: email,
+      subject: 'VPN Subscription Active! 🛡️',
+      html,
+      text: `Your VPN subscription (${vars.PLAN_NAME}) is now active. Next billing: ${vars.NEXT_BILLING}`
+    });
+  }
+
+  async sendVpnSubscriptionCancelled(email, vars) {
+    const html = this.loadTemplate('vpn-subscription-cancelled', vars);
+    return this.sendEmail({
+      to: email,
+      subject: 'VPN Subscription Cancelled',
+      html,
+      text: `Your VPN subscription has been cancelled. Access until: ${vars.ACCESS_UNTIL}`
+    });
+  }
+
+  // Legacy compatibility — maps old signature to new template
   async sendVerificationEmail(email, verificationToken) {
-    const verificationUrl = `${process.env.APP_URL}/verify-email?token=${verificationToken}`;
-    
-    const html = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .button { 
-              display: inline-block; 
-              padding: 12px 24px; 
-              background-color: #007bff; 
-              color: white; 
-              text-decoration: none; 
-              border-radius: 5px; 
-              margin: 20px 0;
-            }
-            .footer { margin-top: 30px; font-size: 12px; color: #666; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <h2>Verify Your Email Address</h2>
-            <p>Thank you for registering with eSIM Service!</p>
-            <p>Please click the button below to verify your email address:</p>
-            <a href="${verificationUrl}" class="button">Verify Email</a>
-            <p>Or copy and paste this link into your browser:</p>
-            <p>${verificationUrl}</p>
-            <p>This link will expire in 24 hours.</p>
-            <div class="footer">
-              <p>If you didn't create an account, please ignore this email.</p>
-            </div>
-          </div>
-        </body>
-      </html>
-    `;
-
-    return this.sendEmail({
-      to: email,
-      subject: 'Verify Your Email Address',
-      html,
-      text: `Please verify your email by visiting: ${verificationUrl}`
-    });
+    return this.sendWelcomeEmail(email, { NAME: email.split('@')[0] });
   }
 
-  // Send password reset email
-  async sendPasswordResetEmail(email, resetToken) {
-    const resetUrl = `${process.env.APP_URL}/reset-password?token=${resetToken}`;
-    
-    const html = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .button { 
-              display: inline-block; 
-              padding: 12px 24px; 
-              background-color: #dc3545; 
-              color: white; 
-              text-decoration: none; 
-              border-radius: 5px; 
-              margin: 20px 0;
-            }
-            .footer { margin-top: 30px; font-size: 12px; color: #666; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <h2>Reset Your Password</h2>
-            <p>We received a request to reset your password.</p>
-            <p>Click the button below to reset your password:</p>
-            <a href="${resetUrl}" class="button">Reset Password</a>
-            <p>Or copy and paste this link into your browser:</p>
-            <p>${resetUrl}</p>
-            <p>This link will expire in 1 hour.</p>
-            <div class="footer">
-              <p>If you didn't request a password reset, please ignore this email.</p>
-            </div>
-          </div>
-        </body>
-      </html>
-    `;
-
-    return this.sendEmail({
-      to: email,
-      subject: 'Reset Your Password',
-      html,
-      text: `Reset your password by visiting: ${resetUrl}`
-    });
-  }
-
-  // Send order confirmation email
   async sendOrderConfirmationEmail(email, orderDetails) {
-    const html = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .order-details { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0; }
-            .footer { margin-top: 30px; font-size: 12px; color: #666; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <h2>Order Confirmation</h2>
-            <p>Thank you for your purchase!</p>
-            <div class="order-details">
-              <h3>Order Details</h3>
-              <p><strong>Order ID:</strong> ${orderDetails.orderId}</p>
-              <p><strong>Plan:</strong> ${orderDetails.planName}</p>
-              <p><strong>Amount:</strong> ${orderDetails.amount} ${orderDetails.currency}</p>
-              <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-            </div>
-            <p>Your eSIM will be activated shortly. You will receive installation instructions in a separate email.</p>
-            <div class="footer">
-              <p>Thank you for choosing eSIM Service!</p>
-            </div>
-          </div>
-        </body>
-      </html>
-    `;
-
-    return this.sendEmail({
-      to: email,
-      subject: 'Order Confirmation - eSIM Service',
-      html,
-      text: `Order confirmed! Order ID: ${orderDetails.orderId}`
+    return this.sendPurchaseConfirmation(email, {
+      NAME: orderDetails.name || email.split('@')[0],
+      ORDER_ID: orderDetails.orderId,
+      DESTINATION: orderDetails.destination || 'N/A',
+      PLAN_NAME: orderDetails.planName,
+      DATA_AMOUNT: orderDetails.dataAmount || 'N/A',
+      VALIDITY: orderDetails.validity || 'N/A',
+      TOTAL_PRICE: `${orderDetails.amount} ${orderDetails.currency}`
     });
   }
 
@@ -241,4 +260,3 @@ class EmailService {
 }
 
 module.exports = new EmailService();
-
