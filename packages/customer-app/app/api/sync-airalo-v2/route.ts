@@ -206,7 +206,7 @@ async function handleSync(source: string) {
       status: 'active',
       provider: 'airalo',
       package_type: pkg.type || 'sim',
-      plan_type: pkg.operator_plan_type || 'data',
+      plan_type: ['global', 'regional'].includes(pkg.operator_type) ? 'regional' : 'country',
       is_enabled: true,
       synced_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
