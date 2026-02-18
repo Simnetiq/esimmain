@@ -31,6 +31,11 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'cdn-revamp.airalo.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'eujmomonscnlmwcbkbfy.supabase.co',
         pathname: '/storage/v1/object/public/**',
       },

@@ -1,274 +1,165 @@
-import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
+import { createClient } from '@supabase/supabase-js';
+
+function getSupabase() {
+  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  return createClient(url, key);
+}
 
 export default async function sitemap() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.simnetiq.store';
-  
-  // Supported languages
   const languages = ['en', 'es', 'fr', 'de', 'ar', 'he', 'ru'];
-  
-  // Static pages - Main (high priority, indexed)
-  const staticPages = [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1.0,
-    },
-    {
-      url: `${baseUrl}/esim-plans`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/blog`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/contact`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/about`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/affiliate-program`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/jobs`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.6,
-    },
-  ];
+  const now = new Date().toISOString();
 
-  // Login page (lower priority - users find via navigation)
-  const authPages = [
-    {
-      url: `${baseUrl}/login`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.4,
-    },
-  ];
+  // Helper: generate hreflang alternates for a path
+  function withAlternates(path, lastmod, changefreq, priority) {
+    const alternates = {};
+    languages.forEach(lang => {
+      alternates[lang] = lang === 'en'
+        ? `${baseUrl}${path}`
+        : `${baseUrl}/${lang}${path}`;
+    });
 
-  // Legal pages
-  const legalPages = [
-    {
-      url: `${baseUrl}/privacy-policy`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
-    {
-      url: `${baseUrl}/terms-of-service`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
-    {
-      url: `${baseUrl}/cookie-policy`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
-    {
-      url: `${baseUrl}/return-policy`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
-  ];
-
-  // Multilingual pages - generate for all non-English languages
-  const multilingualPages = [];
-  const mainPages = ['', '/blog', '/contact', '/esim-plans', '/affiliate-program', '/jobs', '/about'];
-  const legalPagesMultilang = ['/privacy-policy', '/terms-of-service', '/cookie-policy', '/return-policy'];
-  
-  languages.forEach(lang => {
-    if (lang !== 'en') {
-      // Main pages with higher priority
-      mainPages.forEach(page => {
-        const priority = page === '' ? 0.9 
-          : page === '/esim-plans' ? 0.85 
-          : page === '/blog' ? 0.8 
-          : 0.6;
-        
-        const changeFreq = (page === '' || page === '/blog' || page === '/esim-plans') ? 'daily' : 'weekly';
-        
-        multilingualPages.push({
-          url: `${baseUrl}/${lang}${page}`,
-          lastModified: new Date(),
-          changeFrequency: changeFreq,
-          priority: priority,
-        });
-      });
-      
-      // Legal pages in other languages
-      legalPagesMultilang.forEach(page => {
-        multilingualPages.push({
-          url: `${baseUrl}/${lang}${page}`,
-          lastModified: new Date(),
-          changeFrequency: 'yearly',
-          priority: 0.3,
-        });
-      });
-      
-      // Login page in other languages
-      multilingualPages.push({
-        url: `${baseUrl}/${lang}/login`,
-        lastModified: new Date(),
-        changeFrequency: 'monthly',
-        priority: 0.4,
-      });
-    }
-  });
-
-  // Fetch blog posts dynamically from BOTH collections for maximum coverage
-  let blogPosts = [];
-  const addedSlugs = new Set(); // Track added slugs to avoid duplicates
-  
-  try {
-    // Method 1: Query blog_posts_translations (new structure with separate translations)
-    try {
-      const translationsRef = collection(db, 'blog_posts_translations');
-      const translationsQuery = query(translationsRef);
-      const translationsSnapshot = await getDocs(translationsQuery);
-      
-      translationsSnapshot.forEach((doc) => {
-        const translation = doc.data();
-        const slug = translation.slug;
-        const language = translation.language || 'en';
-        const lastModified = translation.updatedAt?.toDate() || translation.createdAt?.toDate() || new Date();
-        
-        if (slug && !addedSlugs.has(`${language}:${slug}`)) {
-          const blogUrl = language === 'en' 
-            ? `${baseUrl}/blog/${slug}`
-            : `${baseUrl}/${language}/blog/${slug}`;
-          
-          blogPosts.push({
-            url: blogUrl,
-            lastModified: lastModified,
-            changeFrequency: 'weekly',
-            priority: 0.7,
-          });
-          addedSlugs.add(`${language}:${slug}`);
-        }
-      });
-      
-    } catch (e) {
-    }
-    
-    // Method 2: Query blog_posts (legacy structure with embedded translations)
-    try {
-      const blogsRef = collection(db, 'blog_posts');
-      const blogsQuery = query(
-        blogsRef,
-        where('status', '==', 'published'),
-        orderBy('publishedAt', 'desc')
-      );
-      const blogsSnapshot = await getDocs(blogsQuery);
-      
-      blogsSnapshot.forEach((doc) => {
-        const post = doc.data();
-        const baseSlug = post.baseSlug || post.slug;
-        const lastModified = post.updatedAt?.toDate() || post.publishedAt?.toDate() || new Date();
-        
-        // Add English version
-        if (baseSlug && !addedSlugs.has(`en:${baseSlug}`)) {
-          blogPosts.push({
-            url: `${baseUrl}/blog/${baseSlug}`,
-            lastModified: lastModified,
-            changeFrequency: 'weekly',
-            priority: 0.7,
-          });
-          addedSlugs.add(`en:${baseSlug}`);
-        }
-        
-        // Add translations if they exist in the post
-        if (post.translations) {
-          Object.entries(post.translations).forEach(([lang, translation]) => {
-            if (lang !== 'en' && translation?.slug && !addedSlugs.has(`${lang}:${translation.slug}`)) {
-              blogPosts.push({
-                url: `${baseUrl}/${lang}/blog/${translation.slug}`,
-                lastModified: lastModified,
-                changeFrequency: 'weekly',
-                priority: 0.7,
-              });
-              addedSlugs.add(`${lang}:${translation.slug}`);
-            }
-          });
-        }
-        
-        // Also check availableLanguages array
-        if (post.availableLanguages && Array.isArray(post.availableLanguages)) {
-          post.availableLanguages.forEach(lang => {
-            if (lang !== 'en' && baseSlug) {
-              const langSlug = `${baseSlug}-${lang}`;
-              if (!addedSlugs.has(`${lang}:${langSlug}`)) {
-                blogPosts.push({
-                  url: `${baseUrl}/${lang}/blog/${langSlug}`,
-                  lastModified: lastModified,
-                  changeFrequency: 'weekly',
-                  priority: 0.7,
-                });
-                addedSlugs.add(`${lang}:${langSlug}`);
-              }
-            }
-          });
-        }
-      });
-      
-    } catch (e) {
-    }
-    
-  } catch (error) {
+    return {
+      url: `${baseUrl}${path}`,
+      lastModified: lastmod || now,
+      changeFrequency: changefreq,
+      priority: priority,
+      alternates: { languages: alternates },
+    };
   }
 
-  // Fetch job postings dynamically
-  let jobPages = [];
-  try {
-    const jobsRef = collection(db, 'jobs');
-    const jobsQuery = query(
-      jobsRef,
-      where('status', '==', 'active'),
-      orderBy('createdAt', 'desc')
-    );
-    
-    const jobsSnapshot = await getDocs(jobsQuery);
-    
-    jobsSnapshot.forEach((doc) => {
-      const job = doc.data();
-      const lastModified = job.updatedAt?.toDate() || job.createdAt?.toDate() || new Date();
-      
-      jobPages.push({
-        url: `${baseUrl}/jobs/${doc.id}`,
-        lastModified: lastModified,
-        changeFrequency: 'weekly',
-        priority: 0.6,
+  // --- Static pages ---
+  const staticPages = [
+    withAlternates('', now, 'daily', 1.0),
+    withAlternates('/esim-plans', now, 'daily', 0.9),
+    withAlternates('/blog', now, 'daily', 0.9),
+    withAlternates('/contact', now, 'monthly', 0.7),
+    withAlternates('/about', now, 'monthly', 0.7),
+    withAlternates('/affiliate-program', now, 'monthly', 0.8),
+    withAlternates('/jobs', now, 'weekly', 0.6),
+    withAlternates('/login', now, 'monthly', 0.4),
+    withAlternates('/privacy-policy', now, 'yearly', 0.3),
+    withAlternates('/terms-of-service', now, 'yearly', 0.3),
+    withAlternates('/cookie-policy', now, 'yearly', 0.3),
+    withAlternates('/return-policy', now, 'yearly', 0.3),
+  ];
+
+  // --- Localized static pages (non-English) ---
+  const localizedPages = [];
+  const mainPaths = ['', '/esim-plans', '/blog', '/contact', '/about', '/affiliate-program', '/jobs'];
+  const legalPaths = ['/privacy-policy', '/terms-of-service', '/cookie-policy', '/return-policy'];
+
+  languages.forEach(lang => {
+    if (lang === 'en') return;
+    mainPaths.forEach(path => {
+      const priority = path === '' ? 0.9 : path === '/esim-plans' ? 0.85 : path === '/blog' ? 0.8 : 0.6;
+      const freq = ['', '/esim-plans', '/blog'].includes(path) ? 'daily' : 'weekly';
+      localizedPages.push({
+        url: `${baseUrl}/${lang}${path}`,
+        lastModified: now,
+        changeFrequency: freq,
+        priority,
       });
     });
-  } catch (error) {
+    legalPaths.forEach(path => {
+      localizedPages.push({
+        url: `${baseUrl}/${lang}${path}`,
+        lastModified: now,
+        changeFrequency: 'yearly',
+        priority: 0.3,
+      });
+    });
+    localizedPages.push({
+      url: `${baseUrl}/${lang}/login`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.4,
+    });
+  });
+
+  // --- Country eSIM pages from Supabase ---
+  const countryPages = [];
+  const supabase = getSupabase();
+
+  if (supabase) {
+    try {
+      const { data: countries } = await supabase
+        .from('countries')
+        .select('slug, name, updated_at')
+        .eq('is_active', true)
+        .gt('plan_count', 0)
+        .order('name');
+
+      if (countries) {
+        for (const country of countries) {
+          const lastmod = country.updated_at || now;
+          // English: /esim/germany, other langs: /fr/esim/germany
+          countryPages.push(withAlternates(`/esim/${country.slug}`, lastmod, 'weekly', 0.8));
+
+          // Also add localized versions
+          languages.forEach(lang => {
+            if (lang === 'en') return;
+            countryPages.push({
+              url: `${baseUrl}/${lang}/esim/${country.slug}`,
+              lastModified: lastmod,
+              changeFrequency: 'weekly',
+              priority: 0.75,
+            });
+          });
+        }
+      }
+    } catch (e) {
+      console.error('Sitemap: failed to fetch countries', e);
+    }
+
+    // --- Blog posts from Supabase (if migrated) or skip ---
+    // Check if blog_posts table exists in this Supabase
+    try {
+      const { data: posts } = await supabase
+        .from('blog_posts')
+        .select('slug, updated_at, published_at')
+        .eq('status', 'published')
+        .order('published_at', { ascending: false });
+
+      if (posts) {
+        for (const post of posts) {
+          const lastmod = post.updated_at || post.published_at || now;
+          countryPages.push({
+            url: `${baseUrl}/blog/${post.slug}`,
+            lastModified: lastmod,
+            changeFrequency: 'weekly',
+            priority: 0.7,
+          });
+        }
+      }
+    } catch (e) {
+      // blog_posts table may not exist in this Supabase - that's OK
+    }
   }
 
-  // Combine all URLs
+  // --- Regions pages ---
+  if (supabase) {
+    try {
+      const { data: regions } = await supabase
+        .from('regions')
+        .select('slug, updated_at')
+        .eq('is_active', true);
+
+      if (regions) {
+        for (const region of regions) {
+          countryPages.push(withAlternates(`/esim/${region.slug}`, region.updated_at || now, 'weekly', 0.75));
+        }
+      }
+    } catch (e) {
+      // regions table may not exist
+    }
+  }
+
   return [
     ...staticPages,
-    ...authPages,
-    ...legalPages,
-    ...multilingualPages,
-    ...blogPosts,
-    ...jobPages,
+    ...localizedPages,
+    ...countryPages,
   ];
 }
