@@ -189,6 +189,7 @@ export function hasAdminPermission(userProfile, permission) {
  * Get user role from Supabase
  */
 export async function getUserRole(userId) {
+  if (!userId) return ADMIN_ROLES.USER;
   try {
     const supabase = getSupabase();
     
