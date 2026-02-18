@@ -14,7 +14,7 @@ if (supabaseUrl && supabaseAnonKey) {
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: true,
-      flowType: 'pkce',
+      flowType: 'implicit',
     },
     global: {
       headers: {
