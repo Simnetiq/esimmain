@@ -1,100 +1,106 @@
-import { db, storage } from '../firebase/config';
-import { collection, addDoc, serverTimestamp, getDocs, query, orderBy } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+/**
+ * Jobs Service - Supabase version
+ */
 
-// Create a new job application
+import { getSupabase, isSupabaseAvailable } from '../lib/supabase';
+
 export const createJobApplication = async (applicationData) => {
   try {
+    const supabase = getSupabase();
     let resumeUrl = null;
-    
+    let resumeFileName = null;
+
     // Upload resume file if provided
     if (applicationData.resume) {
-      const resumeRef = ref(storage, `job-applications/resumes/${Date.now()}_${applicationData.resume.name}`);
-      const uploadResult = await uploadBytes(resumeRef, applicationData.resume);
-      resumeUrl = await getDownloadURL(uploadResult.ref);
+      const fileName = `${Date.now()}_${applicationData.resume.name}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('job-applications')
+        .upload(`resumes/${fileName}`, applicationData.resume);
+
+      if (uploadError) throw new Error(`Failed to upload resume: ${uploadError.message}`);
+
+      const { data: urlData } = supabase.storage
+        .from('job-applications')
+        .getPublicUrl(`resumes/${fileName}`);
+
+      resumeUrl = urlData.publicUrl;
+      resumeFileName = applicationData.resume.name;
     }
 
-    // Create application document
     const applicationDoc = {
       name: applicationData.name,
       email: applicationData.email,
       phone: applicationData.phone,
       position: applicationData.position,
-      resumeUrl: resumeUrl,
-      resumeFileName: applicationData.resume?.name || null,
-      status: 'pending', // pending, reviewed, contacted, rejected, hired
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
+      resume_url: resumeUrl,
+      resume_file_name: resumeFileName,
+      status: 'pending'
     };
 
-    const docRef = await addDoc(collection(db, 'jobApplications'), applicationDoc);
-    
-    return { id: docRef.id, ...applicationDoc };
+    const { data, error } = await supabase
+      .from('job_applications')
+      .insert(applicationDoc)
+      .select()
+      .single();
+
+    if (error) throw new Error(`Failed to create job application: ${error.message}`);
+    return { id: data.id, ...data };
   } catch (error) {
     throw new Error(`Failed to create job application: ${error.message}`);
   }
 };
 
-// Get all job applications (for admin)
 export const getJobApplications = async () => {
   try {
-    const applicationsRef = collection(db, 'jobApplications');
-    const q = query(applicationsRef, orderBy('createdAt', 'desc'));
-    const querySnapshot = await getDocs(q);
-    
-    const applications = [];
-    querySnapshot.forEach((doc) => {
-      applications.push({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate() || new Date(),
-        updatedAt: doc.data().updatedAt?.toDate() || new Date()
-      });
-    });
-    
-    return applications;
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from('job_applications')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw new Error(`Failed to get job applications: ${error.message}`);
+
+    return (data || []).map(row => ({
+      id: row.id,
+      ...row,
+      createdAt: row.created_at ? new Date(row.created_at) : new Date(),
+      updatedAt: row.updated_at ? new Date(row.updated_at) : new Date()
+    }));
   } catch (error) {
     throw new Error(`Failed to get job applications: ${error.message}`);
   }
 };
 
-// Update job application status (for admin)
 export const updateJobApplicationStatus = async (applicationId, newStatus) => {
   try {
-    const { doc, updateDoc } = await import('firebase/firestore');
-    const applicationRef = doc(db, 'jobApplications', applicationId);
-    
-    await updateDoc(applicationRef, {
-      status: newStatus,
-      updatedAt: serverTimestamp()
-    });
-    
+    const supabase = getSupabase();
+    const { error } = await supabase
+      .from('job_applications')
+      .update({ status: newStatus, updated_at: new Date().toISOString() })
+      .eq('id', applicationId);
+
+    if (error) throw new Error(`Failed to update job application status: ${error.message}`);
     return true;
   } catch (error) {
     throw new Error(`Failed to update job application status: ${error.message}`);
   }
 };
 
-// Delete job application (for admin)
 export const deleteJobApplication = async (applicationId) => {
   try {
-    const { doc, deleteDoc } = await import('firebase/firestore');
-    const applicationRef = doc(db, 'jobApplications', applicationId);
-    
-    await deleteDoc(applicationRef);
-    
+    const supabase = getSupabase();
+    const { error } = await supabase.from('job_applications').delete().eq('id', applicationId);
+    if (error) throw new Error(`Failed to delete job application: ${error.message}`);
     return true;
   } catch (error) {
     throw new Error(`Failed to delete job application: ${error.message}`);
   }
 };
 
-// Get job application statistics (for admin)
 export const getJobApplicationStats = async () => {
   try {
     const applications = await getJobApplications();
-    
-    const stats = {
+    return {
       total: applications.length,
       pending: applications.filter(app => app.status === 'pending').length,
       reviewed: applications.filter(app => app.status === 'reviewed').length,
@@ -102,8 +108,6 @@ export const getJobApplicationStats = async () => {
       rejected: applications.filter(app => app.status === 'rejected').length,
       hired: applications.filter(app => app.status === 'hired').length
     };
-    
-      return stats;
   } catch (error) {
     throw new Error(`Failed to get job application stats: ${error.message}`);
   }

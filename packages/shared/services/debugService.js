@@ -1,103 +1,76 @@
-import { db } from '../firebase/config';
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+/**
+ * Debug Service - Supabase version
+ */
 
-// Debug function to check referral transactions
+import { getSupabase, isSupabaseAvailable } from '../lib/supabase';
+
 export const debugReferralTransactions = async (userId) => {
   try {
-    
+    const supabase = getSupabase();
+
     // Get user profile
-    const userDoc = await getDoc(doc(db, 'users', userId));
-    const userData = userDoc.data();
-    
-    // Get user's referral code
-    const referralCode = userData?.referralCode;
-    
+    const { data: userData } = await supabase.from('users').select('*').eq('id', userId).single();
+    const referralCode = userData?.referral_code;
+
     // Get referral code document
+    let referralData = null;
     if (referralCode) {
-      const referralDoc = await getDoc(doc(db, 'referralCodes', referralCode));
-      const referralData = referralDoc.data();
+      const { data } = await supabase.from('referral_codes').select('*').eq('code', referralCode).single();
+      referralData = data;
     }
-    
+
     // Get all transactions for this user
-    const transactionsSnapshot = await getDocs(
-      collection(db, 'users', userId, 'transactions')
-    );
-    
-    const transactions = transactionsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-    
-    
+    const { data: transactions } = await supabase
+      .from('user_transactions')
+      .select('*')
+      .eq('user_id', userId);
+
+    const allTransactions = transactions || [];
+
     // Filter referral transactions
-    const referralTransactions = transactions.filter(t => 
-      t.method === 'referral' || 
+    const referralTransactions = allTransactions.filter(t =>
+      t.method === 'referral' ||
       t.description?.includes('Referral earnings') ||
       t.description?.includes('referral')
     );
-    
-    
+
     // Get users who used this referral code
+    let referredUsers = [];
     if (referralCode) {
-      const usersSnapshot = await getDocs(
-        query(
-          collection(db, 'users'),
-          where('referredBy', '==', referralCode)
-        )
-      );
-      
-      const referredUsers = usersSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      
+      const { data: users } = await supabase
+        .from('users')
+        .select('id, email, referred_by, created_at')
+        .eq('referred_by', referralCode);
+      referredUsers = users || [];
     }
-    
+
     return {
       userProfile: userData,
-      referralCode: referralCode,
-      referralData: referralCode ? (await getDoc(doc(db, 'referralCodes', referralCode))).data() : null,
-      allTransactions: transactions,
-      referralTransactions: referralTransactions,
-      referredUsers: referralCode ? (await getDocs(query(collection(db, 'users'), where('referredBy', '==', referralCode)))).docs.map(doc => ({ id: doc.id, ...doc.data() })) : []
+      referralCode,
+      referralData,
+      allTransactions,
+      referralTransactions,
+      referredUsers
     };
-    
   } catch (error) {
     return { error: error.message };
   }
 };
 
-// Debug function to check all referral codes and their usage
 export const debugAllReferralCodes = async () => {
   try {
-    
-    // Get all referral codes
-    const referralCodesSnapshot = await getDocs(collection(db, 'referralCodes'));
-    const referralCodes = referralCodesSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-    
-    
-    // Get all users who used referral codes
-    const usersSnapshot = await getDocs(
-      query(
-        collection(db, 'users'),
-        where('referredBy', '!=', null)
-      )
-    );
-    
-    const referredUsers = usersSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-    
-    
+    const supabase = getSupabase();
+
+    const { data: referralCodes } = await supabase.from('referral_codes').select('*');
+    const { data: referredUsers } = await supabase
+      .from('users')
+      .select('id, email, referred_by, created_at')
+      .not('referred_by', 'is', null);
+
     return {
-      referralCodes: referralCodes,
-      referredUsers: referredUsers
+      referralCodes: referralCodes || [],
+      referredUsers: referredUsers || []
     };
-    
   } catch (error) {
     return { error: error.message };
   }

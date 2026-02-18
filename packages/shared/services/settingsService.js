@@ -1,48 +1,13 @@
-import { 
-  doc, 
-  getDoc, 
-  setDoc, 
-  serverTimestamp 
-} from 'firebase/firestore';
-import { db } from '../firebase/config';
+/**
+ * Settings Service - Supabase version
+ */
 
-// Default settings structure
+import { getSupabase, isSupabaseAvailable } from '../lib/supabase';
+
 const defaultSettings = {
-  // Social Media Links
-  socialMedia: {
-    linkedin: '',
-    facebook: '',
-    twitter: '',
-    instagram: '',
-    youtube: '',
-    tiktok: '',
-    telegram: '',
-    whatsapp: ''
-  },
-  
-  // Contact Information
-  contact: {
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    state: '',
-    country: '',
-    postalCode: '',
-    website: ''
-  },
-  
-  // Company Information
-  company: {
-    name: '',
-    description: '',
-    founded: '',
-    employees: '',
-    industry: '',
-    logo: ''
-  },
-  
-  // Business Hours
+  socialMedia: { linkedin: '', facebook: '', twitter: '', instagram: '', youtube: '', tiktok: '', telegram: '', whatsapp: '' },
+  contact: { email: '', phone: '', address: '', city: '', state: '', country: '', postalCode: '', website: '' },
+  company: { name: '', description: '', founded: '', employees: '', industry: '', logo: '' },
   businessHours: {
     monday: { open: '09:00', close: '18:00', closed: false },
     tuesday: { open: '09:00', close: '18:00', closed: false },
@@ -52,94 +17,57 @@ const defaultSettings = {
     saturday: { open: '10:00', close: '16:00', closed: false },
     sunday: { open: '00:00', close: '00:00', closed: true }
   },
-  
-  // SEO Settings
-  seo: {
-    title: '',
-    description: '',
-    keywords: [],
-    ogImage: '',
-    favicon: ''
-  },
-  
-  // App Settings
-  app: {
-    maintenanceMode: false,
-    allowRegistration: true,
-    requireEmailVerification: false,
-    maxFileSize: 10, // MB
-    supportedFormats: ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx']
-  },
-  
-  // App Store Links
-  appStore: {
-    iosUrl: '',
-    androidUrl: ''
-  },
-  
-  // Discount Settings
-  referral: {
-    discountPercentage: 17,
-    minimumPrice: 0.5
-  },
-  
-  regular: {
-    discountPercentage: 10,
-    minimumPrice: 0.5
-  },
-  
-  // Metadata
-  updatedAt: serverTimestamp(),
-  updatedBy: ''
+  seo: { title: '', description: '', keywords: [], ogImage: '', favicon: '' },
+  app: { maintenanceMode: false, allowRegistration: true, requireEmailVerification: false, maxFileSize: 10, supportedFormats: ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx'] },
+  appStore: { iosUrl: '', androidUrl: '' },
+  referral: { discountPercentage: 17, minimumPrice: 0.5 },
+  regular: { discountPercentage: 10, minimumPrice: 0.5 }
 };
 
-// Get all settings
 export const getSettings = async () => {
   try {
-    const settingsRef = doc(db, 'settings', 'general');
-    const settingsDoc = await getDoc(settingsRef);
-    
-    if (settingsDoc.exists()) {
-      const data = settingsDoc.data();
-      return {
-        id: settingsDoc.id,
-        ...data,
-        // Merge with defaults for any missing fields
-        socialMedia: { ...defaultSettings.socialMedia, ...data.socialMedia },
-        contact: { ...defaultSettings.contact, ...data.contact },
-        company: { ...defaultSettings.company, ...data.company },
-        businessHours: { ...defaultSettings.businessHours, ...data.businessHours },
-        seo: { ...defaultSettings.seo, ...data.seo },
-        app: { ...defaultSettings.app, ...data.app },
-        appStore: { ...defaultSettings.appStore, ...data.appStore },
-        referral: { ...defaultSettings.referral, ...data.referral },
-        regular: { ...defaultSettings.regular, ...data.regular }
-      };
-    } else {
-      // Return defaults if no settings exist
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from('app_config')
+      .select('value')
+      .eq('key', 'settings_general')
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error;
+
+    if (data?.value) {
+      const d = data.value;
       return {
         id: 'general',
-        ...defaultSettings
+        ...d,
+        socialMedia: { ...defaultSettings.socialMedia, ...d.socialMedia },
+        contact: { ...defaultSettings.contact, ...d.contact },
+        company: { ...defaultSettings.company, ...d.company },
+        businessHours: { ...defaultSettings.businessHours, ...d.businessHours },
+        seo: { ...defaultSettings.seo, ...d.seo },
+        app: { ...defaultSettings.app, ...d.app },
+        appStore: { ...defaultSettings.appStore, ...d.appStore },
+        referral: { ...defaultSettings.referral, ...d.referral },
+        regular: { ...defaultSettings.regular, ...d.regular }
       };
     }
+    return { id: 'general', ...defaultSettings };
   } catch (error) {
     console.error('Error getting settings:', error);
     throw error;
   }
 };
 
-// Update settings
 export const updateSettings = async (settingsData, userId) => {
   try {
-    const settingsRef = doc(db, 'settings', 'general');
-    
-    const updateData = {
-      ...settingsData,
-      updatedAt: serverTimestamp(),
-      updatedBy: userId
-    };
-    
-    await setDoc(settingsRef, updateData, { merge: true });
+    const supabase = getSupabase();
+    const updateData = { ...settingsData, updatedAt: new Date().toISOString(), updatedBy: userId };
+
+    const { error } = await supabase
+      .from('app_config')
+      .upsert({ key: 'settings_general', value: updateData }, { onConflict: 'key' });
+
+    if (error) throw error;
     return { success: true };
   } catch (error) {
     console.error('Error updating settings:', error);
@@ -147,18 +75,20 @@ export const updateSettings = async (settingsData, userId) => {
   }
 };
 
-// Update specific section of settings
 export const updateSettingsSection = async (section, data, userId) => {
   try {
-    const settingsRef = doc(db, 'settings', 'general');
-    
-    const updateData = {
-      [section]: data,
-      updatedAt: serverTimestamp(),
-      updatedBy: userId
-    };
-    
-    await setDoc(settingsRef, updateData, { merge: true });
+    const currentSettings = await getSettings();
+    currentSettings[section] = data;
+    currentSettings.updatedAt = new Date().toISOString();
+    currentSettings.updatedBy = userId;
+    delete currentSettings.id;
+
+    const supabase = getSupabase();
+    const { error } = await supabase
+      .from('app_config')
+      .upsert({ key: 'settings_general', value: currentSettings }, { onConflict: 'key' });
+
+    if (error) throw error;
     return { success: true };
   } catch (error) {
     console.error('Error updating settings section:', error);
@@ -166,7 +96,6 @@ export const updateSettingsSection = async (section, data, userId) => {
   }
 };
 
-// Get social media links only
 export const getSocialMediaLinks = async () => {
   try {
     const settings = await getSettings();
@@ -177,7 +106,6 @@ export const getSocialMediaLinks = async () => {
   }
 };
 
-// Get contact information only
 export const getContactInfo = async () => {
   try {
     const settings = await getSettings();
@@ -188,7 +116,6 @@ export const getContactInfo = async () => {
   }
 };
 
-// Get app store links only
 export const getAppStoreLinks = async () => {
   try {
     const settings = await getSettings();
@@ -199,7 +126,6 @@ export const getAppStoreLinks = async () => {
   }
 };
 
-// Get company information only
 export const getCompanyInfo = async () => {
   try {
     const settings = await getSettings();
@@ -210,43 +136,36 @@ export const getCompanyInfo = async () => {
   }
 };
 
-// Get referral settings only
 export const getReferralSettings = async () => {
   try {
     const settings = await getSettings();
-    const referralSettings = settings.referral || defaultSettings.referral;
-    return referralSettings;
+    return settings.referral || defaultSettings.referral;
   } catch (error) {
     console.error('Error getting referral settings:', error);
     return defaultSettings.referral;
   }
 };
 
-// Get regular settings only
 export const getRegularSettings = async () => {
   try {
     const settings = await getSettings();
-    const regularSettings = settings.regular || { discountPercentage: 10, minimumPrice: 0.5 };
-    return regularSettings;
+    return settings.regular || { discountPercentage: 10, minimumPrice: 0.5 };
   } catch (error) {
     console.error('Error getting regular settings:', error);
     return { discountPercentage: 10, minimumPrice: 0.5 };
   }
 };
 
-// Reset settings to defaults
 export const resetSettingsToDefaults = async (userId) => {
   try {
-    const settingsRef = doc(db, 'settings', 'general');
-    
-    const resetData = {
-      ...defaultSettings,
-      updatedAt: serverTimestamp(),
-      updatedBy: userId,
-      resetAt: serverTimestamp()
-    };
-    
-    await setDoc(settingsRef, resetData);
+    const supabase = getSupabase();
+    const resetData = { ...defaultSettings, updatedAt: new Date().toISOString(), updatedBy: userId, resetAt: new Date().toISOString() };
+
+    const { error } = await supabase
+      .from('app_config')
+      .upsert({ key: 'settings_general', value: resetData }, { onConflict: 'key' });
+
+    if (error) throw error;
     return { success: true };
   } catch (error) {
     console.error('Error resetting settings:', error);
@@ -254,21 +173,14 @@ export const resetSettingsToDefaults = async (userId) => {
   }
 };
 
-// Validate settings data
 export const validateSettings = (settings) => {
   const errors = {};
-  
-  // Validate email
   if (settings.contact?.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(settings.contact.email)) {
     errors.email = 'Please enter a valid email address';
   }
-  
-  // Validate phone
   if (settings.contact?.phone && !/^[\+]?[1-9][\d]{0,15}$/.test(settings.contact.phone.replace(/[\s\-\(\)]/g, ''))) {
     errors.phone = 'Please enter a valid phone number';
   }
-  
-  // Validate URLs
   const urlFields = ['website', 'linkedin', 'facebook', 'twitter', 'instagram', 'youtube', 'tiktok'];
   urlFields.forEach(field => {
     const value = settings.socialMedia?.[field] || settings.contact?.[field];
@@ -276,9 +188,5 @@ export const validateSettings = (settings) => {
       errors[field] = 'Please enter a valid URL starting with http:// or https://';
     }
   });
-  
-  return {
-    isValid: Object.keys(errors).length === 0,
-    errors
-  };
+  return { isValid: Object.keys(errors).length === 0, errors };
 };

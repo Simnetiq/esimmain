@@ -1,103 +1,89 @@
-import {
-  collection,
-  doc,
-  getDocs,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  query,
-  where,
-  orderBy,
-  serverTimestamp
-} from 'firebase/firestore';
-import { db } from '../firebase/config';
+/**
+ * Contact Service - Supabase version
+ */
 
-// Contact request data structure
-const createContactRequestData = (requestData) => {
-  return {
-    name: requestData.name || '',
-    email: requestData.email || '',
-    message: requestData.message || '',
-    type: requestData.type || 'contact', // contact, deletion_request
-    agreementAccepted: requestData.agreementAccepted || false,
-    agreementText: requestData.agreementText || '',
-    status: 'new', // new, in_progress, resolved, closed
-    priority: 'medium', // low, medium, high, urgent
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-    resolvedAt: null,
-    assignedTo: null,
-    notes: []
-  };
-};
+import { getSupabase, isSupabaseAvailable } from '../lib/supabase';
 
-// Create a new contact request
+const createContactRequestData = (requestData) => ({
+  name: requestData.name || '',
+  email: requestData.email || '',
+  message: requestData.message || '',
+  type: requestData.type || 'contact',
+  agreement_accepted: requestData.agreementAccepted || false,
+  agreement_text: requestData.agreementText || '',
+  status: 'new',
+  priority: 'medium',
+  resolved_at: null,
+  assigned_to: null,
+  notes: []
+});
+
 export const createContactRequest = async (requestData) => {
   try {
+    const supabase = getSupabase();
     const contactRequest = createContactRequestData(requestData);
-    const docRef = await addDoc(collection(db, 'contact_requests'), contactRequest);
-    return { success: true, id: docRef.id };
+    const { data, error } = await supabase
+      .from('contact_requests')
+      .insert(contactRequest)
+      .select('id')
+      .single();
+    if (error) throw error;
+    return { success: true, id: data.id };
   } catch (error) {
     console.error('Error creating contact request:', error);
     throw error;
   }
 };
 
-// Get all contact requests
 export const getContactRequests = async () => {
   try {
-    const q = query(
-      collection(db, 'contact_requests'),
-      orderBy('createdAt', 'desc')
-    );
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from('contact_requests')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return (data || []).map(row => ({ id: row.id, ...row }));
   } catch (error) {
     console.error('Error getting contact requests:', error);
     throw error;
   }
 };
 
-// Get contact requests by status
 export const getContactRequestsByStatus = async (status) => {
   try {
-    const q = query(
-      collection(db, 'contact_requests'),
-      where('status', '==', status),
-      orderBy('createdAt', 'desc')
-    );
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from('contact_requests')
+      .select('*')
+      .eq('status', status)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return (data || []).map(row => ({ id: row.id, ...row }));
   } catch (error) {
     console.error('Error getting contact requests by status:', error);
     throw error;
   }
 };
 
-// Update contact request status
 export const updateContactRequestStatus = async (requestId, status, notes = '') => {
   try {
-    const requestRef = doc(db, 'contact_requests', requestId);
+    const supabase = getSupabase();
     const updateData = {
       status,
-      updatedAt: serverTimestamp()
+      updated_at: new Date().toISOString()
     };
-
     if (status === 'resolved' || status === 'closed') {
-      updateData.resolvedAt = serverTimestamp();
+      updateData.resolved_at = new Date().toISOString();
     }
-
     if (notes) {
       updateData.notes = [notes];
     }
-
-    await updateDoc(requestRef, updateData);
+    const { error } = await supabase
+      .from('contact_requests')
+      .update(updateData)
+      .eq('id', requestId);
+    if (error) throw error;
     return { success: true };
   } catch (error) {
     console.error('Error updating contact request status:', error);
@@ -105,10 +91,11 @@ export const updateContactRequestStatus = async (requestId, status, notes = '') 
   }
 };
 
-// Delete contact request
 export const deleteContactRequest = async (requestId) => {
   try {
-    await deleteDoc(doc(db, 'contact_requests', requestId));
+    const supabase = getSupabase();
+    const { error } = await supabase.from('contact_requests').delete().eq('id', requestId);
+    if (error) throw error;
     return { success: true };
   } catch (error) {
     console.error('Error deleting contact request:', error);
@@ -116,14 +103,17 @@ export const deleteContactRequest = async (requestId) => {
   }
 };
 
-// Add note to contact request
 export const addNoteToContactRequest = async (requestId, note) => {
   try {
-    const requestRef = doc(db, 'contact_requests', requestId);
-    await updateDoc(requestRef, {
-      notes: [note],
-      updatedAt: serverTimestamp()
-    });
+    const supabase = getSupabase();
+    const { error } = await supabase
+      .from('contact_requests')
+      .update({
+        notes: [note],
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', requestId);
+    if (error) throw error;
     return { success: true };
   } catch (error) {
     console.error('Error adding note to contact request:', error);

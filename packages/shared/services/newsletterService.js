@@ -1,124 +1,101 @@
-import { 
-  collection, 
-  doc, 
-  getDocs, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  query, 
-  where, 
-  orderBy, 
-  serverTimestamp 
-} from 'firebase/firestore';
-import { db } from '../firebase/config';
+/**
+ * Newsletter Service - Supabase version
+ */
 
-// Newsletter subscription data structure
-const createNewsletterSubscription = (subscriptionData) => {
-  return {
-    email: subscriptionData.email || '',
-    status: 'active', // active, unsubscribed, bounced
-    source: subscriptionData.source || 'website', // website, admin, api
-    subscribedAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-    unsubscribedAt: null,
-    tags: subscriptionData.tags || [],
-    notes: subscriptionData.notes || ''
-  };
-};
+import { getSupabase, isSupabaseAvailable } from '../lib/supabase';
 
-// Subscribe to newsletter
 export const subscribeToNewsletter = async (subscriptionData) => {
   try {
+    const supabase = getSupabase();
+
     // Check if email already exists
-    const existingQuery = query(
-      collection(db, 'newsletter_subscriptions'),
-      where('email', '==', subscriptionData.email)
-    );
-    const existingSnapshot = await getDocs(existingQuery);
-    
-    if (!existingSnapshot.empty) {
-      // Update existing subscription to active if it was unsubscribed
-      const existingDoc = existingSnapshot.docs[0];
-      const existingData = existingDoc.data();
-      
-      if (existingData.status === 'unsubscribed') {
-        await updateDoc(doc(db, 'newsletter_subscriptions', existingDoc.id), {
-          status: 'active',
-          updatedAt: serverTimestamp(),
-          unsubscribedAt: null,
-          source: subscriptionData.source || 'website'
-        });
-        return { success: true, id: existingDoc.id, message: 'Email reactivated' };
-      } else {
-        return { success: false, message: 'Email already subscribed' };
+    const { data: existing } = await supabase
+      .from('newsletter_subscriptions')
+      .select('id, status')
+      .eq('email', subscriptionData.email)
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      const row = existing[0];
+      if (row.status === 'unsubscribed') {
+        const { error } = await supabase
+          .from('newsletter_subscriptions')
+          .update({
+            status: 'active',
+            updated_at: new Date().toISOString(),
+            unsubscribed_at: null,
+            source: subscriptionData.source || 'website'
+          })
+          .eq('id', row.id);
+        if (error) throw error;
+        return { success: true, id: row.id, message: 'Email reactivated' };
       }
+      return { success: false, message: 'Email already subscribed' };
     }
-    
-    // Create new subscription
-    const subscription = createNewsletterSubscription(subscriptionData);
-    const docRef = await addDoc(collection(db, 'newsletter_subscriptions'), subscription);
-    return { success: true, id: docRef.id };
+
+    const { data, error } = await supabase
+      .from('newsletter_subscriptions')
+      .insert({
+        email: subscriptionData.email || '',
+        status: 'active',
+        source: subscriptionData.source || 'website',
+        tags: subscriptionData.tags || [],
+        notes: subscriptionData.notes || ''
+      })
+      .select('id')
+      .single();
+
+    if (error) throw error;
+    return { success: true, id: data.id };
   } catch (error) {
     console.error('Error subscribing to newsletter:', error);
     throw error;
   }
 };
 
-// Get all newsletter subscriptions
 export const getNewsletterSubscriptions = async () => {
   try {
-    const q = query(
-      collection(db, 'newsletter_subscriptions'),
-      orderBy('subscribedAt', 'desc')
-    );
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from('newsletter_subscriptions')
+      .select('*')
+      .order('subscribed_at', { ascending: false });
+    if (error) throw error;
+    return (data || []).map(row => ({ id: row.id, ...row }));
   } catch (error) {
     console.error('Error getting newsletter subscriptions:', error);
     throw error;
   }
 };
 
-// Get subscriptions by status
 export const getNewsletterSubscriptionsByStatus = async (status) => {
   try {
-    const q = query(
-      collection(db, 'newsletter_subscriptions'),
-      where('status', '==', status),
-      orderBy('subscribedAt', 'desc')
-    );
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from('newsletter_subscriptions')
+      .select('*')
+      .eq('status', status)
+      .order('subscribed_at', { ascending: false });
+    if (error) throw error;
+    return (data || []).map(row => ({ id: row.id, ...row }));
   } catch (error) {
     console.error('Error getting newsletter subscriptions by status:', error);
     throw error;
   }
 };
 
-// Update subscription status
 export const updateNewsletterSubscriptionStatus = async (subscriptionId, status, notes = '') => {
   try {
-    const subscriptionRef = doc(db, 'newsletter_subscriptions', subscriptionId);
-    const updateData = {
-      status,
-      updatedAt: serverTimestamp()
-    };
-    
-    if (status === 'unsubscribed') {
-      updateData.unsubscribedAt = serverTimestamp();
-    }
-    
-    if (notes) {
-      updateData.notes = notes;
-    }
-    
-    await updateDoc(subscriptionRef, updateData);
+    const supabase = getSupabase();
+    const updateData = { status, updated_at: new Date().toISOString() };
+    if (status === 'unsubscribed') updateData.unsubscribed_at = new Date().toISOString();
+    if (notes) updateData.notes = notes;
+
+    const { error } = await supabase
+      .from('newsletter_subscriptions')
+      .update(updateData)
+      .eq('id', subscriptionId);
+    if (error) throw error;
     return { success: true };
   } catch (error) {
     console.error('Error updating newsletter subscription status:', error);
@@ -126,10 +103,11 @@ export const updateNewsletterSubscriptionStatus = async (subscriptionId, status,
   }
 };
 
-// Delete newsletter subscription
 export const deleteNewsletterSubscription = async (subscriptionId) => {
   try {
-    await deleteDoc(doc(db, 'newsletter_subscriptions', subscriptionId));
+    const supabase = getSupabase();
+    const { error } = await supabase.from('newsletter_subscriptions').delete().eq('id', subscriptionId);
+    if (error) throw error;
     return { success: true };
   } catch (error) {
     console.error('Error deleting newsletter subscription:', error);
@@ -137,21 +115,17 @@ export const deleteNewsletterSubscription = async (subscriptionId) => {
   }
 };
 
-// Unsubscribe from newsletter
 export const unsubscribeFromNewsletter = async (email) => {
   try {
-    const q = query(
-      collection(db, 'newsletter_subscriptions'),
-      where('email', '==', email)
-    );
-    const querySnapshot = await getDocs(q);
-    
-    if (querySnapshot.empty) {
-      return { success: false, message: 'Email not found' };
-    }
-    
-    const doc = querySnapshot.docs[0];
-    await updateNewsletterSubscriptionStatus(doc.id, 'unsubscribed');
+    const supabase = getSupabase();
+    const { data } = await supabase
+      .from('newsletter_subscriptions')
+      .select('id')
+      .eq('email', email)
+      .limit(1);
+
+    if (!data || data.length === 0) return { success: false, message: 'Email not found' };
+    await updateNewsletterSubscriptionStatus(data[0].id, 'unsubscribed');
     return { success: true };
   } catch (error) {
     console.error('Error unsubscribing from newsletter:', error);
@@ -159,19 +133,15 @@ export const unsubscribeFromNewsletter = async (email) => {
   }
 };
 
-// Get subscription statistics
 export const getNewsletterStats = async () => {
   try {
     const allSubscriptions = await getNewsletterSubscriptions();
-    
-    const stats = {
+    return {
       total: allSubscriptions.length,
       active: allSubscriptions.filter(sub => sub.status === 'active').length,
       unsubscribed: allSubscriptions.filter(sub => sub.status === 'unsubscribed').length,
       bounced: allSubscriptions.filter(sub => sub.status === 'bounced').length
     };
-    
-    return stats;
   } catch (error) {
     console.error('Error getting newsletter stats:', error);
     throw error;

@@ -1,53 +1,34 @@
-import { 
-  collection, 
-  query, 
-  where, 
-  getDocs, 
-  doc, 
-  updateDoc, 
-  deleteDoc, 
-  addDoc, 
-  orderBy, 
-  limit,
-  startAfter,
-  serverTimestamp 
-} from 'firebase/firestore';
-import { db } from '../firebase/config';
-
-const BLACKLIST_COLLECTION = 'blacklist';
-
 /**
- * Get all blacklist records with pagination
+ * Blacklist Service - Supabase version
  */
-export const getBlacklistRecords = async (pageSize = 50, lastDoc = null) => {
+
+import { getSupabase, isSupabaseAvailable } from '../lib/supabase';
+
+const BLACKLIST_TABLE = 'fraud_blocklist';
+
+export const getBlacklistRecords = async (pageSize = 50, offset = 0) => {
   try {
-    let q = query(
-      collection(db, BLACKLIST_COLLECTION),
-      orderBy('createdAt', 'desc'),
-      limit(pageSize)
-    );
+    const supabase = getSupabase();
+    const { data, error, count } = await supabase
+      .from(BLACKLIST_TABLE)
+      .select('*', { count: 'exact' })
+      .order('created_at', { ascending: false })
+      .range(offset, offset + pageSize - 1);
 
-    if (lastDoc) {
-      q = query(q, startAfter(lastDoc));
-    }
+    if (error) throw error;
 
-    const snapshot = await getDocs(q);
-    const records = [];
-    
-    snapshot.forEach((doc) => {
-      records.push({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate?.() || new Date(),
-        updatedAt: doc.data().updatedAt?.toDate?.() || new Date(),
-        blockedAt: doc.data().blockedAt?.toDate?.() || new Date(),
-      });
-    });
+    const records = (data || []).map(row => ({
+      id: row.id,
+      ...row,
+      createdAt: row.created_at ? new Date(row.created_at) : new Date(),
+      updatedAt: row.updated_at ? new Date(row.updated_at) : new Date(),
+      blockedAt: row.blocked_at || row.created_at ? new Date(row.blocked_at || row.created_at) : new Date()
+    }));
 
     return {
       records,
-      lastDoc: snapshot.docs[snapshot.docs.length - 1] || null,
-      hasMore: snapshot.docs.length === pageSize
+      lastDoc: null, // Not needed for Supabase pagination
+      hasMore: (offset + pageSize) < (count || 0)
     };
   } catch (error) {
     console.error('Error fetching blacklist records:', error);
@@ -55,67 +36,59 @@ export const getBlacklistRecords = async (pageSize = 50, lastDoc = null) => {
   }
 };
 
-/**
- * Get blacklist records by user ID
- */
 export const getBlacklistRecordsByUserId = async (userId) => {
   try {
-    const q = query(
-      collection(db, BLACKLIST_COLLECTION),
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc')
-    );
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from(BLACKLIST_TABLE)
+      .select('*')
+      .eq('userId', userId)
+      .order('created_at', { ascending: false });
 
-    const snapshot = await getDocs(q);
-    const records = [];
-    
-    snapshot.forEach((doc) => {
-      records.push({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate?.() || new Date(),
-        updatedAt: doc.data().updatedAt?.toDate?.() || new Date(),
-        blockedAt: doc.data().blockedAt?.toDate?.() || new Date(),
-      });
-    });
+    if (error) throw error;
 
-    return records;
+    return (data || []).map(row => ({
+      id: row.id,
+      ...row,
+      createdAt: row.created_at ? new Date(row.created_at) : new Date(),
+      updatedAt: row.updated_at ? new Date(row.updated_at) : new Date(),
+      blockedAt: row.blocked_at || row.created_at ? new Date(row.blocked_at || row.created_at) : new Date()
+    }));
   } catch (error) {
     console.error('Error fetching blacklist records by user ID:', error);
     throw error;
   }
 };
 
-/**
- * Create a new blacklist record
- */
 export const createBlacklistRecord = async (blacklistData) => {
   try {
-    const docRef = await addDoc(collection(db, BLACKLIST_COLLECTION), {
-      ...blacklistData,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      blockedAt: serverTimestamp(),
-    });
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from(BLACKLIST_TABLE)
+      .insert({
+        ...blacklistData,
+        blocked_at: new Date().toISOString()
+      })
+      .select('id')
+      .single();
 
-    return docRef.id;
+    if (error) throw error;
+    return data.id;
   } catch (error) {
     console.error('Error creating blacklist record:', error);
     throw error;
   }
 };
 
-/**
- * Update a blacklist record
- */
 export const updateBlacklistRecord = async (recordId, updateData) => {
   try {
-    const docRef = doc(db, BLACKLIST_COLLECTION, recordId);
-    await updateDoc(docRef, {
-      ...updateData,
-      updatedAt: serverTimestamp(),
-    });
+    const supabase = getSupabase();
+    const { error } = await supabase
+      .from(BLACKLIST_TABLE)
+      .update({ ...updateData, updated_at: new Date().toISOString() })
+      .eq('id', recordId);
 
+    if (error) throw error;
     return true;
   } catch (error) {
     console.error('Error updating blacklist record:', error);
@@ -123,19 +96,20 @@ export const updateBlacklistRecord = async (recordId, updateData) => {
   }
 };
 
-/**
- * Remove user from blacklist (unblock)
- */
 export const removeFromBlacklist = async (recordId, reason = 'manual_removal') => {
   try {
-    const docRef = doc(db, BLACKLIST_COLLECTION, recordId);
-    await updateDoc(docRef, {
-      status: 'removed',
-      removedAt: serverTimestamp(),
-      removalReason: reason,
-      updatedAt: serverTimestamp(),
-    });
+    const supabase = getSupabase();
+    const { error } = await supabase
+      .from(BLACKLIST_TABLE)
+      .update({
+        status: 'removed',
+        removed_at: new Date().toISOString(),
+        removal_reason: reason,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', recordId);
 
+    if (error) throw error;
     return true;
   } catch (error) {
     console.error('Error removing from blacklist:', error);
@@ -143,14 +117,11 @@ export const removeFromBlacklist = async (recordId, reason = 'manual_removal') =
   }
 };
 
-/**
- * Delete a blacklist record permanently
- */
 export const deleteBlacklistRecord = async (recordId) => {
   try {
-    const docRef = doc(db, BLACKLIST_COLLECTION, recordId);
-    await deleteDoc(docRef);
-
+    const supabase = getSupabase();
+    const { error } = await supabase.from(BLACKLIST_TABLE).delete().eq('id', recordId);
+    if (error) throw error;
     return true;
   } catch (error) {
     console.error('Error deleting blacklist record:', error);
@@ -158,36 +129,22 @@ export const deleteBlacklistRecord = async (recordId) => {
   }
 };
 
-/**
- * Get blacklist statistics
- */
 export const getBlacklistStats = async () => {
   try {
-    const q = query(collection(db, BLACKLIST_COLLECTION));
-    const snapshot = await getDocs(q);
-    
-    const stats = {
-      total: 0,
-      active: 0,
-      removed: 0,
-      byReason: {},
-      byStatus: {},
-    };
+    const supabase = getSupabase();
+    const { data, error } = await supabase.from(BLACKLIST_TABLE).select('status, reason');
 
-    snapshot.forEach((doc) => {
-      const data = doc.data();
+    if (error) throw error;
+
+    const stats = { total: 0, active: 0, removed: 0, byReason: {}, byStatus: {} };
+
+    (data || []).forEach(row => {
       stats.total++;
-      
-      const status = data.status || 'active';
+      const status = row.status || 'active';
       stats.byStatus[status] = (stats.byStatus[status] || 0) + 1;
-      
-      if (status === 'active') {
-        stats.active++;
-      } else if (status === 'removed') {
-        stats.removed++;
-      }
-
-      const reason = data.reason || 'unknown';
+      if (status === 'active') stats.active++;
+      else if (status === 'removed') stats.removed++;
+      const reason = row.reason || 'unknown';
       stats.byReason[reason] = (stats.byReason[reason] || 0) + 1;
     });
 
@@ -198,42 +155,31 @@ export const getBlacklistStats = async () => {
   }
 };
 
-/**
- * Search blacklist records
- */
 export const searchBlacklistRecords = async (searchTerm) => {
   try {
-    const q = query(
-      collection(db, BLACKLIST_COLLECTION),
-      orderBy('createdAt', 'desc')
-    );
+    const supabase = getSupabase();
+    const { data, error } = await supabase
+      .from(BLACKLIST_TABLE)
+      .select('*')
+      .order('created_at', { ascending: false });
 
-    const snapshot = await getDocs(q);
-    const records = [];
-    
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-      const searchableText = [
-        data.userId,
-        data.userEmail,
-        data.reason,
-        data.status,
-        data.blockedFrom || '',
-        JSON.stringify(data.additionalData || {})
-      ].join(' ').toLowerCase();
+    if (error) throw error;
 
-      if (searchableText.includes(searchTerm.toLowerCase())) {
-        records.push({
-          id: doc.id,
-          ...data,
-          createdAt: data.createdAt?.toDate?.() || new Date(),
-          updatedAt: data.updatedAt?.toDate?.() || new Date(),
-          blockedAt: data.blockedAt?.toDate?.() || new Date(),
-        });
-      }
-    });
-
-    return records;
+    return (data || [])
+      .filter(row => {
+        const searchableText = [
+          row.userId, row.userEmail, row.email, row.reason, row.status,
+          JSON.stringify(row.metadata || {})
+        ].join(' ').toLowerCase();
+        return searchableText.includes(searchTerm.toLowerCase());
+      })
+      .map(row => ({
+        id: row.id,
+        ...row,
+        createdAt: row.created_at ? new Date(row.created_at) : new Date(),
+        updatedAt: row.updated_at ? new Date(row.updated_at) : new Date(),
+        blockedAt: row.blocked_at || row.created_at ? new Date(row.blocked_at || row.created_at) : new Date()
+      }));
   } catch (error) {
     console.error('Error searching blacklist records:', error);
     throw error;

@@ -1,7 +1,6 @@
-// Admin service for managing user roles and permissions
+// Admin service for managing user roles and permissions - Supabase version
 
-import { doc, getDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import { getSupabase, isSupabaseAvailable } from '../lib/supabase';
 
 // Admin roles constants
 export const ADMIN_ROLES = {
@@ -38,123 +37,130 @@ export const ADMIN_PERMISSIONS = {
 
 /**
  * Create a super admin user
- * @param {string} email - Email of the user to make super admin
- * @returns {Promise<boolean>} Success status
  */
 export async function createSuperAdmin(email) {
   try {
-    // Check if user already exists
-    const usersRef = collection(db, 'users');
-    const q = query(usersRef, where('email', '==', email));
-    const querySnapshot = await getDocs(q);
+    const supabase = getSupabase();
     
-    if (querySnapshot.empty) {
+    const { data: users, error: fetchError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', email)
+      .limit(1);
+
+    if (fetchError) throw fetchError;
+    if (!users || users.length === 0) {
       throw new Error('User not found. Please create the user account first.');
     }
 
-    // Get the user document
-    const userDoc = querySnapshot.docs[0];
-    const userId = userDoc.id;
+    const userId = users[0].id;
 
-    // Update user role to super_admin
-    await updateDoc(doc(db, 'users', userId), {
-      role: 'super_admin',
-      isSuperAdmin: true,
-      adminPermissions: {
-        canManageUsers: true,
-        canManagePlans: true,
-        canManageOrders: true,
-        canViewAnalytics: true,
-        canManageSettings: true
-      },
-      updatedAt: new Date()
-    });
+    const { error } = await supabase
+      .from('users')
+      .update({
+        role: 'super_admin',
+        is_super_admin: true,
+        admin_permissions: {
+          canManageUsers: true,
+          canManagePlans: true,
+          canManageOrders: true,
+          canViewAnalytics: true,
+          canManageSettings: true
+        },
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId);
 
+    if (error) throw error;
     return true;
-  } catch {
+  } catch (error) {
     throw error;
   }
 }
 
 /**
  * Create an admin user
- * @param {string} email - Email of the user to make admin
- * @returns {Promise<boolean>} Success status
  */
 export async function createAdmin(email) {
   try {
-    // Check if user already exists
-    const usersRef = collection(db, 'users');
-    const q = query(usersRef, where('email', '==', email));
-    const querySnapshot = await getDocs(q);
+    const supabase = getSupabase();
     
-    if (querySnapshot.empty) {
+    const { data: users, error: fetchError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', email)
+      .limit(1);
+
+    if (fetchError) throw fetchError;
+    if (!users || users.length === 0) {
       throw new Error('User not found. Please create the user account first.');
     }
 
-    // Get the user document
-    const userDoc = querySnapshot.docs[0];
-    const userId = userDoc.id;
+    const userId = users[0].id;
 
-    // Update user role to admin
-    await updateDoc(doc(db, 'users', userId), {
-      role: 'admin',
-      isAdmin: true,
-      adminPermissions: {
-        canManageUsers: true,
-        canManagePlans: true,
-        canManageOrders: true,
-        canViewAnalytics: true,
-        canManageSettings: false
-      },
-      updatedAt: new Date()
-    });
+    const { error } = await supabase
+      .from('users')
+      .update({
+        role: 'admin',
+        is_admin: true,
+        admin_permissions: {
+          canManageUsers: true,
+          canManagePlans: true,
+          canManageOrders: true,
+          canViewAnalytics: true,
+          canManageSettings: false
+        },
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId);
 
+    if (error) throw error;
     return true;
-  } catch {
+  } catch (error) {
     throw error;
   }
 }
 
 /**
  * Remove admin privileges from a user
- * @param {string} email - Email of the user to remove admin privileges
- * @returns {Promise<boolean>} Success status
  */
 export async function removeAdminPrivileges(email) {
   try {
-    // Check if user already exists
-    const usersRef = collection(db, 'users');
-    const q = query(usersRef, where('email', '==', email));
-    const querySnapshot = await getDocs(q);
+    const supabase = getSupabase();
     
-    if (querySnapshot.empty) {
+    const { data: users, error: fetchError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', email)
+      .limit(1);
+
+    if (fetchError) throw fetchError;
+    if (!users || users.length === 0) {
       throw new Error('User not found.');
     }
 
-    // Get the user document
-    const userDoc = querySnapshot.docs[0];
-    const userId = userDoc.id;
+    const userId = users[0].id;
 
-    // Update user role to customer
-    await updateDoc(doc(db, 'users', userId), {
-      role: 'customer',
-      isAdmin: false,
-      isSuperAdmin: false,
-      adminPermissions: null,
-      updatedAt: new Date()
-    });
+    const { error } = await supabase
+      .from('users')
+      .update({
+        role: 'customer',
+        is_admin: false,
+        is_super_admin: false,
+        admin_permissions: null,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId);
 
+    if (error) throw error;
     return true;
-  } catch {
+  } catch (error) {
     throw error;
   }
 }
 
 /**
  * Check if user has admin access
- * @param {object} userProfile - User profile object
- * @returns {boolean} True if user has admin access
  */
 export function hasAdminAccess(userProfile) {
   if (!userProfile) return false;
@@ -163,8 +169,6 @@ export function hasAdminAccess(userProfile) {
 
 /**
  * Check if user has super admin access
- * @param {object} userProfile - User profile object
- * @returns {boolean} True if user has super admin access
  */
 export function hasSuperAdminAccess(userProfile) {
   if (!userProfile) return false;
@@ -173,32 +177,34 @@ export function hasSuperAdminAccess(userProfile) {
 
 /**
  * Check if user has specific admin permission
- * @param {object} userProfile - User profile object
- * @param {string} permission - Permission to check
- * @returns {boolean} True if user has the permission
  */
 export function hasAdminPermission(userProfile, permission) {
-  if (!userProfile || !userProfile.adminPermissions) return false;
-  
-  // Super admin has all permissions
+  if (!userProfile || !userProfile.adminPermissions && !userProfile.admin_permissions) return false;
   if (userProfile.role === 'super_admin') return true;
-  
-  // Check specific permission
-  return userProfile.adminPermissions[permission] === true;
+  const perms = userProfile.adminPermissions || userProfile.admin_permissions;
+  return perms?.[permission] === true;
 }
 
 /**
- * Get user role from Firestore
- * @param {string} userId - User ID
- * @returns {Promise<string>} User role
+ * Get user role from Supabase
  */
 export async function getUserRole(userId) {
   try {
-    const userDoc = await getDoc(doc(db, 'users', userId));
-    if (userDoc.exists()) {
-      return userDoc.data().role || ADMIN_ROLES.USER;
+    const supabase = getSupabase();
+    
+    const { data, error } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', userId)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') return ADMIN_ROLES.USER;
+      console.error('Error getting user role:', error);
+      return ADMIN_ROLES.USER;
     }
-    return ADMIN_ROLES.USER;
+
+    return data?.role || ADMIN_ROLES.USER;
   } catch (error) {
     console.error('Error getting user role:', error);
     return ADMIN_ROLES.USER;

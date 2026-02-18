@@ -1,230 +1,151 @@
-// Configuration service to read admin settings
-import { doc, getDoc, addDoc, serverTimestamp, collection } from 'firebase/firestore';
-import { db } from '../firebase/config';
+/**
+ * Configuration Service - Supabase version
+ */
+
+import { getSupabase, isSupabaseAvailable } from '../lib/supabase';
 
 class ConfigService {
   constructor() {
     this.cache = new Map();
-    this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
+    this.cacheTimeout = 5 * 60 * 1000;
   }
 
-  // Get Stripe mode (test/live) from admin configuration
-  async getStripeMode() {
+  async _getConfigValue(key) {
     try {
-      // First try to get from Firestore (admin panel)
-      const configRef = doc(db, 'config', 'stripe');
-      const configDoc = await getDoc(configRef);
-      
-      if (configDoc.exists()) {
-        const configData = configDoc.data();
-        if (configData.mode) {
-          return configData.mode;
-        }
+      const supabase = getSupabase();
+      const { data, error } = await supabase
+        .from('app_config')
+        .select('value')
+        .eq('key', key)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') return null;
+        throw error;
       }
-      
-      // Fallback to localStorage (admin panel fallback)
-      const savedMode = localStorage.getItem('esim_stripe_mode');
-      if (savedMode) {
-        return savedMode;
-      }
-      
-      // Default to test mode
-      return 'test';
+      return data?.value || null;
     } catch (error) {
-      // Fallback to localStorage
-      const savedMode = localStorage.getItem('esim_stripe_mode');
-      if (savedMode) {
-        return savedMode;
-      }
-      return 'test';
+      return null;
     }
   }
 
-  // Get DataPlans environment (test/production)
+  async getStripeMode() {
+    try {
+      const config = await this._getConfigValue('stripe');
+      if (config?.mode) return config.mode;
+      const savedMode = localStorage.getItem('esim_stripe_mode');
+      return savedMode || 'test';
+    } catch (error) {
+      const savedMode = localStorage.getItem('esim_stripe_mode');
+      return savedMode || 'test';
+    }
+  }
+
   async getDataPlansEnvironment() {
     try {
-      // First try to get from Firestore (admin panel)
-      const configRef = doc(db, 'config', 'environment');
-      const configDoc = await getDoc(configRef);
-      
-      if (configDoc.exists()) {
-        const configData = configDoc.data();
-        if (configData.mode) {
-          return configData.mode;
-        }
-      }
-      
-      // Fallback to localStorage (admin panel fallback)
+      const config = await this._getConfigValue('environment');
+      if (config?.mode) return config.mode;
       const savedEnv = localStorage.getItem('esim_environment');
-      if (savedEnv) {
-        return savedEnv;
-      }
-      
-      // Default to test environment
-      return 'test';
+      return savedEnv || 'test';
     } catch (error) {
-      // Fallback to localStorage
       const savedEnv = localStorage.getItem('esim_environment');
       return savedEnv || 'test';
     }
   }
 
-  // Get Airalo API configuration
   async getAiraloConfig() {
     try {
-      // First try to get from Firestore
-      const configRef = doc(db, 'config', 'airalo');
-      const configDoc = await getDoc(configRef);
-      
-      if (configDoc.exists()) {
-        const configData = configDoc.data();
-        if (configData.api_key) {
-          return {
-            apiKey: configData.api_key,
-            environment: configData.environment || 'sandbox',
-            baseUrl: 'https://partners-api.airalo.com/v2'
-          };
-        }
-      }
-      
-      // Fallback to localStorage
-      const savedKey = localStorage.getItem('airalo_api_key');
-      const savedEnv = localStorage.getItem('airalo_environment') || 'test';
-      
-      if (savedKey) {
+      const config = await this._getConfigValue('airalo');
+      if (config?.api_key) {
         return {
-          apiKey: savedKey,
-          environment: savedEnv,
+          apiKey: config.api_key,
+          environment: config.environment || 'sandbox',
           baseUrl: 'https://partners-api.airalo.com/v2'
         };
       }
-      
-      // Default configuration
-      return {
-        apiKey: null,
-        environment: 'sandbox',
-        baseUrl: 'https://sandbox-partners-api.airalo.com/v2'
-      };
+      const savedKey = localStorage.getItem('airalo_api_key');
+      const savedEnv = localStorage.getItem('airalo_environment') || 'test';
+      if (savedKey) {
+        return { apiKey: savedKey, environment: savedEnv, baseUrl: 'https://partners-api.airalo.com/v2' };
+      }
+      return { apiKey: null, environment: 'sandbox', baseUrl: 'https://sandbox-partners-api.airalo.com/v2' };
     } catch (error) {
-      return {
-        apiKey: null,
-        environment: 'sandbox',
-        baseUrl: 'https://sandbox-partners-api.airalo.com/v2'
-      };
+      return { apiKey: null, environment: 'sandbox', baseUrl: 'https://sandbox-partners-api.airalo.com/v2' };
     }
   }
 
-  // Get Stripe publishable key based on mode
   async getStripePublishableKey(mode = 'test') {
-    
     try {
-      // First check environment variable
       const envKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
-      if (envKey) {
-        return envKey;
+      if (envKey) return envKey;
+
+      const config = await this._getConfigValue('stripe');
+      if (config) {
+        const liveKey = config.livePublishableKey || config.live_publishable_key;
+        if (liveKey) return liveKey;
       }
-      
-      // Try to get keys from Firestore as fallback
-      const configRef = doc(db, 'config', 'stripe');
-      const configDoc = await getDoc(configRef);
-      
-      if (configDoc.exists()) {
-        const configData = configDoc.data();
-        
-        // Always use live key (only one key supported now)
-        const liveKey = configData.livePublishableKey || configData.live_publishable_key;
-        if (liveKey) {
-          return liveKey;
-        }
-      }
-      
-      // No fallback - show error if keys not found
       throw new Error('Stripe keys not configured. Please contact administrator.');
     } catch (error) {
-      
-      // Log the error if it's related to expired keys
-      if (error.message && error.message.includes('expired')) {
+      if (error.message?.includes('expired')) {
         this.logExpiredStripeKey('publishable', error);
       }
-      
       throw new Error('Stripe keys not configured. Please contact administrator.');
     }
   }
 
-  // Get Stripe secret key based on mode (for server-side)
   async getStripeSecretKey(mode = 'test') {
     try {
-      // First check environment variables (priority)
       if (mode === 'live' || mode === 'production') {
         const envKey = process.env.STRIPE_SECRET_KEY_LIVE || process.env.STRIPE_SECRET_KEY;
-        if (envKey) {
-          return envKey;
-        }
+        if (envKey) return envKey;
       } else {
         const envKey = process.env.STRIPE_SECRET_KEY_TEST || process.env.STRIPE_SECRET_KEY;
-        if (envKey) {
-          return envKey;
-        }
+        if (envKey) return envKey;
       }
-      
-      // Fallback to Firestore if environment variables not found
-      const configRef = doc(db, 'config', 'stripe');
-      const configDoc = await getDoc(configRef);
-      
-      if (configDoc.exists()) {
-        const configData = configDoc.data();
-        
+
+      const config = await this._getConfigValue('stripe');
+      if (config) {
         if (mode === 'live' || mode === 'production') {
-          const liveKey = configData.liveSecretKey || configData.live_secret_key;
-          if (liveKey) {
-            return liveKey;
-          }
-        } else if (mode === 'test') {
-          const testKey = configData.testSecretKey || configData.test_secret_key;
-          if (testKey) {
-            return testKey;
-          }
+          const liveKey = config.liveSecretKey || config.live_secret_key;
+          if (liveKey) return liveKey;
+        } else {
+          const testKey = config.testSecretKey || config.test_secret_key;
+          if (testKey) return testKey;
         }
       }
-      
       throw new Error('Stripe secret key not configured');
     } catch (error) {
       throw error;
     }
   }
 
-  // Log expired Stripe key event
   async logExpiredStripeKey(keyType = 'unknown', error = null) {
     try {
-      const logData = {
+      const supabase = getSupabase();
+      await supabase.from('application_logs').insert({
         type: 'stripe',
         level: 'error',
         message: `Expired Stripe ${keyType} key detected`,
         details: error ? `Error: ${error.message}` : 'Stripe key validation failed',
-        timestamp: serverTimestamp(),
         metadata: {
           keyType,
           errorCode: error?.code || 'unknown',
-          userAgent: navigator.userAgent,
-          url: window.location.href
+          userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'server',
+          url: typeof window !== 'undefined' ? window.location.href : 'server'
         }
-      };
-
-      await addDoc(collection(db, 'application_logs'), logData);
-    } catch (logError) {
-    }
+      });
+    } catch (logError) {}
   }
 
-  // Log promocode usage event
   async logPromocodeUsage(promocode, userId, action, details = {}) {
     try {
-      const logData = {
+      const supabase = getSupabase();
+      await supabase.from('application_logs').insert({
         type: 'promocode',
         level: action === 'used' ? 'success' : 'info',
         message: `Promocode "${promocode}" ${action}`,
         details: details.message || `Promocode ${action} by user`,
-        timestamp: serverTimestamp(),
-        userId: userId,
+        user_id: userId,
         metadata: {
           promocode,
           action,
@@ -233,40 +154,28 @@ class ConfigService {
           finalAmount: details.finalAmount || null,
           planId: details.planId || null,
           country: details.country || null,
-          userAgent: navigator.userAgent,
-          url: window.location.href,
+          userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'server',
+          url: typeof window !== 'undefined' ? window.location.href : 'server',
           ip: details.ip || null
         }
-      };
-
-      await addDoc(collection(db, 'application_logs'), logData);
-    } catch (logError) {
-    }
+      });
+    } catch (logError) {}
   }
 
-  // Get OpenRouter API configuration (for AI-generated content)
   async getOpenRouterConfig() {
     try {
-      // First try to get from Firestore config tab
-      const configRef = doc(db, 'config', 'openrouter');
-      const configDoc = await getDoc(configRef);
-      
-      if (configDoc.exists()) {
-        const configData = configDoc.data();
-        if (configData.api_key) { 
-          return {
-            apiKey: configData.api_key,
-            model: configData.model || 'openai/gpt-3.5-turbo',
-            baseUrl: 'https://openrouter.ai/api/v1',
-            maxTokens: configData.max_tokens || 150,
-            temperature: configData.temperature || 0.7,
-            siteName: configData.site_name || 'Simnetiq',
-            siteUrl: configData.site_url || 'https://esim.Simnetiq.net'
-          };
-        }
+      const config = await this._getConfigValue('openrouter');
+      if (config?.api_key) {
+        return {
+          apiKey: config.api_key,
+          model: config.model || 'openai/gpt-3.5-turbo',
+          baseUrl: 'https://openrouter.ai/api/v1',
+          maxTokens: config.max_tokens || 150,
+          temperature: config.temperature || 0.7,
+          siteName: config.site_name || 'Simnetiq',
+          siteUrl: config.site_url || 'https://esim.Simnetiq.net'
+        };
       }
-      
-      // Fallback to environment variable
       const envKey = process.env.OPENROUTER_API_KEY;
       if (envKey) {
         return {
@@ -279,31 +188,18 @@ class ConfigService {
           siteUrl: process.env.OPENROUTER_SITE_URL || 'https://esim.Simnetiq.net'
         };
       }
-      
-      // No API key found
       return {
-        apiKey: null,
-        model: 'openai/gpt-3.5-turbo',
-        baseUrl: 'https://openrouter.ai/api/v1',
-        maxTokens: 150,
-        temperature: 0.7,
-        siteName: 'Simnetiq',
-        siteUrl: 'https://esim.Simnetiq.net'
+        apiKey: null, model: 'openai/gpt-3.5-turbo', baseUrl: 'https://openrouter.ai/api/v1',
+        maxTokens: 150, temperature: 0.7, siteName: 'Simnetiq', siteUrl: 'https://esim.Simnetiq.net'
       };
     } catch (error) {
       return {
-        apiKey: null,
-        model: 'openai/gpt-3.5-turbo',
-        baseUrl: 'https://openrouter.ai/api/v1',
-        maxTokens: 150,
-        temperature: 0.7,
-        siteName: 'Simnetiq',
-        siteUrl: 'https://Simnetiq.com'
+        apiKey: null, model: 'openai/gpt-3.5-turbo', baseUrl: 'https://openrouter.ai/api/v1',
+        maxTokens: 150, temperature: 0.7, siteName: 'Simnetiq', siteUrl: 'https://Simnetiq.com'
       };
     }
   }
 
-  // Clear cache
   clearCache() {
     this.cache.clear();
   }
