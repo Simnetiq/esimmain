@@ -1,14 +1,44 @@
 // Language detection and utilities for blog localization
+// ============================================================================
+// CENTRALIZED LANGUAGE CONFIGURATION
+// This is the single source of truth for all supported languages in the system.
+// Used by: countries, regions, plans, blog posts, and all translation systems.
+// ============================================================================
 
+/**
+ * Complete list of supported languages for translations.
+ *
+ * When adding a new language:
+ * 1. Add it to this array with all required properties
+ * 2. Run the translation automation to populate missing translations
+ * 3. No other code changes should be needed
+ *
+ * ISO 639-1 codes are used for consistency.
+ */
 export const supportedLanguages = [
-  { code: 'en', name: 'English', nativeName: 'English', flag: '🇺🇸' },
-  { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸' },
-  { code: 'fr', name: 'French', nativeName: 'Français', flag: '🇫🇷' },
-  { code: 'de', name: 'German', nativeName: 'Deutsch', flag: '🇩🇪' },
-  { code: 'ar', name: 'Arabic', nativeName: 'العربية', flag: '🇸🇦' },
-  { code: 'he', name: 'Hebrew', nativeName: 'עברית', flag: '🇮🇱' },
-  { code: 'ru', name: 'Russian', nativeName: 'Русский', flag: '🇷🇺' }
+  // Original languages
+  { code: 'en', name: 'English', nativeName: 'English', flag: '🇺🇸', isRTL: false },
+  { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸', isRTL: false },
+  { code: 'fr', name: 'French', nativeName: 'Français', flag: '🇫🇷', isRTL: false },
+  { code: 'de', name: 'German', nativeName: 'Deutsch', flag: '🇩🇪', isRTL: false },
+  { code: 'ar', name: 'Arabic', nativeName: 'العربية', flag: '🇸🇦', isRTL: true },
+  { code: 'he', name: 'Hebrew', nativeName: 'עברית', flag: '🇮🇱', isRTL: true },
+  { code: 'ru', name: 'Russian', nativeName: 'Русский', flag: '🇷🇺', isRTL: false },
+  // New languages (added for expanded translation support)
+  { code: 'pt', name: 'Portuguese', nativeName: 'Português', flag: '🇵🇹', isRTL: false },
+  { code: 'zh', name: 'Chinese', nativeName: '中文', flag: '🇨🇳', isRTL: false },
+  { code: 'pl', name: 'Polish', nativeName: 'Polski', flag: '🇵🇱', isRTL: false },
+  { code: 'uk', name: 'Ukrainian', nativeName: 'Українська', flag: '🇺🇦', isRTL: false },
+  { code: 'ja', name: 'Japanese', nativeName: '日本語', flag: '🇯🇵', isRTL: false },
+  { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', flag: '🇮🇳', isRTL: false }
 ];
+
+/**
+ * Map of language codes to their full names (for translation prompts)
+ */
+export const languageNameMap = Object.fromEntries(
+  supportedLanguages.map(lang => [lang.code, lang.name])
+);
 
 /**
  * Get native language name from code (e.g., 'Русский' for Russian)
@@ -78,8 +108,18 @@ export const getLanguageFlag = (code) => {
  * @returns {string} - 'rtl' or 'ltr'
  */
 export const getLanguageDirection = (code) => {
-  const rtlLanguages = ['ar', 'he']; // Arabic and Hebrew are RTL
-  return rtlLanguages.includes(code) ? 'rtl' : 'ltr';
+  const language = supportedLanguages.find(lang => lang.code === code);
+  return language?.isRTL ? 'rtl' : 'ltr';
+};
+
+/**
+ * Check if a language is RTL
+ * @param {string} code - Language code
+ * @returns {boolean}
+ */
+export const isRTLLanguage = (code) => {
+  const language = supportedLanguages.find(lang => lang.code === code);
+  return language?.isRTL ?? false;
 };
 
 /**

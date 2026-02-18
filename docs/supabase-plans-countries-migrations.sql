@@ -1092,6 +1092,7 @@ END $$;
 -- PART 7: UPDATED_AT TRIGGERS
 -- ============================================================================
 
+-- Function for tables with 'updated_at' column
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -1100,14 +1101,22 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Apply triggers to all tables with updated_at
+-- Function for translation tables with 'last_updated_at' column
+CREATE OR REPLACE FUNCTION update_translation_last_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.last_updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Apply triggers to tables with 'updated_at' column
 DO $$
 DECLARE
     t TEXT;
 BEGIN
     FOR t IN SELECT unnest(ARRAY[
-        'regions', 'countries', 'dataplans', 'regional_plans', 'plan_topups',
-        'country_translations', 'plan_translations', 'regional_plan_translations', 'region_translations'
+        'regions', 'countries', 'dataplans', 'regional_plans', 'plan_topups'
     ])
     LOOP
         EXECUTE format('
@@ -1117,6 +1126,26 @@ BEGIN
             FOR EACH ROW
             EXECUTE FUNCTION update_updated_at_column();
         ', t, t, t, t);
+    END LOOP;
+END $$;
+
+-- Apply triggers to translation tables with 'last_updated_at' column
+DO $$
+DECLARE
+    t TEXT;
+BEGIN
+    FOR t IN SELECT unnest(ARRAY[
+        'country_translations', 'plan_translations', 'regional_plan_translations', 'region_translations'
+    ])
+    LOOP
+        EXECUTE format('
+            DROP TRIGGER IF EXISTS trg_update_%s_updated_at ON %s;
+            DROP TRIGGER IF EXISTS trg_update_%s_last_updated_at ON %s;
+            CREATE TRIGGER trg_update_%s_last_updated_at
+            BEFORE UPDATE ON %s
+            FOR EACH ROW
+            EXECUTE FUNCTION update_translation_last_updated_at();
+        ', t, t, t, t, t, t);
     END LOOP;
 END $$;
 

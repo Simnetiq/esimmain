@@ -6,8 +6,8 @@
   "regions": ["iad1"],
   "crons": [
     {
-      "path": "/api/sync-airalo",
-      "schedule": "0 0 * * *"
+      "path": "/api/sync-airalo-v2",
+      "schedule": "0 * * * *"
     }
   ],
   "headers": [

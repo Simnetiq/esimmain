@@ -12,6 +12,7 @@ export { default as providerUtils } from './utils/providerUtils';
 export * from './utils/priceUtils';
 export * from './utils/esimFieldMapper';
 export * from './utils/planDisplayUtils';
+export * from './utils/languageUtils';
 
 // Constants
 export const GLOBAL_PLAN_IMAGE_URL = 'https://cdn.airalo.com/images/5c6c78b0-1713-43f1-807e-7c62ab1904e9.png';
