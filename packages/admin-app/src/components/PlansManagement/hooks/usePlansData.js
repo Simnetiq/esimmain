@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { collection, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
+import supabase from '../../../lib/supabase';
 import { esimService } from '@esim/shared/services/esimService';
 import toast from 'react-hot-toast';
 import { DATA_SOURCES, PAGINATION, categorizePlan, planHasSms, planHasVoice } from '../utils/helpers';
@@ -284,17 +283,17 @@ export const usePlansData = (t) => {
   const loadAllPlans = useCallback(async () => {
     try {
       setLoading(true);
-      const plansSnapshot = await getDocs(collection(db, 'dataplans'));
-      const plansData = plansSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      const { data: plansData, error } = await supabase
+        .from('dataplans')
+        .select('*');
 
-      setAllPlans(plansData);
+      if (error) throw error;
+
+      setAllPlans(plansData || []);
 
       // Extract unique countries from plans
       const countries = new Set();
-      plansData
+      (plansData || [])
         .filter(plan => plan.type !== 'topup' && plan.is_topup !== true)
         .forEach(plan => {
           (plan.country_codes || []).forEach(code => countries.add(code));
@@ -304,7 +303,7 @@ export const usePlansData = (t) => {
       const sortedCountries = Array.from(countries).sort();
       setAvailableCountries(sortedCountries);
     } catch (error) {
-      console.error('Error loading Firebase plans:', error);
+      console.error('Error loading plans:', error);
       toast.error(t?.('plansManagement.errorLoadingPlans', 'Failed to load plans') || 'Failed to load plans');
     } finally {
       setLoading(false);
@@ -314,12 +313,11 @@ export const usePlansData = (t) => {
   const loadTopups = useCallback(async () => {
     try {
       setLoadingTopups(true);
-      const topupsSnapshot = await getDocs(collection(db, 'topups'));
-      const topupsData = topupsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setTopups(topupsData);
+      const { data: topupsData, error } = await supabase
+        .from('topups')
+        .select('*');
+      if (error) throw error;
+      setTopups(topupsData || []);
     } catch (error) {
       console.error('Error loading topups:', error);
       toast.error(t?.('plansManagement.errorLoadingTopups', 'Failed to load topups') || 'Failed to load topups');
@@ -374,10 +372,11 @@ export const usePlansData = (t) => {
   const updatePlanPrice = useCallback(async (planId, newPrice) => {
     try {
       setLoading(true);
-      const planRef = doc(db, 'dataplans', planId);
-      await updateDoc(planRef, {
-        price: parseFloat(newPrice)
-      });
+      const { error } = await supabase
+        .from('dataplans')
+        .update({ price: parseFloat(newPrice) })
+        .eq('id', planId);
+      if (error) throw error;
 
       toast.success(t?.('plansManagement.priceUpdated', 'Price updated to ${{price}}!', { price: newPrice }) || `Price updated to $${newPrice}!`);
       await loadAllPlans();
@@ -396,7 +395,8 @@ export const usePlansData = (t) => {
 
     try {
       setLoading(true);
-      await deleteDoc(doc(db, 'dataplans', planId));
+      const { error } = await supabase.from('dataplans').delete().eq('id', planId);
+      if (error) throw error;
       toast.success(t?.('plansManagement.planDeleted', 'Plan "{{planName}}" deleted successfully!', { planName }) || `Plan "${planName}" deleted!`);
       await loadAllPlans();
     } catch (error) {

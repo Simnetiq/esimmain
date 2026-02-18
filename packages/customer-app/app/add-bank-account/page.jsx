@@ -5,8 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft, CreditCard, Building2, User, Phone } from 'lucide-react';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
+import { getSupabase } from '@esim/shared/lib/supabase';
 import toast from 'react-hot-toast';
 
 const AddBankAccountPage = () => {
@@ -33,18 +32,23 @@ const AddBankAccountPage = () => {
       }
 
       try {
-        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-        const userData = userDoc.data();
+        const supabase = getSupabase();
+        const { data: userData } = await supabase
+          .from('users')
+          .select('bank_account')
+          .eq('id', currentUser.uid)
+          .single();
         
-        if (userData?.bankAccount) {
+        if (userData?.bank_account) {
+          const ba = userData.bank_account;
           setFormData({
-            accountHolderName: userData.bankAccount.accountHolderName || '',
-            accountNumber: userData.bankAccount.accountNumber || '',
-            routingNumber: userData.bankAccount.routingNumber || '',
-            branchNumber: userData.bankAccount.branchNumber || '',
-            bankName: userData.bankAccount.bankName || '',
-            phoneNumber: userData.bankAccount.phoneNumber || '',
-            country: userData.bankAccount.country || 'US'
+            accountHolderName: ba.accountHolderName || '',
+            accountNumber: ba.accountNumber || '',
+            routingNumber: ba.routingNumber || '',
+            branchNumber: ba.branchNumber || '',
+            bankName: ba.bankName || '',
+            phoneNumber: ba.phoneNumber || '',
+            country: ba.country || 'US'
           });
         }
       } catch (error) {
@@ -84,13 +88,17 @@ const AddBankAccountPage = () => {
       }
 
       // Save bank account to user profile
-      await setDoc(doc(db, 'users', currentUser.uid), {
-        bankAccount: {
-          ...formData,
-          addedAt: new Date(),
-          isVerified: false
-        }
-      }, { merge: true });
+      const supabase = getSupabase();
+      await supabase
+        .from('users')
+        .update({
+          bank_account: {
+            ...formData,
+            addedAt: new Date().toISOString(),
+            isVerified: false
+          }
+        })
+        .eq('id', currentUser.uid);
 
       toast.success('Bank account added successfully!');
       router.back(); // Go back to previous page

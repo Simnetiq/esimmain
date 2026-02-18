@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, usePathname } from 'next/navigation';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
+import { getSupabase } from '@esim/shared/lib/supabase';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { getProviderFromPlanData } from '@esim/shared/utils/providerUtils';
@@ -110,13 +109,13 @@ export const usePackageData = () => {
       let imageUrl = null;
       let translations = {};
 
-      // Handle global plans first - use hardcoded image URL
       if (isGlobalPlan(planData)) {
-        // Use hardcoded global plan image - no need to fetch from Firebase
         setCountryTranslations({});
         setCountryImage({ url: GLOBAL_PLAN_IMAGE_URL, isOperator: true });
         return;
       }
+
+      const supabase = getSupabase();
 
       const isRegionalPlan = planData.type === 'regional' ||
         planData.isRegional === true ||
@@ -129,118 +128,70 @@ export const usePackageData = () => {
       const countryCode = planData.country_code || planData.countryId;
       const countryName = planData.country_name || planData.country_title || urlName;
 
+      // Helper to try fetching a country/region by id
+      const tryFetchCountry = async (table, id) => {
+        if (!id) return null;
+        const slug = id.toLowerCase().replace(/\s+/g, '-');
+        const { data } = await supabase.from(table).select('*').eq('id', slug).single();
+        return data;
+      };
+
       // Step 1: Try by country name as slug
       if (countryName && typeof countryName === 'string') {
-        const nameSlug = countryName.toLowerCase().replace(/\s+/g, '-');
-        try {
-          const countryDoc = await getDoc(doc(db, 'countries', nameSlug));
-          if (countryDoc.exists()) {
-            const data = countryDoc.data();
-            imageUrl = extractImageUrl(data);
-            translations = data.translations || {};
-            if (imageUrl) {
-              setCountryTranslations(translations);
-              setCountryImage({ url: imageUrl });
-              return;
-            }
-          }
-        } catch {
-          // Continue to next attempt
+        const data = await tryFetchCountry('countries', countryName);
+        if (data) {
+          imageUrl = extractImageUrl(data);
+          translations = data.translations || {};
+          if (imageUrl) { setCountryTranslations(translations); setCountryImage({ url: imageUrl }); return; }
         }
       }
 
       // Step 2: Try by country code as slug (lowercase)
       if (countryCode) {
-        const codeSlug = countryCode.toLowerCase().replace(/\s+/g, '-');
-        try {
-          const countryDoc = await getDoc(doc(db, 'countries', codeSlug));
-          if (countryDoc.exists()) {
-            const data = countryDoc.data();
-            imageUrl = extractImageUrl(data);
-            translations = data.translations || {};
-            if (imageUrl) {
-              setCountryTranslations(translations);
-              setCountryImage({ url: imageUrl });
-              return;
-            }
-          }
-        } catch {
-          // Continue to next attempt
+        const data = await tryFetchCountry('countries', countryCode);
+        if (data) {
+          imageUrl = extractImageUrl(data);
+          translations = data.translations || {};
+          if (imageUrl) { setCountryTranslations(translations); setCountryImage({ url: imageUrl }); return; }
         }
       }
 
       // Step 3: If regional, try region collection
       if (isRegionalPlan && regionSlug) {
-        const regSlug = regionSlug.toLowerCase().replace(/\s+/g, '-');
-        try {
-          const regionDoc = await getDoc(doc(db, 'regions', regSlug));
-          if (regionDoc.exists()) {
-            const data = regionDoc.data();
-            imageUrl = extractImageUrl(data);
-            translations = data.translations || {};
-            if (imageUrl) {
-              setCountryTranslations(translations);
-              setCountryImage({ url: imageUrl });
-              return;
-            }
-          }
-        } catch {
-          // Continue to next attempt
+        const data = await tryFetchCountry('regions', regionSlug);
+        if (data) {
+          imageUrl = extractImageUrl(data);
+          translations = data.translations || {};
+          if (imageUrl) { setCountryTranslations(translations); setCountryImage({ url: imageUrl }); return; }
         }
       }
 
-      // Step 4: Try by country code uppercase (ISO format)
+      // Step 4: Try by country code uppercase
       if (countryCode) {
-        try {
-          const countryDoc = await getDoc(doc(db, 'countries', countryCode.toUpperCase()));
-          if (countryDoc.exists()) {
-            const data = countryDoc.data();
-            imageUrl = extractImageUrl(data);
-            translations = data.translations || {};
-            if (imageUrl) {
-              setCountryTranslations(translations);
-              setCountryImage({ url: imageUrl });
-              return;
-            }
-          }
-        } catch {
-          // Continue to next attempt
+        const { data } = await supabase.from('countries').select('*').eq('id', countryCode.toUpperCase()).single();
+        if (data) {
+          imageUrl = extractImageUrl(data);
+          translations = data.translations || {};
+          if (imageUrl) { setCountryTranslations(translations); setCountryImage({ url: imageUrl }); return; }
         }
       }
 
-      // Step 5: Try URL param as country slug
+      // Step 5: Try URL param as slug
       if (urlCode) {
-        const urlSlug = urlCode.toLowerCase().replace(/\s+/g, '-');
-        try {
-          let docSnap = await getDoc(doc(db, 'countries', urlSlug));
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            imageUrl = extractImageUrl(data);
-            translations = data.translations || {};
-            if (imageUrl) {
-              setCountryTranslations(translations);
-              setCountryImage({ url: imageUrl });
-              return;
-            }
-          }
-          // Try regions
-          docSnap = await getDoc(doc(db, 'regions', urlSlug));
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            imageUrl = extractImageUrl(data);
-            translations = data.translations || {};
-            if (imageUrl) {
-              setCountryTranslations(translations);
-              setCountryImage({ url: imageUrl });
-              return;
-            }
-          }
-        } catch {
-          // Continue
+        let data = await tryFetchCountry('countries', urlCode);
+        if (data) {
+          imageUrl = extractImageUrl(data);
+          translations = data.translations || {};
+          if (imageUrl) { setCountryTranslations(translations); setCountryImage({ url: imageUrl }); return; }
+        }
+        data = await tryFetchCountry('regions', urlCode);
+        if (data) {
+          imageUrl = extractImageUrl(data);
+          translations = data.translations || {};
+          if (imageUrl) { setCountryTranslations(translations); setCountryImage({ url: imageUrl }); return; }
         }
       }
 
-      // No image found
       setCountryTranslations(translations);
       setCountryImage(null);
     } catch (error) {
@@ -276,18 +227,19 @@ export const usePackageData = () => {
         }
       }
 
-      // FALLBACK: Try Firebase dataplans collection
-      // This ensures backwards compatibility during migration
+      // FALLBACK: Try Supabase dataplans directly
       try {
-        const packageRef = doc(db, 'dataplans', packageId);
-        const packageSnap = await getDoc(packageRef);
+        const supabase = getSupabase();
+        const { data, error: sbError } = await supabase
+          .from('dataplans')
+          .select('*')
+          .eq('id', packageId)
+          .single();
 
-        if (packageSnap.exists()) {
-          const data = packageSnap.data();
+        if (data && !sbError) {
           const fullData = {
-            id: packageSnap.id,
+            id: data.id,
             ...data,
-            // Map Firebase fields to view model format
             validity: data.validity_days || data.period || data.duration,
             period: data.validity_days || data.period || data.duration,
             duration: data.validity_days || data.period || data.duration,
@@ -305,15 +257,15 @@ export const usePackageData = () => {
             activationPolicy: data.activation_policy || 'first-usage',
             coveredCountryCount: data.covered_countries_count || (data.covered_countries?.length || 0)
           };
-          console.log('[usePackageData] Loaded from Firebase:', packageId);
+          console.log('[usePackageData] Loaded from Supabase fallback:', packageId);
           setPackageData(fullData);
           setProviderInfo(getProviderFromPlanData(fullData));
           await fetchImageAndTranslations(fullData, urlCountryCode, urlCountryName);
           setTranslationsLoaded(true);
           return;
         }
-      } catch (firebaseError) {
-        console.warn('[usePackageData] Firebase fetch failed:', firebaseError);
+      } catch (fallbackError) {
+        console.warn('[usePackageData] Supabase fallback failed:', fallbackError);
       }
 
       // No plan found in either source

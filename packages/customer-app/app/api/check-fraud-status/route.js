@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { db } from '@esim/shared/firebase/config';
+import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 import {
   checkUserBlocked,
   getFraudStats,
@@ -10,33 +10,15 @@ import { checkBlocklist } from '@esim/shared/services/fraudDetectionService';
 
 export const dynamic = 'force-dynamic';
 
-/**
- * Check Fraud Status API
- * 
- * This endpoint should be called BEFORE initiating Stripe checkout
- * to block known fraudsters from even reaching the payment page.
- * 
- * GET /api/check-fraud-status?userId=xxx&email=xxx
- * 
- * Returns:
- * - allowed: boolean - Whether the user can proceed to checkout
- * - blockType: string - Type of block (temporary, permanent, card_blocked, ip_blocked)
- * - message: string - User-facing message
- * - canContactSupport: boolean - Whether user can appeal
- * - expiresAt: string - When temporary block expires (ISO string)
- */
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
     const email = searchParams.get('email');
-    const cardFingerprint = searchParams.get('cardFingerprint'); // Optional, from previous payment
+    const cardFingerprint = searchParams.get('cardFingerprint');
 
-    // Get client IP
     const forwarded = request.headers.get('x-forwarded-for');
     const ipAddress = forwarded ? forwarded.split(',')[0].trim() : request.headers.get('x-real-ip') || null;
-
-    // Get country from headers (set by Cloudflare or similar)
     const countryCode = request.headers.get('cf-ipcountry') || null;
 
     if (!userId && !email) {
@@ -46,11 +28,11 @@ export async function GET(request) {
       );
     }
 
-    // 1. Check if user is blocked in fraud signals system
-    const blockStatus = await checkUserBlocked(db, userId, email, cardFingerprint, ipAddress);
+    const supabase = getSupabaseAdmin();
+
+    const blockStatus = await checkUserBlocked(supabase, userId, email, cardFingerprint, ipAddress);
 
     if (blockStatus.blocked) {
-      
       return NextResponse.json({
         allowed: false,
         blocked: true,
@@ -63,8 +45,7 @@ export async function GET(request) {
       });
     }
 
-    // 2. Also check legacy blocklist
-    const legacyBlocklistCheck = await checkBlocklist(db, userId, email, cardFingerprint);
+    const legacyBlocklistCheck = await checkBlocklist(supabase, userId, email, cardFingerprint);
     
     if (legacyBlocklistCheck.blocked) {
       return NextResponse.json({
@@ -77,13 +58,9 @@ export async function GET(request) {
       });
     }
 
-    // 3. Analyze IP risk (for logging/warning, not blocking)
     const ipRisk = analyzeIpRisk(ipAddress, countryCode);
+    const fraudStats = await getFraudStats(supabase, userId, email);
 
-    // 4. Get fraud stats for the user
-    const fraudStats = await getFraudStats(db, userId, email);
-
-    // 5. Check if user is approaching block threshold
     let warning = null;
     if (fraudStats && fraudStats.attempts >= FRAUD_SIGNALS_CONFIG.MAX_BLOCKED_ATTEMPTS_BEFORE_BAN - 2) {
       warning = {
@@ -93,12 +70,6 @@ export async function GET(request) {
       };
     }
 
-    // 6. Check for high-risk region
-    if (countryCode && FRAUD_SIGNALS_CONFIG.HIGH_RISK_REGIONS.includes(countryCode)) {
-      // Don't block, but log for monitoring
-    }
-
-    // User is allowed
     return NextResponse.json({
       allowed: true,
       blocked: false,
@@ -111,8 +82,6 @@ export async function GET(request) {
     });
 
   } catch (error) {
-    
-    // Fail open - allow checkout on error but log
     return NextResponse.json({
       allowed: true,
       blocked: false,
@@ -122,16 +91,11 @@ export async function GET(request) {
   }
 }
 
-/**
- * POST endpoint for checking fraud status with body params
- * More secure for passing card fingerprint
- */
 export async function POST(request) {
   try {
     const body = await request.json();
     const { userId, email, cardFingerprint } = body;
 
-    // Get client IP
     const forwarded = request.headers.get('x-forwarded-for');
     const ipAddress = forwarded ? forwarded.split(',')[0].trim() : request.headers.get('x-real-ip') || null;
     const countryCode = request.headers.get('cf-ipcountry') || null;
@@ -143,11 +107,11 @@ export async function POST(request) {
       );
     }
 
-    // Full fraud check
-    const blockStatus = await checkUserBlocked(db, userId, email, cardFingerprint, ipAddress);
+    const supabase = getSupabaseAdmin();
+
+    const blockStatus = await checkUserBlocked(supabase, userId, email, cardFingerprint, ipAddress);
 
     if (blockStatus.blocked) {
-      
       return NextResponse.json({
         allowed: false,
         blocked: true,
@@ -160,8 +124,7 @@ export async function POST(request) {
       });
     }
 
-    // Legacy blocklist
-    const legacyBlocklistCheck = await checkBlocklist(db, userId, email, cardFingerprint);
+    const legacyBlocklistCheck = await checkBlocklist(supabase, userId, email, cardFingerprint);
     
     if (legacyBlocklistCheck.blocked) {
       return NextResponse.json({
@@ -174,9 +137,8 @@ export async function POST(request) {
       });
     }
 
-    // IP risk
     const ipRisk = analyzeIpRisk(ipAddress, countryCode);
-    const fraudStats = await getFraudStats(db, userId, email);
+    const fraudStats = await getFraudStats(supabase, userId, email);
 
     let warning = null;
     if (fraudStats && fraudStats.attempts >= FRAUD_SIGNALS_CONFIG.MAX_BLOCKED_ATTEMPTS_BEFORE_BAN - 2) {
@@ -199,7 +161,6 @@ export async function POST(request) {
     });
 
   } catch (error) {
-    
     return NextResponse.json({
       allowed: true,
       blocked: false,

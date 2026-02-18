@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
-import { collection, query, orderBy, limit, getDocs, doc, getDoc } from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
+import supabase from '../lib/supabase';
 import { motion } from 'framer-motion';
 import { 
   FileText, 
@@ -25,14 +24,17 @@ const ApplicationLogs = () => {
   // Helper function to get user email by ID
   const getUserEmailById = async (userId) => {
     try {
-      const userDoc = await getDoc(doc(db, 'users', userId));
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        return userData.actualEmail || userData.email || userId;
+      const { data } = await supabase
+        .from('users')
+        .select('email, actual_email')
+        .eq('id', userId)
+        .single();
+      if (data) {
+        return data.actual_email || data.email || userId;
       }
-      return userId; // Return ID if no email found
+      return userId;
     } catch {
-      return userId; // Return ID as fallback
+      return userId;
     }
   };
 
@@ -40,95 +42,79 @@ const ApplicationLogs = () => {
     try {
       setLoading(true);
       
-      // Load from all collections for backward compatibility
-      const [applicationLogsSnapshot, blacklistLogsSnapshot, referralUsagesSnapshot] = await Promise.all([
-        getDocs(query(
-          collection(db, 'application_logs'),
-          orderBy('timestamp', 'desc'),
-          limit(50)
-        )),
-        getDocs(collection(db, 'blacklist')),
-        getDocs(query(
-          collection(db, 'referralUsages'),
-          orderBy('createdAt', 'desc'),
-          limit(50)
-        ))
+      // Load from Supabase tables
+      const [appLogsResult, blacklistResult, referralResult] = await Promise.all([
+        supabase
+          .from('application_logs')
+          .select('*')
+          .order('timestamp', { ascending: false })
+          .limit(50),
+        supabase
+          .from('fraud_signals')
+          .select('*')
+          .eq('blocked', true)
+          .limit(100),
+        supabase
+          .from('referral_usages')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(50)
       ]);
 
-      // Combine logs from all collections
-      const applicationLogs = applicationLogsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        timestamp: doc.data().timestamp?.toDate() || new Date(),
+      const applicationLogs = (appLogsResult.data || []).map(row => ({
+        ...row,
+        timestamp: row.timestamp ? new Date(row.timestamp) : new Date(),
         source: 'application_logs'
       }));
 
-          const blacklistLogs = await Promise.all(
-            blacklistLogsSnapshot.docs.map(async (doc) => {
-              const data = doc.data();
-              // Use createdAt as the main timestamp, fallback to other fields
-              const timestamp = data.createdAt?.toDate() ||
-                               data.blockedAt?.toDate() ||
-                               data.updatedAt?.toDate() ||
-                               data.timestamp?.toDate() ||
-                               new Date();
-
-              // Get user email if not already present
-              let userEmail = data.userEmail;
-              if (!userEmail && data.userId) {
-                userEmail = await getUserEmailById(data.userId);
-              }
-
-              return {
-                id: doc.id,
-                ...data,
-                timestamp: timestamp,
-                source: 'blacklist',
-                type: 'blacklist',
-                level: 'warning', // Blacklist entries are warnings
-                message: data.description || `User blocked: ${data.reason || 'unknown reason'}`,
-                details: null,
-                userId: data.userId,
-                userEmail: userEmail,
-                metadata: {
-                  reason: data.reason,
-                  status: data.status,
-                  source: data.source,
-                  clicksToday: data.clicksToday,
-                  maxClicksPerDay: data.maxClicksPerDay,
-                  autoUnblockTime: data.autoUnblockTime,
-                  blockedAt: data.blockedAt,
-                  additionalData: data.additionalData
-                }
-              };
-            })
-          );
-
-      // Process referral usage logs and fetch referrer and referred user emails
-      const referralUsageLogs = await Promise.all(
-        referralUsagesSnapshot.docs.map(async (doc) => {
-          const data = doc.data();
-          const referrerEmail = await getUserEmailById(data.referrerId);
-          const referredUserEmail = await getUserEmailById(data.referredUserId);
-          
+      const blacklistLogs = await Promise.all(
+        (blacklistResult.data || []).map(async (row) => {
+          const timestamp = new Date(row.created_at || row.blocked_at || row.updated_at || new Date());
+          let userEmail = row.user_email;
+          if (!userEmail && row.user_id) {
+            userEmail = await getUserEmailById(row.user_id);
+          }
           return {
-            id: doc.id,
-            ...data,
-            timestamp: data.createdAt?.toDate() || new Date(),
+            ...row,
+            timestamp,
+            source: 'blacklist',
+            type: 'blacklist',
+            level: 'warning',
+            message: row.description || `User blocked: ${row.reason || 'unknown reason'}`,
+            details: null,
+            userId: row.user_id,
+            userEmail,
+            metadata: {
+              reason: row.reason,
+              status: row.status,
+              source: row.source,
+              blockedAt: row.blocked_at,
+            }
+          };
+        })
+      );
+
+      const referralUsageLogs = await Promise.all(
+        (referralResult.data || []).map(async (row) => {
+          const referrerEmail = await getUserEmailById(row.referrer_id);
+          const referredUserEmail = await getUserEmailById(row.referred_user_id);
+          return {
+            ...row,
+            timestamp: row.created_at ? new Date(row.created_at) : new Date(),
             source: 'referralUsages',
             type: 'promocode',
             level: 'success',
-            message: `Referral code "${data.referralCode}" used by ${referrerEmail}`,
+            message: `Referral code "${row.referral_code}" used by ${referrerEmail}`,
             details: null,
-            userId: data.referredUserId,
+            userId: row.referred_user_id,
             userEmail: referredUserEmail,
             metadata: {
-              referralCode: data.referralCode,
-              referrerId: data.referrerId,
-              referrerEmail: referrerEmail,
-              referredUserId: data.referredUserId,
-              referredUserEmail: referredUserEmail,
-              status: data.status
+              referralCode: row.referral_code,
+              referrerId: row.referrer_id,
+              referrerEmail,
+              referredUserId: row.referred_user_id,
+              referredUserEmail,
+              status: row.status
             }
           };
         })
@@ -144,9 +130,8 @@ const ApplicationLogs = () => {
         setLogs(allLogs);
       }
 
-      // Set pagination based on application_logs collection only (blacklist loads all)
-      setLastDoc(applicationLogsSnapshot.docs.length > 0 ? applicationLogsSnapshot.docs[applicationLogsSnapshot.docs.length - 1] : null);
-      setHasMore(applicationLogsSnapshot.docs.length === 50);
+      // Set pagination
+      setHasMore((appLogsResult.data || []).length === 50);
     } catch {
       toast.error('Failed to load application logs');
     } finally {

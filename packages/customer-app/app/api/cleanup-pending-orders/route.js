@@ -1,25 +1,8 @@
 import { NextResponse } from 'next/server';
-import { db } from '@esim/shared/firebase/config';
-import { collection, query, where, getDocs, deleteDoc, doc, Timestamp } from 'firebase/firestore';
+import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 
 export const dynamic = 'force-dynamic';
 
-/**
- * API Route: Cleanup Stale Pending Orders
- * 
- * This endpoint removes pending orders that are older than a specified threshold.
- * Use cases:
- * - Clean up abandoned checkout sessions
- * - Free up storage from users who never completed payment
- * - Admin maintenance task
- * 
- * Security: This should be protected in production (add admin auth check)
- * 
- * Query Parameters:
- * - hours: Number of hours old to consider "stale" (default: 24)
- * - dryRun: If "true", only counts orders without deleting (default: false)
- * - userId: Optional - clean only for specific user
- */
 export async function POST(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -27,11 +10,10 @@ export async function POST(request) {
     const dryRun = searchParams.get('dryRun') === 'true';
     const specificUserId = searchParams.get('userId');
     
-    // Calculate cutoff timestamp
     const cutoffTime = new Date(Date.now() - hoursOld * 60 * 60 * 1000);
-    const cutoffTimestamp = Timestamp.fromDate(cutoffTime);
     
-    
+    const supabase = getSupabaseAdmin();
+
     const results = {
       globalOrdersFound: 0,
       globalOrdersDeleted: 0,
@@ -42,111 +24,86 @@ export async function POST(request) {
       skippedOrderIds: []
     };
     
-    // Step 1: Find stale pending orders in global 'orders' collection
-    const ordersRef = collection(db, 'orders');
-    const pendingOrdersQuery = query(
-      ordersRef,
-      where('status', '==', 'pending'),
-      where('createdAt', '<', cutoffTimestamp)
-    );
+    // Find stale pending orders
+    let query = supabase
+      .from('orders')
+      .select('*')
+      .eq('status', 'pending')
+      .lt('created_at', cutoffTime.toISOString());
+
+    const { data: pendingOrders, error } = await query;
+    if (error) throw error;
+
+    results.globalOrdersFound = (pendingOrders || []).length;
     
-    const pendingOrdersSnapshot = await getDocs(pendingOrdersQuery);
-    results.globalOrdersFound = pendingOrdersSnapshot.size;
-    
-    
-    // Process global orders
-    for (const orderDoc of pendingOrdersSnapshot.docs) {
-      const orderData = orderDoc.data();
-      const orderId = orderDoc.id;
-      
-      // Skip if user filter is applied and doesn't match
-      if (specificUserId && orderData.userId !== specificUserId) {
-        results.skippedOrderIds.push(orderId);
+    for (const order of (pendingOrders || [])) {
+      if (specificUserId && order.user_id !== specificUserId) {
+        results.skippedOrderIds.push(order.id);
         continue;
       }
       
-      // Skip if payment was actually completed (safety check)
-      if (orderData.paymentStatus === 'completed' || orderData.paymentStatus === 'paid') {
-        results.skippedOrderIds.push(orderId);
+      if (order.payment_status === 'completed' || order.payment_status === 'paid') {
+        results.skippedOrderIds.push(order.id);
         continue;
       }
       
-      // Skip if eSIM was created (safety check)
-      if (orderData.esimCreated === true) {
-        results.skippedOrderIds.push(orderId);
+      if (order.esim_created === true) {
+        results.skippedOrderIds.push(order.id);
         continue;
       }
       
       if (!dryRun) {
         try {
-          await deleteDoc(doc(db, 'orders', orderId));
+          await supabase.from('orders').delete().eq('id', order.id);
           results.globalOrdersDeleted++;
-          results.deletedOrderIds.push(orderId);
+          results.deletedOrderIds.push(order.id);
           
-          // Also delete from user's esims collection if userId exists
-          if (orderData.userId) {
+          if (order.user_id) {
             try {
-              await deleteDoc(doc(db, 'users', orderData.userId, 'esims', orderId));
+              await supabase.from('user_esims').delete().eq('id', order.id).eq('user_id', order.user_id);
               results.userOrdersDeleted++;
             } catch {
-              // User order might not exist or already deleted
+              // User order might not exist
             }
           }
         } catch (deleteError) {
-          results.errors.push({ orderId, error: deleteError.message });
+          results.errors.push({ orderId: order.id, error: deleteError.message });
         }
       } else {
-        results.deletedOrderIds.push(orderId);
-        results.globalOrdersDeleted++; // Count what would be deleted
+        results.deletedOrderIds.push(order.id);
+        results.globalOrdersDeleted++;
       }
     }
     
-    // Step 2: If a specific user is specified, also check their esims collection
+    // User-specific esims collection
     if (specificUserId) {
-      const userEsimsRef = collection(db, 'users', specificUserId, 'esims');
-      const userPendingQuery = query(
-        userEsimsRef,
-        where('status', '==', 'pending'),
-        where('createdAt', '<', cutoffTimestamp)
-      );
+      const { data: userOrders } = await supabase
+        .from('user_esims')
+        .select('*')
+        .eq('user_id', specificUserId)
+        .eq('status', 'pending')
+        .lt('created_at', cutoffTime.toISOString());
+
+      results.userOrdersFound = (userOrders || []).length;
       
-      const userPendingSnapshot = await getDocs(userPendingQuery);
-      results.userOrdersFound = userPendingSnapshot.size;
-      
-      
-      for (const userOrderDoc of userPendingSnapshot.docs) {
-        const orderData = userOrderDoc.data();
-        const orderId = userOrderDoc.id;
-        
-        // Skip if payment was completed
-        if (orderData.paymentStatus === 'completed' || orderData.paymentStatus === 'paid') {
-          continue;
-        }
-        
-        // Skip if eSIM was created
-        if (orderData.esimCreated === true) {
-          continue;
-        }
-        
-        // Skip if already in deleted list (from global collection processing)
-        if (results.deletedOrderIds.includes(orderId)) {
-          continue;
-        }
+      for (const order of (userOrders || [])) {
+        if (order.payment_status === 'completed' || order.payment_status === 'paid') continue;
+        if (order.esim_created === true) continue;
+        if (results.deletedOrderIds.includes(order.id)) continue;
         
         if (!dryRun) {
           try {
-            await deleteDoc(doc(db, 'users', specificUserId, 'esims', orderId));
+            await supabase.from('user_esims').delete().eq('id', order.id).eq('user_id', specificUserId);
             results.userOrdersDeleted++;
-            results.deletedOrderIds.push(orderId);
+            results.deletedOrderIds.push(order.id);
           } catch (deleteError) {
-            results.errors.push({ orderId, error: deleteError.message });
+            results.errors.push({ orderId: order.id, error: deleteError.message });
           }
         } else {
-          results.deletedOrderIds.push(orderId);
+          results.deletedOrderIds.push(order.id);
         }
       }
     }
-    
     
     return NextResponse.json({
       success: true,
@@ -160,19 +117,12 @@ export async function POST(request) {
     
   } catch (error) {
     return NextResponse.json(
-      { 
-        success: false, 
-        error: error.message,
-        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-      },
+      { success: false, error: error.message },
       { status: 500 }
     );
   }
 }
 
-/**
- * GET endpoint to check stale pending orders without deleting
- */
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -180,38 +130,36 @@ export async function GET(request) {
     const specificUserId = searchParams.get('userId');
     
     const cutoffTime = new Date(Date.now() - hoursOld * 60 * 60 * 1000);
-    const cutoffTimestamp = Timestamp.fromDate(cutoffTime);
     
-    // Count stale pending orders
-    const ordersRef = collection(db, 'orders');
-    const pendingOrdersQuery = query(
-      ordersRef,
-      where('status', '==', 'pending'),
-      where('createdAt', '<', cutoffTimestamp)
-    );
-    
-    const pendingOrdersSnapshot = await getDocs(pendingOrdersQuery);
-    
-    const orders = pendingOrdersSnapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        userId: data.userId,
-        email: data.customerEmail,
-        packageId: data.packageId,
-        amount: data.amount,
-        status: data.status,
-        paymentStatus: data.paymentStatus,
-        createdAt: data.createdAt?.toDate?.()?.toISOString() || 'unknown'
-      };
-    }).filter(order => !specificUserId || order.userId === specificUserId);
+    const supabase = getSupabaseAdmin();
+
+    const { data: pendingOrders, error } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('status', 'pending')
+      .lt('created_at', cutoffTime.toISOString());
+
+    if (error) throw error;
+
+    const orders = (pendingOrders || [])
+      .map(d => ({
+        id: d.id,
+        userId: d.user_id,
+        email: d.customer_email,
+        packageId: d.package_id,
+        amount: d.amount,
+        status: d.status,
+        paymentStatus: d.payment_status,
+        createdAt: d.created_at
+      }))
+      .filter(order => !specificUserId || order.userId === specificUserId);
     
     return NextResponse.json({
       success: true,
       count: orders.length,
       hoursOld,
       cutoffTime: cutoffTime.toISOString(),
-      orders: orders.slice(0, 50), // Limit to 50 for response size
+      orders: orders.slice(0, 50),
       hasMore: orders.length > 50
     });
     

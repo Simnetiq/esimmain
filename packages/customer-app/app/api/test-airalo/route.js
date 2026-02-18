@@ -2,22 +2,23 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
+    // Get Airalo credentials from Supabase config
+    const { getSupabaseAdmin } = await import('@esim/shared/lib/supabaseAdmin');
+    const supabase = getSupabaseAdmin();
     
-    // Get Airalo credentials from Firestore
-    const { db } = await import('@esim/shared/firebase/config');
-    const { doc, getDoc } = await import('firebase/firestore');
+    const { data: configData, error: configError } = await supabase
+      .from('app_config')
+      .select('*')
+      .eq('id', 'airalo')
+      .single();
     
-    const airaloConfigRef = doc(db, 'config', 'airalo');
-    const airaloConfig = await getDoc(airaloConfigRef);
-    
-    if (!airaloConfig.exists()) {
+    if (configError || !configData) {
       return NextResponse.json({
         success: false,
         error: 'Airalo configuration not found'
       }, { status: 400 });
     }
     
-    const configData = airaloConfig.data();
     const clientId = configData.api_key;
     const clientSecret = process.env.AIRALO_CLIENT_SECRET_PRODUCTION;
     
@@ -28,7 +29,6 @@ export async function GET() {
       }, { status: 400 });
     }
 
-    
     const baseUrl = 'https://partners-api.airalo.com';
     
     // Authenticate
@@ -83,7 +83,6 @@ export async function GET() {
     
     const packagesData = await packagesResponse.json();
     
-    // Analyze the response
     const analysis = {
       responseKeys: Object.keys(packagesData),
       dataType: typeof packagesData.data,
@@ -100,7 +99,6 @@ export async function GET() {
     if (packagesData.data && Array.isArray(packagesData.data)) {
       analysis.totalPlans = packagesData.data.length;
       
-      // Get sample structures
       analysis.sampleStructures = packagesData.data.slice(0, 3).map(item => ({
         title: item.title,
         id: item.id,
@@ -111,31 +109,21 @@ export async function GET() {
         keys: Object.keys(item)
       }));
       
-      // Count countries
       packagesData.data.forEach(plan => {
-        // From plan.countries
         if (plan.countries && Array.isArray(plan.countries)) {
           plan.countries.forEach(country => {
-            if (country.country_code) {
-              analysis.countriesFound.add(country.country_code);
-            }
+            if (country.country_code) analysis.countriesFound.add(country.country_code);
           });
         }
-        
-        // From plan.operators
         if (plan.operators && Array.isArray(plan.operators)) {
           plan.operators.forEach(operator => {
             if (operator.countries && Array.isArray(operator.countries)) {
               operator.countries.forEach(country => {
-                if (country.country_code) {
-                  analysis.countriesFound.add(country.country_code);
-                }
+                if (country.country_code) analysis.countriesFound.add(country.country_code);
               });
             }
           });
         }
-        
-        // From individual country entries
         if (plan.country_code && plan.title && !plan.packages && !plan.countries) {
           analysis.countriesFound.add(plan.country_code);
         }

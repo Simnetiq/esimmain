@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
+import supabase from '../lib/supabase';
 import { 
   getAllPromoCodes, 
   createPromoCode, 
@@ -73,14 +72,16 @@ const FinancesManagement = () => {
   const loadOrders = async () => {
     try {
       setOrdersLoading(true);
-      const ordersRef = collection(db, 'orders');
-      const q = query(ordersRef, orderBy('createdAt', 'desc'));
-      const snapshot = await getDocs(q);
+      const { data: ordersRaw, error } = await supabase
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false });
       
-      const ordersData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate()
+      if (error) throw error;
+      
+      const ordersData = (ordersRaw || []).map(row => ({
+        ...row,
+        createdAt: row.created_at ? new Date(row.created_at) : null
       }));
       
       setOrders(ordersData);
@@ -139,13 +140,19 @@ const FinancesManagement = () => {
   // Load countries for selector
   const loadCountries = async () => {
     try {
-      const countriesRef = collection(db, 'countries');
-      const snapshot = await getDocs(countriesRef);
-      const countriesData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        code: doc.data().code,
-        name: doc.data().name
-      })).sort((a, b) => a.name.localeCompare(b.name));
+      const { data, error } = await supabase
+        .from('countries')
+        .select('id, iso_code, name')
+        .eq('is_active', true)
+        .order('name', { ascending: true });
+      
+      if (error) throw error;
+      
+      const countriesData = (data || []).map(row => ({
+        id: row.id,
+        code: row.iso_code || row.id,
+        name: row.name
+      }));
       setCountries(countriesData);
     } catch (error) {
       console.error('Error loading countries:', error);

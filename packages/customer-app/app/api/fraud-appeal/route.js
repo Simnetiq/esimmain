@@ -1,23 +1,14 @@
 import { NextResponse } from 'next/server';
-import { db } from '@esim/shared/firebase/config';
+import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 import { submitBlockAppeal, getFraudStats } from '@esim/shared/services/fraudSignalsService';
 
 export const dynamic = 'force-dynamic';
 
-/**
- * Fraud Appeal API
- * 
- * Allows blocked users to submit an appeal to have their account reviewed
- * 
- * POST /api/fraud-appeal
- * Body: { userId, email, contactEmail, reason, additionalInfo }
- */
 export async function POST(request) {
   try {
     const body = await request.json();
     const { userId, email, contactEmail, contactPhone, reason, additionalInfo } = body;
 
-    // Get client IP for logging
     const forwarded = request.headers.get('x-forwarded-for');
     const ipAddress = forwarded ? forwarded.split(',')[0].trim() : request.headers.get('x-real-ip') || null;
 
@@ -35,7 +26,6 @@ export async function POST(request) {
       );
     }
 
-    // Validate email format
     const emailToValidate = contactEmail || email;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(emailToValidate)) {
@@ -45,11 +35,11 @@ export async function POST(request) {
       );
     }
 
-    // Get fraud stats to include in appeal
-    const fraudStats = await getFraudStats(db, userId, email);
+    const supabase = getSupabaseAdmin();
 
-    // Submit the appeal
-    const result = await submitBlockAppeal(db, {
+    const fraudStats = await getFraudStats(supabase, userId, email);
+
+    const result = await submitBlockAppeal(supabase, {
       userId,
       email,
       contactEmail: contactEmail || email,
@@ -67,7 +57,6 @@ export async function POST(request) {
       );
     }
 
-
     return NextResponse.json({
       success: true,
       appealId: result.appealId,
@@ -83,10 +72,6 @@ export async function POST(request) {
   }
 }
 
-/**
- * GET endpoint to check appeal status
- * GET /api/fraud-appeal?appealId=xxx
- */
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -100,55 +85,49 @@ export async function GET(request) {
       );
     }
 
-    const { collection, query, where, getDocs, doc, getDoc } = await import('firebase/firestore');
+    const supabase = getSupabaseAdmin();
 
     if (appealId) {
-      // Get specific appeal
-      const appealRef = doc(db, 'fraud_appeals', appealId);
-      const appealSnap = await getDoc(appealRef);
+      const { data: appealData, error } = await supabase
+        .from('fraud_appeals')
+        .select('*')
+        .eq('id', appealId)
+        .single();
 
-      if (!appealSnap.exists()) {
+      if (error || !appealData) {
         return NextResponse.json(
           { error: 'Appeal not found', code: 'NOT_FOUND' },
           { status: 404 }
         );
       }
 
-      const appealData = appealSnap.data();
-      
       return NextResponse.json({
         success: true,
         appeal: {
-          id: appealSnap.id,
+          id: appealData.id,
           status: appealData.status,
-          createdAt: appealData.createdAt?.toDate?.()?.toISOString() || null,
-          resolvedAt: appealData.resolvedAt?.toDate?.()?.toISOString() || null,
+          createdAt: appealData.created_at,
+          resolvedAt: appealData.resolved_at || null,
           resolution: appealData.resolution || null
         }
       });
     }
 
-    // Get appeals by email
     if (email) {
-      const appealsRef = collection(db, 'fraud_appeals');
-      const q = query(appealsRef, where('contactEmail', '==', email.toLowerCase()));
-      const snapshot = await getDocs(q);
-
-      const appeals = [];
-      snapshot.forEach(docSnap => {
-        const data = docSnap.data();
-        appeals.push({
-          id: docSnap.id,
-          status: data.status,
-          createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
-          resolvedAt: data.resolvedAt?.toDate?.()?.toISOString() || null,
-          resolution: data.resolution || null
-        });
-      });
+      const { data: appeals } = await supabase
+        .from('fraud_appeals')
+        .select('*')
+        .eq('contact_email', email.toLowerCase());
 
       return NextResponse.json({
         success: true,
-        appeals
+        appeals: (appeals || []).map(d => ({
+          id: d.id,
+          status: d.status,
+          createdAt: d.created_at,
+          resolvedAt: d.resolved_at || null,
+          resolution: d.resolution || null
+        }))
       });
     }
 

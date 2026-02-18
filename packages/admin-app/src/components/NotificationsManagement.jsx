@@ -3,8 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
-import { collection, query, getDocs, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, orderBy } from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
+import supabase from '../lib/supabase';
 import { motion } from 'framer-motion';
 import { 
   Plus, 
@@ -94,16 +93,12 @@ const NotificationsManagement = () => {
   // Load countries for notifications
   const loadCountriesForNotifications = async () => {
     try {
-      const countriesSnapshot = await getDocs(collection(db, 'countries'));
-      const countriesData = countriesSnapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          ...data,
-          flagEmoji: data.flagEmoji || getFlagEmoji(data.code)
-        };
-      });
-      setNotificationCountries(countriesData);
+      const { data: countriesData } = await supabase
+        .from('countries')
+        .select('*')
+        .eq('is_active', true)
+        .order('name', { ascending: true });
+      // setNotificationCountries commented out - variable not used
     } catch {
     }
   };
@@ -112,16 +107,15 @@ const NotificationsManagement = () => {
   const loadNotifications = async () => {
     try {
       setLoadingNotifications(true);
-      const notificationsSnapshot = await getDocs(
-        query(collection(db, 'notifications'), orderBy('createdAt', 'desc'))
-      );
-      const notificationsData = notificationsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      const { data: notificationsData, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .order('created_at', { ascending: false });
       
-      setNotifications(notificationsData);
-      setFilteredNotifications(notificationsData);
+      if (error) throw error;
+      
+      setNotifications(notificationsData || []);
+      setFilteredNotifications(notificationsData || []);
     } catch (error) {
       toast.error(`Error loading notifications: ${error.message}`);
     } finally {
@@ -160,7 +154,7 @@ const NotificationsManagement = () => {
     }
   };
 
-  // Upload image to Firebase Storage
+  // Upload image
   const uploadImage = async () => {
     if (!selectedImage) return null;
 
@@ -228,28 +222,35 @@ const NotificationsManagement = () => {
       }
 
       const notificationData = {
-        ...notificationFormData,
-        imageUrl: imageUrl, // Use uploaded image URL
-        createdAt: editingNotification ? editingNotification.createdAt : serverTimestamp(),
-        updatedAt: serverTimestamp(),
-        createdBy: currentUser.email,
-        sentCount: editingNotification ? editingNotification.sentCount || 0 : 0,
-        readCount: editingNotification ? editingNotification.readCount || 0 : 0,
-        // Set default values for removed fields
-        body: notificationFormData.name, // Use name as body for backward compatibility
+        title: notificationFormData.title,
+        name: notificationFormData.name,
+        image_url: imageUrl || '',
+        updated_at: new Date().toISOString(),
+        created_by: currentUser.email,
+        sent_count: editingNotification ? editingNotification.sent_count || editingNotification.sentCount || 0 : 0,
+        read_count: editingNotification ? editingNotification.read_count || editingNotification.readCount || 0 : 0,
+        body: notificationFormData.name,
         type: 'general',
         priority: 'normal',
-        targetAudience: 'all',
+        target_audience: 'all',
         countries: [],
-        scheduledDate: '',
-        isActive: true
+        scheduled_date: '',
+        is_active: true
       };
 
       if (editingNotification) {
-        await updateDoc(doc(db, 'notifications', editingNotification.id), notificationData);
+        const { error } = await supabase
+          .from('notifications')
+          .update(notificationData)
+          .eq('id', editingNotification.id);
+        if (error) throw error;
         toast.success('Notification updated successfully');
       } else {
-        await addDoc(collection(db, 'notifications'), notificationData);
+        notificationData.created_at = new Date().toISOString();
+        const { error } = await supabase
+          .from('notifications')
+          .insert(notificationData);
+        if (error) throw error;
         toast.success('Notification created successfully');
       }
 
@@ -281,7 +282,8 @@ const NotificationsManagement = () => {
     
     try {
       setLoadingNotifications(true);
-      await deleteDoc(doc(db, 'notifications', notificationId));
+      const { error } = await supabase.from('notifications').delete().eq('id', notificationId);
+      if (error) throw error;
       toast.success('Notification deleted successfully');
       await loadNotifications();
     } catch {
@@ -342,14 +344,17 @@ const NotificationsManagement = () => {
 
 
       // Update notification with sent count and timestamp
-      await updateDoc(doc(db, 'notifications', notification.id), {
-        sentCount: (notification.sentCount || 0) + result.successCount,
-        lastSentAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-        fcmSentAt: serverTimestamp(), // Track when FCM was sent
-        fcmSuccessCount: result.successCount,
-        fcmFailureCount: result.failureCount || 0
-      });
+      await supabase
+        .from('notifications')
+        .update({
+          sent_count: (notification.sentCount || notification.sent_count || 0) + result.successCount,
+          last_sent_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          fcm_sent_at: new Date().toISOString(),
+          fcm_success_count: result.successCount,
+          fcm_failure_count: result.failureCount || 0
+        })
+        .eq('id', notification.id);
 
       toast.success('Success');
       

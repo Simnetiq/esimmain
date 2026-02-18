@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
-import { collection, getDocs, query, where, orderBy, limit } from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
+import supabase from '../lib/supabase';
 import {
   Search,
   Users,
@@ -90,38 +89,41 @@ const UserManagement = () => {
   const loadUsersFromFirestore = async () => {
     try {
       setLoading(true);
-      const usersSnapshot = await getDocs(collection(db, 'users'));
-      const usersData = usersSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      const { data: usersData, error: usersError } = await supabase
+        .from('users')
+        .select('*');
+      
+      if (usersError) throw usersError;
       
       // Load all orders once to extract platform info
-      const ordersSnapshot = await getDocs(collection(db, 'orders'));
-      const allOrders = ordersSnapshot.docs.map(doc => doc.data());
+      const { data: allOrders } = await supabase
+        .from('orders')
+        .select('user_id, platform, security, created_at');
       
       // Group orders by userId and find the earliest order for each user
       const userFirstOrders = {};
-      allOrders.forEach(order => {
-        const userId = order.userId;
+      (allOrders || []).forEach(order => {
+        const userId = order.user_id;
         if (!userId) return;
         
-        const orderDate = order.createdAt?.seconds || 0;
+        const orderDate = order.created_at ? new Date(order.created_at).getTime() : 0;
+        const existingDate = userFirstOrders[userId]?.created_at 
+          ? new Date(userFirstOrders[userId].created_at).getTime() : Infinity;
         
-        if (!userFirstOrders[userId] || orderDate < userFirstOrders[userId].createdAt?.seconds) {
+        if (!userFirstOrders[userId] || orderDate < existingDate) {
           userFirstOrders[userId] = order;
         }
       });
       
       // Merge platform info into users
-      const usersWithPlatform = usersData.map(user => {
+      const usersWithPlatform = (usersData || []).map(user => {
         const firstOrder = userFirstOrders[user.id];
         if (firstOrder) {
           return {
             ...user,
             detectedPlatform: firstOrder.platform || null,
             detectedUserAgent: firstOrder.security?.userAgent || null,
-            firstOrderDate: firstOrder.createdAt,
+            firstOrderDate: firstOrder.created_at,
             hasOrders: true
           };
         }
@@ -261,7 +263,7 @@ const UserManagement = () => {
                       })()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {user.createdAt ? new Date(user.createdAt.toDate()).toLocaleDateString() : 'Unknown'}
+                      {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <span className="text-blue-600 text-xs">

@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { storage } from '@esim/shared/firebase/config';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+// Image upload via Supabase Storage
 import toast from 'react-hot-toast';
 import {
   Plus,
@@ -403,10 +402,18 @@ const RegionManagement = () => {
     try {
       setUploadingImage(true);
       const fileName = `regions/${formData.id || 'temp'}_${Date.now()}_${file.name}`;
-      const storageRef = ref(storage, fileName);
-      await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(storageRef);
-      setFormData(prev => ({ ...prev, imageUrl: downloadURL }));
+      
+      const { error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(fileName, file, { upsert: true });
+      
+      if (uploadError) throw uploadError;
+      
+      const { data: urlData } = supabase.storage
+        .from('images')
+        .getPublicUrl(fileName);
+      
+      setFormData(prev => ({ ...prev, imageUrl: urlData.publicUrl }));
       toast.success('Image uploaded successfully');
     } catch (error) {
       console.error('Error uploading image:', error);

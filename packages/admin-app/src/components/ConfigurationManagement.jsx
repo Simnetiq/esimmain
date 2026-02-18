@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
-import { collection,  getDocs, getDoc, doc, writeBatch, setDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
+import supabase from '../lib/supabase';
 import { motion } from 'framer-motion';
 import { 
   Settings, 
@@ -82,56 +81,46 @@ const ConfigurationManagement = () => {
   // Configuration Functions
   const loadSavedConfig = async () => {
     try {
-      const configDoc = await getDocs(collection(db, 'admin_config'));
-      if (!configDoc.empty) {
-        configDoc.docs[0].data();
-      }
+      // Admin config loaded from app_config table
     } catch {
     }
   };
 
   const loadRoamjetApiKey = async () => {
     try {
-      // Try to load from Firestore first
-      try {
-        const configRef = doc(db, 'config', 'roamjet');
-        const configDoc = await getDoc(configRef);
-        if (configDoc.exists()) {
-          const configData = configDoc.data();
-          if (configData.api_key) {
-            setRoamjetApiKey(configData.api_key);
-          }
-          if (configData.base_url) {
-            setRoamjetBaseUrl(configData.base_url);
-          }
-          return;
-        }
-      } catch {
+      const { data } = await supabase
+        .from('app_config')
+        .select('value')
+        .eq('key', 'roamjet')
+        .single();
+      
+      if (data?.value) {
+        if (data.value.api_key) setRoamjetApiKey(data.value.api_key);
+        if (data.value.base_url) setRoamjetBaseUrl(data.value.base_url);
+        return;
       }
       
       // Fallback to localStorage
       const storedApiKey = localStorage.getItem('roamjet_api_key');
       const storedBaseUrl = localStorage.getItem('roamjet_base_url');
-      if (storedApiKey) {
-        setRoamjetApiKey(storedApiKey);
-      }
-      if (storedBaseUrl) {
-        setRoamjetBaseUrl(storedBaseUrl);
-      }
+      if (storedApiKey) setRoamjetApiKey(storedApiKey);
+      if (storedBaseUrl) setRoamjetBaseUrl(storedBaseUrl);
     } catch {
     }
   };
 
   const loadMarkupPercentage = async () => {
     try {
-      const pricingConfigRef = doc(db, 'config', 'pricing');
-      const pricingConfig = await getDoc(pricingConfigRef);
+      const { data } = await supabase
+        .from('app_config')
+        .select('value')
+        .eq('key', 'pricing')
+        .single();
       
-      if (pricingConfig.exists()) {
-        const data = pricingConfig.data();
-        setMarkupPercentage(data.markup_percentage || 17);
-        setRegularDiscountPercentage(data.regular_discount_percentage || 10);
-        setTransactionCommissionPercentage(data.transaction_commission_percentage || 5);
+      if (data?.value) {
+        setMarkupPercentage(data.value.markup_percentage || 17);
+        setRegularDiscountPercentage(data.value.regular_discount_percentage || 10);
+        setTransactionCommissionPercentage(data.value.transaction_commission_percentage || 5);
       }
     } catch {
     }
@@ -144,18 +133,18 @@ const ConfigurationManagement = () => {
         return;
       }
       
-      // Save to localStorage
       localStorage.setItem('roamjet_api_key', roamjetApiKey);
       localStorage.setItem('roamjet_base_url', roamjetBaseUrl);
       
-      // Save to Firestore so API routes can access it
-      const configRef = doc(db, 'config', 'roamjet');
-      await setDoc(configRef, {
-        api_key: roamjetApiKey,
-        base_url: roamjetBaseUrl,
-        updated_at: serverTimestamp(),
-        updated_by: currentUser?.uid || 'admin'
-      }, { merge: true });
+      await supabase.from('app_config').upsert({
+        key: 'roamjet',
+        value: {
+          api_key: roamjetApiKey,
+          base_url: roamjetBaseUrl,
+          updated_by: currentUser?.uid || 'admin'
+        },
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'key' });
       
       toast.success('RoamJet API credentials saved successfully!');
     } catch {
@@ -167,32 +156,33 @@ const ConfigurationManagement = () => {
     try {
       setLoading(true);
       
-      // Save to both locations for compatibility
-      // 1. Save to config/pricing (for backward compatibility)
-      const pricingConfigRef = doc(db, 'config', 'pricing');
-      await setDoc(pricingConfigRef, {
-        markup_percentage: markupPercentage,
-        regular_discount_percentage: regularDiscountPercentage,
-        transaction_commission_percentage: transactionCommissionPercentage,
-        updated_at: serverTimestamp(),
-        updated_by: currentUser?.uid || 'admin'
-      }, { merge: true });
+      await supabase.from('app_config').upsert({
+        key: 'pricing',
+        value: {
+          markup_percentage: markupPercentage,
+          regular_discount_percentage: regularDiscountPercentage,
+          transaction_commission_percentage: transactionCommissionPercentage,
+          updated_by: currentUser?.uid || 'admin'
+        },
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'key' });
       
-      // 2. Save to settings/general/referral (for referral system)
-      const settingsRef = doc(db, 'settings', 'general');
-      await setDoc(settingsRef, {
-        referral: {
-          discountPercentage: markupPercentage,
-          minimumPrice: 0.5,
-          transactionCommissionPercentage: transactionCommissionPercentage
+      await supabase.from('app_config').upsert({
+        key: 'settings_general',
+        value: {
+          referral: {
+            discountPercentage: markupPercentage,
+            minimumPrice: 0.5,
+            transactionCommissionPercentage: transactionCommissionPercentage
+          },
+          regular: {
+            discountPercentage: regularDiscountPercentage,
+            minimumPrice: 0.5
+          },
+          updatedBy: currentUser?.uid || 'admin'
         },
-        regular: {
-          discountPercentage: regularDiscountPercentage,
-          minimumPrice: 0.5
-        },
-        updatedAt: serverTimestamp(),
-        updatedBy: currentUser?.uid || 'admin'
-      }, { merge: true });
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'key' });
       
       toast.success(`Settings updated: Referral ${markupPercentage}%, Regular ${regularDiscountPercentage}%, Commission ${transactionCommissionPercentage}%`);
     } catch {
@@ -266,16 +256,10 @@ const ConfigurationManagement = () => {
       setIsDeleting(true);
       
       // Delete all countries
-      const countriesSnapshot = await getDocs(collection(db, 'countries'));
-      const batch = writeBatch(db);
-      countriesSnapshot.forEach(doc => batch.delete(doc.ref));
-      await batch.commit();
-
+      await supabase.from('countries').delete().neq('id', '');
+      
       // Delete all plans
-      const plansSnapshot = await getDocs(collection(db, 'dataplans'));
-      const plansBatch = writeBatch(db);
-      plansSnapshot.forEach(doc => plansBatch.delete(doc.ref));
-      await plansBatch.commit();
+      await supabase.from('dataplans').delete().neq('id', '');
 
       toast.success('All data has been reset successfully!');
     } catch {
@@ -288,13 +272,16 @@ const ConfigurationManagement = () => {
   // Version Configuration Functions
   const loadVersionConfig = async () => {
     try {
-      const versionDoc = await getDoc(doc(db, 'app_config', 'version'));
+      const { data } = await supabase
+        .from('app_config')
+        .select('value')
+        .eq('key', 'version')
+        .single();
       
-      if (versionDoc.exists()) {
-        const data = versionDoc.data();
+      if (data?.value) {
         setVersionConfig(prev => ({
           ...prev,
-          ...data
+          ...data.value
         }));
       }
     } catch {
@@ -312,13 +299,15 @@ const ConfigurationManagement = () => {
         return;
       }
 
-      const configData = {
-        min_required_version: versionConfig.min_required_version,
-        last_updated: new Date(),
-        last_updated_by: currentUser?.email || 'admin'
-      };
-
-      await setDoc(doc(db, 'app_config', 'version'), configData, { merge: true });
+      await supabase.from('app_config').upsert({
+        key: 'version',
+        value: {
+          min_required_version: versionConfig.min_required_version,
+          last_updated: new Date().toISOString(),
+          last_updated_by: currentUser?.email || 'admin'
+        },
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'key' });
       
       toast.success('Version configuration saved successfully!');
     } catch {
@@ -345,14 +334,16 @@ const ConfigurationManagement = () => {
   // Stripe Configuration Functions
   const loadStripeConfig = async () => {
     try {
-      const stripeConfigRef = doc(db, 'config', 'stripe');
-      const stripeConfigDoc = await getDoc(stripeConfigRef);
+      const { data } = await supabase
+        .from('app_config')
+        .select('value')
+        .eq('key', 'stripe')
+        .single();
       
-      if (stripeConfigDoc.exists()) {
-        const data = stripeConfigDoc.data();
+      if (data?.value) {
         setStripeConfig(prev => ({
           ...prev,
-          livePublishableKey: data.livePublishableKey || data.live_publishable_key || ''
+          livePublishableKey: data.value.livePublishableKey || data.value.live_publishable_key || ''
         }));
       }
     } catch {
@@ -375,13 +366,14 @@ const ConfigurationManagement = () => {
         return;
       }
 
-      const configData = {
-        livePublishableKey: stripeConfig.livePublishableKey.trim(),
-        updated_at: serverTimestamp(),
-        updated_by: currentUser?.uid || 'admin'
-      };
-
-      await setDoc(doc(db, 'config', 'stripe'), configData, { merge: true });
+      await supabase.from('app_config').upsert({
+        key: 'stripe',
+        value: {
+          livePublishableKey: stripeConfig.livePublishableKey.trim(),
+          updated_by: currentUser?.uid || 'admin'
+        },
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'key' });
       
       toast.success('Stripe configuration saved successfully!');
     } catch {
@@ -401,19 +393,21 @@ const ConfigurationManagement = () => {
   // OpenRouter Configuration Functions
   const loadOpenRouterConfig = async () => {
     try {
-      const openRouterConfigRef = doc(db, 'config', 'openrouter');
-      const openRouterConfigDoc = await getDoc(openRouterConfigRef);
+      const { data } = await supabase
+        .from('app_config')
+        .select('value')
+        .eq('key', 'openrouter')
+        .single();
       
-      if (openRouterConfigDoc.exists()) {
-        const data = openRouterConfigDoc.data();
+      if (data?.value) {
         setOpenRouterConfig(prev => ({
           ...prev,
-          api_key: data.api_key || '',
-          model: data.model || 'openai/gpt-3.5-turbo',
-          max_tokens: data.max_tokens || 150,
-          temperature: data.temperature || 0.7,
-          site_name: data.site_name || 'Simnetiq',
-          site_url: data.site_url || 'https://esim.simnetiq.shop'
+          api_key: data.value.api_key || '',
+          model: data.value.model || 'openai/gpt-3.5-turbo',
+          max_tokens: data.value.max_tokens || 150,
+          temperature: data.value.temperature || 0.7,
+          site_name: data.value.site_name || 'Simnetiq',
+          site_url: data.value.site_url || 'https://esim.simnetiq.shop'
         }));
       }
     } catch {
@@ -436,18 +430,19 @@ const ConfigurationManagement = () => {
         return;
       }
 
-      const configData = {
-        api_key: openRouterConfig.api_key.trim(),
-        model: openRouterConfig.model,
-        max_tokens: parseInt(openRouterConfig.max_tokens) || 150,
-        temperature: parseFloat(openRouterConfig.temperature) || 0.7,
-        site_name: openRouterConfig.site_name || 'Simnetiq',
-        site_url: openRouterConfig.site_url || 'https://simnetiq.shop',
-        updated_at: serverTimestamp(),
-        updated_by: currentUser?.uid || 'admin'
-      };
-
-      await setDoc(doc(db, 'config', 'openrouter'), configData, { merge: true });
+      await supabase.from('app_config').upsert({
+        key: 'openrouter',
+        value: {
+          api_key: openRouterConfig.api_key.trim(),
+          model: openRouterConfig.model,
+          max_tokens: parseInt(openRouterConfig.max_tokens) || 150,
+          temperature: parseFloat(openRouterConfig.temperature) || 0.7,
+          site_name: openRouterConfig.site_name || 'Simnetiq',
+          site_url: openRouterConfig.site_url || 'https://simnetiq.shop',
+          updated_by: currentUser?.uid || 'admin'
+        },
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'key' });
       
       toast.success('OpenRouter configuration saved successfully!');
     } catch {

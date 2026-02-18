@@ -12,7 +12,6 @@ export async function POST(request) {
       );
     }
 
-    // Validate password strength
     if (newPassword.length < 6) {
       return NextResponse.json(
         { error: 'Password must be at least 6 characters long' },
@@ -20,39 +19,40 @@ export async function POST(request) {
       );
     }
 
-    // Find user by email and token
+    // Find user by email and token using Supabase admin client
     const adminDb = getAdminDb();
     const adminAuth = getAdminAuth();
-    const usersRef = adminDb.collection('users');
-    const userQuery = await usersRef
-      .where('email', '==', email)
-      .where('resetToken', '==', token)
-      .limit(1)
-      .get();
 
-    if (userQuery.empty) {
+    const { data: users, error } = await adminDb
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .eq('reset_token', token)
+      .limit(1);
+
+    if (error || !users || users.length === 0) {
       return NextResponse.json(
         { error: 'Invalid or expired reset token' },
         { status: 400 }
       );
     }
 
-    const userDoc = userQuery.docs[0];
-    const userData = userDoc.data();
+    const userData = users[0];
 
     // Check if token is expired
-    if (!userData.resetTokenExpiry || Date.now() > userData.resetTokenExpiry) {
+    if (!userData.reset_token_expiry || Date.now() > userData.reset_token_expiry) {
       return NextResponse.json(
         { error: 'Reset token has expired. Please request a new one.' },
         { status: 400 }
       );
     }
 
-    // Update password in Firebase Auth
+    // Update password in Supabase Auth
     try {
-      await adminAuth.updateUser(userDoc.id, {
+      const { error: authErr } = await adminAuth.auth.admin.updateUserById(userData.id, {
         password: newPassword,
       });
+      if (authErr) throw authErr;
     } catch (authError) {
       return NextResponse.json(
         { error: 'Failed to update password', details: authError.message },
@@ -61,12 +61,14 @@ export async function POST(request) {
     }
 
     // Clear reset token from database
-    await userDoc.ref.update({
-      resetToken: null,
-      resetTokenExpiry: null,
-      updatedAt: new Date().toISOString(),
-    });
-
+    await adminDb
+      .from('users')
+      .update({
+        reset_token: null,
+        reset_token_expiry: null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', userData.id);
 
     return NextResponse.json({ 
       success: true,
@@ -80,4 +82,3 @@ export async function POST(request) {
     );
   }
 }
-

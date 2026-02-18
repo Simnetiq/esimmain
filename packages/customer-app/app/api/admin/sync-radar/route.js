@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { db } from '@esim/shared/firebase/config';
+import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 import { syncToStripeRadar } from '@esim/shared/services/fraudSignalsService';
 
 export const dynamic = 'force-dynamic';
 
-// Get Stripe secret key based on mode
 const getStripeSecretKey = () => {
   const stripeMode = process.env.STRIPE_MODE || 'live';
   if (stripeMode === 'test' || stripeMode === 'sandbox') {
@@ -19,25 +18,11 @@ const stripe = stripeSecretKey ? new Stripe(stripeSecretKey, {
   apiVersion: '2023-10-16',
 }) : null;
 
-/**
- * Sync Fraud Blocklist to Stripe Radar
- * 
- * POST /api/admin/sync-radar
- * 
- * This should be called:
- * 1. Manually by admin when needed
- * 2. Automatically via cron job (e.g., every hour)
- * 3. After blocking a user with card fingerprint
- * 
- * Requires admin API key for security
- */
 export async function POST(request) {
   try {
-    // Verify admin API key
     const authHeader = request.headers.get('authorization');
     const adminApiKey = process.env.ADMIN_API_KEY;
 
-    // In development, allow without key
     if (process.env.NODE_ENV === 'production' && adminApiKey) {
       if (!authHeader || authHeader !== `Bearer ${adminApiKey}`) {
         return NextResponse.json(
@@ -54,9 +39,8 @@ export async function POST(request) {
       );
     }
 
-
-
-    const result = await syncToStripeRadar(db, stripe);
+    const supabase = getSupabaseAdmin();
+    const result = await syncToStripeRadar(supabase, stripe);
 
     if (!result.success) {
       return NextResponse.json(
@@ -81,12 +65,8 @@ export async function POST(request) {
   }
 }
 
-/**
- * GET - Check Stripe Radar blocklist status
- */
 export async function GET(request) {
   try {
-    // Verify admin API key
     const authHeader = request.headers.get('authorization');
     const adminApiKey = process.env.ADMIN_API_KEY;
 
@@ -106,7 +86,6 @@ export async function GET(request) {
       );
     }
 
-    // Get Stripe Radar blocklist info
     const lists = await stripe.radar.valueLists.list({ limit: 100 });
     
     const fraudList = lists.data.find(list => 
@@ -122,7 +101,6 @@ export async function GET(request) {
       });
     }
 
-    // Get items in the list
     const items = await stripe.radar.valueListItems.list({
       value_list: fraudList.id,
       limit: 100

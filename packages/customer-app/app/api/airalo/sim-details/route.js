@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { db } from '@esim/shared/firebase/config';
-import { doc, getDoc } from 'firebase/firestore';
+import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 
 export async function POST(request) {
   try {
@@ -18,7 +17,7 @@ export async function POST(request) {
     const airaloMode = process.env.AIRALO_MODE || 'production';
     const isSandbox = airaloMode === 'sandbox' || airaloMode === 'test';
     
-    // Get Airalo credentials based on mode (consistent with stripe-webhook)
+    // Get Airalo credentials based on mode
     let clientId = isSandbox
       ? (process.env.AIRALO_CLIENT_ID_SANDBOX || process.env.AIRALO_CLIENT_ID)
       : process.env.AIRALO_CLIENT_ID;
@@ -27,21 +26,22 @@ export async function POST(request) {
       ? (process.env.AIRALO_CLIENT_SECRET_SANDBOX || process.env.AIRALO_CLIENT_SECRET)
       : process.env.AIRALO_CLIENT_SECRET;
     
-    // Select correct base URL
     const baseUrl = isSandbox 
       ? (process.env.AIRALO_BASE_URL_SANDBOX || 'https://sandbox-partners-api.airalo.com')
       : (process.env.AIRALO_BASE_URL || 'https://partners-api.airalo.com');
     
-    // Fallback to Firestore config if env vars not set
+    // Fallback to Supabase config if env vars not set
     if (!clientId || !clientSecret) {
-      const airaloConfigRef = doc(db, 'config', 'airalo');
-      const airaloConfig = await getDoc(airaloConfigRef);
+      const supabase = getSupabaseAdmin();
+      const { data: configData } = await supabase
+        .from('app_config')
+        .select('*')
+        .eq('id', 'airalo')
+        .single();
       
-      if (airaloConfig.exists()) {
-        const configData = airaloConfig.data();
+      if (configData) {
         clientId = clientId || configData.client_id || configData.api_key;
         clientSecret = clientSecret || configData.client_secret;
-      } else {
       }
     }
     
@@ -67,9 +67,6 @@ export async function POST(request) {
     });
 
     if (!authResponse.ok) {
-      const errorText = await authResponse.text();
-      
-      // Return a more user-friendly error
       return NextResponse.json({
         success: false,
         error: 'Unable to connect to eSIM provider. Please try again later.',
@@ -93,11 +90,9 @@ export async function POST(request) {
       }
     });
 
-
     if (!simResponse.ok) {
       const errorText = await simResponse.text();
       
-      // Handle specific error cases
       if (simResponse.status === 404) {
         return NextResponse.json({
           success: false,
@@ -120,22 +115,17 @@ export async function POST(request) {
     }
 
     const simDetails = await simResponse.json();
-
-    // Extract relevant data from SIM details
     const simData = simDetails.data;
     const lpaString = simData?.qrcode || simData?.lpa || simData?.qr_code;
     const appleInstallUrl = simData?.direct_apple_installation_url || 
       (lpaString ? `https://esimsetup.apple.com/esim_qrcode_provisioning?carddata=${encodeURIComponent(lpaString)}` : null);
     
-    // Return both snake_case and camelCase for complete compatibility
     const qrCodeData = {
-      // snake_case fields (for consistency with EsimQrCode.jsx)
       qr_code: lpaString,
       qr_code_url: simData?.qrcode_url || simData?.qr_code_url,
       direct_apple_installation_url: appleInstallUrl,
       matching_id: simData?.matching_id,
       activation_code: simData?.activation_code,
-      // camelCase fields (for backwards compatibility)
       qrCode: lpaString,
       qrCodeUrl: simData?.qrcode_url || simData?.qr_code_url,
       activationCode: simData?.activation_code,
@@ -146,11 +136,9 @@ export async function POST(request) {
       status: simData?.status,
       packageName: simData?.package?.title,
       packageDetails: simData?.package,
-      // Country info
       country_code: simData?.package?.country_code,
       country_name: simData?.package?.country?.name || simData?.package?.country_name
     };
-
 
     return NextResponse.json({
       success: true,

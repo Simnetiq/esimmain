@@ -4,8 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { getReferralStats, createReferralCode } from '@esim/shared/services/referralService';
-import { doc, getDoc, collection, query, where, getDocs, writeBatch, setDoc } from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
+import { getSupabase } from '@esim/shared/lib/supabase';
 import toast from 'react-hot-toast';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
 // Affiliate Components
@@ -57,10 +56,14 @@ const AffiliateProgramPage = () => {
 
     try {
       setCheckingBankAccount(true);
-      const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-      const userData = userDoc.data();
+      const supabase = getSupabase();
+      const { data: userData } = await supabase
+        .from('users')
+        .select('bank_account')
+        .eq('id', currentUser.uid)
+        .single();
       
-      if (userData?.bankAccount) {
+      if (userData?.bank_account) {
         setHasBankAccount(true);
       } else {
         setHasBankAccount(false);
@@ -85,64 +88,52 @@ const AffiliateProgramPage = () => {
     if (hasBankAccount) {
       // User has bank account - mark their referral transactions as paid
       try {
+        const supabase = getSupabase();
+        
         // Get user's unpaid referral transactions
-        const transactionsSnapshot = await getDocs(
-          query(
-            collection(db, 'users', currentUser.uid, 'transactions'),
-            where('type', '==', 'deposit'),
-            where('method', '==', 'referral_commission'),
-            where('status', '==', 'completed')
-          )
-        );
+        const { data: transactions } = await supabase
+          .from('user_transactions')
+          .select('*')
+          .eq('user_id', currentUser.uid)
+          .eq('type', 'deposit')
+          .eq('method', 'referral_commission')
+          .eq('status', 'completed');
 
-        if (transactionsSnapshot.empty) {
-          toast('No pending referral earnings to withdraw', {
-            icon: 'ℹ️',
-            duration: 3000,
-          });
+        if (!transactions || transactions.length === 0) {
+          toast('No pending referral earnings to withdraw', { icon: 'ℹ️', duration: 3000 });
           return;
         }
 
-        // Calculate total amount first to check minimum withdrawal
-        const totalAmount = transactionsSnapshot.docs.reduce((sum, doc) => sum + (doc.data().amount || 0), 0);
+        const totalAmount = transactions.reduce((sum, t) => sum + (t.amount || 0), 0);
         const minimumWithdrawal = 50;
 
         if (totalAmount < minimumWithdrawal) {
-          toast.error(`Minimum withdrawal amount is ${formatPrice(minimumWithdrawal)}. You have ${formatPrice(totalAmount)} available.`, {
-            duration: 5000,
-          });
+          toast.error(`Minimum withdrawal amount is ${formatPrice(minimumWithdrawal)}. You have ${formatPrice(totalAmount)} available.`, { duration: 5000 });
           return;
         }
 
         // Update transactions to mark as paid
-        const batch = writeBatch(db);
-        let updatedCount = 0;
+        const txIds = transactions.map(t => t.id);
+        const now = new Date().toISOString();
+        
+        await supabase
+          .from('user_transactions')
+          .update({ status: 'paid', paid_at: now, paid_by: 'user_request' })
+          .in('id', txIds);
 
-        transactionsSnapshot.docs.forEach((transactionDoc) => {
-          const transactionRef = doc(db, 'users', currentUser.uid, 'transactions', transactionDoc.id);
-          batch.update(transactionRef, {
-            status: 'paid',
-            paidAt: new Date(),
-            paidBy: 'user_request'
-          });
-          updatedCount++;
-        });
-
-        await batch.commit();
+        const updatedCount = txIds.length;
         
         // Create a withdrawal record
-        const withdrawalRef = doc(collection(db, 'users', currentUser.uid, 'transactions'));
-        
-        await setDoc(withdrawalRef, {
-          type: 'purchase', // Withdrawal is a purchase/expense
+        await supabase.from('user_transactions').insert({
+          user_id: currentUser.uid,
+          type: 'purchase',
           amount: totalAmount,
           description: `Withdrawal of ${updatedCount} referral earnings`,
           status: 'completed',
           method: 'withdrawal',
-          withdrawalDate: new Date(),
-          transactionCount: updatedCount,
-          timestamp: new Date(),
-          createdAt: new Date(),
+          withdrawal_date: now,
+          transaction_count: updatedCount,
+          created_at: now,
         });
         
         toast.success(`Successfully withdrew ${formatPrice(totalAmount)} from ${updatedCount} referral earnings!`);

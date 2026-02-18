@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
-import { doc, getDoc, updateDoc, collection, getDocs, serverTimestamp } from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
+import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 
-// Supported languages for country translations
 const SUPPORTED_LANGUAGES = [
   { code: 'en', name: 'English' },
   { code: 'es', name: 'Spanish' },
@@ -13,16 +11,10 @@ const SUPPORTED_LANGUAGES = [
   { code: 'ru', name: 'Russian' }
 ];
 
-// Translate a single country name
 async function translateCountryName(openaiApiKey, countryName, targetLanguage) {
   const languageNames = {
-    'en': 'English',
-    'es': 'Spanish',
-    'fr': 'French',
-    'de': 'German',
-    'ar': 'Arabic',
-    'he': 'Hebrew',
-    'ru': 'Russian'
+    'en': 'English', 'es': 'Spanish', 'fr': 'French', 'de': 'German',
+    'ar': 'Arabic', 'he': 'Hebrew', 'ru': 'Russian'
   };
 
   const targetLanguageName = languageNames[targetLanguage] || targetLanguage;
@@ -38,19 +30,11 @@ async function translateCountryName(openaiApiKey, countryName, targetLanguage) {
       messages: [
         {
           role: 'system',
-          content: `You are a professional translator. Translate country names accurately and naturally. 
-Use the official/common name in the target language that native speakers would use.
-For example:
-- "United States" in Spanish → "Estados Unidos"
-- "Germany" in German → "Deutschland"
-- "United Kingdom" in Arabic → "المملكة المتحدة"
-- "France" in Hebrew → "צרפת"`
+          content: `You are a professional translator. Translate country names accurately and naturally. Use the official/common name in the target language.`
         },
         {
           role: 'user',
-          content: `Translate this country name to ${targetLanguageName}: "${countryName}"
-
-Respond with ONLY the translated name, nothing else.`
+          content: `Translate this country name to ${targetLanguageName}: "${countryName}"\n\nRespond with ONLY the translated name, nothing else.`
         }
       ],
       temperature: 0.1,
@@ -70,40 +54,43 @@ export async function POST(request) {
   try {
     const { countryCode, countryName, targetLanguages, translateAll } = await request.json();
 
-    // Fetch OpenAI API key from Firestore
-    const configRef = doc(db, 'config', 'openai');
-    const configDoc = await getDoc(configRef);
+    const supabase = getSupabaseAdmin();
+
+    // Fetch OpenAI API key
+    const { data: configData, error: configError } = await supabase
+      .from('app_config')
+      .select('*')
+      .eq('id', 'openai')
+      .single();
     
-    if (!configDoc.exists() || !configDoc.data().api_key) {
+    if (configError || !configData?.api_key) {
       return NextResponse.json(
         { success: false, error: 'OpenAI API key not configured. Go to Config > API Keys to set it up.' },
         { status: 400 }
       );
     }
 
-    const openaiApiKey = configDoc.data().api_key;
+    const openaiApiKey = configData.api_key;
 
-    // If translateAll is true, translate ALL countries
     if (translateAll) {
-      const countriesSnapshot = await getDocs(collection(db, 'countries'));
-      const countries = countriesSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      const { data: countries, error } = await supabase
+        .from('countries')
+        .select('*');
+
+      if (error) throw error;
 
       let successCount = 0;
       let skipCount = 0;
       let errorCount = 0;
       const results = [];
 
-      for (const country of countries) {
+      for (const country of (countries || [])) {
         const englishName = country.translations?.en || country.name;
         if (!englishName) {
           skipCount++;
           continue;
         }
 
-        // Find missing languages
         const existingLanguages = Object.keys(country.translations || {});
         const missingLanguages = SUPPORTED_LANGUAGES
           .map(lang => lang.code)
@@ -117,39 +104,28 @@ export async function POST(request) {
 
         try {
           const newTranslations = { ...country.translations };
-          
-          // Ensure English exists
-          if (!newTranslations.en) {
-            newTranslations.en = englishName;
-          }
+          if (!newTranslations.en) newTranslations.en = englishName;
 
-          // Translate to each missing language
           for (const targetLang of missingLanguages) {
             try {
               const translated = await translateCountryName(openaiApiKey, englishName, targetLang);
               newTranslations[targetLang] = translated;
-              
-              // Small delay to avoid rate limiting
               await new Promise(resolve => setTimeout(resolve, 200));
             } catch (err) {
               console.error(`Error translating ${country.code} to ${targetLang}:`, err);
             }
           }
 
-          // Update country in Firestore
-          const countryRef = doc(db, 'countries', country.id);
-          await updateDoc(countryRef, {
-            translations: newTranslations,
-            translatedAt: serverTimestamp()
-          });
+          await supabase
+            .from('countries')
+            .update({
+              translations: newTranslations,
+              translated_at: new Date().toISOString()
+            })
+            .eq('id', country.id);
 
           successCount++;
-          results.push({ 
-            country: country.code, 
-            status: 'success', 
-            languagesAdded: missingLanguages.length 
-          });
-
+          results.push({ country: country.code, status: 'success', languagesAdded: missingLanguages.length });
         } catch (err) {
           console.error(`Error processing country ${country.code}:`, err);
           errorCount++;
@@ -159,12 +135,7 @@ export async function POST(request) {
 
       return NextResponse.json({
         success: true,
-        summary: {
-          total: countries.length,
-          translated: successCount,
-          skipped: skipCount,
-          errors: errorCount
-        },
+        summary: { total: (countries || []).length, translated: successCount, skipped: skipCount, errors: errorCount },
         results
       });
     }
@@ -184,25 +155,29 @@ export async function POST(request) {
       try {
         const translated = await translateCountryName(openaiApiKey, countryName, targetLang);
         translations[targetLang] = translated;
-        
-        // Small delay to avoid rate limiting
         await new Promise(resolve => setTimeout(resolve, 200));
       } catch (err) {
         console.error(`Error translating to ${targetLang}:`, err);
-        translations[targetLang] = countryName; // Fallback to original
+        translations[targetLang] = countryName;
       }
     }
 
-    // Update country in Firestore
-    const countryRef = doc(db, 'countries', countryCode);
-    const countryDoc = await getDoc(countryRef);
-    
-    if (countryDoc.exists()) {
-      const existingTranslations = countryDoc.data().translations || {};
-      await updateDoc(countryRef, {
-        translations: { ...existingTranslations, ...translations },
-        translatedAt: serverTimestamp()
-      });
+    // Update country
+    const { data: existingCountry } = await supabase
+      .from('countries')
+      .select('translations')
+      .eq('id', countryCode)
+      .single();
+
+    if (existingCountry) {
+      const merged = { ...(existingCountry.translations || {}), ...translations };
+      await supabase
+        .from('countries')
+        .update({
+          translations: merged,
+          translated_at: new Date().toISOString()
+        })
+        .eq('id', countryCode);
     }
 
     return NextResponse.json({

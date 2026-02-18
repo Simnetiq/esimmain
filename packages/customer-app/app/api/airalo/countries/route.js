@@ -1,38 +1,28 @@
 export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
-import { db } from '@esim/shared/firebase/config';
-import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
+import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get('limit')) || 100;
+    const limitParam = parseInt(searchParams.get('limit')) || 100;
 
-    const countriesQuery = query(
-      collection(db, 'countries'),
-      where('status', '==', 'active'),
-      orderBy('name', 'asc')
-    );
+    const supabase = getSupabaseAdmin();
 
-    const countriesSnapshot = await getDocs(countriesQuery);
-    const countries = [];
+    const { data: countries, error } = await supabase
+      .from('countries')
+      .select('*')
+      .eq('status', 'active')
+      .order('name', { ascending: true })
+      .limit(limitParam);
 
-    countriesSnapshot.forEach((doc) => {
-      const countryData = doc.data();
-      countries.push({
-        id: doc.id,
-        ...countryData
-      });
-    });
-
-    // Limit results
-    const limitedCountries = countries.slice(0, limit);
+    if (error) throw error;
 
     return NextResponse.json({
       success: true,
-      countries: limitedCountries,
-      total: countries.length,
+      countries: countries || [],
+      total: (countries || []).length,
       message: 'Countries retrieved successfully'
     });
 

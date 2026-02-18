@@ -1,28 +1,10 @@
 import { NextResponse } from 'next/server';
-import { db } from '@esim/shared/firebase/config';
+import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 import { getUserFraudStats } from '@esim/shared/services/fraudDetectionService';
 
-// Force dynamic rendering for this API route
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-/**
- * Admin API: Get fraud statistics for a user
- * 
- * GET /api/admin/fraud-stats?userId={userId}
- * 
- * Returns:
- * {
- *   purchasesLast24Hours: number,
- *   purchasesLast7Days: number,
- *   failedAttemptsLast7Days: number,
- *   isHighRisk: boolean
- * }
- * 
- * NOTE: This is a protected endpoint. In production, you should:
- * 1. Verify admin authentication
- * 2. Add rate limiting
- */
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -35,15 +17,8 @@ export async function GET(request) {
       );
     }
 
-    // TODO: Add authentication check here
-    // const authHeader = request.headers.get('authorization');
-    // const token = await verifyAdminToken(authHeader);
-    // if (!token || !token.admin) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    // }
-
-    // Get fraud stats
-    const stats = await getUserFraudStats(db, userId);
+    const supabase = getSupabaseAdmin();
+    const stats = await getUserFraudStats(supabase, userId);
 
     if (!stats) {
       return NextResponse.json(
@@ -66,4 +41,3 @@ export async function GET(request) {
     );
   }
 }
-

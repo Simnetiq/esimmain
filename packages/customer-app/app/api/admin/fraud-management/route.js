@@ -1,24 +1,11 @@
 import { NextResponse } from 'next/server';
-import { db } from '@esim/shared/firebase/config';
-import { collection, query, where, getDocs, doc, getDoc, updateDoc, deleteDoc, orderBy, limit as firestoreLimit, serverTimestamp } from 'firebase/firestore';
+import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 import { blockUser, unblockUser, getFraudStats } from '@esim/shared/services/fraudSignalsService';
 
 export const dynamic = 'force-dynamic';
 
-/**
- * Admin Fraud Management API
- * 
- * GET /api/admin/fraud-management - List blocked users, fraud signals, appeals
- * POST /api/admin/fraud-management - Block/unblock user, resolve appeal
- * DELETE /api/admin/fraud-management - Remove from blocklist
- */
-
-/**
- * GET - List fraud data for admin dashboard
- */
 export async function GET(request) {
   try {
-    // Verify admin API key
     const authHeader = request.headers.get('authorization');
     const adminApiKey = process.env.ADMIN_API_KEY;
 
@@ -35,137 +22,109 @@ export async function GET(request) {
     const type = searchParams.get('type') || 'all';
     const limitParam = parseInt(searchParams.get('limit') || '50');
 
+    const supabase = getSupabaseAdmin();
     const response = {};
 
     // Get blocked users
     if (type === 'all' || type === 'blocked') {
-      const blockedQuery = query(
-        collection(db, 'fraudSignals'),
-        where('blocked', '==', true),
-        firestoreLimit(limitParam)
-      );
-      const blockedSnap = await getDocs(blockedQuery);
-      
-      response.blockedUsers = [];
-      blockedSnap.forEach(docSnap => {
-        const data = docSnap.data();
-        response.blockedUsers.push({
-          id: docSnap.id,
-          userId: data.userId,
-          email: data.email,
-          blocked: data.blocked,
-          blockType: data.blockType,
-          blockReason: data.blockReason,
-          blockedAt: data.blockedAt?.toDate?.()?.toISOString() || null,
-          blockExpiresAt: data.blockExpiresAt?.toDate?.()?.toISOString() || null,
-          temporaryBlockCount: data.temporaryBlockCount,
-          attempts: data.attempts,
-          cardFingerprints: data.cardFingerprints || [],
-          ips: data.ips || []
-        });
-      });
+      const { data: blockedUsers } = await supabase
+        .from('fraud_signals')
+        .select('*')
+        .eq('blocked', true)
+        .limit(limitParam);
+
+      response.blockedUsers = (blockedUsers || []).map(d => ({
+        id: d.id,
+        userId: d.user_id,
+        email: d.email,
+        blocked: d.blocked,
+        blockType: d.block_type,
+        blockReason: d.block_reason,
+        blockedAt: d.blocked_at,
+        blockExpiresAt: d.block_expires_at,
+        temporaryBlockCount: d.temporary_block_count,
+        attempts: d.attempts,
+        cardFingerprints: d.card_fingerprints || [],
+        ips: d.ips || []
+      }));
     }
 
     // Get pending appeals
     if (type === 'all' || type === 'appeals') {
-      const appealsQuery = query(
-        collection(db, 'fraud_appeals'),
-        where('status', '==', 'pending'),
-        firestoreLimit(limitParam)
-      );
-      const appealsSnap = await getDocs(appealsQuery);
-      
-      response.pendingAppeals = [];
-      appealsSnap.forEach(docSnap => {
-        const data = docSnap.data();
-        response.pendingAppeals.push({
-          id: docSnap.id,
-          userId: data.userId,
-          email: data.email,
-          contactEmail: data.contactEmail,
-          reason: data.reason,
-          additionalInfo: data.additionalInfo,
-          status: data.status,
-          createdAt: data.createdAt?.toDate?.()?.toISOString() || null
-        });
-      });
+      const { data: appeals } = await supabase
+        .from('fraud_appeals')
+        .select('*')
+        .eq('status', 'pending')
+        .limit(limitParam);
+
+      response.pendingAppeals = (appeals || []).map(d => ({
+        id: d.id,
+        userId: d.user_id,
+        email: d.email,
+        contactEmail: d.contact_email,
+        reason: d.reason,
+        additionalInfo: d.additional_info,
+        status: d.status,
+        createdAt: d.created_at
+      }));
     }
 
     // Get recent blocked payments
     if (type === 'all' || type === 'blocked_payments') {
-      const blockedPaymentsQuery = query(
-        collection(db, 'fraud_blocked_payments'),
-        firestoreLimit(limitParam)
-      );
-      const blockedPaymentsSnap = await getDocs(blockedPaymentsQuery);
-      
-      response.blockedPayments = [];
-      blockedPaymentsSnap.forEach(docSnap => {
-        const data = docSnap.data();
-        response.blockedPayments.push({
-          id: docSnap.id,
-          userId: data.userId,
-          email: data.email,
-          cardLast4: data.cardLast4,
-          cardBrand: data.cardBrand,
-          blockReason: data.blockReason,
-          riskLevel: data.riskLevel,
-          countryCode: data.countryCode,
-          isHighRiskRegion: data.isHighRiskRegion,
-          createdAt: data.createdAt?.toDate?.()?.toISOString() || null
-        });
-      });
+      const { data: blockedPayments } = await supabase
+        .from('fraud_blocked_payments')
+        .select('*')
+        .limit(limitParam);
+
+      response.blockedPayments = (blockedPayments || []).map(d => ({
+        id: d.id,
+        userId: d.user_id,
+        email: d.email,
+        cardLast4: d.card_last4,
+        cardBrand: d.card_brand,
+        blockReason: d.block_reason,
+        riskLevel: d.risk_level,
+        countryCode: d.country_code,
+        isHighRiskRegion: d.is_high_risk_region,
+        createdAt: d.created_at
+      }));
     }
 
     // Get fraud warnings
     if (type === 'all' || type === 'warnings') {
-      const warningsQuery = query(
-        collection(db, 'fraud_warnings'),
-        where('reviewed', '==', false),
-        firestoreLimit(limitParam)
-      );
-      const warningsSnap = await getDocs(warningsQuery);
-      
-      response.fraudWarnings = [];
-      warningsSnap.forEach(docSnap => {
-        const data = docSnap.data();
-        response.fraudWarnings.push({
-          id: docSnap.id,
-          warningId: data.warningId,
-          orderId: data.orderId,
-          userId: data.userId,
-          email: data.email,
-          cardLast4: data.cardLast4,
-          fraudType: data.fraudType,
-          actionable: data.actionable,
-          createdAt: data.createdAt?.toDate?.()?.toISOString() || null
-        });
-      });
+      const { data: warnings } = await supabase
+        .from('fraud_warnings')
+        .select('*')
+        .eq('reviewed', false)
+        .limit(limitParam);
+
+      response.fraudWarnings = (warnings || []).map(d => ({
+        id: d.id,
+        warningId: d.warning_id,
+        orderId: d.order_id,
+        userId: d.user_id,
+        email: d.email,
+        cardLast4: d.card_last4,
+        fraudType: d.fraud_type,
+        actionable: d.actionable,
+        createdAt: d.created_at
+      }));
     }
 
     // Get statistics
     if (type === 'all' || type === 'stats') {
-      const now = new Date();
-      const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-      const last7d = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const { count: blockedCount } = await supabase
+        .from('fraud_signals')
+        .select('*', { count: 'exact', head: true })
+        .eq('blocked', true);
 
-      // Count blocked users
-      const blockedCountQuery = query(
-        collection(db, 'fraudSignals'),
-        where('blocked', '==', true)
-      );
-      const blockedCountSnap = await getDocs(blockedCountQuery);
-
-      // Count blocked payments in last 24h (simplified - just get recent)
-      const recentBlockedQuery = query(
-        collection(db, 'fraud_blocked_payments'),
-        firestoreLimit(100)
-      );
-      const recentBlockedSnap = await getDocs(recentBlockedQuery);
+      const { count: recentBlockedCount } = await supabase
+        .from('fraud_blocked_payments')
+        .select('*', { count: 'exact', head: true });
 
       response.stats = {
-        totalBlockedUsers: blockedCountSnap.size,
-        recentBlockedPayments: recentBlockedSnap.size,
+        totalBlockedUsers: blockedCount || 0,
+        recentBlockedPayments: recentBlockedCount || 0,
         pendingAppeals: response.pendingAppeals?.length || 0,
         unviewedWarnings: response.fraudWarnings?.length || 0
       };
@@ -185,12 +144,8 @@ export async function GET(request) {
   }
 }
 
-/**
- * POST - Block/unblock user, resolve appeal
- */
 export async function POST(request) {
   try {
-    // Verify admin API key
     const authHeader = request.headers.get('authorization');
     const adminApiKey = process.env.ADMIN_API_KEY;
 
@@ -203,6 +158,7 @@ export async function POST(request) {
       }
     }
 
+    const supabase = getSupabaseAdmin();
     const body = await request.json();
     const { action, userId, email, reason, appealId, resolution, permanent } = body;
 
@@ -215,7 +171,7 @@ export async function POST(request) {
           );
         }
 
-        const result = await blockUser(db, userId, email, {
+        const result = await blockUser(supabase, userId, email, {
           reason: reason || 'Manually blocked by admin',
           permanent,
           createdBy: 'admin'
@@ -237,7 +193,7 @@ export async function POST(request) {
           );
         }
 
-        await unblockUser(db, userId, email);
+        await unblockUser(supabase, userId, email);
 
         return NextResponse.json({
           success: true,
@@ -253,28 +209,31 @@ export async function POST(request) {
           );
         }
 
-        const appealRef = doc(db, 'fraud_appeals', appealId);
-        const appealSnap = await getDoc(appealRef);
+        const { data: appealData, error: appealError } = await supabase
+          .from('fraud_appeals')
+          .select('*')
+          .eq('id', appealId)
+          .single();
 
-        if (!appealSnap.exists()) {
+        if (appealError || !appealData) {
           return NextResponse.json(
             { error: 'Appeal not found', code: 'NOT_FOUND' },
             { status: 404 }
           );
         }
 
-        const appealData = appealSnap.data();
+        await supabase
+          .from('fraud_appeals')
+          .update({
+            status: 'resolved',
+            resolution: resolution || 'reviewed',
+            resolved_at: new Date().toISOString(),
+            resolved_by: 'admin'
+          })
+          .eq('id', appealId);
 
-        await updateDoc(appealRef, {
-          status: 'resolved',
-          resolution: resolution || 'reviewed',
-          resolvedAt: serverTimestamp(),
-          resolvedBy: 'admin'
-        });
-
-        // If approved, unblock the user
         if (resolution === 'approved') {
-          await unblockUser(db, appealData.userId, appealData.email);
+          await unblockUser(supabase, appealData.user_id, appealData.email);
         }
 
         return NextResponse.json({
@@ -293,13 +252,15 @@ export async function POST(request) {
           );
         }
 
-        const warningRef = doc(db, 'fraud_warnings', warningId);
-        await updateDoc(warningRef, {
-          reviewed: true,
-          reviewedAt: serverTimestamp(),
-          reviewedBy: 'admin',
-          action: body.warningAction || 'reviewed'
-        });
+        await supabase
+          .from('fraud_warnings')
+          .update({
+            reviewed: true,
+            reviewed_at: new Date().toISOString(),
+            reviewed_by: 'admin',
+            action: body.warningAction || 'reviewed'
+          })
+          .eq('id', warningId);
 
         return NextResponse.json({
           success: true,
@@ -323,12 +284,8 @@ export async function POST(request) {
   }
 }
 
-/**
- * DELETE - Remove from blocklist
- */
 export async function DELETE(request) {
   try {
-    // Verify admin API key
     const authHeader = request.headers.get('authorization');
     const adminApiKey = process.env.ADMIN_API_KEY;
 
@@ -341,18 +298,20 @@ export async function DELETE(request) {
       }
     }
 
+    const supabase = getSupabaseAdmin();
     const { searchParams } = new URL(request.url);
     const blockId = searchParams.get('blockId');
     const cardFingerprint = searchParams.get('cardFingerprint');
 
     if (blockId) {
-      // Remove specific block entry
-      const blockRef = doc(db, 'fraud_blocklist', blockId);
-      await updateDoc(blockRef, {
-        active: false,
-        deactivatedAt: serverTimestamp(),
-        deactivatedBy: 'admin'
-      });
+      await supabase
+        .from('fraud_blocklist')
+        .update({
+          active: false,
+          deactivated_at: new Date().toISOString(),
+          deactivated_by: 'admin'
+        })
+        .eq('id', blockId);
 
       return NextResponse.json({
         success: true,
@@ -361,13 +320,14 @@ export async function DELETE(request) {
     }
 
     if (cardFingerprint) {
-      // Remove card fingerprint block
-      const cardBlockRef = doc(db, 'fraud_blocklist', `card_${cardFingerprint}`);
-      await updateDoc(cardBlockRef, {
-        active: false,
-        deactivatedAt: serverTimestamp(),
-        deactivatedBy: 'admin'
-      });
+      await supabase
+        .from('fraud_blocklist')
+        .update({
+          active: false,
+          deactivated_at: new Date().toISOString(),
+          deactivated_by: 'admin'
+        })
+        .eq('id', `card_${cardFingerprint}`);
 
       return NextResponse.json({
         success: true,

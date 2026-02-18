@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 
 // Generate mock QR code data for sandbox mode
-// Returns both snake_case and camelCase for complete compatibility
 function generateMockQR() {
   const mockIccid = `8901260${Math.floor(Math.random() * 10000000000000).toString().padStart(13, '0')}`;
   const mockActivationCode = `TEST_${Math.random().toString(36).substring(2, 14).toUpperCase()}`;
@@ -10,14 +9,12 @@ function generateMockQR() {
   const appleInstallUrl = `https://esimsetup.apple.com/esim_qrcode_provisioning?carddata=${encodeURIComponent(mockLpa)}`;
   
   return {
-    // snake_case fields (for consistency with EsimQrCode.jsx)
     qr_code: mockLpa,
     qr_code_url: 'https://test.example.com/qr.png',
     direct_apple_installation_url: appleInstallUrl,
     matching_id: mockMatchingId,
     activation_code: mockActivationCode,
     smdp_address: 'test.smdp.io',
-    // camelCase fields (for backwards compatibility)
     qrCode: mockLpa,
     lpa: mockLpa,
     iccid: mockIccid,
@@ -45,23 +42,19 @@ export async function POST(request) {
 
     // SANDBOX/TEST MODE - Return mock QR code
     if (isTestMode) {
-      
       let qrData;
       
-      // Use existing mock sim data if provided
       if (mockSimData) {
         const lpaString = mockSimData.qrcode || mockSimData.lpa;
         const appleUrl = lpaString ? `https://esimsetup.apple.com/esim_qrcode_provisioning?carddata=${encodeURIComponent(lpaString)}` : null;
         
         qrData = {
-          // snake_case fields (for consistency with EsimQrCode.jsx)
           qr_code: lpaString,
           qr_code_url: mockSimData.qrcode_url || 'https://test.example.com/qr.png',
           direct_apple_installation_url: appleUrl,
           matching_id: mockSimData.matching_id,
           activation_code: mockSimData.activation_code,
           smdp_address: 'test.smdp.io',
-          // camelCase fields (for backwards compatibility)
           qrCode: lpaString,
           activationCode: mockSimData.activation_code,
           iccid: mockSimData.iccid,
@@ -72,7 +65,6 @@ export async function POST(request) {
           directAppleInstallationUrl: appleUrl
         };
       } else {
-        // Generate new mock QR data
         qrData = generateMockQR();
       }
       
@@ -85,7 +77,6 @@ export async function POST(request) {
     }
 
     // PRODUCTION MODE - Get real QR code from Airalo via OAuth
-    
     if (!orderIdToUse) {
       return NextResponse.json({
         success: false,
@@ -93,15 +84,9 @@ export async function POST(request) {
       }, { status: 400 });
     }
 
-    // Import Firebase helpers
-    const { db: dbImport } = await import('@esim/shared/firebase/config');
-    const { doc: docImport, getDoc: getDocImport } = await import('firebase/firestore');
-    
-    // Determine Airalo mode (sandbox vs production)
     const airaloMode = process.env.AIRALO_MODE || 'production';
     const isSandbox = airaloMode === 'sandbox' || airaloMode === 'test';
     
-    // Get Airalo credentials based on mode (consistent with stripe-webhook)
     let clientId = isSandbox
       ? (process.env.AIRALO_CLIENT_ID_SANDBOX || process.env.AIRALO_CLIENT_ID)
       : process.env.AIRALO_CLIENT_ID;
@@ -110,19 +95,21 @@ export async function POST(request) {
       ? (process.env.AIRALO_CLIENT_SECRET_SANDBOX || process.env.AIRALO_CLIENT_SECRET)
       : process.env.AIRALO_CLIENT_SECRET;
     
-    // Select correct base URL
     const airaloBaseUrl = isSandbox 
       ? (process.env.AIRALO_BASE_URL_SANDBOX || 'https://sandbox-partners-api.airalo.com')
       : (process.env.AIRALO_BASE_URL || 'https://partners-api.airalo.com');
     
-    
-    // Fallback to Firestore config if env vars not set
+    // Fallback to Supabase config if env vars not set
     if (!clientId || !clientSecret) {
-      const airaloConfigRef = docImport(dbImport, 'config', 'airalo');
-      const airaloConfig = await getDocImport(airaloConfigRef);
+      const { getSupabaseAdmin } = await import('@esim/shared/lib/supabaseAdmin');
+      const supabase = getSupabaseAdmin();
+      const { data: configData } = await supabase
+        .from('app_config')
+        .select('*')
+        .eq('id', 'airalo')
+        .single();
       
-      if (airaloConfig.exists()) {
-        const configData = airaloConfig.data();
+      if (configData) {
         clientId = clientId || configData.api_key || configData.client_id;
         clientSecret = clientSecret || configData.client_secret;
       }
@@ -168,7 +155,6 @@ export async function POST(request) {
       }, { status: 401 });
     }
 
-    // Get SIM details from Airalo API (includes QR code)
     const simResponse = await fetch(`${airaloBaseUrl}/v2/sims/${orderIdToUse}`, {
       method: 'GET',
       headers: {
@@ -180,7 +166,6 @@ export async function POST(request) {
     if (!simResponse.ok) {
       const errorText = await simResponse.text();
       
-      // Provide helpful error messages based on status code
       let userMessage = `QR code retrieval failed: ${simResponse.statusText}`;
       let canRetry = false;
       
@@ -213,7 +198,6 @@ export async function POST(request) {
     const simResult = await simResponse.json();
     const simData = simResult.data;
 
-    // Extract QR code information from the SIM data
     const qrCode = simData.qrcode || simData.lpa;
     const lpa = simData.lpa;
     const iccid = simData.iccid;
@@ -221,17 +205,14 @@ export async function POST(request) {
     const activationCode = simData.activation_code;
     const appleInstallUrl = lpa ? `https://esimsetup.apple.com/esim_qrcode_provisioning?carddata=${encodeURIComponent(lpa)}` : null;
 
-    // Return BOTH snake_case and camelCase for complete compatibility
     return NextResponse.json({
       success: true,
-      // snake_case fields (for consistency with EsimQrCode.jsx)
       qr_code: qrCode,
       qr_code_url: simData.qrcode_url,
       direct_apple_installation_url: appleInstallUrl,
       matching_id: matchingId,
       activation_code: activationCode,
       smdp_address: simData.smdp_address,
-      // camelCase fields (for backwards compatibility)
       qrCode: qrCode,
       qrCodeUrl: simData.qrcode_url,
       directAppleInstallationUrl: appleInstallUrl,

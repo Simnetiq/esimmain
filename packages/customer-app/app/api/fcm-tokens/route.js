@@ -1,37 +1,31 @@
 import { NextResponse } from 'next/server';
-import { collection, query, getDocs, where, doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
+import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 
-// GET - Retrieve FCM tokens (for admin dashboard)
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
-    const limit = parseInt(searchParams.get('limit')) || 100;
+    const limitParam = parseInt(searchParams.get('limit')) || 100;
 
-    let q = query(collection(db, 'fcm_tokens'), where('active', '==', true));
+    const supabase = getSupabaseAdmin();
+
+    let query = supabase
+      .from('fcm_tokens')
+      .select('*')
+      .eq('active', true);
     
     if (userId) {
-      q = query(q, where('userId', '==', userId));
+      query = query.eq('user_id', userId);
     }
 
-    const snapshot = await getDocs(q);
-    const tokens = [];
+    const { data: tokens, error } = await query.limit(limitParam);
 
-    snapshot.forEach((doc) => {
-      tokens.push({
-        id: doc.id,
-        ...doc.data()
-      });
-    });
-
-    // Limit results
-    const limitedTokens = tokens.slice(0, limit);
+    if (error) throw error;
 
     return NextResponse.json({
       success: true,
-      tokens: limitedTokens,
-      totalCount: tokens.length
+      tokens: tokens || [],
+      totalCount: (tokens || []).length
     });
 
   } catch (error) {
@@ -43,17 +37,10 @@ export async function GET(request) {
   }
 }
 
-// POST - Save FCM token (called from mobile app)
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { 
-      token, 
-      userId, 
-      platform, // 'ios' or 'android'
-      appVersion,
-      deviceModel 
-    } = body;
+    const { token, userId, platform, appVersion, deviceModel } = body;
 
     if (!token || !userId) {
       return NextResponse.json(
@@ -62,42 +49,46 @@ export async function POST(request) {
       );
     }
 
-    // Check if token already exists
-    const existingQuery = query(
-      collection(db, 'fcm_tokens'),
-      where('token', '==', token)
-    );
-    
-    const existingSnapshot = await getDocs(existingQuery);
-    
-    if (existingSnapshot.empty) {
-      // Create new token document
-      const tokenData = {
-        token,
-        userId,
-        platform: platform || 'unknown',
-        appVersion: appVersion || 'unknown',
-        deviceModel: deviceModel || 'unknown',
-        active: true,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-        lastUsedAt: serverTimestamp()
-      };
+    const supabase = getSupabaseAdmin();
 
-      await setDoc(doc(collection(db, 'fcm_tokens')), tokenData);
+    // Check if token already exists
+    const { data: existing } = await supabase
+      .from('fcm_tokens')
+      .select('id')
+      .eq('token', token)
+      .limit(1);
+
+    const now = new Date().toISOString();
+
+    if (!existing || existing.length === 0) {
+      // Create new token
+      await supabase
+        .from('fcm_tokens')
+        .insert({
+          token,
+          user_id: userId,
+          platform: platform || 'unknown',
+          app_version: appVersion || 'unknown',
+          device_model: deviceModel || 'unknown',
+          active: true,
+          created_at: now,
+          updated_at: now,
+          last_used_at: now
+        });
     } else {
       // Update existing token
-      const existingDoc = existingSnapshot.docs[0];
-      await setDoc(doc(db, 'fcm_tokens', existingDoc.id), {
-        userId,
-        platform: platform || existingDoc.data().platform,
-        appVersion: appVersion || existingDoc.data().appVersion,
-        deviceModel: deviceModel || existingDoc.data().deviceModel,
-        active: true,
-        updatedAt: serverTimestamp(),
-        lastUsedAt: serverTimestamp()
-      }, { merge: true });
-      
+      await supabase
+        .from('fcm_tokens')
+        .update({
+          user_id: userId,
+          platform: platform || undefined,
+          app_version: appVersion || undefined,
+          device_model: deviceModel || undefined,
+          active: true,
+          updated_at: now,
+          last_used_at: now
+        })
+        .eq('token', token);
     }
 
     return NextResponse.json({

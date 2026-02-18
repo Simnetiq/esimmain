@@ -16,12 +16,15 @@ export async function POST(request) {
       );
     }
 
-    // Check if user exists in Firebase
+    // Check if user exists in Supabase
     const adminDb = getAdminDb();
-    const usersRef = adminDb.collection('users');
-    const userQuery = await usersRef.where('email', '==', email).limit(1).get();
+    const { data: users, error } = await adminDb
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .limit(1);
 
-    if (userQuery.empty) {
+    if (error || !users || users.length === 0) {
       // Don't reveal if user exists or not for security
       return NextResponse.json({ 
         success: true,
@@ -29,30 +32,31 @@ export async function POST(request) {
       });
     }
 
-    const userDoc = userQuery.docs[0];
-    const userData = userDoc.data();
+    const userData = users[0];
 
     // Generate a secure reset token
     const resetToken = crypto.randomBytes(32).toString('hex');
     const resetTokenExpiry = Date.now() + 3600000; // 1 hour from now
 
     // Save token to user document
-    await userDoc.ref.update({
-      resetToken,
-      resetTokenExpiry,
-      updatedAt: new Date().toISOString(),
-    });
+    await adminDb
+      .from('users')
+      .update({
+        reset_token: resetToken,
+        reset_token_expiry: resetTokenExpiry,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', userData.id);
 
     // Create reset link
     const resetLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.simnetiq.store'}/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
-
 
     // Render email template
     let emailHtml;
     try {
       emailHtml = await render(
         <PasswordResetEmail 
-          name={userData.displayName || userData.name || 'there'} 
+          name={userData.display_name || userData.name || 'there'} 
           resetLink={resetLink}
         />
       );
@@ -60,9 +64,8 @@ export async function POST(request) {
       throw new Error(`Email template rendering failed: ${renderError.message}`);
     }
 
-    // Plain text version
     const emailText = `
-Hi ${userData.displayName || userData.name || 'there'},
+Hi ${userData.display_name || userData.name || 'there'},
 
 We received a request to reset your password for your Simnetiq account.
 
@@ -75,7 +78,6 @@ If you didn't request a password reset, please ignore this email.
 © 2025 Simnetiq. All rights reserved.
     `;
 
-    // Send email via Hostinger
     try {
       await sendEmail({
         to: email,
@@ -86,7 +88,6 @@ If you didn't request a password reset, please ignore this email.
     } catch (emailError) {
       throw new Error(`Email sending failed: ${emailError.message}`);
     }
-
 
     return NextResponse.json({ 
       success: true,
@@ -104,4 +105,3 @@ If you didn't request a password reset, please ignore this email.
     );
   }
 }
-

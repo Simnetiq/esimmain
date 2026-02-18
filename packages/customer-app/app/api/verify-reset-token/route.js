@@ -12,27 +12,24 @@ export async function POST(request) {
       );
     }
 
-    // Find user by email and token
     const adminDb = getAdminDb();
-    const usersRef = adminDb.collection('users');
-    const userQuery = await usersRef
-      .where('email', '==', email)
-      .where('resetToken', '==', token)
-      .limit(1)
-      .get();
+    const { data: users, error } = await adminDb
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .eq('reset_token', token)
+      .limit(1);
 
-    if (userQuery.empty) {
+    if (error || !users || users.length === 0) {
       return NextResponse.json(
         { error: 'Invalid or expired reset token' },
         { status: 400 }
       );
     }
 
-    const userDoc = userQuery.docs[0];
-    const userData = userDoc.data();
+    const userData = users[0];
 
-    // Check if token is expired
-    if (!userData.resetTokenExpiry || Date.now() > userData.resetTokenExpiry) {
+    if (!userData.reset_token_expiry || Date.now() > userData.reset_token_expiry) {
       return NextResponse.json(
         { error: 'Reset token has expired. Please request a new one.' },
         { status: 400 }
@@ -42,7 +39,7 @@ export async function POST(request) {
     return NextResponse.json({ 
       success: true,
       message: 'Token is valid',
-      userId: userDoc.id
+      userId: userData.id
     });
 
   } catch (error) {
@@ -53,4 +50,3 @@ export async function POST(request) {
     );
   }
 }
-

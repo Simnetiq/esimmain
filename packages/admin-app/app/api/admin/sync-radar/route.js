@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { db } from '@esim/shared/firebase/config';
 import { syncToStripeRadar } from '@esim/shared/services/fraudSignalsService';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseAdmin = createClient(
+  process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 export const dynamic = 'force-dynamic';
 
@@ -54,7 +59,7 @@ export async function POST(request) {
       );
     } 
 
-    const result = await syncToStripeRadar(db, stripe);
+    const result = await syncToStripeRadar(supabaseAdmin, stripe);
 
     if (!result.success) {
       return NextResponse.json(

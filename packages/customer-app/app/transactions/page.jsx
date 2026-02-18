@@ -5,8 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft, DollarSign, Calendar, Download, CreditCard } from 'lucide-react';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
-import { collection, query, where, orderBy, getDocs, limit, startAfter } from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
+import { getSupabase } from '@esim/shared/lib/supabase';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
 
 const TransactionsPage = () => {
@@ -24,48 +23,35 @@ const TransactionsPage = () => {
     try {
       setLoading(true);
       
-      let q = query(
-        collection(db, 'users', currentUser.uid, 'transactions'),
-        orderBy('timestamp', 'desc'),
-        limit(20)
-      );
+      const supabase = getSupabase();
+      let query = supabase
+        .from('user_transactions')
+        .select('*')
+        .eq('user_id', currentUser.uid)
+        .order('created_at', { ascending: false })
+        .limit(20);
 
-      // Apply filter
       if (filter === 'earnings') {
-        q = query(
-          collection(db, 'users', currentUser.uid, 'transactions'),
-          where('type', '==', 'deposit'),
-          orderBy('timestamp', 'desc'),
-          limit(20)
-        );
+        query = query.eq('type', 'deposit');
       } else if (filter === 'withdrawals') {
-        q = query(
-          collection(db, 'users', currentUser.uid, 'transactions'),
-          where('type', '==', 'purchase'),
-          where('method', '==', 'withdrawal'),
-          orderBy('timestamp', 'desc'),
-          limit(20)
-        );
+        query = query.eq('type', 'purchase').eq('method', 'withdrawal');
       }
 
       if (loadMore && lastDoc) {
-        q = query(q, startAfter(lastDoc));
+        query = query.lt('created_at', lastDoc);
       }
 
-      const snapshot = await getDocs(q);
-      const newTransactions = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      const { data: newTransactions } = await query;
+      const txs = (newTransactions || []).map(t => ({ ...t, createdAt: t.created_at, timestamp: t.created_at }));
 
       if (loadMore) {
-        setTransactions(prev => [...prev, ...newTransactions]);
+        setTransactions(prev => [...prev, ...txs]);
       } else {
-        setTransactions(newTransactions);
+        setTransactions(txs);
       }
 
-      setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
-      setHasMore(snapshot.docs.length === 20);
+      setLastDoc(txs.length > 0 ? txs[txs.length - 1].created_at : null);
+      setHasMore(txs.length === 20);
     } catch {
     } finally {
       setLoading(false);

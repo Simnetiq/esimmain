@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
-import { collection, getDocs, doc, setDoc, onSnapshot } from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
+import supabase from '../lib/supabase';
 import {
   Users,
   Plus,
@@ -72,36 +71,34 @@ const AdminHome = ({ onNavigate }) => {
   useEffect(() => {
     const loadStats = async () => {
       try {
-        // Load users count
-        const usersSnapshot = await getDocs(collection(db, 'users'));
-        const totalUsers = usersSnapshot.size;
+        const { count: totalUsers } = await supabase
+          .from('users')
+          .select('*', { count: 'exact', head: true });
 
-        // Load orders count
-        const ordersSnapshot = await getDocs(collection(db, 'orders'));
-        const totalOrders = ordersSnapshot.size;
+        const { count: totalOrders } = await supabase
+          .from('orders')
+          .select('*', { count: 'exact', head: true });
 
-        // Load fraud tracking attempts count
-        const fraudSnapshot = await getDocs(collection(db, 'fraud_tracking_attempts'));
-        const fraudAttempts = fraudSnapshot.size;
+        const { count: fraudAttempts } = await supabase
+          .from('fraud_signals')
+          .select('*', { count: 'exact', head: true });
 
-        // Load blog posts count and find latest
-        const blogSnapshot = await getDocs(collection(db, 'blog'));
-        const blogPosts = blogSnapshot.size;
+        const { data: blogData, count: blogPosts } = await supabase
+          .from('blog')
+          .select('created_at, published_at', { count: 'exact' })
+          .order('created_at', { ascending: false })
+          .limit(1);
+
         let lastBlogPost = null;
-        
-        blogSnapshot.docs.forEach(doc => {
-          const data = doc.data();
-          const postDate = data.createdAt?.toDate() || data.publishedAt?.toDate();
-          if (postDate && (!lastBlogPost || postDate > lastBlogPost)) {
-            lastBlogPost = postDate;
-          }
-        });
+        if (blogData?.[0]) {
+          lastBlogPost = new Date(blogData[0].created_at || blogData[0].published_at);
+        }
 
         setStats({
-          totalUsers,
-          totalOrders,
-          fraudAttempts,
-          blogPosts,
+          totalUsers: totalUsers || 0,
+          totalOrders: totalOrders || 0,
+          fraudAttempts: fraudAttempts || 0,
+          blogPosts: blogPosts || 0,
           lastBlogPost,
           loading: false
         });
@@ -114,27 +111,37 @@ const AdminHome = ({ onNavigate }) => {
     loadStats();
   }, []);
 
-  // Load shortcuts from Firestore (shared across all admins)
+  // Load shortcuts from Supabase (shared across all admins)
   useEffect(() => {
-    const shortcutsRef = doc(db, 'adminSettings', 'shortcuts');
-    
-    const unsubscribe = onSnapshot(shortcutsRef, (docSnap) => {
-      if (docSnap.exists() && docSnap.data().shortcuts) {
-        setShortcuts(docSnap.data().shortcuts);
+    const loadShortcuts = async () => {
+      try {
+        const { data } = await supabase
+          .from('app_config')
+          .select('value')
+          .eq('key', 'admin_shortcuts')
+          .single();
+        
+        if (data?.value?.shortcuts) {
+          setShortcuts(data.value.shortcuts);
+        }
+      } catch (error) {
+        console.error('Error loading shortcuts:', error);
       }
-    }, (error) => {
-      console.error('Error loading shortcuts:', error);
-    });
-
-    return () => unsubscribe();
+    };
+    loadShortcuts();
   }, []);
 
-  // Save shortcuts to Firestore (shared across all admins)
+  // Save shortcuts to Supabase (shared across all admins)
   const saveShortcuts = async (newShortcuts) => {
     setShortcuts(newShortcuts);
     try {
-      const shortcutsRef = doc(db, 'adminSettings', 'shortcuts');
-      await setDoc(shortcutsRef, { shortcuts: newShortcuts }, { merge: true });
+      await supabase
+        .from('app_config')
+        .upsert({
+          key: 'admin_shortcuts',
+          value: { shortcuts: newShortcuts },
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'key' });
     } catch (error) {
       console.error('Error saving shortcuts:', error);
     }

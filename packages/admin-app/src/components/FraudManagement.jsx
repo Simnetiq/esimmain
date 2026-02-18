@@ -1,20 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  collection, 
-  getDocs, 
-  query, 
-  where, 
-  orderBy, 
-  limit,
-  doc,
-  updateDoc,
-  deleteDoc,
-  serverTimestamp,
-  Timestamp
-} from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
+import supabase from '../lib/supabase';
 import { 
   ShieldX, 
   ShieldCheck, 
@@ -62,74 +49,70 @@ const FraudManagement = () => {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      // Load blocked users from fraudSignals
-      const blockedQuery = query(
-        collection(db, 'fraudSignals'),
-        where('blocked', '==', true),
-        limit(100)
-      );
-      const blockedSnap = await getDocs(blockedQuery);
-      const blocked = blockedSnap.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        blockedAt: doc.data().blockedAt?.toDate?.() || null,
-        blockExpiresAt: doc.data().blockExpiresAt?.toDate?.() || null,
-        lastAttemptAt: doc.data().lastAttemptAt?.toDate?.() || null
+      // Load blocked users from fraud_signals
+      const { data: blocked } = await supabase
+        .from('fraud_signals')
+        .select('*')
+        .eq('blocked', true)
+        .limit(100);
+      
+      const blockedMapped = (blocked || []).map(row => ({
+        ...row,
+        blockedAt: row.blocked_at ? new Date(row.blocked_at) : null,
+        blockExpiresAt: row.block_expires_at ? new Date(row.block_expires_at) : null,
+        lastAttemptAt: row.last_attempt_at ? new Date(row.last_attempt_at) : null
       }));
-      setBlockedUsers(blocked);
+      setBlockedUsers(blockedMapped);
 
       // Load blocked payments
-      const paymentsQuery = query(
-        collection(db, 'fraud_blocked_payments'),
-        orderBy('createdAt', 'desc'),
-        limit(100)
-      );
-      const paymentsSnap = await getDocs(paymentsQuery);
-      const payments = paymentsSnap.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate?.() || null
+      const { data: payments } = await supabase
+        .from('fraud_blocked_payments')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(100);
+      
+      const paymentsMapped = (payments || []).map(row => ({
+        ...row,
+        createdAt: row.created_at ? new Date(row.created_at) : null
       }));
-      setBlockedPayments(payments);
+      setBlockedPayments(paymentsMapped);
 
       // Load pending appeals
-      const appealsQuery = query(
-        collection(db, 'fraud_appeals'),
-        where('status', '==', 'pending'),
-        limit(50)
-      );
-      const appealsSnap = await getDocs(appealsQuery);
-      const appeals = appealsSnap.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate?.() || null
+      const { data: appeals } = await supabase
+        .from('fraud_appeals')
+        .select('*')
+        .eq('status', 'pending')
+        .limit(50);
+      
+      const appealsMapped = (appeals || []).map(row => ({
+        ...row,
+        createdAt: row.created_at ? new Date(row.created_at) : null
       }));
-      setPendingAppeals(appeals);
+      setPendingAppeals(appealsMapped);
 
       // Load fraud warnings
-      const warningsQuery = query(
-        collection(db, 'fraud_warnings'),
-        where('reviewed', '==', false),
-        limit(50)
-      );
-      const warningsSnap = await getDocs(warningsQuery);
-      const warnings = warningsSnap.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate?.() || null
+      const { data: warnings } = await supabase
+        .from('fraud_warnings')
+        .select('*')
+        .eq('reviewed', false)
+        .limit(50);
+      
+      const warningsMapped = (warnings || []).map(row => ({
+        ...row,
+        createdAt: row.created_at ? new Date(row.created_at) : null
       }));
-      setFraudWarnings(warnings);
+      setFraudWarnings(warningsMapped);
 
       // Calculate stats
       const now = new Date();
       const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-      const recentPayments = payments.filter(p => p.createdAt && p.createdAt > last24h);
+      const recentPayments = paymentsMapped.filter(p => p.createdAt && p.createdAt > last24h);
 
       setStats({
-        totalBlocked: blocked.length,
+        totalBlocked: blockedMapped.length,
         blockedPayments24h: recentPayments.length,
-        pendingAppeals: appeals.length,
-        unviewedWarnings: warnings.length
+        pendingAppeals: appealsMapped.length,
+        unviewedWarnings: warningsMapped.length
       });
 
     } catch (error) {
@@ -149,14 +132,16 @@ const FraudManagement = () => {
     if (!window.confirm(`Unblock user ${user.email || user.userId}?`)) return;
 
     try {
-      const userRef = doc(db, 'fraudSignals', user.id);
-      await updateDoc(userRef, {
-        blocked: false,
-        blockType: null,
-        blockExpiresAt: null,
-        unblockedAt: serverTimestamp(),
-        unblockedBy: 'admin'
-      });
+      await supabase
+        .from('fraud_signals')
+        .update({
+          blocked: false,
+          block_type: null,
+          block_expires_at: null,
+          unblocked_at: new Date().toISOString(),
+          unblocked_by: 'admin'
+        })
+        .eq('id', user.id);
 
       toast.success('User unblocked successfully');
       loadData();
@@ -171,14 +156,16 @@ const FraudManagement = () => {
     if (!window.confirm(`Permanently block user ${user.email || user.userId}?`)) return;
 
     try {
-      const userRef = doc(db, 'fraudSignals', user.id);
-      await updateDoc(userRef, {
-        blocked: true,
-        blockType: 'permanent',
-        blockExpiresAt: null,
-        blockedAt: serverTimestamp(),
-        blockReason: 'Permanently blocked by admin'
-      });
+      await supabase
+        .from('fraud_signals')
+        .update({
+          blocked: true,
+          block_type: 'permanent',
+          block_expires_at: null,
+          blocked_at: new Date().toISOString(),
+          block_reason: 'Permanently blocked by admin'
+        })
+        .eq('id', user.id);
 
       toast.success('User permanently blocked');
       loadData();
@@ -191,30 +178,27 @@ const FraudManagement = () => {
   // Resolve appeal
   const handleResolveAppeal = async (appeal, resolution) => {
     try {
-      const appealRef = doc(db, 'fraud_appeals', appeal.id);
-      await updateDoc(appealRef, {
-        status: 'resolved',
-        resolution,
-        resolvedAt: serverTimestamp(),
-        resolvedBy: 'admin'
-      });
+      await supabase
+        .from('fraud_appeals')
+        .update({
+          status: 'resolved',
+          resolution,
+          resolved_at: new Date().toISOString(),
+          resolved_by: 'admin'
+        })
+        .eq('id', appeal.id);
 
       // If approved, unblock the user
       if (resolution === 'approved') {
-        const userQuery = query(
-          collection(db, 'fraudSignals'),
-          where('userId', '==', appeal.userId)
-        );
-        const userSnap = await getDocs(userQuery);
-        
-        if (!userSnap.empty) {
-          await updateDoc(userSnap.docs[0].ref, {
+        await supabase
+          .from('fraud_signals')
+          .update({
             blocked: false,
-            blockType: null,
-            unblockedAt: serverTimestamp(),
-            unblockedBy: 'admin_appeal'
-          });
-        }
+            block_type: null,
+            unblocked_at: new Date().toISOString(),
+            unblocked_by: 'admin_appeal'
+          })
+          .eq('user_id', appeal.userId);
       }
 
       toast.success(`Appeal ${resolution}`);
@@ -228,13 +212,15 @@ const FraudManagement = () => {
   // Mark warning as reviewed
   const handleMarkWarningReviewed = async (warning, action) => {
     try {
-      const warningRef = doc(db, 'fraud_warnings', warning.id);
-      await updateDoc(warningRef, {
-        reviewed: true,
-        reviewedAt: serverTimestamp(),
-        reviewedBy: 'admin',
-        action
-      });
+      await supabase
+        .from('fraud_warnings')
+        .update({
+          reviewed: true,
+          reviewed_at: new Date().toISOString(),
+          reviewed_by: 'admin',
+          action
+        })
+        .eq('id', warning.id);
 
       toast.success('Warning marked as reviewed');
       loadData();

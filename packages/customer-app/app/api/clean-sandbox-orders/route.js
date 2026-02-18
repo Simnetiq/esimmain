@@ -1,15 +1,5 @@
 import { NextResponse } from 'next/server';
-import { db } from '@esim/shared/firebase/config';
-import { collection, query, where, getDocs, doc, writeBatch } from 'firebase/firestore';
-
-/**
- * CLEAN SANDBOX/TEST ORDERS
- * 
- * Deletes all sandbox/test orders from Firebase so they don't show in production
- * 
- * Usage:
- * GET https://www.simnetiq.store/api/clean-sandbox-orders?key=YOUR_SECRET_KEY
- */
+import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 
 export async function GET(request) {
   try {
@@ -18,35 +8,25 @@ export async function GET(request) {
 
     const expectedAdminKey = process.env.ADMIN_SECRET_KEY || 'change-me-in-production';
     if (adminKey !== expectedAdminKey) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const supabase = getSupabaseAdmin();
 
+    // Find test/sandbox orders
+    const { data: testOrders } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('is_test_mode', true);
 
-    const ordersRef = collection(db, 'orders');
-    
-    // Find all orders that are marked as test/sandbox
-    const testQuery = query(
-      ordersRef,
-      where('isTestMode', '==', true)
-    );
-
-    const sandboxQuery = query(
-      ordersRef,
-      where('mode', '==', 'sandbox')
-    );
-
-    const testOrders = await getDocs(testQuery);
-    const sandboxOrders = await getDocs(sandboxQuery);
+    const { data: sandboxOrders } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('mode', 'sandbox');
 
     const allTestOrders = new Map();
-    
-    testOrders.forEach(doc => allTestOrders.set(doc.id, doc.data()));
-    sandboxOrders.forEach(doc => allTestOrders.set(doc.id, doc.data()));
-
+    (testOrders || []).forEach(o => allTestOrders.set(o.id, o));
+    (sandboxOrders || []).forEach(o => allTestOrders.set(o.id, o));
 
     if (allTestOrders.size === 0) {
       return NextResponse.json({
@@ -57,45 +37,21 @@ export async function GET(request) {
     }
 
     const deleted = [];
-    const batch = writeBatch(db);
-    let batchCount = 0;
 
-    // Delete each test order
     for (const [orderId, orderData] of allTestOrders.entries()) {
-      
-      const orderRef = doc(db, 'orders', orderId);
-      batch.delete(orderRef);
-      batchCount++;
+      await supabase.from('orders').delete().eq('id', orderId);
 
-      // Also delete from user's collection if exists
-      if (orderData.userId) {
-        try {
-          const userOrderRef = doc(db, 'users', orderData.userId, 'esims', orderId);
-          batch.delete(userOrderRef);
-          batchCount++;
-        } catch (error) {
-        }
+      if (orderData.user_id) {
+        await supabase.from('user_esims').delete().eq('id', orderId).eq('user_id', orderData.user_id);
       }
 
       deleted.push({
         orderId,
-        planName: orderData.planName,
+        planName: orderData.plan_name,
         amount: orderData.amount,
         mode: orderData.mode || 'unknown'
       });
-
-      // Firestore batch limit is 500 operations
-      if (batchCount >= 400) {
-        await batch.commit();
-        batchCount = 0;
-      }
     }
-
-    // Commit remaining operations
-    if (batchCount > 0) {
-      await batch.commit();
-    }
-
 
     return NextResponse.json({
       success: true,
@@ -104,10 +60,7 @@ export async function GET(request) {
     });
 
   } catch (error) {
-    return NextResponse.json(
-      { error: `Failed: ${error.message}` },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: `Failed: ${error.message}` }, { status: 500 });
   }
 }
 
@@ -118,26 +71,18 @@ export async function POST(request) {
 
     const expectedAdminKey = process.env.ADMIN_SECRET_KEY || 'change-me-in-production';
     if (adminKey !== expectedAdminKey) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const supabase = getSupabaseAdmin();
 
-    const ordersRef = collection(db, 'orders');
-    
-    // Find all test/sandbox orders
-    const allOrders = await getDocs(ordersRef);
-    
-    const testOrders = [];
-    allOrders.forEach(doc => {
-      const data = doc.data();
-      if (data.isTestMode === true || data.mode === 'sandbox' || data.test === true) {
-        testOrders.push({ id: doc.id, data });
-      }
-    });
+    const { data: allOrders } = await supabase
+      .from('orders')
+      .select('*');
 
+    const testOrders = (allOrders || []).filter(d =>
+      d.is_test_mode === true || d.mode === 'sandbox' || d.test === true
+    );
 
     if (testOrders.length === 0) {
       return NextResponse.json({
@@ -148,41 +93,21 @@ export async function POST(request) {
     }
 
     const deleted = [];
-    const batch = writeBatch(db);
-    let batchCount = 0;
 
     for (const order of testOrders) {
-      
-      const orderRef = doc(db, 'orders', order.id);
-      batch.delete(orderRef);
-      batchCount++;
+      await supabase.from('orders').delete().eq('id', order.id);
 
-      if (order.data.userId) {
-        try {
-          const userOrderRef = doc(db, 'users', order.data.userId, 'esims', order.id);
-          batch.delete(userOrderRef);
-          batchCount++;
-        } catch (error) {
-        }
+      if (order.user_id) {
+        await supabase.from('user_esims').delete().eq('id', order.id).eq('user_id', order.user_id);
       }
 
       deleted.push({
         orderId: order.id,
-        planName: order.data.planName,
-        amount: order.data.amount,
-        mode: order.data.mode || 'unknown'
+        planName: order.plan_name,
+        amount: order.amount,
+        mode: order.mode || 'unknown'
       });
-
-      if (batchCount >= 400) {
-        await batch.commit();
-        batchCount = 0;
-      }
     }
-
-    if (batchCount > 0) {
-      await batch.commit();
-    }
-
 
     return NextResponse.json({
       success: true,
@@ -191,24 +116,6 @@ export async function POST(request) {
     });
 
   } catch (error) {
-    return NextResponse.json(
-      { error: `Failed: ${error.message}` },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: `Failed: ${error.message}` }, { status: 500 });
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

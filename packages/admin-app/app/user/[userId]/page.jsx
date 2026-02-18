@@ -3,8 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAdmin } from '@esim/shared/contexts/AdminContext';
-import { collection, query, getDocs, getDoc, doc, updateDoc, orderBy, deleteDoc, where } from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
+import supabase from '../../../src/lib/supabase';
 import { getAllReferralCodes, createReferralCode } from '@esim/shared/services/referralService';
 import { 
   ArrowLeft, 
@@ -24,15 +23,11 @@ import {
 import toast from 'react-hot-toast';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
 
-// Generate QR code from LPA data
-
-
 const UserDetailsPage = () => {
   const { userId } = useParams();
   const router = useRouter();
   const { isAdmin, canManageAdmins } = useAdmin();
   
-  // State Management
   const [user, setUser] = useState(null);
   const [referralCodes, setReferralCodes] = useState([]);
   const [transactions, setTransactions] = useState([]);
@@ -47,7 +42,6 @@ const UserDetailsPage = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedEsim, setSelectedEsim] = useState(null);
   
-  // Redirect if not admin
   useEffect(() => {
     if (!isAdmin && !canManageAdmins) {
       router.push('/');
@@ -58,20 +52,24 @@ const UserDetailsPage = () => {
     try {
       setLoading(true);
       
-      // Load user document
-      const userDoc = await getDoc(doc(db, 'users', userId));
-      if (!userDoc.exists()) {
+      // Load user
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (userError || !userData) {
         toast.error('User not found');
         router.push('/');
         return;
       }
 
-      const userData = {
-        id: userDoc.id,
-        ...userDoc.data(),
-        createdAt: userDoc.data().createdAt?.toDate()
+      const userObj = {
+        ...userData,
+        createdAt: userData.created_at ? new Date(userData.created_at) : null
       };
-      setUser(userData);
+      setUser(userObj);
       setEditedEmail(userData.email || '');
 
       // Load referral codes
@@ -81,65 +79,58 @@ const UserDetailsPage = () => {
         setReferralCodes(userCodes);
       }
 
-      // Load transactions
-      const transactionsSnapshot = await getDocs(
-        query(
-          collection(db, 'users', userId, 'transactions'),
-          orderBy('createdAt', 'desc')
-        )
-      );
-      const transactionsData = transactionsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate()
-      }));
-      setTransactions(transactionsData);
+      // Load transactions (user_transactions or a transactions table)
+      const { data: transactionsData } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
 
-      // Load eSIMs from user's subcollection
+      setTransactions((transactionsData || []).map(t => ({
+        ...t,
+        id: t.id,
+        createdAt: t.created_at ? new Date(t.created_at) : null
+      })));
+
+      // Load eSIMs from esims table
       let esimsData = [];
       try {
-        const userEsimsSnapshot = await getDocs(
-          query(
-            collection(db, 'users', userId, 'esims'),
-            orderBy('createdAt', 'desc')
-          )
-        );
-        
-        esimsData = userEsimsSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          createdAt: doc.data().createdAt?.toDate(),
-          activationDate: doc.data().activationDate?.toDate(),
-          expiryDate: doc.data().expiryDate?.toDate()
+        const { data: userEsims } = await supabase
+          .from('esims')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false });
+
+        esimsData = (userEsims || []).map(e => ({
+          ...e,
+          id: e.id,
+          createdAt: e.created_at ? new Date(e.created_at) : null,
+          activationDate: e.activation_date ? new Date(e.activation_date) : null,
+          expiryDate: e.expiry_date ? new Date(e.expiry_date) : null
         }));
       } catch (e) {
-        console.log('No user esims subcollection or error:', e);
+        console.log('No esims or error:', e);
       }
 
-      // Also fetch from global orders collection by email
+      // Also fetch from orders by email
       if (userData.email) {
         try {
-          const globalOrdersSnapshot = await getDocs(
-            query(
-              collection(db, 'orders'),
-              where('customerEmail', '==', userData.email)
-            )
-          );
-          
-          const globalOrders = globalOrdersSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-            createdAt: doc.data().createdAt?.toDate(),
-            activationDate: doc.data().activationDate?.toDate(),
-            expiryDate: doc.data().expiryDate?.toDate()
+          const { data: globalOrders } = await supabase
+            .from('orders')
+            .select('*')
+            .eq('customer_email', userData.email);
+
+          const mappedOrders = (globalOrders || []).map(o => ({
+            ...o,
+            id: o.id,
+            createdAt: o.created_at ? new Date(o.created_at) : null,
+            activationDate: o.activation_date ? new Date(o.activation_date) : null,
+            expiryDate: o.expiry_date ? new Date(o.expiry_date) : null
           }));
           
-          // Merge orders, avoiding duplicates by id
           const existingIds = new Set(esimsData.map(e => e.id));
-          const newOrders = globalOrders.filter(o => !existingIds.has(o.id));
+          const newOrders = mappedOrders.filter(o => !existingIds.has(o.id));
           esimsData = [...esimsData, ...newOrders];
-          
-          // Sort by createdAt descending
           esimsData.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
         } catch (e) {
           console.log('Error fetching global orders:', e);
@@ -161,50 +152,42 @@ const UserDetailsPage = () => {
     try {
       setLoadingEsims(true);
       
-      // Load from user's subcollection
       let esimsData = [];
       try {
-        const userEsimsSnapshot = await getDocs(
-          query(
-            collection(db, 'users', userId, 'esims'),
-            orderBy('createdAt', 'desc')
-          )
-        );
-        
-        esimsData = userEsimsSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          createdAt: doc.data().createdAt?.toDate(),
-          activationDate: doc.data().activationDate?.toDate(),
-          expiryDate: doc.data().expiryDate?.toDate()
+        const { data: userEsims } = await supabase
+          .from('esims')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false });
+
+        esimsData = (userEsims || []).map(e => ({
+          ...e,
+          id: e.id,
+          createdAt: e.created_at ? new Date(e.created_at) : null,
+          activationDate: e.activation_date ? new Date(e.activation_date) : null,
+          expiryDate: e.expiry_date ? new Date(e.expiry_date) : null
         }));
       } catch (e) {
-        console.log('No user esims subcollection or error:', e);
+        console.log('No esims or error:', e);
       }
 
-      // Also fetch from global orders collection by email
       try {
-        const globalOrdersSnapshot = await getDocs(
-          query(
-            collection(db, 'orders'),
-            where('customerEmail', '==', user.email)
-          )
-        );
-        
-        const globalOrders = globalOrdersSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          createdAt: doc.data().createdAt?.toDate(),
-          activationDate: doc.data().activationDate?.toDate(),
-          expiryDate: doc.data().expiryDate?.toDate()
+        const { data: globalOrders } = await supabase
+          .from('orders')
+          .select('*')
+          .eq('customer_email', user.email);
+
+        const mappedOrders = (globalOrders || []).map(o => ({
+          ...o,
+          id: o.id,
+          createdAt: o.created_at ? new Date(o.created_at) : null,
+          activationDate: o.activation_date ? new Date(o.activation_date) : null,
+          expiryDate: o.expiry_date ? new Date(o.expiry_date) : null
         }));
         
-        // Merge orders, avoiding duplicates by id
         const existingIds = new Set(esimsData.map(e => e.id));
-        const newOrders = globalOrders.filter(o => !existingIds.has(o.id));
+        const newOrders = mappedOrders.filter(o => !existingIds.has(o.id));
         esimsData = [...esimsData, ...newOrders];
-        
-        // Sort by createdAt descending
         esimsData.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
       } catch (e) {
         console.log('Error fetching global orders:', e);
@@ -218,13 +201,11 @@ const UserDetailsPage = () => {
     }
   }, [userId, user?.email]);
 
-  // Load user data
   useEffect(() => {
     if (userId) {
       loadUserData();
     }
   }, [userId, loadUserData]);
-
 
   const handleUpdateEmail = async () => {
     if (!editedEmail || editedEmail === user.email) {
@@ -233,10 +214,12 @@ const UserDetailsPage = () => {
     }
 
     try {
-      await updateDoc(doc(db, 'users', userId), {
-        email: editedEmail,
-        actualEmail: editedEmail
-      });
+      const { error } = await supabase
+        .from('users')
+        .update({ email: editedEmail, actual_email: editedEmail })
+        .eq('id', userId);
+
+      if (error) throw error;
       
       setUser({ ...user, email: editedEmail });
       setIsEditingEmail(false);
@@ -265,27 +248,24 @@ const UserDetailsPage = () => {
   const handleDeleteEsim = async () => {
     if (!selectedEsim) return;
 
-    let deletedFromUser = false;
-    let deletedFromGlobal = false;
+    let deletedFromEsims = false;
+    let deletedFromOrders = false;
 
-    // Try to delete from user's esims subcollection
     try {
-      await deleteDoc(doc(db, 'users', userId, 'esims', selectedEsim.id));
-      deletedFromUser = true;
+      const { error } = await supabase.from('esims').delete().eq('id', selectedEsim.id);
+      if (!error) deletedFromEsims = true;
     } catch (e) {
-      console.log('Not in user esims or error:', e);
+      console.log('Not in esims or error:', e);
     }
     
-    // Also try to delete from global orders collection
     try {
-      await deleteDoc(doc(db, 'orders', selectedEsim.id));
-      deletedFromGlobal = true;
+      const { error } = await supabase.from('orders').delete().eq('id', selectedEsim.id);
+      if (!error) deletedFromOrders = true;
     } catch (e) {
-      console.log('Not in global orders or error:', e);
+      console.log('Not in orders or error:', e);
     }
     
-    // Only show success if at least one deletion succeeded
-    if (deletedFromUser || deletedFromGlobal) {
+    if (deletedFromEsims || deletedFromOrders) {
       toast.success('eSIM deleted successfully');
       setShowDeleteModal(false);
       setSelectedEsim(null);
@@ -329,7 +309,6 @@ const UserDetailsPage = () => {
     );
   }
 
-  // Calculate stats - Total spent from eSIM orders
   const totalSpent = esimOrders
     .reduce((sum, esim) => sum + (esim.amount || esim.price || 0), 0);
   
@@ -505,7 +484,6 @@ const UserDetailsPage = () => {
 
         {/* Tab Content */}
         <div>
-          {/* Overview Tab */}
           {activeTab === 'overview' && (
             <div className="space-y-6">
               <div className="bg-white border border-gray-200 rounded-lg p-6">
@@ -534,7 +512,6 @@ const UserDetailsPage = () => {
             </div>
           )}
 
-          {/* eSIMs Tab */}
           {activeTab === 'esims' && (
             <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
               {loadingEsims ? (
@@ -552,21 +529,11 @@ const UserDetailsPage = () => {
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Plan
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Price
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Created
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Actions
-                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -574,10 +541,10 @@ const UserDetailsPage = () => {
                         <tr key={esim.id} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm font-medium text-gray-900">
-                              {esim.packageName || esim.planName || 'Unknown Plan'}
+                              {esim.packageName || esim.planName || esim.package_name || esim.plan_name || 'Unknown Plan'}
                             </div>
                             <div className="text-sm text-gray-500">
-                              {esim.dataAmount} • {esim.validity}
+                              {esim.dataAmount || esim.data_amount} • {esim.validity}
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -617,7 +584,6 @@ const UserDetailsPage = () => {
             </div>
           )}
 
-          {/* Referrals Tab */}
           {activeTab === 'referrals' && (
             <div className="space-y-6">
               <div className="flex justify-between items-center">
@@ -669,7 +635,6 @@ const UserDetailsPage = () => {
             </div>
           )}
 
-          {/* Transactions Tab */}
           {activeTab === 'transactions' && (
             <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
               {transactions.length === 0 ? (
@@ -683,18 +648,10 @@ const UserDetailsPage = () => {
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Type
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Amount
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Method
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Date
-                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -722,7 +679,6 @@ const UserDetailsPage = () => {
               )}
             </div>
           )}
-
         </div>
       </div>
 
@@ -804,7 +760,7 @@ const UserDetailsPage = () => {
                 Are you sure you want to delete this eSIM?
               </p>
               <p className="text-sm text-gray-500 mt-2">
-                <strong>{selectedEsim.packageName || selectedEsim.planName}</strong>
+                <strong>{selectedEsim.packageName || selectedEsim.planName || selectedEsim.package_name || selectedEsim.plan_name}</strong>
               </p>
               <p className="text-sm text-red-600 mt-2 font-medium">
                 This action cannot be undone.

@@ -84,31 +84,36 @@ const Navbar = ({ hideLanguageSelector = false }) => {
     };
   }, []);
 
-  // Language detection with fallback (use useMemo for consistency)
-  const detectedLanguage = React.useMemo(() => {
-    if (i18nLoading) {
-      if (typeof window !== 'undefined') {
-        const savedLanguage = localStorage.getItem('Simnetiq-language');
-        if (savedLanguage) return savedLanguage;
-      }
-      return detectLanguageFromPath(pathname) || 'en';
-    }
-    return locale || 'en';
-  }, [locale, pathname, i18nLoading]);
+  // Language detection: always use pathname on server & initial hydration to avoid mismatch.
+  // localStorage is only read after mount to update the language.
+  const pathnameLanguage = detectLanguageFromPath(pathname) || 'en';
+  const ssrSafeLanguage = i18nLoading ? pathnameLanguage : (locale || 'en');
 
-  const direction = getLanguageDirection(detectedLanguage);
+  const [currentLanguage, setCurrentLanguage] = useState(ssrSafeLanguage);
+
+  // After mount, sync with localStorage if i18n is still loading
+  useEffect(() => {
+    if (i18nLoading) {
+      const savedLanguage = localStorage.getItem('Simnetiq-language');
+      if (savedLanguage && savedLanguage !== currentLanguage) {
+        setCurrentLanguage(savedLanguage);
+      }
+    }
+  }, [i18nLoading]);
+
+  // Keep in sync with i18n context once it finishes loading
+  useEffect(() => {
+    if (!i18nLoading && locale) {
+      setCurrentLanguage(locale);
+    }
+  }, [i18nLoading, locale]);
+
+  const direction = getLanguageDirection(currentLanguage);
   const isRTL = direction === 'rtl';
 
-  // Keep for backward compatibility with existing code
-  const currentLanguage = detectedLanguage;
-
-  // Generate localized URLs - only apply locale prefix after mount to avoid hydration mismatch
+  // Generate localized URLs based on currentLanguage (SSR-safe on initial render)
   const getLocalizedUrl = (path) => {
-    // Before mount, return base path to match server render
-    if (!mounted) {
-      return path;
-    }
-    if (currentLanguage === 'en') {   
+    if (currentLanguage === 'en') {
       return path;
     }
     return `/${currentLanguage}${path}`;
@@ -213,7 +218,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
       }`}
       style={{ zIndex: 9999 }}
       dir={direction}
-      lang={detectedLanguage}
+      lang={currentLanguage}
     >
       <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-2 px-4">  
         <div className={`flex lg:flex-1 items-center ${isRTL ? 'justify-end' : 'justify-start'}`}> 
@@ -431,7 +436,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
 
       {/* Mobile menu using Portal */}
       {isMenuOpen && mounted && createPortal(
-        <div className="lg:hidden" style={{ zIndex: 99999, position: 'fixed', inset: 0 }} dir={direction} lang={detectedLanguage}>
+        <div className="lg:hidden" style={{ zIndex: 99999, position: 'fixed', inset: 0 }} dir={direction} lang={currentLanguage}>
           <div 
             className="fixed inset-0 w-full h-full overflow-y-auto bg-white/80 backdrop-blur-xl" 
             style={{ zIndex: 99999 }}

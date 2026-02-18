@@ -32,24 +32,12 @@ const LanguageSelector = () => {
     { code: 'es', name: getNativeLanguageName('es'), flag: getLanguageFlag('es'), route: '/es' }
   ];
 
-  // Determine current language from multiple sources
-  const getCurrentLanguage = () => {
-    // First try to use the I18n context locale
+  // Determine current language from context or pathname (no localStorage during render to avoid hydration mismatch)
+  const currentLanguage = React.useMemo(() => {
     if (locale) {
       return languages.find(lang => lang.code === locale) || languages.find(lang => lang.code === 'en');
     }
-    
-    // Check localStorage for saved language preference
-    if (typeof window !== 'undefined') {
-      const savedLanguage = localStorage.getItem('Simnetiq-language');
-      if (savedLanguage) {
-        const savedLang = languages.find(lang => lang.code === savedLanguage);
-        if (savedLang) {
-          return savedLang;
-        }
-      }
-    }
-    
+
     // Fallback to pathname detection for both old and new routes
     if (pathname.startsWith('/he')) return languages.find(lang => lang.code === 'he');
     if (pathname.startsWith('/ar')) return languages.find(lang => lang.code === 'ar');
@@ -64,10 +52,8 @@ const LanguageSelector = () => {
     if (pathname.startsWith('/german')) return languages.find(lang => lang.code === 'de');
     if (pathname.startsWith('/french')) return languages.find(lang => lang.code === 'fr');
     if (pathname.startsWith('/spanish')) return languages.find(lang => lang.code === 'es');
-    return languages.find(lang => lang.code === 'en'); // default to English
-  };
-
-  const currentLanguage = getCurrentLanguage();
+    return languages.find(lang => lang.code === 'en');
+  }, [locale, pathname]);
 
   const getLocalizedPath = (languageCode, currentPath) => {
     

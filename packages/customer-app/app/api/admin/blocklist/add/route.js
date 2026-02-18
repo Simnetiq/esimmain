@@ -1,37 +1,12 @@
 import { NextResponse } from 'next/server';
-import { db } from '@esim/shared/firebase/config';
+import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 import { addToBlocklist } from '@esim/shared/services/fraudDetectionService';
 
-/**
- * Admin API: Add user/email to fraud blocklist
- * 
- * POST /api/admin/blocklist/add
- * 
- * Body:
- * {
- *   userId?: string,
- *   email?: string,
- *   reason: string,
- *   adminId: string
- * }
- * 
- * NOTE: This is a protected endpoint. In production, you should:
- * 1. Verify admin authentication (check Firebase Auth token)
- * 2. Verify admin role in Firestore
- * 3. Add rate limiting
- */
 export async function POST(request) {
   try {
     const body = await request.json();
-    
-    const {
-      userId,
-      email,
-      reason,
-      adminId
-    } = body;
+    const { userId, email, reason, adminId } = body;
 
-    // Validate required fields
     if (!reason || !adminId) {
       return NextResponse.json(
         { error: 'Missing required fields: reason, adminId' },
@@ -46,15 +21,9 @@ export async function POST(request) {
       );
     }
 
-    // TODO: Add authentication check here
-    // const authHeader = request.headers.get('authorization');
-    // const token = await verifyAdminToken(authHeader);
-    // if (!token || !token.admin) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    // }
+    const supabase = getSupabaseAdmin();
 
-    // Add to blocklist
-    const result = await addToBlocklist(db, {
+    const result = await addToBlocklist(supabase, {
       userId,
       email,
       reason,
@@ -82,4 +51,3 @@ export async function POST(request) {
     );
   }
 }
-
