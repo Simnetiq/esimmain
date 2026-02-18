@@ -8,8 +8,7 @@ import { getLanguageDirection, detectLanguageFromPath } from '@esim/shared/utils
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
 import { formatPrice, parsePrice } from '@esim/shared/utils/priceUtils';
 import Image from 'next/image';
-import { db } from '@esim/shared/firebase/config';
-import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import { getSupabase } from '@esim/shared/lib/supabase';
 import { GLOBAL_PLAN_IMAGE_URL } from '@esim/shared';
 
 
@@ -305,19 +304,18 @@ const PlanSelectionBottomSheet = ({
     return `/${currentLanguage}${path}`;
   };
 
-  // Fetch region colors and names from Firebase
+  // Fetch region colors and names from Supabase
   useEffect(() => {
     const fetchRegionData = async () => {
       try {
-        const regionsRef = collection(db, 'regions');
-        const snapshot = await getDocs(regionsRef);
+        const supabase = getSupabase();
+        const { data: regions, error } = await supabase.from('countries').select('id, color, translations, name').not('color', 'is', null);
+        if (error) throw error;
         const colors = {};
         const names = {};
-        snapshot.docs.forEach(doc => {
-          const data = doc.data();
-          colors[doc.id] = data.color || '#6B7280';
-          // Get translated name or fallback to default name
-          names[doc.id] = data.translations?.[currentLanguage] || data.name || doc.id;
+        (regions || []).forEach(row => {
+          colors[row.id] = row.color || '#6B7280';
+          names[row.id] = row.translations?.[currentLanguage] || row.name || row.id;
         });
         setRegionColors(colors);
         setRegionNames(names);
@@ -368,62 +366,40 @@ const PlanSelectionBottomSheet = ({
         return;
       }
 
-      // Fetch from Firebase using multiple strategies (like EsimCard.jsx)
+      // Fetch from Supabase using multiple strategies
       try {
+        const supabase = getSupabase();
         let imageUrl = null;
+
+        const tryFetch = async (id) => {
+          const { data } = await supabase.from('countries').select('image, photo').eq('id', id).single();
+          return data ? extractImageUrl(data) : null;
+        };
 
         // Step 1: Try by country name as slug
         if (countryName && typeof countryName === 'string') {
-          const nameSlug = countryName.toLowerCase().replace(/\s+/g, '-');
-          const countryDoc = await getDoc(doc(db, 'countries', nameSlug));
-          if (countryDoc.exists()) {
-            imageUrl = extractImageUrl(countryDoc.data());
-            if (imageUrl) {
-              setCountryImage({ url: imageUrl });
-              return;
-            }
-          }
+          imageUrl = await tryFetch(countryName.toLowerCase().replace(/\s+/g, '-'));
+          if (imageUrl) { setCountryImage({ url: imageUrl }); return; }
         }
 
         // Step 2: Try by country code as slug (lowercase)
         if (countryCode) {
-          const codeSlug = countryCode.toLowerCase().replace(/\s+/g, '-');
-          const countryDoc = await getDoc(doc(db, 'countries', codeSlug));
-          if (countryDoc.exists()) {
-            imageUrl = extractImageUrl(countryDoc.data());
-            if (imageUrl) {
-              setCountryImage({ url: imageUrl });
-              return;
-            }
-          }
+          imageUrl = await tryFetch(countryCode.toLowerCase().replace(/\s+/g, '-'));
+          if (imageUrl) { setCountryImage({ url: imageUrl }); return; }
         }
 
-        // Step 3: If regional, try regions collection
+        // Step 3: If regional, try region slug
         if (isRegional && countryName) {
-          const regionSlug = countryName.toLowerCase().replace(/\s+/g, '-');
-          const regionDoc = await getDoc(doc(db, 'regions', regionSlug));
-          if (regionDoc.exists()) {
-            imageUrl = extractImageUrl(regionDoc.data());
-            if (imageUrl) {
-              setCountryImage({ url: imageUrl });
-              return;
-            }
-          }
+          imageUrl = await tryFetch(countryName.toLowerCase().replace(/\s+/g, '-'));
+          if (imageUrl) { setCountryImage({ url: imageUrl }); return; }
         }
 
         // Step 4: Try by country code uppercase (ISO format)
         if (countryCode) {
-          const countryDoc = await getDoc(doc(db, 'countries', countryCode.toUpperCase()));
-          if (countryDoc.exists()) {
-            imageUrl = extractImageUrl(countryDoc.data());
-            if (imageUrl) {
-              setCountryImage({ url: imageUrl });
-              return;
-            }
-          }
+          imageUrl = await tryFetch(countryCode.toUpperCase());
+          if (imageUrl) { setCountryImage({ url: imageUrl }); return; }
         }
 
-        // No image found
         setCountryImage(null);
       } catch (error) {
         console.error('Error fetching country image:', error);

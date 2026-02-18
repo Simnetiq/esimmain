@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
+import { getSupabase } from '@esim/shared/lib/supabase';
 import { 
   Globe, 
   RefreshCw, 
@@ -58,16 +57,11 @@ const ApiConfiguration = () => {
   // Load RoamJet API Key
   const loadRoamjetApiKey = async () => {
     try {
-      const configRef = doc(db, 'config', 'roamjet');
-      const configDoc = await getDoc(configRef);
-      if (configDoc.exists()) {
-        const configData = configDoc.data();
-        if (configData.api_key) {
-          setRoamjetApiKey(configData.api_key);
-        }
-        if (configData.base_url) {
-          setRoamjetBaseUrl(configData.base_url);
-        }
+      const supabase = getSupabase();
+      const { data } = await supabase.from('app_config').select('value').eq('key', 'roamjet').single();
+      if (data?.value) {
+        if (data.value.api_key) setRoamjetApiKey(data.value.api_key);
+        if (data.value.base_url) setRoamjetBaseUrl(data.value.base_url);
       }
     } catch {
     }
@@ -76,16 +70,11 @@ const ApiConfiguration = () => {
   // Load Coinbase Commerce Config
   const loadCoinbaseConfig = async () => {
     try {
-      const configRef = doc(db, 'config', 'coinbase');
-      const configDoc = await getDoc(configRef);
-      if (configDoc.exists()) {
-        const configData = configDoc.data();
-        if (configData.api_key) {
-          setCoinbaseApiKey(configData.api_key);
-        }
-        if (configData.webhook_secret) {
-          setCoinbaseWebhookSecret(configData.webhook_secret);
-        }
+      const supabase = getSupabase();
+      const { data } = await supabase.from('app_config').select('value').eq('key', 'coinbase').single();
+      if (data?.value) {
+        if (data.value.api_key) setCoinbaseApiKey(data.value.api_key);
+        if (data.value.webhook_secret) setCoinbaseWebhookSecret(data.value.webhook_secret);
       }
     } catch {
     }
@@ -94,13 +83,10 @@ const ApiConfiguration = () => {
   // Load OpenAI Config
   const loadOpenaiConfig = async () => {
     try {
-      const configRef = doc(db, 'config', 'openai');
-      const configDoc = await getDoc(configRef);
-      if (configDoc.exists()) {
-        const configData = configDoc.data();
-        if (configData.api_key) {
-          setOpenaiApiKey(configData.api_key);
-        }
+      const supabase = getSupabase();
+      const { data } = await supabase.from('app_config').select('value').eq('key', 'openai').single();
+      if (data?.value) {
+        if (data.value.api_key) setOpenaiApiKey(data.value.api_key);
       }
     } catch {
     }
@@ -116,13 +102,16 @@ const ApiConfiguration = () => {
 
       setLoading(true);
       
-      const configRef = doc(db, 'config', 'roamjet');
-      await setDoc(configRef, {
-        api_key: roamjetApiKey,
-        base_url: roamjetBaseUrl,
-        updated_at: serverTimestamp(),
-        updated_by: currentUser?.uid || 'admin'
-      }, { merge: true });
+      const supabase = getSupabase();
+      await supabase.from('app_config').upsert({
+        key: 'roamjet',
+        value: {
+          api_key: roamjetApiKey,
+          base_url: roamjetBaseUrl,
+          updated_by: currentUser?.uid || 'admin'
+        },
+        updated_at: new Date().toISOString()
+      });
       
       toast.success('RoamJet API credentials saved successfully!');
     } catch {
@@ -142,13 +131,16 @@ const ApiConfiguration = () => {
 
       setSavingCoinbase(true);
       
-      const configRef = doc(db, 'config', 'coinbase');
-      await setDoc(configRef, {
-        api_key: coinbaseApiKey,
-        webhook_secret: coinbaseWebhookSecret,
-        updated_at: serverTimestamp(),
-        updated_by: currentUser?.uid || 'admin'
-      }, { merge: true });
+      const supabase = getSupabase();
+      await supabase.from('app_config').upsert({
+        key: 'coinbase',
+        value: {
+          api_key: coinbaseApiKey,
+          webhook_secret: coinbaseWebhookSecret,
+          updated_by: currentUser?.uid || 'admin'
+        },
+        updated_at: new Date().toISOString()
+      });
       
       toast.success('Coinbase Commerce configuration saved successfully!');
     } catch {
@@ -168,12 +160,15 @@ const ApiConfiguration = () => {
 
       setSavingOpenai(true);
       
-      const configRef = doc(db, 'config', 'openai');
-      await setDoc(configRef, {
-        api_key: openaiApiKey,
-        updated_at: serverTimestamp(),
-        updated_by: currentUser?.uid || 'admin'
-      }, { merge: true });
+      const supabase = getSupabase();
+      await supabase.from('app_config').upsert({
+        key: 'openai',
+        value: {
+          api_key: openaiApiKey,
+          updated_by: currentUser?.uid || 'admin'
+        },
+        updated_at: new Date().toISOString()
+      });
       
       toast.success('OpenAI configuration saved successfully!');
     } catch {

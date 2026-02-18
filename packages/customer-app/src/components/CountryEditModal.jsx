@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
+import { getSupabase } from '@esim/shared/lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, 
@@ -207,26 +206,27 @@ const CountryEditModal = ({
       
       // Prepare country data
       const countryData = {
+        id: formData.code.toUpperCase(),
         code: formData.code.toUpperCase(),
         name: formData.name.trim(),
         translations: formData.translations,
         photo: photoURL,
         description: formData.description.trim(),
         isActive: formData.isActive,
-        updated_at: serverTimestamp(),
+        updated_at: new Date().toISOString(),
         updated_by: currentUser?.uid || 'admin'
       };
       
       // Add created_at for new countries
       if (!isEditing) {
-        countryData.created_at = serverTimestamp();
+        countryData.created_at = new Date().toISOString();
         countryData.planCount = 0;
         countryData.minPrice = null;
       }
       
-      // Save to Firebase
-      const countryRef = doc(db, 'countries', formData.code.toUpperCase());
-      await setDoc(countryRef, countryData, { merge: true });
+      // Save to Supabase
+      const supabase = getSupabase();
+      await supabase.from('countries').upsert(countryData);
       
       toast.success(
         isEditing 

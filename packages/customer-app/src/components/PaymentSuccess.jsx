@@ -4,8 +4,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
-import { doc, getDoc, onSnapshot } from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
+import { getSupabase } from '@esim/shared/lib/supabase';
 import { QrCode, Download, CheckCircle, AlertCircle, Clock } from 'lucide-react';
 import QRCodeLib from 'qrcode';
 import Image from 'next/image';
@@ -125,18 +124,33 @@ const PaymentSuccess = () => {
     setProcessing(false);
   }, [currentUser, extractQrData, generateQRCode, t]);
 
-  // Listen to order updates in real-time
+  // Poll for order updates (replaces Firebase onSnapshot)
   const subscribeToOrder = useCallback((orderId) => {
-    const orderRef = doc(db, 'orders', orderId);
+    const supabase = getSupabase();
+    let cancelled = false;
     
-    return onSnapshot(orderRef, async (snapshot) => {
-      if (snapshot.exists()) {
-        const orderData = snapshot.data();
-        await processOrderData(orderData, orderId);
+    const poll = async () => {
+      while (!cancelled) {
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        if (cancelled) break;
+        try {
+          const { data: orderData, error } = await supabase
+            .from('orders')
+            .select('*')
+            .eq('id', orderId)
+            .single();
+          if (!error && orderData) {
+            await processOrderData(orderData, orderId);
+            if (orderData.status === 'completed' || orderData.status === 'failed') break;
+          }
+        } catch (error) {
+          console.error('Order poll error:', error);
+        }
       }
-    }, (error) => {
-      console.error('Order subscription error:', error);
-    });
+    };
+    
+    poll();
+    return () => { cancelled = true; };
   }, [processOrderData]);
 
   // Fetch order and set up listener
@@ -152,40 +166,46 @@ const PaymentSuccess = () => {
       }
 
       // Try to fetch order
+      const supabase = getSupabase();
       let orderData = null;
-      let orderDoc = null;
       
-      // Check user's collection first
+      // Check user's esims first
       if (currentUser) {
-        const userOrderRef = doc(db, 'users', currentUser.uid, 'esims', orderParam);
-        orderDoc = await getDoc(userOrderRef);
-        if (orderDoc.exists()) {
-          orderData = orderDoc.data();
-        }
+        const { data } = await supabase
+          .from('esims')
+          .select('*')
+          .eq('id', orderParam)
+          .eq('user_id', currentUser.uid)
+          .single();
+        if (data) orderData = data;
       }
       
       // Check global orders collection
       if (!orderData) {
-        const globalOrderRef = doc(db, 'orders', orderParam);
-        orderDoc = await getDoc(globalOrderRef);
-        if (orderDoc.exists()) {
-          orderData = orderDoc.data();
-        }
+        const { data } = await supabase
+          .from('orders')
+          .select('*')
+          .eq('id', orderParam)
+          .single();
+        if (data) orderData = data;
       }
       
       // If order not found, wait and try again (webhook might not have fired yet)
       if (!orderData) {
         await new Promise(resolve => setTimeout(resolve, 3000));
         
-        const globalOrderRef = doc(db, 'orders', orderParam);
-        orderDoc = await getDoc(globalOrderRef);
+        const { data } = await supabase
+          .from('orders')
+          .select('*')
+          .eq('id', orderParam)
+          .single();
         
-        if (!orderDoc.exists()) {
+        if (!data) {
           setError(`${t('paymentSuccess.errorOrderNotFound', 'Order not found. Please wait a moment and refresh, or contact support with order ID:')} ${orderParam}`);
           setProcessing(false);
           return;
         }
-        orderData = orderDoc.data();
+        orderData = data;
       }
 
       // SECURITY CHECK: Verify this order belongs to the user or has valid email

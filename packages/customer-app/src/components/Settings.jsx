@@ -3,8 +3,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
+import { getSupabase } from '@esim/shared/lib/supabase';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { getLanguageDirection, detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
@@ -122,11 +121,15 @@ const Settings = () => {
     }
 
     try {
-      const userRef = doc(db, 'users', currentUser.uid);
-      const userSnap = await getDoc(userRef);
+      const supabase = getSupabase();
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', currentUser.uid)
+        .single();
       
-      if (userSnap.exists()) {
-        setUserProfile(userSnap.data());
+      if (data) {
+        setUserProfile(data);
       }
     } catch (error) {
     } finally {

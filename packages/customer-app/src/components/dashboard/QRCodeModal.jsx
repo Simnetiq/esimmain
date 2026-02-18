@@ -16,8 +16,7 @@ import {
   mapPackageCountryData
 } from '@esim/shared/utils/esimFieldMapper';
 import { useCountryNames } from '@esim/shared/hooks/useCountriesSupabase';
-import { db } from '@esim/shared/firebase/config';
-import { doc, getDoc } from 'firebase/firestore';
+import { getSupabase } from '@esim/shared/lib/supabase';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
 
@@ -85,45 +84,34 @@ const QRCodeModal = ({
       }
 
       try {
+        const supabase = getSupabase();
         let imageUrl = null;
 
-        // 1. Try countries collection first (works for both countries AND regions like "asia")
+        // 1. Try countries table by name slug
         if (countryName && typeof countryName === 'string') {
           const nameSlug = countryName.toLowerCase().replace(/\s+/g, '-');
-          const countryDoc = await getDoc(doc(db, 'countries', nameSlug));
-          if (countryDoc.exists()) {
-            const data = countryDoc.data();
-            imageUrl = data.image?.url || data.photo;
-          }
+          const { data } = await supabase.from('countries').select('image, photo').eq('id', nameSlug).single();
+          if (data) imageUrl = data.image?.url || data.photo;
         }
 
-        // 2. Try code as lowercase slug (e.g., "asia" from country_codes)
+        // 2. Try code as lowercase slug
         if (!imageUrl && code) {
           const codeSlug = code.toLowerCase().replace(/\s+/g, '-');
-          const countryDoc = await getDoc(doc(db, 'countries', codeSlug));
-          if (countryDoc.exists()) {
-            const data = countryDoc.data();
-            imageUrl = data.image?.url || data.photo;
-          }
+          const { data } = await supabase.from('countries').select('image, photo').eq('id', codeSlug).single();
+          if (data) imageUrl = data.image?.url || data.photo;
         }
 
-        // 3. For regional plans, also check the regions collection
+        // 3. For regional plans, check countries table with region slug
         if (!imageUrl && isRegional && countryName) {
           const regionSlug = countryName.toLowerCase().replace(/\s+/g, '-');
-          const regionDoc = await getDoc(doc(db, 'regions', regionSlug));
-          if (regionDoc.exists()) {
-            const data = regionDoc.data();
-            imageUrl = data.imageUrl?.url || data.image?.url;
-          }
+          const { data } = await supabase.from('countries').select('image, photo').eq('id', regionSlug).single();
+          if (data) imageUrl = data.image?.url || data.photo;
         }
 
-        // 4. Try uppercase ISO code as fallback (e.g., "DE")
+        // 4. Try uppercase ISO code as fallback
         if (!imageUrl && code && !isRegional) {
-          const countryDoc = await getDoc(doc(db, 'countries', code.toUpperCase()));
-          if (countryDoc.exists()) {
-            const data = countryDoc.data();
-            imageUrl = data.image?.url || data.photo;
-          }
+          const { data } = await supabase.from('countries').select('image, photo').eq('id', code.toUpperCase()).single();
+          if (data) imageUrl = data.image?.url || data.photo;
         }
 
         setCountryImage(imageUrl || null);

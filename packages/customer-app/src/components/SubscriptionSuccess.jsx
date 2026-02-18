@@ -4,8 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
-import { httpsCallable } from 'firebase/functions';
-import { functions } from '@esim/shared/firebase/config';
+import { getSupabase } from '@esim/shared/lib/supabase';
 import { motion } from 'framer-motion';
 import { CheckCircle, Download, QrCode, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -38,22 +37,27 @@ const SubscriptionSuccess = () => {
           throw new Error('Missing payment session information');
         }
 
-        // Call the existing Firebase function to create eSIM order
-        const createOrder = httpsCallable(functions, 'create_order');
-        const orderResult = await createOrder({
-          planId: planId,
-          sessionId: sessionId
+        // Call API route to create eSIM order
+        const orderResponse = await fetch('/api/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ planId, sessionId }),
         });
+        if (!orderResponse.ok) throw new Error('Failed to create order');
+        const orderResult = await orderResponse.json();
 
-        setOrder(orderResult.data);
+        setOrder(orderResult);
 
-        // Call the existing Firebase function to get QR code
-        const getQrCode = httpsCallable(functions, 'get_esim_qr_code');
-        const qrResult = await getQrCode({
-          orderId: orderResult.data.orderId
+        // Call API route to get QR code
+        const qrResponse = await fetch('/api/get-esim-qr-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId: orderResult.orderId }),
         });
+        if (!qrResponse.ok) throw new Error('Failed to get QR code');
+        const qrResult = await qrResponse.json();
 
-        setQrCode(qrResult.data);
+        setQrCode(qrResult);
 
         toast.success('Payment successful! Your eSIM is ready.');
         

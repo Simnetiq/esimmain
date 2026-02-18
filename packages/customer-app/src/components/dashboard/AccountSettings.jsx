@@ -1,7 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { updateProfile, sendPasswordResetEmail, deleteUser } from 'firebase/auth';
-import { doc, updateDoc } from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
+import { getSupabase } from '@esim/shared/lib/supabase';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { getLanguageDirection, detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
@@ -154,15 +152,13 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
 
     setIsUpdating(true);
     try {
-      await updateProfile(currentUser, { displayName: newName.trim() });
+      const supabase = getSupabase();
+      await supabase.auth.updateUser({ data: { display_name: newName.trim() } });
 
-      if (userProfile) {
-        const userRef = doc(db, 'users', currentUser.uid);
-        await updateDoc(userRef, {
-          displayName: newName.trim(),
-          updatedAt: new Date()
-        });
-      }
+      await supabase.from('users').update({
+        displayName: newName.trim(),
+        updatedAt: new Date().toISOString()
+      }).eq('id', currentUser.uid);
 
       await onLoadUserProfile();
       setEditingName(false);
@@ -177,11 +173,11 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
   const handleUpdatePhone = useCallback(async () => {
     setIsUpdating(true);
     try {
-      const userRef = doc(db, 'users', currentUser.uid);
-      await updateDoc(userRef, {
+      const supabase = getSupabase();
+      await supabase.from('users').update({
         phoneNumber: newPhone.trim(),
-        updatedAt: new Date()
-      });
+        updatedAt: new Date().toISOString()
+      }).eq('id', currentUser.uid);
 
       await onLoadUserProfile();
       setEditingPhone(false);
@@ -196,7 +192,8 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
   const handlePasswordReset = useCallback(async () => {
     setIsSendingReset(true);
     try {
-      await sendPasswordResetEmail(currentUser.auth, currentUser.email);
+      const supabase = getSupabase();
+      await supabase.auth.resetPasswordForEmail(currentUser.email);
       showToast('success', t('dashboard.passwordResetEmailSent', 'Password reset email sent! Check your inbox.'));
     } catch {
       showToast('error', t('dashboard.failedToSendPasswordReset', 'Failed to send password reset email'));
@@ -218,12 +215,12 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
   const handleNewsletterToggle = useCallback(async () => {
     setIsUnsubscribing(true);
     try {
-      const userRef = doc(db, 'users', currentUser.uid);
+      const supabase = getSupabase();
       const newStatus = !isSubscribedToNewsletter;
-      await updateDoc(userRef, {
+      await supabase.from('users').update({
         newsletterSubscribed: newStatus,
-        newsletterUpdatedAt: new Date()
-      });
+        newsletterUpdatedAt: new Date().toISOString()
+      }).eq('id', currentUser.uid);
       await onLoadUserProfile();
       showToast('success', newStatus 
         ? t('settings.subscribedToNewsletter', 'Subscribed to newsletter')
@@ -244,20 +241,24 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
 
     setIsDeleting(true);
     try {
-      // Soft delete user data in Firestore
-      const userRef = doc(db, 'users', currentUser.uid);
-      await updateDoc(userRef, {
+      const supabase = getSupabase();
+      // Soft delete user data
+      await supabase.from('users').update({
         deleted: true,
-        deletedAt: new Date(),
+        deletedAt: new Date().toISOString(),
         email: `deleted_${currentUser.uid}@deleted.com`,
         displayName: 'Deleted User'
-      });
+      }).eq('id', currentUser.uid);
 
-      // Try to delete Firebase Auth account
+      // Try to delete auth account via API route (admin operation)
       try {
-        await deleteUser(currentUser);
+        await fetch('/api/delete-account', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: currentUser.uid }),
+        });
       } catch (authError) {
-        // If deletion requires recent login, just log out
+        // If deletion fails, just log out
       }
 
       // Log out and redirect

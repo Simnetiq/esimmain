@@ -8,8 +8,7 @@ import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils
 import { formatPrice } from '@esim/shared/utils/priceUtils';
 import { mapPackageCountryData, mapPlanDetails } from '@esim/shared/utils/esimFieldMapper';
 import { useCountryNames } from '@esim/shared/hooks/useCountriesSupabase';
-import { db } from '@esim/shared/firebase/config';
-import { doc, getDoc } from 'firebase/firestore';
+import { getSupabase } from '@esim/shared/lib/supabase';
 import Image from 'next/image';
 
 const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, planMetadataLoading }) => {
@@ -44,41 +43,30 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
       }
 
       try {
+        const supabase = getSupabase();
         let imageUrl = null;
 
         if (countryName && typeof countryName === 'string') {
           const nameSlug = countryName.toLowerCase().replace(/\s+/g, '-');
-          const countryDoc = await getDoc(doc(db, 'countries', nameSlug));
-          if (countryDoc.exists()) {
-            const data = countryDoc.data();
-            imageUrl = data.image?.url || data.photo;
-          }
+          const { data } = await supabase.from('countries').select('image, photo').eq('id', nameSlug).single();
+          if (data) imageUrl = data.image?.url || data.photo;
         }
 
         if (!imageUrl && code) {
           const codeSlug = code.toLowerCase().replace(/\s+/g, '-');
-          const countryDoc = await getDoc(doc(db, 'countries', codeSlug));
-          if (countryDoc.exists()) {
-            const data = countryDoc.data();
-            imageUrl = data.image?.url || data.photo;
-          }
+          const { data } = await supabase.from('countries').select('image, photo').eq('id', codeSlug).single();
+          if (data) imageUrl = data.image?.url || data.photo;
         }
 
         if (!imageUrl && isRegional && countryName) {
           const regionSlug = countryName.toLowerCase().replace(/\s+/g, '-');
-          const regionDoc = await getDoc(doc(db, 'regions', regionSlug));
-          if (regionDoc.exists()) {
-            const data = regionDoc.data();
-            imageUrl = data.imageUrl?.url || data.image?.url;
-          }
+          const { data } = await supabase.from('countries').select('image, photo').eq('id', regionSlug).single();
+          if (data) imageUrl = data.image?.url || data.photo;
         }
 
         if (!imageUrl && code && !isRegional) {
-          const countryDoc = await getDoc(doc(db, 'countries', code.toUpperCase()));
-          if (countryDoc.exists()) {
-            const data = countryDoc.data();
-            imageUrl = data.image?.url || data.photo;
-          }
+          const { data } = await supabase.from('countries').select('image, photo').eq('id', code.toUpperCase()).single();
+          if (data) imageUrl = data.image?.url || data.photo;
         }
 
         setCountryImage(imageUrl || null);

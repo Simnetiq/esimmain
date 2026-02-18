@@ -6,8 +6,7 @@ import { X, Gift, CheckCircle, AlertCircle } from 'lucide-react';
 import { isValidReferralCode, hasUserUsedReferralCode } from '@esim/shared/services/referralService';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
-import { doc, updateDoc } from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
+import { getSupabase } from '@esim/shared/lib/supabase';
 import toast from 'react-hot-toast';
 
 const ReferralBottomSheet = ({ isOpen, onClose }) => {
@@ -101,10 +100,11 @@ const ReferralBottomSheet = ({ isOpen, onClose }) => {
       
       if (result.success) {
         // Update user profile to mark referral code as used
-        await updateDoc(doc(db, 'users', currentUser.uid), {
+        const supabase = getSupabase();
+        await supabase.from('users').update({
           referralCodeUsed: true,
           referredBy: referralCode.trim().toUpperCase()
-        });
+        }).eq('id', currentUser.uid);
 
         // Reload user profile to reflect changes
         await loadUserProfile();

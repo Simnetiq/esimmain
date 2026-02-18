@@ -4,8 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
-import { collection, query, getDocs, doc, setDoc, getDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
-import { db } from '@esim/shared/firebase/config';
+import { getSupabase } from '@esim/shared/lib/supabase';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { esimService } from '@esim/shared/services/esimService';
 import { getReferralStats, createReferralCode } from '@esim/shared/services/referralService';
@@ -488,32 +487,26 @@ const Dashboard = () => {
         // Load referral stats
         await loadReferralStats();
 
-        // Fetch eSIMs from mobile app collection structure (users/{userId}/esims)
-        // Note: We can't use where('deleted', '!=', true) because it excludes documents without the field
-        // Instead, we fetch all and filter in memory
-        const esimsQuery = query(
-          collection(db, 'users', currentUser.uid, 'esims')
-        );
+        // Fetch eSIMs from Supabase esims table
+        const supabase = getSupabase();
+        const { data: esimsData, error: esimsError } = await supabase
+          .from('esims')
+          .select('*')
+          .eq('user_id', currentUser.uid);
 
-        const esimsSnapshot = await getDocs(esimsQuery);
+        if (esimsError) throw esimsError;
 
-        const ordersData = await Promise.all(esimsSnapshot.docs
-          .filter(doc => {
-            // Filter out deleted orders (only if explicitly marked as deleted)
-            const data = doc.data();
+        const ordersData = await Promise.all((esimsData || [])
+          .filter(data => {
+            // Filter out deleted orders
             if (data.deleted === true) return false;
-
-            // Filter out test/sandbox orders to prevent 404 errors in production
-            // Test orders don't exist in production Airalo API
-            if (data.isTestMode === true || data.mode === 'sandbox' || data.test === true) {
-              return false;
-            }
-
+            // Filter out test/sandbox orders
+            if (data.isTestMode === true || data.mode === 'sandbox' || data.test === true) return false;
             return true;
           })
-          .map(async doc => {
+          .map(async (data) => {
             try {
-              const data = doc.data();
+              const docId = data.id;
 
               // Extract QR code data from orderData.sims[0] structure (Airalo format)
               // Use both direct fields and nested structure for compatibility
@@ -570,7 +563,7 @@ const Dashboard = () => {
                 data.orderData?.package ||
                 data.packageId ||
                 data.planId ||
-                doc.id;
+                docId;
               let displayPlanName = data.planName || planData.package || data.customerName || packageSlug || 'Unknown Plan';
 
               // Build QR code object with all formats for complete compatibility
@@ -596,10 +589,10 @@ const Dashboard = () => {
               };
 
               return {
-                id: doc.id,
+                id: docId,
                 ...data,
                 // Map mobile app fields to web app expected fields
-                orderId: data.orderResult?.orderId || data.order_id || data.orderId || doc.id,
+                orderId: data.orderResult?.orderId || data.order_id || data.orderId || docId,
                 airaloOrderId: data.airaloOrderId || planData.id,
                 planName: displayPlanName,
                 amount: data.amount || data.price || data.orderResult?.price || planData.price || 0,
@@ -669,34 +662,30 @@ const Dashboard = () => {
         return;
       }
 
-      if (!db) {
-        return;
-      }
-
       try {
+        const supabase = getSupabase();
         // Check if user profile exists
-        const userDocRef = doc(db, 'users', currentUser.uid);
-        const userDoc = await getDoc(userDocRef);
+        const { data: userDoc, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', currentUser.uid)
+          .single();
 
-        if (!userDoc.exists()) {
+        if (error || !userDoc) {
           // Create user profile if it doesn't exist
-          await setDoc(userDocRef, {
+          await supabase.from('users').upsert({
+            id: currentUser.uid,
             email: currentUser.email,
             displayName: currentUser.displayName || 'Unknown User',
-            createdAt: new Date(),
+            createdAt: new Date().toISOString(),
             role: 'customer'
           });
-          // Reload user profile after creating it
           await loadUserProfile();
         } else {
-          // Force reload profile in case it wasn't loaded
           await loadUserProfile();
         }
       } catch (error) {
-        // Only show toast if it's not a permission error or if we really need to know
-        if (error.code !== 'permission-denied') {
-          toast.error('Failed to fetch user data');
-        }
+        toast.error('Failed to fetch user data');
       }
     };
 
@@ -955,15 +944,15 @@ const Dashboard = () => {
         return;
       }
 
-      // Update the order in Firebase
-      const orderRef = doc(db, 'users', currentUser.uid, 'esims', order.id);
-      await updateDoc(orderRef, {
+      // Update the order in Supabase
+      const supabase = getSupabase();
+      await supabase.from('esims').update({
         countryCode: countryCode.toUpperCase(),
         countryName: countryName,
-        updatedAt: serverTimestamp(),
-        countryUpdatedAt: serverTimestamp(),
+        updatedAt: new Date().toISOString(),
+        countryUpdatedAt: new Date().toISOString(),
         countryUpdateReason: 'Updated from Airalo API eSIM details'
-      });
+      }).eq('id', order.id).eq('user_id', currentUser.uid);
 
       // Update local state
       setOrders(prevOrders =>
@@ -1045,23 +1034,22 @@ const Dashboard = () => {
     if (!confirmed) return;
 
     try {
-      // Soft delete from user's esims subcollection
-      const userOrderRef = doc(db, 'users', currentUser.uid, 'esims', order.id);
-      await updateDoc(userOrderRef, {
+      const supabase = getSupabase();
+      // Soft delete from esims table
+      await supabase.from('esims').update({
         deleted: true,
-        deletedAt: serverTimestamp(),
+        deletedAt: new Date().toISOString(),
         status: 'deleted'
-      });
+      }).eq('id', order.id).eq('user_id', currentUser.uid);
 
-      // Also soft delete from global orders collection (if it exists)
+      // Also soft delete from global orders table (if it exists)
       try {
-        const globalOrderRef = doc(db, 'orders', order.id);
-        await updateDoc(globalOrderRef, {
+        await supabase.from('orders').update({
           deleted: true,
-          deletedAt: serverTimestamp(),
+          deletedAt: new Date().toISOString(),
           deletedByUser: currentUser.uid,
           status: 'deleted'
-        });
+        }).eq('id', order.id);
       } catch (globalError) {
         // Global order might not exist or already deleted - this is OK
       }
