@@ -1,27 +1,17 @@
-import { createClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 /**
  * Supabase client for browser/client-side usage
+ * Uses @supabase/ssr createBrowserClient which stores auth in cookies
+ * This is required for PKCE OAuth flow to work with server-side callback
  */
 let supabase = null;
 
 if (supabaseUrl && supabaseAnonKey) {
-  supabase = createClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: true,
-      flowType: 'implicit',
-    },
-    global: {
-      headers: {
-        'x-client-info': '@esim/shared'
-      }
-    }
-  });
+  supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
 } else if (typeof window !== 'undefined') {
   console.warn(
     '⚠️ Supabase client not initialized. Missing environment variables.\n' +
