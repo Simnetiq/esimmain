@@ -1,7 +1,12 @@
 {
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next@4.3.18"
+    }
+  ],
   "buildCommand": "cd ../.. && npm run build:customer",
   "installCommand": "cd ../.. && npm install",
-  "framework": "nextjs",
   "crons": [
     {
       "path": "/api/sync-airalo-v2",
