@@ -1,7 +1,4 @@
 {
-  "buildCommand": "cd ../.. && npm run build:customer && echo '{\"version\":1,\"outDirectory\":\"out\"}' > packages/customer-app/.next/export-detail.json",
-  "installCommand": "cd ../.. && npm install",
-  "regions": ["iad1"],
   "crons": [
     {
       "path": "/api/sync-airalo-v2",
