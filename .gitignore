@@ -85,3 +85,4 @@ firebase-debug.*.log
 *.temp
 esim-service.json
 .env*.local
+firebase-service-account.json
