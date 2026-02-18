@@ -5,7 +5,6 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 /**
  * Supabase client for browser/client-side usage
- * Uses the anon key for public read operations
  */
 let supabase = null;
 
@@ -14,7 +13,8 @@ if (supabaseUrl && supabaseAnonKey) {
     auth: {
       autoRefreshToken: true,
       persistSession: true,
-      detectSessionInUrl: false
+      detectSessionInUrl: true,
+      flowType: 'pkce',
     },
     global: {
       headers: {
@@ -31,19 +31,10 @@ if (supabaseUrl && supabaseAnonKey) {
   );
 }
 
-/**
- * Check if Supabase is available
- * @returns {boolean}
- */
 export function isSupabaseAvailable() {
   return supabase !== null;
 }
 
-/**
- * Get Supabase client with safety check
- * @returns {import('@supabase/supabase-js').SupabaseClient}
- * @throws {Error} if Supabase is not initialized
- */
 export function getSupabase() {
   if (!supabase) {
     throw new Error(

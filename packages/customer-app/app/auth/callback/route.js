@@ -26,7 +26,13 @@ export async function GET(request) {
       }
     );
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    console.log('🔑 Auth callback - code exchange result:', { 
+      success: !!data?.session, 
+      error: error?.message,
+      userId: data?.user?.id,
+      cookiesSet: response.cookies.getAll().map(c => c.name)
+    });
     if (error) {
       console.error('Auth callback error:', error.message);
       return NextResponse.redirect(new URL('/login?error=auth_failed', request.url));
