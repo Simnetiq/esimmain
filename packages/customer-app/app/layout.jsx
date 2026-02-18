@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import dynamic from 'next/dynamic'
 import { Heebo, IBM_Plex_Sans_Arabic, Rubik, DM_Sans, IBM_Plex_Sans } from 'next/font/google'
+import { Analytics as VercelAnalytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import Providers from '../src/components/Providers'
 import ConditionalNavbar from '../src/components/ConditionalNavbar'
@@ -243,6 +244,7 @@ export default function RootLayout({ children }) {
             </div>
           </LanguageWrapper>
         </Providers>
+        <VercelAnalytics />
         <SpeedInsights />
       </body>
     </html>
