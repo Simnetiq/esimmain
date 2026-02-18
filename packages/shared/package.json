@@ -66,6 +66,7 @@
     "./lib/firebaseAdmin": "./lib/firebaseAdmin.js",
     "./lib/supabase": "./lib/supabase.js",
     "./lib/supabaseServer": "./lib/supabaseServer.js",
+    "./lib/email": "./lib/email.js",
     "./lib/passkit": "./lib/passkit.js",
     "./types/supabase": "./types/supabase.ts"
   },
