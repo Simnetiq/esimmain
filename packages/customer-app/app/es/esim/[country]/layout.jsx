@@ -8,7 +8,7 @@ function getSupabase() {
 }
 
 export async function generateMetadata({ params }) {
-  const { country: countrySlug } = await params;
+  const { country: countrySlug } = params;
   const supabase = getSupabase();
 
   if (!supabase) {
