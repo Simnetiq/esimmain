@@ -1,10 +1,4 @@
 {
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next@4.3.18"
-    }
-  ],
   "crons": [
     {
       "path": "/api/sync-airalo-v2",
