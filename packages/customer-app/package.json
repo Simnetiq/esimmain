@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
-    "build": "next build",
+    "build": "next build && node -e \"const fs=require('fs'),p='.next/export-detail.json';if(!fs.existsSync(p))fs.writeFileSync(p,JSON.stringify({version:1,outDirectory:'out'}))\"",
     "start": "next start -p 3000",
     "lint": "next lint"
   },
