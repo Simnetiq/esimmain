@@ -167,18 +167,22 @@ export function AuthProvider({ children }) {
   }
 
   async function signInWithApple() {
-    try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'apple',
-        options: {
-          redirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback`,
-        },
-      });
-      if (error) throw error;
-      return data;
-    } catch (error) {
-      throw error;
-    }
+    if (typeof window === 'undefined') return;
+    
+    const clientId = 'com.simnetiq.web';
+    const redirectUri = `${window.location.origin}/api/auth/apple/callback`;
+    const state = Math.random().toString(36).substring(2);
+    
+    const params = new URLSearchParams({
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      response_type: 'code',
+      response_mode: 'form_post',
+      scope: 'email name',
+      state: state,
+    });
+    
+    window.location.href = `https://appleid.apple.com/auth/authorize?${params.toString()}`;
   }
 
   async function completeGoogleSignup() {
