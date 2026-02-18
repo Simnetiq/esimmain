@@ -1,5 +1,5 @@
 // Shared package exports
-export * from './firebase/config';
+export * from './lib/supabase';
 export * from './contexts/AuthContext';
 export * from './contexts/AdminContext';
 export * from './services/adminService';
@@ -21,7 +21,6 @@ export const GLOBAL_PLAN_IMAGE_URL = 'https://cdn.airalo.com/images/5c6c78b0-171
 export { useCountries } from './hooks/useCountries';
 export { useCountryFilters } from './hooks/useCountryFilters';
 export { useRegions } from './hooks/useRegions';
-export { useLazyAuth } from './hooks/useLazyAuth';
 
 // Supabase Hooks
 export { useCountriesSupabase, useCountryPlansSupabase } from './hooks/useCountriesSupabase';
@@ -44,8 +43,3 @@ export { default as AuthModal } from './components/AuthModal.jsx';
 export { default as Providers } from './components/Providers.jsx';
 export { default as LightProviders } from './components/LightProviders.jsx';
 export { default as Loading } from './components/Loading.jsx';
-
-// Lazy Firebase Auth (for performance optimization)
-export * from './firebase/lazyAuth';
-
-

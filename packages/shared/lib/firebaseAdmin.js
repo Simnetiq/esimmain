@@ -1,115 +1,67 @@
-import admin from 'firebase-admin';
+import { createClient } from '@supabase/supabase-js';
 
-let adminInitialized = false;
+const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+let adminClient = null;
 let initializationError = null;
 
-// Initialize Firebase Admin SDK only once
+/**
+ * Initialize Supabase Admin client (server-side only)
+ * Replaces Firebase Admin SDK initialization
+ */
 export function initializeFirebaseAdmin() {
-  // If already initialized successfully, return
-  if (adminInitialized && admin.apps.length > 0) {
-    return;
-  }
+  if (adminClient) return;
+  if (initializationError) throw initializationError;
 
-  // If we already tried and failed, throw the same error
-  if (initializationError) {
-    throw initializationError;
-  }
-
-  // Check if we have the required environment variables
-  const hasRequiredVars = 
-    process.env.FIREBASE_PROJECT_ID &&
-    process.env.FIREBASE_CLIENT_EMAIL &&
-    process.env.FIREBASE_PRIVATE_KEY;
-
-  if (!hasRequiredVars) {
-    const missingVars = [];
-    if (!process.env.FIREBASE_PROJECT_ID) missingVars.push('FIREBASE_PROJECT_ID');
-    if (!process.env.FIREBASE_CLIENT_EMAIL) missingVars.push('FIREBASE_CLIENT_EMAIL');
-    if (!process.env.FIREBASE_PRIVATE_KEY) missingVars.push('FIREBASE_PRIVATE_KEY');
-    
+  if (!supabaseUrl || !supabaseServiceKey) {
+    const missing = [];
+    if (!supabaseUrl) missing.push('SUPABASE_URL');
+    if (!supabaseServiceKey) missing.push('SUPABASE_SERVICE_ROLE_KEY');
     initializationError = new Error(
-      `Firebase Admin credentials missing: ${missingVars.join(', ')}. Please check your environment variables.`
+      `Supabase Admin credentials missing: ${missing.join(', ')}. Please check your environment variables.`
     );
     console.error('❌', initializationError.message);
     throw initializationError;
   }
 
   try {
-    if (!admin.apps.length) {
-      // Process the private key - handle multiple formats
-      let privateKey = process.env.FIREBASE_PRIVATE_KEY;
-      
-      // Handle different newline encodings
-      // 1. Replace literal \n strings with actual newlines
-      if (privateKey.includes('\\n')) {
-        privateKey = privateKey.replace(/\\n/g, '\n');
-      }
-      
-      // 2. Handle double-escaped newlines (\\\\n)
-      if (privateKey.includes('\\\\n')) {
-        privateKey = privateKey.replace(/\\\\n/g, '\n');
-      }
-      
-      // 3. Remove any quotes that might have been included
-      privateKey = privateKey.replace(/^["']|["']$/g, '');
-      
-      // 4. Ensure proper line breaks exist
-      if (!privateKey.includes('\n') && privateKey.includes('-----BEGIN PRIVATE KEY-----')) {
-        // Key is on one line without proper breaks, try to fix it
-        privateKey = privateKey
-          .replace(/-----BEGIN PRIVATE KEY-----/g, '-----BEGIN PRIVATE KEY-----\n')
-          .replace(/-----END PRIVATE KEY-----/g, '\n-----END PRIVATE KEY-----\n')
-          .replace(/([A-Za-z0-9+/=]{64})/g, '$1\n')
-          .replace(/\n\n/g, '\n');
-      }
-      
-      admin.initializeApp({
-        credential: admin.credential.cert({
-          projectId: process.env.FIREBASE_PROJECT_ID,
-          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-          privateKey: privateKey,
-        }),
-      });
-      adminInitialized = true;
-    } else {
-      adminInitialized = true;
-    }
+    adminClient = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    });
   } catch (error) {
-    initializationError = new Error(`Failed to initialize Firebase Admin: ${error.message}`);
+    initializationError = new Error(`Failed to initialize Supabase Admin: ${error.message}`);
     console.error('❌', initializationError.message);
-    
-    // Debug info (only show in development)
-    if (process.env.NODE_ENV === 'development') {
-      const key = process.env.FIREBASE_PRIVATE_KEY || '';
-      console.error('🔍 Debug info:');
-      console.error('   - Key length:', key.length);
-      console.error('   - Has \\n:', key.includes('\\n'));
-      console.error('   - Has \\\\n:', key.includes('\\\\n'));
-      console.error('   - Has actual newlines:', key.includes('\n'));
-      console.error('   - First 60 chars:', key.substring(0, 60));
-      console.error('   - Last 60 chars:', key.substring(key.length - 60));
-    }
-    
     throw initializationError;
   }
 }
 
-// Get Firestore instance
+/**
+ * Get Supabase Admin client (replaces getAdminDb)
+ * @returns {import('@supabase/supabase-js').SupabaseClient}
+ */
 export function getAdminDb() {
   initializeFirebaseAdmin();
-  return admin.firestore();
+  return adminClient;
 }
 
-// Get Auth instance
+/**
+ * Get Admin Auth - Supabase admin auth operations
+ * @returns {{ updateUser: Function }}
+ */
 export function getAdminAuth() {
   initializeFirebaseAdmin();
-  return admin.auth();
+  return adminClient.auth.admin;
 }
 
-// Check if admin is initialized
+/**
+ * Check if admin is initialized
+ */
 export function isAdminInitialized() {
-  return adminInitialized && admin.apps.length > 0;
+  return adminClient !== null;
 }
 
-export default admin;
-
+export default adminClient;
