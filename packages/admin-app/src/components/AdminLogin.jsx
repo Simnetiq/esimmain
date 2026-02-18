@@ -5,8 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@esim/shared/contexts/AuthContext'
 import { Shield, Mail, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
-import { auth } from '@esim/shared/firebase/config'
+import { getSupabase } from '@esim/shared/lib/supabase'
 
 export default function AdminLogin() {
   const router = useRouter()
@@ -47,8 +46,12 @@ export default function AdminLogin() {
     setError('')
 
     try {
-      const provider = new GoogleAuthProvider()
-      await signInWithPopup(auth, provider)
+      const supabase = getSupabase()
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: `${window.location.origin}/auth/callback` },
+      })
+      if (oauthError) throw oauthError
       
       toast.success('Login successful!')
       router.push('/')

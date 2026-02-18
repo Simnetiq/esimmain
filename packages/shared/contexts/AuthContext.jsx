@@ -1,20 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  updateProfile,
-  sendPasswordResetEmail,
-  signInWithPopup,
-  GoogleAuthProvider,
-  OAuthProvider,
-  signInAnonymously
-} from 'firebase/auth';
-import { doc, setDoc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
-import { getAuthInstance, db } from '../firebase/config';
+import { getSupabase } from '../lib/supabase';
 import { generateOTPWithTimestamp } from '../utils/otpUtils';
 import { sendVerificationEmail } from '../services/emailService';
 import { hasAdminAccess, hasSuperAdminAccess, hasAdminPermission } from '../services/adminService';
@@ -31,26 +18,35 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [userProfile, setUserProfile] = useState(null);
 
+  const supabase = getSupabase();
+
   async function loginAsGuest() {
     try {
-      const auth = getAuthInstance();
-      const { user } = await signInAnonymously(auth);
+      const { data, error } = await supabase.auth.signInAnonymously();
+      if (error) throw error;
 
-      // Create a guest profile in Firestore if needed
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      if (!userDoc.exists()) {
-        const preferredLanguage = typeof window !== 'undefined' ?
-          localStorage.getItem('Simnetiq-language') || 'en' : 'en';
+      const user = data.user;
 
-        await setDoc(doc(db, 'users', user.uid), {
-          uid: user.uid,
-          isAnonymous: true,
-          createdAt: new Date(),
+      // Create a guest profile if needed
+      const { data: existing } = await supabase
+        .from('users')
+        .select('id')
+        .eq('id', user.id)
+        .single();
+
+      if (!existing) {
+        const preferredLanguage = typeof window !== 'undefined'
+          ? localStorage.getItem('Simnetiq-language') || 'en' : 'en';
+
+        await supabase.from('users').insert({
+          id: user.id,
+          is_anonymous: true,
           role: 'customer',
-          preferredLanguage: preferredLanguage,
-          displayName: 'Guest User'
+          preferred_language: preferredLanguage,
+          display_name: 'Guest User',
         });
       }
+
       return user;
     } catch (error) {
       console.error('Error signing in as guest:', error);
@@ -65,14 +61,10 @@ export function AuthProvider({ children }) {
         try {
           const verifyResponse = await fetch('/api/verify-recaptcha', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ token: recaptchaToken }),
           });
-
           const verifyData = await verifyResponse.json();
-
           if (!verifyData.success) {
             throw new Error('reCAPTCHA verification failed. Please try again.');
           }
@@ -89,7 +81,7 @@ export function AuthProvider({ children }) {
         throw new Error('Failed to send verification email. Please try again.');
       }
 
-      // Store pending signup data in localStorage (not in Firebase yet)
+      // Store pending signup data in localStorage (not in DB yet)
       const pendingSignup = {
         email,
         password,
@@ -115,26 +107,24 @@ export function AuthProvider({ children }) {
         try {
           const verifyResponse = await fetch('/api/verify-recaptcha', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ token: recaptchaToken }),
           });
-
           const verifyData = await verifyResponse.json();
-
           if (!verifyData.success) {
             throw new Error('reCAPTCHA verification failed. Please try again.');
           }
-
         } catch {
           throw new Error('Failed to verify reCAPTCHA. Please try again.');
         }
       }
 
-      const auth = getAuthInstance();
-      const { user } = await signInWithEmailAndPassword(auth, email, password);
-      return user;
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
+      return data.user;
     } catch (error) {
       throw error;
     }
@@ -142,8 +132,8 @@ export function AuthProvider({ children }) {
 
   async function logout() {
     try {
-      const auth = getAuthInstance();
-      await signOut(auth);
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
     } catch (error) {
       throw error;
     }
@@ -151,8 +141,10 @@ export function AuthProvider({ children }) {
 
   async function resetPassword(email) {
     try {
-      const auth = getAuthInstance();
-      await sendPasswordResetEmail(auth, email);
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/reset-password`,
+      });
+      if (error) throw error;
     } catch (error) {
       throw error;
     }
@@ -160,38 +152,15 @@ export function AuthProvider({ children }) {
 
   async function signInWithGoogle() {
     try {
-      const auth = getAuthInstance();
-      const provider = new GoogleAuthProvider();
-      const { user } = await signInWithPopup(auth, provider);
-
-      // Check if user profile exists, if not create it
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      if (!userDoc.exists()) {
-        // Get current language preference from localStorage
-        const preferredLanguage = typeof window !== 'undefined' ?
-          localStorage.getItem('Simnetiq-language') || 'en' : 'en';
-
-        // Create user profile directly
-        await setDoc(doc(db, 'users', user.uid), {
-          email: user.email,
-          displayName: user.displayName,
-          createdAt: new Date(),
-          role: 'customer',
-          emailVerified: true,
-          referredBy: null,
-          referralCodeUsed: false,
-          preferredLanguage: preferredLanguage
-        });
-
-        // Automatically add user to newsletter collection
-        try {
-          await addToNewsletter(user.email, user.displayName, 'web_dashboard');
-        } catch {
-          // Don't fail the signup if newsletter addition fails
-        }
-      }
-
-      return user;
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback`,
+        },
+      });
+      if (error) throw error;
+      // OAuth redirects — user profile creation happens in onAuthStateChange
+      return data;
     } catch (error) {
       throw error;
     }
@@ -199,42 +168,14 @@ export function AuthProvider({ children }) {
 
   async function signInWithApple() {
     try {
-      const auth = getAuthInstance();
-      const provider = new OAuthProvider('apple.com');
-      provider.addScope('email');
-      provider.addScope('name');
-
-      const { user } = await signInWithPopup(auth, provider);
-
-      // Check if user profile exists, if not create it
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      if (!userDoc.exists()) {
-        // Get current language preference from localStorage
-        const preferredLanguage = typeof window !== 'undefined' ?
-          localStorage.getItem('Simnetiq-language') || 'en' : 'en';
-
-        // Create user profile directly
-        await setDoc(doc(db, 'users', user.uid), {
-          email: user.email,
-          displayName: user.displayName || 'Apple User',
-          createdAt: new Date(),
-          role: 'customer',
-          emailVerified: true,
-          referredBy: null,
-          referralCodeUsed: false,
-          preferredLanguage: preferredLanguage,
-          authProvider: 'apple'
-        });
-
-        // Automatically add user to newsletter collection
-        try {
-          await addToNewsletter(user.email, user.displayName || 'Apple User', 'web_dashboard');
-        } catch {
-          // Don't fail the signup if newsletter addition fails
-        }
-      }
-
-      return user;
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'apple',
+        options: {
+          redirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback`,
+        },
+      });
+      if (error) throw error;
+      return data;
     } catch (error) {
       throw error;
     }
@@ -248,42 +189,37 @@ export function AuthProvider({ children }) {
       }
 
       const userData = JSON.parse(pendingUserData);
-      const auth = getAuthInstance();
-      const currentUser = auth?.currentUser;
+      const { data: { user } } = await supabase.auth.getUser();
 
-      if (!currentUser) {
+      if (!user) {
         throw new Error('No authenticated user found');
       }
 
-      // Get current language preference from localStorage
-      const preferredLanguage = typeof window !== 'undefined' ?
-        localStorage.getItem('Simnetiq-language') || 'en' : 'en';
+      const preferredLanguage = typeof window !== 'undefined'
+        ? localStorage.getItem('Simnetiq-language') || 'en' : 'en';
 
-      // Create user profile in Firestore
-      await setDoc(doc(db, 'users', currentUser.uid), {
-        email: currentUser.email,
-        displayName: currentUser.displayName,
-        createdAt: new Date(),
+      await supabase.from('users').upsert({
+        id: user.id,
+        email: user.email,
+        display_name: user.user_metadata?.full_name || user.email,
         role: 'customer',
-        emailVerified: true,
-        referredBy: userData.referralCode || null,
-        referralCodeUsed: !!userData.referralCode,
-        preferredLanguage: preferredLanguage
+        email_verified: true,
+        referred_by: userData.referralCode || null,
+        referral_code_used: !!userData.referralCode,
+        preferred_language: preferredLanguage,
       });
 
       // Process referral code if provided
       if (userData.referralCode && userData.referralCode.trim() !== '') {
         try {
-          await processReferralUsage(userData.referralCode, currentUser.uid);
+          await processReferralUsage(userData.referralCode, user.id);
         } catch {
           // Don't fail the signup if referral processing fails
         }
       }
 
-      // Clean up pending data
       localStorage.removeItem('pendingUserData');
-
-      return currentUser;
+      return user;
     } catch (error) {
       throw error;
     }
@@ -291,7 +227,6 @@ export function AuthProvider({ children }) {
 
   async function verifyEmailOTP(otp) {
     try {
-      // Check if there's a pending signup
       const pendingSignupData = localStorage.getItem('pendingSignup');
       if (!pendingSignupData) {
         throw new Error('No pending signup found. Please register again.');
@@ -299,13 +234,11 @@ export function AuthProvider({ children }) {
 
       const pendingSignup = JSON.parse(pendingSignupData);
 
-      // Check if OTP has expired
       if (Date.now() > pendingSignup.expiresAt) {
         localStorage.removeItem('pendingSignup');
         throw new Error('Verification code has expired. Please register again.');
       }
 
-      // Verify OTP
       if (otp !== pendingSignup.otp) {
         throw new Error('Invalid verification code. Please check and try again.');
       }
@@ -317,52 +250,56 @@ export function AuthProvider({ children }) {
       if (pendingUserData) {
         const userData = JSON.parse(pendingUserData);
         referralCode = userData.referralCode || referralCode;
-        // Clean up pendingUserData
         localStorage.removeItem('pendingUserData');
       }
 
-      // Create Firebase account only after successful verification
-      const auth = getAuthInstance();
-      const { user } = await createUserWithEmailAndPassword(auth, pendingSignup.email, pendingSignup.password);
+      // Create Supabase auth account
+      const { data, error } = await supabase.auth.signUp({
+        email: pendingSignup.email,
+        password: pendingSignup.password,
+        options: {
+          data: {
+            display_name: pendingSignup.displayName,
+          },
+          // Skip email confirmation since we already verified via OTP
+          emailRedirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback`,
+        },
+      });
+      if (error) throw error;
 
-      // Update profile with display name
-      await updateProfile(user, { displayName: pendingSignup.displayName });
+      const user = data.user;
+      const preferredLanguage = typeof window !== 'undefined'
+        ? localStorage.getItem('Simnetiq-language') || 'en' : 'en';
 
-      // Get current language preference from localStorage
-      const preferredLanguage = typeof window !== 'undefined' ?
-        localStorage.getItem('Simnetiq-language') || 'en' : 'en';
-
-      // Create user profile in Firestore
-      await setDoc(doc(db, 'users', user.uid), {
+      // Create user profile in users table
+      await supabase.from('users').insert({
+        id: user.id,
         email: user.email,
-        displayName: pendingSignup.displayName,
-        createdAt: new Date(),
+        display_name: pendingSignup.displayName,
         role: 'customer',
-        emailVerified: true,
-        referredBy: referralCode || null,
-        referralCodeUsed: !!referralCode,
-        preferredLanguage: preferredLanguage
+        email_verified: true,
+        referred_by: referralCode || null,
+        referral_code_used: !!referralCode,
+        preferred_language: preferredLanguage,
       });
 
       // Process referral code if provided
       if (referralCode && referralCode.trim() !== '') {
         try {
-          await processReferralUsage(referralCode, user.uid);
+          await processReferralUsage(referralCode, user.id);
         } catch {
           // Don't fail the signup if referral processing fails
         }
       }
 
-      // Automatically add user to newsletter collection
+      // Add to newsletter
       try {
         await addToNewsletter(user.email, pendingSignup.displayName, 'web_dashboard');
       } catch {
-        // Don't fail the signup if newsletter addition fails
+        // Don't fail if newsletter addition fails
       }
 
-      // Clear pending signup data
       localStorage.removeItem('pendingSignup');
-
       return user;
     } catch (error) {
       throw error;
@@ -372,7 +309,11 @@ export function AuthProvider({ children }) {
   async function updateUserProfile(updates) {
     try {
       if (currentUser) {
-        await setDoc(doc(db, 'users', currentUser.uid), updates, { merge: true });
+        const { error } = await supabase
+          .from('users')
+          .update(updates)
+          .eq('id', currentUser.id);
+        if (error) throw error;
         setUserProfile(prev => ({ ...prev, ...updates }));
       }
     } catch (error) {
@@ -381,97 +322,95 @@ export function AuthProvider({ children }) {
   }
 
   const loadUserProfile = useCallback(async () => {
-    if (currentUser && db) {
-      try {
-        // First try to get by UID
-        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+    if (!currentUser) return;
 
-        let profileData = null;
+    try {
+      const { data: profile, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', currentUser.id)
+        .single();
 
-        if (userDoc.exists()) {
-          profileData = userDoc.data();
-        }
-
-        // Always also check by email to find admin documents
-        const usersRef = collection(db, 'users');
-        const q = query(usersRef, where('email', '==', currentUser.email));
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-          // Look for admin role first
-          let adminDoc = null;
-          for (const doc of querySnapshot.docs) {
-            const data = doc.data();
-            if (data.role === 'admin' || data.role === 'super_admin') {
-              adminDoc = doc;
-              break;
-            }
-          }
-
-          if (adminDoc) {
-            const adminProfileData = adminDoc.data();
-            setUserProfile(adminProfileData);
-          } else if (profileData) {
-            setUserProfile(profileData);
-          }
-        } else if (profileData) {
-          setUserProfile(profileData);
-        }
-      } catch {
-        // Silent error handling for security
+      if (error && error.code !== 'PGRST116') {
+        // PGRST116 = not found, which is OK for new OAuth users
+        console.error('Error loading profile:', error);
+        return;
       }
+
+      if (profile) {
+        setUserProfile(profile);
+      } else {
+        // Auto-create profile for OAuth users on first login
+        const preferredLanguage = typeof window !== 'undefined'
+          ? localStorage.getItem('Simnetiq-language') || 'en' : 'en';
+
+        const newProfile = {
+          id: currentUser.id,
+          email: currentUser.email,
+          display_name: currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || currentUser.email,
+          role: 'customer',
+          email_verified: !!currentUser.email_confirmed_at,
+          preferred_language: preferredLanguage,
+        };
+
+        const { data: created, error: createError } = await supabase
+          .from('users')
+          .insert(newProfile)
+          .select()
+          .single();
+
+        if (!createError && created) {
+          setUserProfile(created);
+
+          // Add to newsletter for new users
+          try {
+            await addToNewsletter(currentUser.email, newProfile.display_name, 'web_dashboard');
+          } catch {
+            // Ignore
+          }
+        }
+      }
+    } catch {
+      // Silent error handling for security
     }
   }, [currentUser]);
 
   useEffect(() => {
-    // Defer auth initialization to avoid blocking initial render
-    // This prevents the Firebase Auth iframe from loading during initial page load
-    let unsubscribe = null;
     let isMounted = true;
 
-    const initAuth = () => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
       if (!isMounted) return;
+      setCurrentUser(session?.user ?? null);
+      setLoading(false);
+    });
 
-      const authInstance = getAuthInstance();
-      if (!authInstance) {
-        setLoading(false);
-        return;
-      }
-
-      unsubscribe = onAuthStateChanged(authInstance, async (user) => {
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
         if (!isMounted) return;
+        const user = session?.user ?? null;
         setCurrentUser(user);
-        if (user) {
-          try {
-            await loadUserProfile();
-          } catch {
-            // Silent error
-          }
-        } else {
+
+        if (!user) {
           setUserProfile(null);
         }
         setLoading(false);
-      });
-    };
-
-    // Defer auth init to after first paint using requestIdleCallback
-    // This significantly reduces Total Blocking Time (TBT)
-    if (typeof window !== 'undefined') {
-      if ('requestIdleCallback' in window) {
-        requestIdleCallback(initAuth, { timeout: 2000 });
-      } else {
-        // Fallback for Safari - use setTimeout after a small delay
-        setTimeout(initAuth, 100);
       }
-    } else {
-      setLoading(false);
-    }
+    );
 
     return () => {
       isMounted = false;
-      if (unsubscribe) unsubscribe();
+      subscription.unsubscribe();
     };
-  }, [loadUserProfile]);
+  }, []);
+
+  // Load profile when user changes
+  useEffect(() => {
+    if (currentUser) {
+      loadUserProfile();
+    }
+  }, [currentUser, loadUserProfile]);
 
   const value = {
     currentUser,
@@ -491,27 +430,22 @@ export function AuthProvider({ children }) {
     // Admin functions
     hasAdminAccess: () => hasAdminAccess(userProfile),
     hasSuperAdminAccess: () => hasSuperAdminAccess(userProfile),
-    hasAdminPermission: (permission) => hasAdminPermission(userProfile, permission)
+    hasAdminPermission: (permission) => hasAdminPermission(userProfile, permission),
   };
 
-  // Helper function to add user to newsletter collection
-  // Fixed: displayName and source parameters are used in the addDoc call below
   async function addToNewsletter(email, displayName, source) {
     try {
-      // Check if email already exists in newsletter collection
-      const existingQuery = query(
-        collection(db, 'newsletter'),
-        where('email', '==', email)
-      );
-      const existingSnapshot = await getDocs(existingQuery);
+      const { data: existing } = await supabase
+        .from('newsletter_subscriptions')
+        .select('id')
+        .eq('email', email)
+        .single();
 
-      if (existingSnapshot.empty) {
-        // Create new newsletter subscription with all provided data
-        await addDoc(collection(db, 'newsletter'), {
-          email: email,
-          displayName: displayName,
-          source: source,
-          timestamp: serverTimestamp()
+      if (!existing) {
+        await supabase.from('newsletter_subscriptions').insert({
+          email,
+          name: displayName,
+          source,
         });
       }
     } catch (error) {
@@ -525,4 +459,3 @@ export function AuthProvider({ children }) {
     </AuthContext.Provider>
   );
 }
-
