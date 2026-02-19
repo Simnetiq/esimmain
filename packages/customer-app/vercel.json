@@ -1,6 +1,6 @@
 {
   "installCommand": "cd ../.. && npm install",
-  "buildCommand": "cd ../.. && npm run build:customer && echo '{\"version\":1,\"success\":true,\"outDirectory\":\".next\"}' > packages/customer-app/.next/export-detail.json",
+  "buildCommand": "cd ../.. && npm run build:customer",
   "framework": "nextjs",
   "crons": [
     {
