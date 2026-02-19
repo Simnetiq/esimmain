@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'standalone',
 
   // Skip ESLint during builds (run separately in CI)
   // This avoids the circular structure warning from eslint-config-next v16
