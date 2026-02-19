@@ -153,15 +153,15 @@ const StripeCheckoutContent = () => {
 
       // Process with Stripe Checkout
       const orderData = {
-        order:      packageData.packageId,
-        email:      currentUser.email,
-        name:       packageData.packageName,
-        total:      expectedTotal,
-        currency:   (packageData.currency || 'USD').toLowerCase(),
-        domain:     window.location.origin,
-        language:   currentLanguage,
-        userId:     currentUser.id,    // required for referral discount + order ownership
-        promoCode:  activePromoCode,   // undefined if no promo — server ignores it
+        order:     packageData.packageId,
+        email:     currentUser.email,
+        name:      packageData.packageName,
+        total:     expectedTotal,
+        currency:  (packageData.currency || 'USD').toLowerCase(),
+        // domain intentionally omitted — server always uses NEXT_PUBLIC_BASE_URL
+        language:  currentLanguage,
+        userId:    currentUser.id,
+        promoCode: activePromoCode,
       };
 
       const response = await fetch('/api/create-payment-order', {

@@ -27,7 +27,10 @@ const getWebhookSecret = () => {
 };
 
 const stripeSecretKey = getStripeSecretKey();
-const stripe = stripeSecretKey ? new Stripe(stripeSecretKey, { apiVersion: '2023-10-16' }) : null;
+const stripe = stripeSecretKey ? new Stripe(stripeSecretKey, {
+  apiVersion: '2025-01-27.acacia',
+  timeout: 30000,
+}) : null;
 
 function getSupabase() { return getSupabaseAdmin(); }
 
@@ -36,14 +39,29 @@ export async function POST(request) {
     const webhookSecret = getWebhookSecret();
     if (!stripe || !stripeSecretKey) { console.error('Stripe not configured'); return NextResponse.json({ error: 'Stripe not configured' }, { status: 503 }); }
 
+    // ── SECURITY: Webhook signature MUST be verified. Never skip. ─────────────
+    // Falling back to JSON.parse() when the secret is absent lets any caller
+    // forge arbitrary events (fake payments, fulfillment without payment, etc.)
+    if (!webhookSecret) {
+      console.error('[stripe-webhook] STRIPE_WEBHOOK_SECRET not configured — rejecting request');
+      return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 });
+    }
+
     const body = await request.text();
     const signature = request.headers.get('stripe-signature');
-    let event;
 
-    if (webhookSecret && signature) {
-      try { event = stripe.webhooks.constructEvent(body, signature, webhookSecret); }
-      catch (err) { console.error('Webhook signature verification failed:', err.message); return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 }); }
-    } else { event = JSON.parse(body); }
+    if (!signature) {
+      console.error('[stripe-webhook] Missing stripe-signature header');
+      return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
+    }
+
+    let event;
+    try {
+      event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    } catch (err) {
+      console.error('[stripe-webhook] Signature verification failed:', err.message);
+      return NextResponse.json({ error: `Webhook signature invalid: ${err.message}` }, { status: 400 });
+    }
 
     switch (event.type) {
       case 'checkout.session.completed': await handleCheckoutSessionCompleted(event.data.object); break;
@@ -171,7 +189,23 @@ async function handleCheckoutSessionCompleted(session) {
       }
     }
 
-    await supabase.from('orders').update({ status: 'processing', payment_status: 'completed', payment_completed_at: now, stripe_session_id: session.id, stripe_payment_intent_id: session.payment_intent, updated_at: now }).eq('id', orderId);
+    // ── Atomic mutex: only one process creates the eSIM ──────────────────────
+    // UPDATE returns the row ONLY if status is still 'pending'/'processing' AND
+    // esim_created is false. If two webhooks race, only one wins this UPDATE.
+    const { data: claimed, error: claimErr } = await supabase
+      .from('orders')
+      .update({ status: 'creating_esim', payment_status: 'completed', payment_completed_at: now, stripe_session_id: session.id, stripe_payment_intent_id: session.payment_intent, updated_at: now })
+      .eq('id', orderId)
+      .eq('esim_created', false)
+      .not('status', 'in', '("creating_esim","completed","esim_creation_failed")')
+      .select('id')
+      .single();
+
+    if (claimErr || !claimed) {
+      // Another process already claimed this order — idempotent, do nothing
+      console.info(`[webhook] Order ${orderId} already being processed or completed — skipping`);
+      return;
+    }
 
     // Confirm promo reservation — payment is good, slot is officially consumed
     await confirmPromoRedemption(supabase, orderId);
@@ -208,14 +242,33 @@ async function handlePaymentIntentSucceeded(paymentIntent) {
 
     await supabase.from('orders').update({ 'payment_method_fingerprint': pmFingerprint, 'payment_method_last4': pmLast4, 'payment_method_brand': pmBrand, stripe_payment_intent_id: paymentIntent.id, updated_at: now }).eq('id', orderId);
 
-    if (!orderData.esim_created && orderData.status !== 'completed') {
+    // ── Skip if this order came from a Checkout Session ───────────────────────
+    // checkout.session.completed is the canonical handler for session-based
+    // payments. payment_intent.succeeded fires too, creating a race for eSIM
+    // creation. Only process here for direct PaymentIntent flows (mobile).
+    if (orderData.stripe_session_id) {
+      console.info(`[webhook] payment_intent.succeeded for session-based order ${orderId} — handled by checkout.session.completed`);
+      return;
+    }
+
+    if (!orderData.esim_created) {
       const paidAmount = paymentIntent.amount / 100;
-      if (paidAmount < orderData.amount - 0.01) {
-        await supabase.from('orders').update({ status: 'payment_mismatch', payment_status: 'failed', error_message: `Payment amount mismatch`, updated_at: now }).eq('id', orderId);
+      if (paidAmount < (orderData.amount ?? 0) - 0.01) {
+        await supabase.from('orders').update({ status: 'payment_mismatch', payment_status: 'failed', error_message: 'Payment amount mismatch', updated_at: now }).eq('id', orderId);
         return;
       }
 
-      await supabase.from('orders').update({ status: 'processing', payment_status: 'completed', payment_completed_at: now, stripe_payment_intent_id: paymentIntent.id, updated_at: now }).eq('id', orderId);
+      // Same atomic mutex — prevents duplicate eSIM if both handlers fire
+      const { data: claimed } = await supabase
+        .from('orders')
+        .update({ status: 'creating_esim', payment_status: 'completed', payment_completed_at: now, stripe_payment_intent_id: paymentIntent.id, updated_at: now })
+        .eq('id', orderId)
+        .eq('esim_created', false)
+        .not('status', 'in', '("creating_esim","completed","esim_creation_failed")')
+        .select('id')
+        .single();
+
+      if (!claimed) return; // Another handler already claimed it
 
       try {
         await createAiraloEsim(orderId, orderData, supabase);

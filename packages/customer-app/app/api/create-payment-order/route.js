@@ -33,7 +33,10 @@ const getStripeSecretKey = () => {
 };
 
 const stripeSecretKey = getStripeSecretKey();
-const stripe = stripeSecretKey ? new Stripe(stripeSecretKey, { apiVersion: '2023-10-16' }) : null;
+const stripe = stripeSecretKey ? new Stripe(stripeSecretKey, {
+  apiVersion: '2025-01-27.acacia',  // latest stable — update periodically
+  timeout: 30000,
+}) : null;
 
 export const dynamic = 'force-dynamic';
 
@@ -172,8 +175,20 @@ async function checkSubmittedPrice(supabase, {
 }
 
 export async function POST(request) {
-  const forwarded = request.headers.get('x-forwarded-for');
-  const ip = forwarded ? forwarded.split(',')[0].trim() : request.headers.get('x-real-ip') || 'unknown';
+  // On Vercel: x-real-ip is set by the edge and cannot be spoofed by clients.
+  // x-forwarded-for CAN be spoofed if taken from the leftmost entry; use the
+  // rightmost non-private entry set by the trusted proxy instead.
+  // cf-connecting-ip is set by Cloudflare when behind a CF proxy.
+  const ip = (
+    request.headers.get('x-real-ip') ||           // Vercel edge (trusted)
+    request.headers.get('cf-connecting-ip') ||    // Cloudflare (trusted)
+    (() => {
+      const fwd = request.headers.get('x-forwarded-for');
+      // Take last (rightmost) entry — set by the outermost trusted proxy
+      return fwd ? fwd.split(',').pop().trim() : null;
+    })() ||
+    'unknown'
+  );
   const userAgent = request.headers.get('user-agent') || 'unknown';
 
   const supabase = getSupabaseAdmin();
@@ -181,11 +196,13 @@ export async function POST(request) {
   try {
     const body = await request.json();
     const {
-      order, email, name, total, currency = 'usd', domain,
+      order, email, name, total, currency = 'usd',
       userId, language = 'en', radarSessionId, isMobile, platform,
       timestamp, nonce,
       promoCode,  // optional — raw promo code string from client
     } = body;
+    // SECURITY: domain is always derived server-side — never trust client value.
+    // A client-supplied domain could redirect users to a phishing site.
 
     if (!order || !email) return NextResponse.json({ error: 'Missing required fields', code: 'MISSING_FIELDS' }, { status: 400 });
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return NextResponse.json({ error: 'Invalid email format', code: 'INVALID_EMAIL' }, { status: 400 });
@@ -307,7 +324,8 @@ export async function POST(request) {
 
     const attemptId = await trackPurchaseAttempt(supabase, { userId, email, amount: validatedPrice, currency: currency.toLowerCase(), metadata: { orderId: order, planName: packageName, riskScore: fraudCheck.riskScore, riskFactors: fraudCheck.riskFactors, ip, userAgent } });
 
-    const finalDomain = domain || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    // Always use server-side env — never the client-supplied domain value.
+    const finalDomain = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
     const stripeMode = process.env.STRIPE_MODE || 'live';
     const isTestMode = stripeMode === 'test' || stripeMode === 'sandbox';
 
@@ -349,7 +367,20 @@ export async function POST(request) {
       is_regional: isRegional,
       unique_order_id: uniqueOrderId,
       original_order_id: order,
-      security: { ip, userAgent, requestTimestamp: timestamp || null, nonce: nonce || null, priceValidatedAt: now, databasePrice: priceValidation.databasePrice, submittedPrice: parseFloat(total) || 0, priceValidationPassed: true },
+      security: {
+        ip,
+        userAgent,
+        requestTimestamp: timestamp || null,
+        // Client nonce is stored for audit only — NOT used for validation.
+        // A client can forge any nonce value; it provides no replay protection here.
+        clientNonce: nonce || null,
+        // Server-generated trace ID for this specific request
+        serverTraceId: `${Date.now()}_${Math.random().toString(36).substr(2, 12)}`,
+        priceValidatedAt: now,
+        databasePrice: priceValidation.databasePrice,
+        submittedPrice: parseFloat(total) || 0,
+        priceValidationPassed: true,
+      },
       price_validation: {
         databasePrice: priceValidation.databasePrice,
         basePrice: priceValidation.basePrice,
@@ -398,7 +429,12 @@ export async function POST(request) {
       };
       if (radarSessionId) paymentIntentConfig.radar_session = radarSessionId;
 
-      const paymentIntent = await stripe.paymentIntents.create(paymentIntentConfig);
+      // Idempotency key = uniqueOrderId: safe to retry on network error,
+      // guaranteed to never create a duplicate PaymentIntent for the same order.
+      const paymentIntent = await stripe.paymentIntents.create(
+        paymentIntentConfig,
+        { idempotencyKey: uniqueOrderId },
+      );
 
       // Reserve promo slot for mobile path as well
       if (promoApplied) {
@@ -443,7 +479,10 @@ export async function POST(request) {
           quantity: 1,
         }],
         mode: 'payment',
-        success_url: getLocalizedUrl(`/payment-success?order_id=${uniqueOrderId}&plan_id=${order}&email=${email}&total=${validatedPrice}&name=${encodeURIComponent(packageName)}&currency=${currency}`),
+        // SECURITY: email removed from URL — exposed in browser history, logs,
+        // and referrer headers. Order lookup uses order_id; auth check uses
+        // Supabase session (user_id). Email in URL is never reliable anyway.
+        success_url: getLocalizedUrl(`/payment-success?order_id=${uniqueOrderId}&plan_id=${order}&currency=${currency}`),
         cancel_url: getLocalizedUrl('/esim-plans?canceled=true'),
         customer_email: email,
         metadata: {
@@ -465,7 +504,11 @@ export async function POST(request) {
       };
       if (radarSessionId) sessionConfig.metadata.radar_session_id = radarSessionId;
 
-      const session = await stripe.checkout.sessions.create(sessionConfig);
+      // Idempotency key = uniqueOrderId: safe to retry, no duplicate sessions.
+      const session = await stripe.checkout.sessions.create(
+        sessionConfig,
+        { idempotencyKey: uniqueOrderId },
+      );
 
       // Reserve promo slot AFTER Stripe session created — roll back on failure
       if (promoApplied) {
@@ -500,8 +543,15 @@ export async function POST(request) {
   } catch (error) {
     console.error('❌ Payment error:', error);
     try {
-      await supabase.from('payment_errors').insert({ error: error.message, stack: error.stack, ip, user_agent: userAgent, created_at: new Date().toISOString() });
-    } catch { /* ignore */ }
+      await supabase.from('payment_errors').insert({
+        error:     error.message,
+        stack:     error.stack,
+        ip,
+        user_agent: userAgent,
+        context:   { stripeCode: error.code, stripeType: error.type, stripeDeclineCode: error.decline_code },
+        created_at: new Date().toISOString(),
+      });
+    } catch { /* ignore — don't let error logging break the response */ }
     return NextResponse.json({ error: 'Payment processing failed. Please try again.', code: 'INTERNAL_ERROR' }, { status: 500 });
   }
 }
