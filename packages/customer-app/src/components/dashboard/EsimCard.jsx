@@ -48,25 +48,25 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
 
         if (countryName && typeof countryName === 'string') {
           const nameSlug = countryName.toLowerCase().replace(/\s+/g, '-');
-          const { data } = await supabase.from('countries').select('image, photo').eq('id', nameSlug).single();
-          if (data) imageUrl = data.image?.url || data.photo;
+          const { data } = await supabase.from('countries').select('image_url').eq('id', nameSlug).maybeSingle();
+          if (data) imageUrl = data.image_url;
         }
 
         if (!imageUrl && code) {
           const codeSlug = code.toLowerCase().replace(/\s+/g, '-');
-          const { data } = await supabase.from('countries').select('image, photo').eq('id', codeSlug).single();
-          if (data) imageUrl = data.image?.url || data.photo;
+          const { data } = await supabase.from('countries').select('image_url').eq('id', codeSlug).maybeSingle();
+          if (data) imageUrl = data.image_url;
         }
 
         if (!imageUrl && isRegional && countryName) {
           const regionSlug = countryName.toLowerCase().replace(/\s+/g, '-');
-          const { data } = await supabase.from('countries').select('image, photo').eq('id', regionSlug).single();
-          if (data) imageUrl = data.image?.url || data.photo;
+          const { data } = await supabase.from('countries').select('image_url').eq('id', regionSlug).maybeSingle();
+          if (data) imageUrl = data.image_url;
         }
 
         if (!imageUrl && code && !isRegional) {
-          const { data } = await supabase.from('countries').select('image, photo').eq('id', code.toUpperCase()).single();
-          if (data) imageUrl = data.image?.url || data.photo;
+          const { data } = await supabase.from('countries').select('image_url').eq('id', code.toUpperCase()).maybeSingle();
+          if (data) imageUrl = data.image_url;
         }
 
         setCountryImage(imageUrl || null);

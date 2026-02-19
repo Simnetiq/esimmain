@@ -14,7 +14,7 @@ export const processReferralUsage = async (referralCode, newUserId) => {
       .from('users')
       .select('referral_code_used, last_login_ip')
       .eq('id', newUserId)
-      .single();
+      .maybeSingle();
 
     if (userData?.referral_code_used) {
       await configService.logPromocodeUsage(referralCode, newUserId, 'duplicate_attempt', {
@@ -29,7 +29,7 @@ export const processReferralUsage = async (referralCode, newUserId) => {
       .from('referral_codes')
       .select('*')
       .eq('code', referralCode)
-      .single();
+      .maybeSingle();
 
     if (refError || !referralData) {
       await configService.logPromocodeUsage(referralCode, newUserId, 'invalid_code', {
@@ -91,7 +91,7 @@ export const getReferralStats = async (userId) => {
       .from('users')
       .select('referral_code')
       .eq('id', userId)
-      .single();
+      .maybeSingle();
 
     const referralCode = userData?.referral_code;
     if (!referralCode) {
@@ -102,7 +102,7 @@ export const getReferralStats = async (userId) => {
       .from('referral_codes')
       .select('*')
       .eq('code', referralCode)
-      .single();
+      .maybeSingle();
 
     if (!referralData) {
       return { referralCode, usageCount: 0, recentUsages: [], totalEarnings: 0, expiryDate: null };
@@ -157,7 +157,7 @@ export const isValidReferralCode = async (code) => {
       .from('referral_codes')
       .select('is_active, expiry_date')
       .eq('code', code.toUpperCase())
-      .single();
+      .maybeSingle();
 
     if (!data) return false;
     const isNotExpired = !data.expiry_date || new Date(data.expiry_date) > new Date();
@@ -174,7 +174,7 @@ export const hasUserUsedReferralCode = async (userId) => {
       .from('users')
       .select('referral_code_used')
       .eq('id', userId)
-      .single();
+      .maybeSingle();
     return data?.referral_code_used || false;
   } catch (error) {
     return false;
@@ -252,7 +252,7 @@ export const updateReferralEarnings = async (referralCode, amount = 1.0) => {
       .from('referral_codes')
       .select('total_earnings')
       .eq('code', referralCode)
-      .single();
+      .maybeSingle();
 
     await supabase.from('referral_codes').update({
       total_earnings: (current?.total_earnings || 0) + amount,
@@ -367,7 +367,7 @@ export const processTransactionCommission = async (transactionData) => {
       .from('users')
       .select('referred_by')
       .eq('id', userId)
-      .single();
+      .maybeSingle();
 
     const referralCodeUsed = userData?.referred_by;
     if (!referralCodeUsed || typeof referralCodeUsed !== 'string') {
@@ -378,7 +378,7 @@ export const processTransactionCommission = async (transactionData) => {
       .from('referral_codes')
       .select('owner_id')
       .eq('code', referralCodeUsed)
-      .single();
+      .maybeSingle();
 
     if (!referralData) return { success: false, error: 'Referral code not found' };
 
@@ -389,7 +389,7 @@ export const processTransactionCommission = async (transactionData) => {
       .from('app_config')
       .select('value')
       .eq('key', 'settings_general')
-      .single();
+      .maybeSingle();
 
     let commissionPercentage = settingsData?.value?.referral?.transactionCommissionPercentage;
 
@@ -398,7 +398,7 @@ export const processTransactionCommission = async (transactionData) => {
         .from('app_config')
         .select('value')
         .eq('key', 'pricing')
-        .single();
+        .maybeSingle();
       commissionPercentage = pricingData?.value?.transaction_commission_percentage;
     }
 
@@ -424,7 +424,7 @@ export const processTransactionCommission = async (transactionData) => {
         status: 'pending'
       })
       .select('id')
-      .single();
+      .maybeSingle();
 
     if (commError) throw commError;
 
@@ -433,7 +433,7 @@ export const processTransactionCommission = async (transactionData) => {
       .from('users')
       .select('total_commissions')
       .eq('id', referrerId)
-      .single();
+      .maybeSingle();
 
     await supabase.from('users').update({
       total_commissions: (referrerData?.total_commissions || 0) + commissionAmount,
@@ -460,7 +460,7 @@ export const processTransactionCommission = async (transactionData) => {
       .from('referral_codes')
       .select('total_transactions, total_transaction_value, total_commissions_earned')
       .eq('code', referralCodeUsed)
-      .single();
+      .maybeSingle();
 
     await supabase.from('referral_codes').update({
       total_transactions: (codeData?.total_transactions || 0) + 1,

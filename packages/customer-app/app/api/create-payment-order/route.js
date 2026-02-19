@@ -116,10 +116,10 @@ async function validateAndGetPrice(supabase, packageId, userId) {
       if (userData) {
         hasReferralDiscount = userData.used_referral_code || userData.has_used_referral_code || userData.referral_code_used || false;
       }
-      const { data: settings } = await supabase.from('app_config').select('*').eq('id', 'general').single();
-      if (settings) {
-        referralDiscountPct = settings.referral?.discountPercentage || 17;
-        minimumPrice = settings.referral?.minimumPrice || 0.5;
+      const { data: settings } = await supabase.from('app_config').select('value').eq('key', 'settings_general').maybeSingle();
+      if (settings?.value) {
+        referralDiscountPct = settings.value.referral?.discountPercentage || 17;
+        minimumPrice = settings.value.referral?.minimumPrice || 0.5;
       }
     } catch (err) {
       console.error('Error checking referral discount:', err);
@@ -138,7 +138,7 @@ async function validateAndGetPrice(supabase, packageId, userId) {
     hasReferralDiscount,
     referralDiscountPct,
     databasePrice,
-    packageCountryCode: packageData.country_code || null,
+    packageCountryCode: packageData.country_iso || null,
   };
 }
 
@@ -332,9 +332,9 @@ export async function POST(request) {
     const getLocalizedUrl = (path) => language === 'en' ? `${finalDomain}${path}` : `${finalDomain}/${language}${path}`;
 
     const packageData = priceValidation.packageData || {};
-    const countryCode = packageData.country_code || null;
-    const countryName = packageData.country_region || null;
-    const countryCodes = packageData.country_codes || (countryCode ? [countryCode] : []);
+    const countryCode = packageData.country_iso || null;
+    const countryName = packageData.country_name || null;
+    const countryCodes = packageData.covered_countries || (countryCode ? [countryCode] : []);
     const isRegional = packageData.is_regional || false;
     const now = new Date().toISOString();
 

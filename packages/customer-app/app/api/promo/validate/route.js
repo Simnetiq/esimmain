@@ -81,7 +81,7 @@ export async function POST(request) {
     // Fetch package data for price + country
     const { data: pkg, error: pkgError } = await supabase
       .from('dataplans')
-      .select('id, price, country_code, is_enabled, status')
+      .select('id, price, country_iso, is_enabled, status')
       .eq('id', packageId)
       .single();
 
@@ -99,7 +99,7 @@ export async function POST(request) {
       userId: null,                        // preview — user ID not required
       userEmail: hasEmail ? email : null,  // null = skip per-user check (preview mode)
       packageId,
-      packageCountryCode: pkg.country_code || null,
+      packageCountryCode: pkg.country_iso || null,  // correct column: country_iso
       basePrice,
     });
 

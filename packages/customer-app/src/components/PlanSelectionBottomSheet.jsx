@@ -309,13 +309,18 @@ const PlanSelectionBottomSheet = ({
     const fetchRegionData = async () => {
       try {
         const supabase = getSupabase();
-        const { data: regions, error } = await supabase.from('countries').select('id, color, translations, name').not('color', 'is', null);
+        // Query the actual regions table — countries table has no color/translations columns
+        const { data: regions, error } = await supabase
+          .from('regions')
+          .select('id, slug, name, display_name, metadata')
+          .eq('is_active', true);
         if (error) throw error;
         const colors = {};
         const names = {};
         (regions || []).forEach(row => {
-          colors[row.id] = row.color || '#6B7280';
-          names[row.id] = row.translations?.[currentLanguage] || row.name || row.id;
+          const key = row.slug || row.id;
+          colors[key] = row.metadata?.color || '#6B7280';
+          names[key] = row.display_name || row.name || key;
         });
         setRegionColors(colors);
         setRegionNames(names);
@@ -329,9 +334,9 @@ const PlanSelectionBottomSheet = ({
     }
   }, [isOpen, currentLanguage]);
 
-  // Helper to extract image URL from Firebase document data
+  // Helper to extract image URL from Supabase document data
   const extractImageUrl = (data) => {
-    return data?.image?.url || data?.photo || data?.imageUrl?.url || null;
+    return data?.image_url || data?.image?.url || data?.photo || data?.imageUrl?.url || null;
   };
 
   // Fetch country image from Firebase when plans are available
@@ -372,7 +377,7 @@ const PlanSelectionBottomSheet = ({
         let imageUrl = null;
 
         const tryFetch = async (id) => {
-          const { data } = await supabase.from('countries').select('image, photo').eq('id', id).single();
+          const { data } = await supabase.from('countries').select('image_url').eq('id', id).maybeSingle();
           return data ? extractImageUrl(data) : null;
         };
 
