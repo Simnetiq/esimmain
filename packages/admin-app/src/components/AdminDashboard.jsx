@@ -20,7 +20,8 @@ import {
   ShieldX,
   Users,
   DollarSign,
-  Globe2
+  Globe2,
+  Tag,
 } from 'lucide-react';
 import AdminHome from './AdminHome';
 import CountryManagement from './CountryManagement';
@@ -36,6 +37,7 @@ import UserManagement from './UserManagement';
 import RegionManagement from './RegionManagement';
 import { RegionsManagement } from './RegionsManagement';
 import FraudManagement from './FraudManagement';
+import PromoCodesManagement from './PromoCodesManagement';
 
 
 
@@ -201,6 +203,7 @@ const AdminDashboard = () => {
                 { id: 'users', label: 'Users', icon: Users, permission: true },
                 { id: 'fraud', label: 'Fraud', icon: ShieldX, permission: canManageConfig },
                 { id: 'finances', label: 'Finances', icon: DollarSign, permission: canManageConfig },
+                { id: 'promos', label: 'Promos', icon: Tag, permission: canManageConfig },
                 { id: 'regions', label: 'Regions', icon: Globe2, permission: canManageConfig },
                 { id: 'country-management', label: 'Countries', icon: MapPin, permission: canManageCountries },
                 { id: 'plans', label: 'Plans', icon: Smartphone, permission: canManagePlans },
@@ -300,6 +303,11 @@ const AdminDashboard = () => {
             {/* Finances Tab */}
             {activeTab === 'finances' && canManageConfig && (
               <FinancesManagement />
+            )}
+
+            {/* Promo Codes Tab */}
+            {activeTab === 'promos' && canManageConfig && (
+              <PromoCodesManagement />
             )}
 
             {/* Regions Tab - Supabase-based */}

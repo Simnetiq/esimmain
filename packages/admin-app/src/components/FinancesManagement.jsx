@@ -1,821 +1,405 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '@esim/shared/contexts/AuthContext';
+import React, { useState, useEffect, useCallback } from 'react';
 import supabase from '../lib/supabase';
-import { 
-  getAllPromoCodes, 
-  createPromoCode, 
-  updatePromoCode, 
-  deletePromoCode,
-  togglePromoCode 
-} from '@esim/shared/services/promoCodeService';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
 import {
-  DollarSign,
-  ShoppingCart,
-  Tag,
-  Plus,
-  Edit2,
-  Trash2,
-  X,
-  Calendar,
-  Percent,
-  ToggleLeft,
-  ToggleRight,
-  RefreshCw,
-  MapPin,
-  ExternalLink
+  DollarSign, ShoppingCart, TrendingUp, CheckCircle, Clock,
+  XCircle, RefreshCw, ExternalLink, MapPin, Search, ChevronDown,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+const fmtDate = (d) =>
+  d ? new Date(d).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
+
+function statusBadge(order) {
+  const s = order.status;
+  const ps = order.payment_status;
+  if (s === 'completed')                          return { label: 'Completed',  cls: 'bg-green-100 text-green-700' };
+  if (s === 'processing')                         return { label: 'Processing', cls: 'bg-blue-100 text-blue-700' };
+  if (s === 'blocked' || s === 'fraud_blocked')   return { label: 'Blocked',    cls: 'bg-red-100 text-red-700' };
+  if (s === 'disputed')                           return { label: 'Disputed',   cls: 'bg-orange-100 text-orange-700' };
+  if (s === 'refunded')                           return { label: 'Refunded',   cls: 'bg-yellow-100 text-yellow-700' };
+  if (s === 'failed' || ps === 'failed')          return { label: 'Failed',     cls: 'bg-red-100 text-red-500' };
+  if (s === 'esim_creation_failed')               return { label: 'eSIM Error', cls: 'bg-orange-100 text-orange-600' };
+  if (s === 'payment_mismatch')                   return { label: 'Mismatch',   cls: 'bg-red-100 text-red-600' };
+  return                                                 { label: s || 'Pending', cls: 'bg-gray-100 text-gray-600' };
+}
+
+const PAGE_SIZE = 50;
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
 const FinancesManagement = () => {
-  const { currentUser } = useAuth();
-  
-  // Orders State
-  const [orders, setOrders] = useState([]);
-  const [ordersLoading, setOrdersLoading] = useState(true);
-  const [orderStats, setOrderStats] = useState({
+  const [orders, setOrders]             = useState([]);
+  const [loading, setLoading]           = useState(true);
+  const [page, setPage]                 = useState(0);
+  const [hasMore, setHasMore]           = useState(true);
+  const [search, setSearch]             = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [expandedOrder, setExpandedOrder] = useState(null);
+
+  const [stats, setStats] = useState({
     totalOrders: 0,
+    completedOrders: 0,
     totalRevenue: 0,
-    ordersByCountry: []
+    promoRevenue: 0,      // revenue from promo-discounted orders
+    byCountry: [],
   });
-  
-  // Promo Codes State
-  const [promoCodes, setPromoCodes] = useState([]);
-  const [promoLoading, setPromoLoading] = useState(true);
-  const [showPromoModal, setShowPromoModal] = useState(false);
-  const [editingPromo, setEditingPromo] = useState(null);
-  const [promoForm, setPromoForm] = useState({
-    code: '',
-    name: '',
-    discountPercentage: '',
-    countries: [],
-    validFrom: '',
-    validUntil: '',
-    enabled: true,
-    maxGlobalUses: '',     // '' = unlimited
-    maxUsesPerUser: '1',   // default: once per user
-    minOrderAmount: '',    // '' = no minimum
-  });
-  
-  // Countries for selector
-  const [countries, setCountries] = useState([]);
-  const [selectedCountries, setSelectedCountries] = useState([]);
-  const [countrySearch, setCountrySearch] = useState('');
-  
-  // Load data on mount
-  useEffect(() => {
-    loadOrders();
-    loadPromoCodes();
-    loadCountries();
-  }, []);
-  
-  // Load orders and calculate stats
-  const loadOrders = async () => {
+
+  // ── Load orders ─────────────────────────────────────────────────────────────
+
+  const loadOrders = useCallback(async (reset = false) => {
+    setLoading(true);
     try {
-      setOrdersLoading(true);
-      const { data: ordersRaw, error } = await supabase
+      const startPage = reset ? 0 : page;
+      let query = supabase
         .from('orders')
         .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      
-      const ordersData = (ordersRaw || []).map(row => ({
-        ...row,
-        createdAt: row.created_at ? new Date(row.created_at) : null
-      }));
-      
-      setOrders(ordersData);
-      
-      // Calculate stats by country
-      const countryMap = {};
-      let totalRevenue = 0;
-      
-      ordersData.forEach(order => {
-        // payment_status is snake_case from PostgREST; status 'completed' is the primary gate
-        const isPaid = order.status === 'completed'
-          || order.payment_status === 'completed'
-          || order.payment_status === 'paid';
+        .order('created_at', { ascending: false })
+        .range(startPage * PAGE_SIZE, startPage * PAGE_SIZE + PAGE_SIZE - 1);
 
-        if (isPaid) {
-          // 'amount' is the new canonical column; fall back to 'price' for older rows
-          const amount = parseFloat(order.amount ?? order.price) || 0;
-          totalRevenue += amount;
-          
-          const country = order.country_code || order.country || order.metadata?.country || 'Unknown';
-          if (!countryMap[country]) {
-            countryMap[country] = { count: 0, revenue: 0 };
-          }
-          countryMap[country].count++;
-          countryMap[country].revenue += amount;
-        }
-      });
-      
-      const ordersByCountry = Object.entries(countryMap)
-        .map(([country, data]) => ({ country, ...data }))
-        .sort((a, b) => b.revenue - a.revenue);
-      
-      setOrderStats({
-        totalOrders: ordersData.length,
-        totalRevenue,
-        ordersByCountry
-      });
-      
-    } catch (error) {
-      console.error('Error loading orders:', error);
+      if (statusFilter !== 'all') query = query.eq('status', statusFilter);
+      if (search.trim()) {
+        query = query.or(
+          `customer_email.ilike.%${search}%,plan_name.ilike.%${search}%,country_code.ilike.%${search}%,id.ilike.%${search}%`
+        );
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      const rows = data || [];
+      setOrders(reset ? rows : prev => [...prev, ...rows]);
+      setHasMore(rows.length === PAGE_SIZE);
+      if (reset) setPage(0);
+    } catch (err) {
+      console.error(err);
       toast.error('Failed to load orders');
     } finally {
-      setOrdersLoading(false);
+      setLoading(false);
     }
-  };
-  
-  // Load promo codes
-  const loadPromoCodes = async () => {
-    try {
-      setPromoLoading(true);
-      const codes = await getAllPromoCodes();
-      setPromoCodes(codes);
-    } catch (error) {
-      console.error('Error loading promo codes:', error);
-      toast.error('Failed to load promo codes');
-    } finally {
-      setPromoLoading(false);
-    }
-  };
-  
-  // Load countries for selector
-  const loadCountries = async () => {
+  }, [page, statusFilter, search]);
+
+  // ── Load stats (separate query — all time, no pagination) ─────────────────
+
+  const loadStats = useCallback(async () => {
     try {
       const { data, error } = await supabase
-        .from('countries')
-        .select('id, iso_code, name')
-        .eq('is_active', true)
-        .order('name', { ascending: true });
-      
+        .from('orders')
+        .select('status, payment_status, amount, price, country_code, country, price_validation')
+        .in('status', ['completed', 'processing']);
+
       if (error) throw error;
-      
-      const countriesData = (data || []).map(row => ({
-        id: row.id,
-        code: row.iso_code || row.id,
-        name: row.name
-      }));
-      setCountries(countriesData);
-    } catch (error) {
-      console.error('Error loading countries:', error);
-    }
-  };
-  
-  // Handle promo form submit
-  const handlePromoSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!promoForm.code.trim()) {
-      toast.error('Please enter a promo code');
-      return;
-    }
-    
-    if (!promoForm.discountPercentage || parseFloat(promoForm.discountPercentage) <= 0) {
-      toast.error('Please enter a valid discount percentage');
-      return;
-    }
-    
-    try {
-      const promoData = {
-        ...promoForm,
-        countries: selectedCountries.map(c => c.code),
-        createdBy: currentUser?.id,
-        discountType: 'percentage',   // admin UI only supports percentage
-        maxGlobalUses:  promoForm.maxGlobalUses  ? parseInt(promoForm.maxGlobalUses)  : null,
-        maxUsesPerUser: promoForm.maxUsesPerUser ? parseInt(promoForm.maxUsesPerUser) : 1,
-        minOrderAmount: promoForm.minOrderAmount ? parseFloat(promoForm.minOrderAmount) : null,
-      };
-      
-      if (editingPromo) {
-        const result = await updatePromoCode(editingPromo.id, promoData);
-        if (result.success) {
-          toast.success('Promo code updated successfully');
-        } else {
-          throw new Error(result.error);
+
+      let revenue = 0, promoRevenue = 0, byCountry = {};
+
+      (data || []).forEach(o => {
+        const isPaid = o.status === 'completed' || o.payment_status === 'completed';
+        const amt = parseFloat(o.amount ?? o.price) || 0;
+        if (isPaid) {
+          revenue += amt;
+          const pv = o.price_validation;
+          if (pv?.promoCode) promoRevenue += amt;
+          const cc = o.country_code || o.country || 'Unknown';
+          byCountry[cc] = byCountry[cc] || { count: 0, revenue: 0 };
+          byCountry[cc].count++;
+          byCountry[cc].revenue += amt;
         }
-      } else {
-        const result = await createPromoCode(promoData);
-        if (result.success) {
-          toast.success('Promo code created successfully');
-        } else {
-          throw new Error(result.error);
-        }
-      }
-      
-      resetPromoForm();
-      loadPromoCodes();
-    } catch (error) {
-      toast.error(error.message || 'Failed to save promo code');
+      });
+
+      setStats({
+        totalOrders:     data?.length || 0,
+        completedOrders: (data || []).filter(o => o.status === 'completed').length,
+        totalRevenue:    revenue,
+        promoRevenue,
+        byCountry: Object.entries(byCountry)
+          .map(([c, v]) => ({ country: c, ...v }))
+          .sort((a, b) => b.revenue - a.revenue)
+          .slice(0, 10),
+      });
+    } catch (err) {
+      console.error('Stats load error:', err);
     }
-  };
-  
-  // Handle promo delete
-  const handleDeletePromo = async (promoId) => {
-    if (!window.confirm('Are you sure you want to delete this promo code?')) return;
-    
-    try {
-      const result = await deletePromoCode(promoId);
-      if (result.success) {
-        toast.success('Promo code deleted');
-        loadPromoCodes();
-      } else {
-        throw new Error(result.error);
-      }
-    } catch (error) {
-      toast.error('Failed to delete promo code');
-    }
-  };
-  
-  // Handle promo toggle
-  const handleTogglePromo = async (promo) => {
-    try {
-      const result = await togglePromoCode(promo.id, !promo.enabled);
-      if (result.success) {
-        toast.success(`Promo code ${promo.enabled ? 'disabled' : 'enabled'}`);
-        loadPromoCodes();
-      }
-    } catch (error) {
-      toast.error('Failed to toggle promo code');
-    }
-  };
-  
-  // Edit promo code
-  const handleEditPromo = (promo) => {
-    setEditingPromo(promo);
-    setPromoForm({
-      code:            promo.code,
-      name:            promo.name || '',
-      discountPercentage: promo.discountPercentage?.toString() || '',
-      countries:       promo.countries || [],
-      validFrom:       promo.validFrom  ? promo.validFrom.toISOString().split('T')[0]  : '',
-      validUntil:      promo.validUntil ? promo.validUntil.toISOString().split('T')[0] : '',
-      enabled:         promo.enabled,
-      maxGlobalUses:   promo.maxGlobalUses  != null ? promo.maxGlobalUses.toString()  : '',
-      maxUsesPerUser:  promo.maxUsesPerUser != null ? promo.maxUsesPerUser.toString() : '1',
-      minOrderAmount:  promo.minOrderAmount != null ? promo.minOrderAmount.toString() : '',
-    });
-    setSelectedCountries(
-      countries.filter(c => promo.countries?.includes(c.code))
-    );
-    setShowPromoModal(true);
-  };
-  
-  // Reset promo form
-  const resetPromoForm = () => {
-    setShowPromoModal(false);
-    setEditingPromo(null);
-    setPromoForm({
-      code:            '',
-      name:            '',
-      discountPercentage: '',
-      countries:       [],
-      validFrom:       '',
-      validUntil:      '',
-      enabled:         true,
-      maxGlobalUses:   '',
-      maxUsesPerUser:  '1',
-      minOrderAmount:  '',
-    });
-    setSelectedCountries([]);
-    setCountrySearch('');
-  };
-  
-  // Add country to selection
-  const addCountry = (country) => {
-    if (!selectedCountries.find(c => c.code === country.code)) {
-      setSelectedCountries([...selectedCountries, country]);
-    }
-    setCountrySearch('');
-  };
-  
-  // Remove country from selection
-  const removeCountry = (countryCode) => {
-    setSelectedCountries(selectedCountries.filter(c => c.code !== countryCode));
-  };
-  
-  // Filter countries for search
-  const filteredCountries = countries.filter(c => 
-    c.name.toLowerCase().includes(countrySearch.toLowerCase()) &&
-    !selectedCountries.find(sc => sc.code === c.code)
-  );
-  
-  // Check if promo is currently active
-  const isPromoActive = (promo) => {
-    if (!promo.enabled) return false;
-    const now = new Date();
-    const validFrom = promo.validFrom || new Date(0);
-    const validUntil = promo.validUntil || new Date('2099-12-31');
-    return now >= validFrom && now <= validUntil;
-  };
+  }, []);
+
+  useEffect(() => {
+    loadStats();
+  }, [loadStats]);
+
+  useEffect(() => {
+    loadOrders(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [statusFilter, search]);
+
+  // ── Render ───────────────────────────────────────────────────────────────────
 
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">Finances</h2>
-        <p className="text-gray-600 mt-1">Manage orders and promotional codes</p>
-      </div>
-      
-      {/* Order Statistics */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <ShoppingCart className="w-5 h-5 text-green-600" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">Order Statistics</h3>
-              <p className="text-sm text-gray-600">Revenue by country</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <a
-              href="https://dashboard.stripe.com/acct_1SUc3SBebobjw5G7/dashboard"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3 py-2 bg-purple-100 text-purple-700 hover:bg-purple-200 rounded-lg transition-colors text-sm font-medium"
-            >
-              <span>Stripe</span>
-              <ExternalLink className="w-4 h-4" />
-            </a>
-            <a
-              href="https://app.partners.airalo.com/home"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3 py-2 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg transition-colors text-sm font-medium"
-            >
-              <span>Airalo</span>
-              <ExternalLink className="w-4 h-4" />
-            </a>
-            <button
-              onClick={loadOrders}
-              disabled={ordersLoading}
-              className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <RefreshCw className={`w-4 h-4 ${ordersLoading ? 'animate-spin' : ''}`} />
-              Refresh
-            </button>
-          </div>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Finances</h2>
+          <p className="text-gray-500 mt-1 text-sm">Revenue overview and transaction history</p>
         </div>
-        
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div className="bg-gray-50 rounded-lg p-4">
-            <div className="flex items-center gap-3">
-              <ShoppingCart className="w-8 h-8 text-blue-600" />
-              <div>
-                <p className="text-sm text-gray-600">Total Orders</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {ordersLoading ? '...' : orderStats.totalOrders}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-gray-50 rounded-lg p-4">
-            <div className="flex items-center gap-3">
-              <DollarSign className="w-8 h-8 text-green-600" />
-              <div>
-                <p className="text-sm text-gray-600">Total Revenue</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {ordersLoading ? '...' : formatPrice(orderStats.totalRevenue)}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Orders by Country Table */}
-        {ordersLoading ? (
-          <div className="flex justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-          </div>
-        ) : orderStats.ordersByCountry.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            <MapPin className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-            <p>No completed orders yet</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Country</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Orders</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Revenue</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {orderStats.ordersByCountry.slice(0, 10).map((item, index) => (
-                  <tr key={item.country} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-gray-900">{item.country}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                      {item.count}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-green-600">
-                      {formatPrice(item.revenue)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-      
-      {/* Promo Codes Section */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-              <Tag className="w-5 h-5 text-purple-600" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">Promo Codes</h3>
-              <p className="text-sm text-gray-600">Manage promotional discounts</p>
-            </div>
-          </div>
-          <button
-            onClick={() => setShowPromoModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm"
+        <div className="flex items-center gap-2">
+          <a href="https://dashboard.stripe.com" target="_blank" rel="noopener noreferrer"
+            className="flex items-center gap-2 px-3 py-2 bg-purple-100 text-purple-700 hover:bg-purple-200 rounded-lg text-sm font-medium"
           >
-            <Plus className="w-4 h-4" />
-            Add Promo Code
+            Stripe <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+          <a href="https://app.partners.airalo.com/home" target="_blank" rel="noopener noreferrer"
+            className="flex items-center gap-2 px-3 py-2 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg text-sm font-medium"
+          >
+            Airalo <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+          <button
+            onClick={() => { loadStats(); loadOrders(true); }}
+            disabled={loading}
+            className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
         </div>
-        
-        {/* Promo Codes List */}
-        {promoLoading ? (
-          <div className="flex justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: 'Total Orders',   value: stats.totalOrders,                    icon: ShoppingCart, color: 'text-blue-600',   bg: 'bg-blue-50'   },
+          { label: 'Completed',      value: stats.completedOrders,                icon: CheckCircle,  color: 'text-green-600',  bg: 'bg-green-50'  },
+          { label: 'Total Revenue',  value: formatPrice(stats.totalRevenue),      icon: DollarSign,   color: 'text-teal-600',   bg: 'bg-teal-50'   },
+          { label: 'Promo Revenue',  value: formatPrice(stats.promoRevenue),      icon: TrendingUp,   color: 'text-purple-600', bg: 'bg-purple-50' },
+        ].map(s => (
+          <div key={s.label} className="bg-white border border-gray-200 rounded-lg p-4 flex items-center gap-3">
+            <div className={`w-10 h-10 ${s.bg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+              <s.icon className={`w-5 h-5 ${s.color}`} />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">{s.label}</p>
+              <p className="text-xl font-bold text-gray-900">{s.value}</p>
+            </div>
           </div>
-        ) : promoCodes.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            <Tag className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-            <p>No promo codes yet</p>
-            <p className="text-sm mt-1">Create your first promo code to offer discounts</p>
+        ))}
+      </div>
+
+      {/* Revenue by Country */}
+      {stats.byCountry.length > 0 && (
+        <div className="bg-white border border-gray-200 rounded-lg p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <MapPin className="w-4 h-4 text-gray-400" />
+            <h3 className="text-sm font-semibold text-gray-700">Revenue by Country (Top 10)</h3>
           </div>
-        ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-100">
+              <thead>
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Code</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Discount</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Countries</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Valid Period</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Uses</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  {['Country', 'Orders', 'Revenue'].map(h => (
+                    <th key={h} className="pb-2 text-left text-xs font-medium text-gray-500 pr-8">{h}</th>
+                  ))}
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {promoCodes.map((promo) => (
-                  <tr key={promo.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div>
-                        <span className="text-sm font-mono font-bold text-gray-900">{promo.code}</span>
-                        {promo.name && promo.name !== promo.code && (
-                          <p className="text-xs text-gray-500">{promo.name}</p>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
-                        <Percent className="w-3 h-3" />
-                        {promo.discountPercentage}%
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      {promo.countries && promo.countries.length > 0 ? (
-                        <div className="flex flex-wrap gap-1 max-w-xs">
-                          {promo.countries.slice(0, 3).map(code => (
-                            <span key={code} className="inline-flex px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">
-                              {code}
-                            </span>
-                          ))}
-                          {promo.countries.length > 3 && (
-                            <span className="text-xs text-gray-500">+{promo.countries.length - 3} more</span>
-                          )}
-                        </div>
-                      ) : (
-                        <span className="text-xs text-gray-500">All countries</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                      {promo.validFrom || promo.validUntil ? (
-                        <div className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          <span>
-                            {promo.validFrom ? promo.validFrom.toLocaleDateString() : 'Start'} - {' '}
-                            {promo.validUntil ? promo.validUntil.toLocaleDateString() : 'No end'}
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="text-gray-400">No date limit</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                        isPromoActive(promo)
-                          ? 'bg-green-100 text-green-700'
-                          : promo.enabled
-                          ? 'bg-yellow-100 text-yellow-700'
-                          : 'bg-gray-100 text-gray-600'
-                      }`}>
-                        {isPromoActive(promo) ? 'Active' : promo.enabled ? 'Scheduled' : 'Disabled'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                      <span className={promo.maxGlobalUses && (promo.usageCount || 0) >= promo.maxGlobalUses ? 'text-red-600 font-semibold' : ''}>
-                        {promo.usageCount || 0}
-                        {promo.maxGlobalUses ? `/${promo.maxGlobalUses}` : ''}
-                      </span>
-                      {promo.maxUsesPerUser != null && (
-                        <span className="block text-xs text-gray-400">{promo.maxUsesPerUser}x/user</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleTogglePromo(promo)}
-                          className="p-1 text-gray-400 hover:text-gray-600"
-                          title={promo.enabled ? 'Disable' : 'Enable'}
-                        >
-                          {promo.enabled ? (
-                            <ToggleRight className="w-5 h-5 text-green-600" />
-                          ) : (
-                            <ToggleLeft className="w-5 h-5" />
-                          )}
-                        </button>
-                        <button
-                          onClick={() => handleEditPromo(promo)}
-                          className="p-1 text-gray-400 hover:text-blue-600"
-                          title="Edit"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDeletePromo(promo.id)}
-                          className="p-1 text-gray-400 hover:text-red-600"
-                          title="Delete"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
+              <tbody className="divide-y divide-gray-50">
+                {stats.byCountry.map(row => (
+                  <tr key={row.country}>
+                    <td className="py-2 pr-8 text-sm font-medium text-gray-900">{row.country}</td>
+                    <td className="py-2 pr-8 text-sm text-gray-600">{row.count}</td>
+                    <td className="py-2 text-sm font-semibold text-green-600">{formatPrice(row.revenue)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
-        )}
-      </div>
-      
-      {/* Add/Edit Promo Modal */}
-      {showPromoModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
-          <div className="bg-white rounded-lg p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {editingPromo ? 'Edit Promo Code' : 'Create Promo Code'}
-              </h3>
-              <button
-                onClick={resetPromoForm}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            
-            <form onSubmit={handlePromoSubmit} className="space-y-4">
-              {/* Code */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Promo Code *
-                </label>
-                <input
-                  type="text"
-                  value={promoForm.code}
-                  onChange={(e) => setPromoForm({ ...promoForm, code: e.target.value.toUpperCase() })}
-                  placeholder="e.g., LATINDECEMBER"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 font-mono uppercase"
-                  required
-                />
-              </div>
-              
-              {/* Name */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Display Name (optional)
-                </label>
-                <input
-                  type="text"
-                  value={promoForm.name}
-                  onChange={(e) => setPromoForm({ ...promoForm, name: e.target.value })}
-                  placeholder="e.g., Latin America December Sale"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-                />
-              </div>
-              
-              {/* Discount Percentage */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Discount Percentage *
-                </label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    min="1"
-                    max="100"
-                    value={promoForm.discountPercentage}
-                    onChange={(e) => setPromoForm({ ...promoForm, discountPercentage: e.target.value })}
-                    placeholder="e.g., 25"
-                    className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-                    required
-                  />
-                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">%</span>
-                </div>
-              </div>
-              
-              {/* Countries */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Countries (leave empty for all)
-                </label>
-                
-                {/* Selected Countries */}
-                {selectedCountries.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {selectedCountries.map(country => (
-                      <span 
-                        key={country.code}
-                        className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-sm"
-                      >
-                        {country.name} ({country.code})
-                        <button
-                          type="button"
-                          onClick={() => removeCountry(country.code)}
-                          className="text-blue-500 hover:text-blue-700"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-                
-                {/* Country Search */}
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={countrySearch}
-                    onChange={(e) => setCountrySearch(e.target.value)}
-                    placeholder="Search countries..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-                  />
-                  
-                  {/* Country Dropdown */}
-                  {countrySearch && filteredCountries.length > 0 && (
-                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                      {filteredCountries.slice(0, 10).map(country => (
-                        <button
-                          key={country.code}
-                          type="button"
-                          onClick={() => addCountry(country)}
-                          className="w-full px-3 py-2 text-left hover:bg-gray-50 text-sm"
-                        >
-                          {country.name} ({country.code})
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-              
-              {/* Valid Period */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Valid From
-                  </label>
-                  <input
-                    type="date"
-                    value={promoForm.validFrom}
-                    onChange={(e) => setPromoForm({ ...promoForm, validFrom: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Valid Until
-                  </label>
-                  <input
-                    type="date"
-                    value={promoForm.validUntil}
-                    onChange={(e) => setPromoForm({ ...promoForm, validUntil: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-                  />
-                </div>
-              </div>
-              
-              {/* Usage Limits */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Global Usage Limit
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={promoForm.maxGlobalUses}
-                    onChange={(e) => setPromoForm({ ...promoForm, maxGlobalUses: e.target.value })}
-                    placeholder="Unlimited"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-                  />
-                  <p className="text-xs text-gray-400 mt-1">Max times this code can be used in total</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Per-User Limit
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={promoForm.maxUsesPerUser}
-                    onChange={(e) => setPromoForm({ ...promoForm, maxUsesPerUser: e.target.value })}
-                    placeholder="1"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-                  />
-                  <p className="text-xs text-gray-400 mt-1">Max uses per email address</p>
-                </div>
-              </div>
-
-              {/* Minimum Order */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Minimum Order Amount (USD)
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={promoForm.minOrderAmount}
-                    onChange={(e) => setPromoForm({ ...promoForm, minOrderAmount: e.target.value })}
-                    placeholder="No minimum"
-                    className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-                  />
-                </div>
-              </div>
-
-              {/* Enabled */}
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="promo-enabled"
-                  checked={promoForm.enabled}
-                  onChange={(e) => setPromoForm({ ...promoForm, enabled: e.target.checked })}
-                  className="w-4 h-4 text-gray-900 border-gray-300 rounded focus:ring-gray-900"
-                />
-                <label htmlFor="promo-enabled" className="text-sm text-gray-700">
-                  Enable this promo code immediately
-                </label>
-              </div>
-              
-              {/* Buttons */}
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
-                >
-                  {editingPromo ? 'Update' : 'Create'}
-                </button>
-                <button
-                  type="button"
-                  onClick={resetPromoForm}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}
+
+      {/* Transactions Table */}
+      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100 flex flex-wrap gap-3 items-center">
+          <h3 className="text-sm font-semibold text-gray-700 flex-shrink-0">Transactions</h3>
+
+          {/* Search */}
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Email, plan, country or order ID…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+            />
+          </div>
+
+          {/* Status filter */}
+          <select
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none"
+          >
+            {['all', 'completed', 'processing', 'failed', 'blocked', 'refunded', 'disputed', 'esim_creation_failed'].map(s => (
+              <option key={s} value={s}>{s === 'all' ? 'All statuses' : s}</option>
+            ))}
+          </select>
+        </div>
+
+        {loading && orders.length === 0 ? (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+          </div>
+        ) : orders.length === 0 ? (
+          <div className="text-center py-12 text-gray-400">
+            <ShoppingCart className="w-10 h-10 mx-auto mb-3 text-gray-200" />
+            <p>No transactions found</p>
+          </div>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-100">
+                <thead className="bg-gray-50">
+                  <tr>
+                    {['Order', 'Customer', 'Plan', 'Amount', 'Promo', 'Country', 'Status', 'Date', ''].map(h => (
+                      <th key={h} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {orders.map(order => {
+                    const badge = statusBadge(order);
+                    const amount = parseFloat(order.amount ?? order.price) || 0;
+                    const pv = order.price_validation || {};
+                    const promoCode = pv.promoCode;
+                    const promoPct  = pv.promoDiscountPct;
+                    const isExpanded = expandedOrder === order.id;
+
+                    return (
+                      <React.Fragment key={order.id}>
+                        <tr
+                          className="hover:bg-gray-50 cursor-pointer"
+                          onClick={() => setExpandedOrder(isExpanded ? null : order.id)}
+                        >
+                          {/* Order ID */}
+                          <td className="px-4 py-3 font-mono text-xs text-gray-500 max-w-[120px]">
+                            <span title={order.id}>{order.id?.substring(0, 16)}…</span>
+                          </td>
+
+                          {/* Customer */}
+                          <td className="px-4 py-3 text-sm text-gray-900 max-w-[180px]">
+                            <span className="truncate block" title={order.customer_email}>
+                              {order.customer_email || order.user_email || '—'}
+                            </span>
+                          </td>
+
+                          {/* Plan */}
+                          <td className="px-4 py-3 text-sm text-gray-700 max-w-[160px]">
+                            <span className="truncate block">{order.plan_name || order.customer_name || '—'}</span>
+                          </td>
+
+                          {/* Amount */}
+                          <td className="px-4 py-3 text-sm font-semibold text-gray-900 whitespace-nowrap">
+                            {amount > 0 ? formatPrice(amount) : '—'}
+                            <span className="text-xs font-normal text-gray-400 ml-1">
+                              {(order.currency || 'USD').toUpperCase()}
+                            </span>
+                          </td>
+
+                          {/* Promo */}
+                          <td className="px-4 py-3">
+                            {promoCode ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs font-mono font-semibold">
+                                🏷 {promoCode}
+                                {promoPct ? <span className="text-purple-500">-{promoPct}%</span> : null}
+                              </span>
+                            ) : (
+                              <span className="text-gray-300 text-xs">—</span>
+                            )}
+                          </td>
+
+                          {/* Country */}
+                          <td className="px-4 py-3 text-sm text-gray-600">
+                            {order.country_code || order.country || '—'}
+                          </td>
+
+                          {/* Status */}
+                          <td className="px-4 py-3">
+                            <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${badge.cls}`}>
+                              {badge.label}
+                            </span>
+                            {order.esim_created && (
+                              <p className="text-xs text-green-500 mt-0.5 flex items-center gap-1">
+                                <CheckCircle className="w-3 h-3" /> eSIM sent
+                              </p>
+                            )}
+                          </td>
+
+                          {/* Date */}
+                          <td className="px-4 py-3 text-xs text-gray-400 whitespace-nowrap">
+                            {fmtDate(order.created_at)}
+                          </td>
+
+                          {/* Expand indicator */}
+                          <td className="px-4 py-3">
+                            <ChevronDown className={`w-4 h-4 text-gray-300 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                          </td>
+                        </tr>
+
+                        {/* Expanded row — order details */}
+                        {isExpanded && (
+                          <tr>
+                            <td colSpan={9} className="px-8 py-4 bg-gray-50 border-t border-gray-100">
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-2 text-xs">
+                                {[
+                                  ['Full Order ID',     order.id],
+                                  ['Unique Order ID',   order.unique_order_id],
+                                  ['Payment Status',    order.payment_status],
+                                  ['Platform',          order.platform || order.source],
+                                  ['DB Price',          pv.databasePrice ? formatPrice(pv.databasePrice) : '—'],
+                                  ['Base Price',        pv.basePrice ? formatPrice(pv.basePrice) : '—'],
+                                  ['Referral Discount', pv.hasReferralDiscount ? `${pv.referralDiscountPct}%` : 'No'],
+                                  ['Promo Code',        pv.promoCode || 'None'],
+                                  ['Promo Discount',    pv.promoDiscountPct ? `${pv.promoDiscountPct}%` : '—'],
+                                  ['Stripe Session',    order.stripe_session_id],
+                                  ['Stripe PI',         order.stripe_payment_intent_id],
+                                  ['ICCID',             order.iccid],
+                                  ['Payment Method',    order.payment_method_brand ? `${order.payment_method_brand} ****${order.payment_method_last4}` : '—'],
+                                  ['Completed At',      fmtDate(order.payment_completed_at || order.completed_at)],
+                                  ['Airalo Order',      order.airalo_order_id],
+                                  ['Error',             order.esim_error || order.failure_reason || order.error_message || '—'],
+                                ].map(([label, val]) => (
+                                  <div key={label}>
+                                    <span className="text-gray-400">{label}: </span>
+                                    <span className="text-gray-700 font-mono break-all">{val || '—'}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Load More */}
+            {hasMore && (
+              <div className="px-4 py-3 border-t border-gray-100 text-center">
+                <button
+                  onClick={() => { setPage(p => p + 1); loadOrders(false); }}
+                  disabled={loading}
+                  className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+                >
+                  {loading ? 'Loading…' : `Load more (showing ${orders.length})`}
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 };
 
 export default FinancesManagement;
-

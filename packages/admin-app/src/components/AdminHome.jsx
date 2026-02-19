@@ -15,7 +15,8 @@ import {
   Upload,
   Link,
   Palette,
-  FileText
+  FileText,
+  Tag,
 } from 'lucide-react';
 
 const AdminHome = ({ onNavigate }) => {
@@ -263,6 +264,22 @@ const AdminHome = ({ onNavigate }) => {
                 {stats.loading ? '...' : stats.fraudAttempts}
               </p>
               <p className="text-sm font-medium text-gray-600">Fraud Attempts</p>
+            </div>
+          </div>
+        </button>
+
+        <button
+          onClick={() => onNavigate('promos')}
+          className="bg-white rounded-lg p-5 hover:shadow-lg transition-all text-left"
+          style={{ border: '2px solid #8b5cf6' }}
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-violet-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Tag className="w-6 h-6 text-violet-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-600 mt-1">Promo Codes</p>
+              <p className="text-xs text-gray-400">Discounts & Redemptions</p>
             </div>
           </div>
         </button>
