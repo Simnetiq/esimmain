@@ -84,7 +84,7 @@ const AdminHome = ({ onNavigate }) => {
           .select('*', { count: 'exact', head: true });
 
         const { data: blogData, count: blogPosts } = await supabase
-          .from('blog')
+          .from('blog_posts')
           .select('created_at, published_at', { count: 'exact' })
           .order('created_at', { ascending: false })
           .limit(1);
