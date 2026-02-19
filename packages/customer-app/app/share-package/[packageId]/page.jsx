@@ -51,6 +51,11 @@ const SharePackagePage = () => {
   const [processingPayment, setProcessingPayment] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
+  // Promo code state
+  const [promoCode, setPromoCode] = useState('');
+  const [promoResult, setPromoResult] = useState(null);   // null | { valid, finalPrice, ... }
+  const [validatingPromo, setValidatingPromo] = useState(false);
+
   // Fraud detection hook
   const {
     isBlocked,
@@ -90,6 +95,28 @@ const SharePackagePage = () => {
   useEffect(() => {
     checkReferralDiscount();
   }, [checkReferralDiscount]);
+
+  // Validate promo code against the server
+  const handleValidatePromo = useCallback(async () => {
+    const code = promoCode.trim();
+    if (!code || !packageId) return;
+
+    setValidatingPromo(true);
+    setPromoResult(null);
+    try {
+      const res = await fetch('/api/promo/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, packageId, email: currentUser?.email || null }),
+      });
+      const data = await res.json();
+      setPromoResult(data);
+    } catch {
+      setPromoResult({ valid: false, error: t('sharePackage.promoError', 'Could not validate promo code') });
+    } finally {
+      setValidatingPromo(false);
+    }
+  }, [promoCode, packageId, currentUser, t]);
 
   // Helper to capitalize words
   const capitalizeWords = (str) => {
@@ -145,10 +172,15 @@ const SharePackagePage = () => {
     const discountPercentage = referralSettings.discountPercentage || 10;
     const minimumPrice = referralSettings.minimumPrice || 0.5;
 
-    const discountedPrice = hasReferralDiscount
+    // Referral discount (server re-validates this too)
+    const referralPrice = hasReferralDiscount
       ? Math.max(minimumPrice, originalPrice * (100 - discountPercentage) / 100)
       : originalPrice;
-    const finalPrice = hasReferralDiscount ? discountedPrice : originalPrice;
+
+    // Promo discount overrides referral if it's better (server anti-stacking logic mirrors this)
+    const finalPrice = (promoResult?.valid && promoResult.finalPrice < referralPrice)
+      ? promoResult.finalPrice
+      : referralPrice;
 
     return {
       packageId: packageId,
@@ -163,9 +195,10 @@ const SharePackagePage = () => {
       country_code: packageData.country_code,
       benefits: packageData.benefits || [],
       speed: packageData.speed,
-      hasReferralDiscount: hasReferralDiscount
+      hasReferralDiscount: hasReferralDiscount,
+      promoCode: promoResult?.valid ? promoResult.code : null,
     };
-  }, [packageData, packageId, hasReferralDiscount, referralSettings]);
+  }, [packageData, packageId, hasReferralDiscount, referralSettings, promoResult]);
 
   // Handle Stripe payment
   const handleStripePayment = useCallback(async () => {
@@ -246,7 +279,8 @@ const SharePackagePage = () => {
         domain: window.location.origin,
         userId: currentUser.id,
         language: currentLanguage,
-        radarSessionId
+        radarSessionId,
+        promoCode: checkoutData.promoCode || null,  // server re-validates independently
       };
 
       const response = await fetch('/api/create-payment-order', {
@@ -445,6 +479,12 @@ const SharePackagePage = () => {
             getLocalizedUrl={getLocalizedUrl}
             isRTL={isRTL}
             t={t}
+            promoCode={promoCode}
+            setPromoCode={setPromoCode}
+            promoResult={promoResult}
+            setPromoResult={setPromoResult}
+            validatingPromo={validatingPromo}
+            onValidatePromo={handleValidatePromo}
           />
 
           {/* Package Stats */}
