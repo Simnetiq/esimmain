@@ -103,7 +103,7 @@ async function validateAndGetPrice(supabase, packageId, userId) {
     .single();
 
   if (error || !packageData) return { valid: false, error: 'Package not found', code: 'PACKAGE_NOT_FOUND' };
-  if (packageData.enabled === false || packageData.status === 'disabled') return { valid: false, error: 'This package is not available', code: 'PACKAGE_DISABLED' };
+  if (packageData.is_enabled === false || packageData.status === 'disabled') return { valid: false, error: 'This package is not available', code: 'PACKAGE_DISABLED' };
 
   const databasePrice = parseFloat(packageData.price);
   if (isNaN(databasePrice) || databasePrice <= 0) return { valid: false, error: 'Invalid package price', code: 'INVALID_DB_PRICE' };

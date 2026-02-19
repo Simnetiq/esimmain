@@ -81,11 +81,11 @@ export async function POST(request) {
     // Fetch package data for price + country
     const { data: pkg, error: pkgError } = await supabase
       .from('dataplans')
-      .select('id, price, country_code, enabled, status')
+      .select('id, price, country_code, is_enabled, status')
       .eq('id', packageId)
       .single();
 
-    if (pkgError || !pkg || pkg.enabled === false || pkg.status === 'disabled') {
+    if (pkgError || !pkg || pkg.is_enabled === false || pkg.status === 'disabled') {
       return NextResponse.json({ valid: false, error: 'Package not found', errorCode: 'PACKAGE_NOT_FOUND' });
     }
 
