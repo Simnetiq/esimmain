@@ -72,8 +72,9 @@ const PaymentSuccess = () => {
   }, []);
 
   // Extract QR data from order
+  // NOTE: Supabase/PostgREST returns snake_case column names — use those here.
   const extractQrData = useCallback((orderData) => {
-    const simData = orderData.orderData?.sims?.[0] || orderData.airaloOrderData?.sims?.[0];
+    const simData = orderData.order_data?.sims?.[0] || orderData.airalo_order_data?.sims?.[0];
     
     if (!simData) return null;
     
@@ -90,20 +91,22 @@ const PaymentSuccess = () => {
   }, []);
 
   // Process order data
+  // IMPORTANT: all field names are snake_case as returned by Supabase/PostgREST.
   const processOrderData = useCallback(async (orderData, orderId) => {
     const info = {
-      orderId: orderId,
-      planId: orderData.planId,
-      planName: orderData.planName || 'eSIM Plan',
-      amount: orderData.amount || 0,
-      currency: orderData.currency || 'usd',
-      customerEmail: orderData.customerEmail || orderData.userEmail,
-      userId: orderData.userId || currentUser?.id || null
+      orderId:       orderId,
+      planId:        orderData.plan_id,
+      planName:      orderData.plan_name || orderData.customer_name || 'eSIM Plan',
+      amount:        orderData.amount ?? orderData.price ?? 0,
+      currency:      orderData.currency || 'usd',
+      customerEmail: orderData.customer_email || orderData.user_email,
+      userId:        orderData.user_id || currentUser?.id || null,
     };
     setOrderInfo(info);
 
     // Check order status
-    if (orderData.status === 'completed' && orderData.orderData?.sims?.[0]) {
+    const hasSimData = orderData.order_data?.sims?.[0] || orderData.airalo_order_data?.sims?.[0];
+    if (orderData.status === 'completed' && hasSimData) {
       // Order is complete with eSIM data
       setOrderStatus('completed');
       const qrData = extractQrData(orderData);
@@ -115,7 +118,7 @@ const PaymentSuccess = () => {
       }
     } else if (orderData.status === 'failed' || orderData.status === 'esim_creation_failed') {
       setOrderStatus('failed');
-      setError(orderData.esimError || t('paymentSuccess.errorActivation', 'eSIM activation failed. Please contact support.'));
+      setError(orderData.esim_error || orderData.failure_reason || t('paymentSuccess.errorActivation', 'eSIM activation failed. Please contact support.'));
     } else {
       // Order is pending - webhook hasn't processed yet
       setOrderStatus('pending');
@@ -209,13 +212,14 @@ const PaymentSuccess = () => {
       }
 
       // SECURITY CHECK: Verify this order belongs to the user or has valid email
-      if (currentUser && orderData.userId && orderData.userId !== currentUser.id) {
+      // Use snake_case field names — Supabase/PostgREST always returns snake_case.
+      if (currentUser && orderData.user_id && orderData.user_id !== currentUser.id) {
         setError(t('paymentSuccess.errorUnauthorized', 'You are not authorized to view this order.'));
         setProcessing(false);
         return;
       }
       
-      if (email && orderData.customerEmail && orderData.customerEmail.toLowerCase() !== email.toLowerCase()) {
+      if (email && orderData.customer_email && orderData.customer_email.toLowerCase() !== email.toLowerCase()) {
         setError(t('paymentSuccess.errorUnauthorized', 'You are not authorized to view this order.'));
         setProcessing(false);
         return;

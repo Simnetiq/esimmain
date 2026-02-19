@@ -66,9 +66,9 @@ export async function POST(request) {
   if (!packageId || typeof packageId !== 'string') {
     return NextResponse.json({ valid: false, error: 'Package ID is required', errorCode: 'MISSING_PACKAGE' });
   }
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return NextResponse.json({ valid: false, error: 'Valid email is required', errorCode: 'INVALID_EMAIL' });
-  }
+  // Email is optional for a preview — if not supplied, per-user usage limit
+  // is not checked. The definitive per-user check happens at checkout time.
+  const hasEmail = email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   // Length guard — codes longer than 50 chars are never valid
   if (code.trim().length > 50) {
@@ -96,8 +96,8 @@ export async function POST(request) {
 
     const result = await validatePromoForCheckout(supabase, {
       code: code.trim(),
-      userId: null,                     // preview — user ID not required at this stage
-      userEmail: email,
+      userId: null,                        // preview — user ID not required
+      userEmail: hasEmail ? email : null,  // null = skip per-user check (preview mode)
       packageId,
       packageCountryCode: pkg.country_code || null,
       basePrice,

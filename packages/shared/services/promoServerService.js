@@ -82,11 +82,10 @@ export async function validatePromoForCheckout(supabase, {
   }
 
   const normalizedCode = code.toUpperCase().trim();
-  const normalizedEmail = (userEmail || '').toLowerCase().trim();
-
-  if (!normalizedEmail) {
-    return { valid: false, error: 'Email is required to validate a promo code', errorCode: 'MISSING_EMAIL' };
-  }
+  // null email = preview mode: structural validation only, per-user cap skipped.
+  // Empty string also treated as preview (unauthenticated user).
+  const normalizedEmail = userEmail ? userEmail.toLowerCase().trim() : null;
+  const isPreview = !normalizedEmail;
 
   // ── 1. Fetch promo (service role bypasses RLS → sees even disabled codes) ──
   const { data: promo, error: fetchError } = await supabase
@@ -118,9 +117,9 @@ export async function validatePromoForCheckout(supabase, {
     return { valid: false, error: 'This promo code is no longer available', errorCode: 'EXHAUSTED' };
   }
 
-  // ── 5. Per-user usage cap (check active/confirmed redemptions by email) ────
+  // ── 5. Per-user usage cap (skipped in preview mode when email is null) ────
   const perUserLimit = promo.max_uses_per_user ?? 1; // default: once per user
-  if (perUserLimit !== null) {
+  if (!isPreview && perUserLimit !== null) {
     const { count: userUseCount, error: countError } = await supabase
       .from('promo_redemptions')
       .select('*', { count: 'exact', head: true })
@@ -211,6 +210,9 @@ export async function reservePromo(supabase, {
   discountAmount,
   metadata = {},
 }) {
+  if (!userEmail) {
+    return { success: false, error: 'Email is required to redeem a promo code', errorCode: 'MISSING_EMAIL' };
+  }
   const normalizedEmail = userEmail.toLowerCase().trim();
 
   // ── Step 1: Atomic counter increment (row-locked, prevents over-redemption) ──

@@ -104,7 +104,7 @@ const StripeCheckoutContent = () => {
         body: JSON.stringify({
           code,
           packageId: packageData.packageId,
-          email: currentUser?.email || '',
+          email: currentUser?.email || null,  // null = preview mode (per-user check skipped)
         }),
       });
 
@@ -160,6 +160,7 @@ const StripeCheckoutContent = () => {
         currency:   (packageData.currency || 'USD').toLowerCase(),
         domain:     window.location.origin,
         language:   currentLanguage,
+        userId:     currentUser.id,    // required for referral discount + order ownership
         promoCode:  activePromoCode,   // undefined if no promo — server ignores it
       };
 
@@ -343,6 +344,13 @@ const StripeCheckoutContent = () => {
               {/* Error message */}
               {promoResult?.valid === false && promoResult.error && (
                 <p className="mt-2 text-sm text-red-600">{promoResult.error}</p>
+              )}
+
+              {/* Note: per-user limit will be enforced at checkout time */}
+              {promoResult?.valid && !currentUser && (
+                <p className="mt-2 text-xs text-amber-600">
+                  ⚠️ {t('stripeCheckout.promoLoginNote', 'Log in before paying — per-account limit will be checked at checkout.')}
+                </p>
               )}
             </div>
 
