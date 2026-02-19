@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd ../.. && npm run build:admin",
+  "buildCommand": "cd ../.. && npm run build:admin && echo '{\"version\":1,\"success\":true,\"outDirectory\":\".next\"}' > packages/admin-app/.next/export-detail.json",
   "outputDirectory": ".next",
   "installCommand": "cd ../.. && npm install",
   "framework": "nextjs",
