@@ -42,11 +42,9 @@ const AuthModal = ({ isOpen, onClose, onAuthenticated }) => {
         try {
             setLoading(true);
             await signInWithGoogle();
-            onAuthenticated();
-            onClose();
+            // OAuth redirects the page — don't call onAuthenticated/onClose
         } catch (error) {
             console.error('Google login failed', error);
-        } finally {
             setLoading(false);
         }
     };
@@ -55,11 +53,9 @@ const AuthModal = ({ isOpen, onClose, onAuthenticated }) => {
         try {
             setLoading(true);
             await signInWithApple();
-            onAuthenticated();
-            onClose();
+            // OAuth redirects the page — don't call onAuthenticated/onClose
         } catch (error) {
             console.error('Apple login failed', error);
-        } finally {
             setLoading(false);
         }
     };

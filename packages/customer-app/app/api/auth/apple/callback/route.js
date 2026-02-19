@@ -40,7 +40,7 @@ export async function POST(request) {
       client_secret: clientSecret,
       code,
       grant_type: 'authorization_code',
-      redirect_uri: `${origin}/api/auth/apple/callback`,
+      redirect_uri: 'https://simnetiq.store/api/auth/apple/callback',
     });
 
     const tokenRes = await fetch('https://appleid.apple.com/auth/token', {

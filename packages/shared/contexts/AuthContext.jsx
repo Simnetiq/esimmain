@@ -170,7 +170,8 @@ export function AuthProvider({ children }) {
     if (typeof window === 'undefined') return;
     
     const clientId = 'com.simnetiq.web';
-    const redirectUri = `${window.location.origin}/api/auth/apple/callback`;
+    // Always use production URL — Apple validates redirect_uri against registered return URLs
+    const redirectUri = 'https://simnetiq.store/api/auth/apple/callback';
     const state = Math.random().toString(36).substring(2);
     
     const params = new URLSearchParams({
