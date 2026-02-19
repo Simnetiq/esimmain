@@ -1,6 +1,6 @@
 {
   "installCommand": "cd ../.. && npm install",
-  "buildCommand": "sh ../../scripts/build-customer.sh",
+  "buildCommand": "cd ../.. && npm run build:customer",
   "outputDirectory": ".next",
   "framework": "nextjs",
   "crons": [

@@ -4,7 +4,7 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
   reactStrictMode: true,
-  output: 'standalone',
+  swcMinify: true,
   
   // Optimize production builds
   productionBrowserSourceMaps: false,
