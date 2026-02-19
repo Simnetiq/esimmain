@@ -49,18 +49,20 @@ const FraudManagement = () => {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      // Load blocked users from fraud_signals
+      // Load blocked users from users table
       const { data: blocked } = await supabase
-        .from('fraud_signals')
+        .from('users')
         .select('*')
-        .eq('blocked', true)
+        .eq('is_blocked', true)
         .limit(100);
-      
+
       const blockedMapped = (blocked || []).map(row => ({
         ...row,
-        blockedAt: row.blocked_at ? new Date(row.blocked_at) : null,
-        blockExpiresAt: row.block_expires_at ? new Date(row.block_expires_at) : null,
-        lastAttemptAt: row.last_attempt_at ? new Date(row.last_attempt_at) : null
+        email: row.email,
+        userId: row.id,
+        blockedAt: row.updated_at ? new Date(row.updated_at) : null,
+        blockReason: row.block_reason,
+        blockType: 'permanent',
       }));
       setBlockedUsers(blockedMapped);
 
@@ -94,7 +96,7 @@ const FraudManagement = () => {
       const { data: warnings } = await supabase
         .from('fraud_warnings')
         .select('*')
-        .eq('reviewed', false)
+        .eq('is_acknowledged', false)
         .limit(50);
       
       const warningsMapped = (warnings || []).map(row => ({
@@ -133,15 +135,13 @@ const FraudManagement = () => {
 
     try {
       await supabase
-        .from('fraud_signals')
+        .from('users')
         .update({
-          blocked: false,
-          block_type: null,
-          block_expires_at: null,
-          unblocked_at: new Date().toISOString(),
-          unblocked_by: 'admin'
+          is_blocked: false,
+          block_reason: null,
+          updated_at: new Date().toISOString(),
         })
-        .eq('id', user.id);
+        .eq('id', user.userId || user.id);
 
       toast.success('User unblocked successfully');
       loadData();
@@ -157,15 +157,13 @@ const FraudManagement = () => {
 
     try {
       await supabase
-        .from('fraud_signals')
+        .from('users')
         .update({
-          blocked: true,
-          block_type: 'permanent',
-          block_expires_at: null,
-          blocked_at: new Date().toISOString(),
-          block_reason: 'Permanently blocked by admin'
+          is_blocked: true,
+          block_reason: 'Permanently blocked by admin',
+          updated_at: new Date().toISOString(),
         })
-        .eq('id', user.id);
+        .eq('id', user.userId || user.id);
 
       toast.success('User permanently blocked');
       loadData();
@@ -181,24 +179,22 @@ const FraudManagement = () => {
       await supabase
         .from('fraud_appeals')
         .update({
-          status: 'resolved',
-          resolution,
-          resolved_at: new Date().toISOString(),
-          resolved_by: 'admin'
+          status: resolution,
+          admin_notes: `${resolution} by admin on ${new Date().toISOString()}`,
+          updated_at: new Date().toISOString(),
         })
         .eq('id', appeal.id);
 
       // If approved, unblock the user
-      if (resolution === 'approved') {
+      if (resolution === 'approved' && appeal.user_id) {
         await supabase
-          .from('fraud_signals')
+          .from('users')
           .update({
-            blocked: false,
-            block_type: null,
-            unblocked_at: new Date().toISOString(),
-            unblocked_by: 'admin_appeal'
+            is_blocked: false,
+            block_reason: null,
+            updated_at: new Date().toISOString(),
           })
-          .eq('user_id', appeal.userId);
+          .eq('id', appeal.user_id);
       }
 
       toast.success(`Appeal ${resolution}`);
@@ -215,10 +211,8 @@ const FraudManagement = () => {
       await supabase
         .from('fraud_warnings')
         .update({
-          reviewed: true,
-          reviewed_at: new Date().toISOString(),
-          reviewed_by: 'admin',
-          action
+          is_acknowledged: true,
+          metadata: { ...(warning.metadata || {}), action, reviewed_at: new Date().toISOString() },
         })
         .eq('id', warning.id);
 

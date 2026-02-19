@@ -92,7 +92,7 @@ const ConfigurationManagement = () => {
         .from('app_config')
         .select('value')
         .eq('key', 'roamjet')
-        .single();
+        .maybeSingle();
       
       if (data?.value) {
         if (data.value.api_key) setRoamjetApiKey(data.value.api_key);
@@ -115,7 +115,7 @@ const ConfigurationManagement = () => {
         .from('app_config')
         .select('value')
         .eq('key', 'pricing')
-        .single();
+        .maybeSingle();
       
       if (data?.value) {
         setMarkupPercentage(data.value.markup_percentage || 17);
@@ -276,7 +276,7 @@ const ConfigurationManagement = () => {
         .from('app_config')
         .select('value')
         .eq('key', 'version')
-        .single();
+        .maybeSingle();
       
       if (data?.value) {
         setVersionConfig(prev => ({
@@ -338,7 +338,7 @@ const ConfigurationManagement = () => {
         .from('app_config')
         .select('value')
         .eq('key', 'stripe')
-        .single();
+        .maybeSingle();
       
       if (data?.value) {
         setStripeConfig(prev => ({
@@ -397,7 +397,7 @@ const ConfigurationManagement = () => {
         .from('app_config')
         .select('value')
         .eq('key', 'openrouter')
-        .single();
+        .maybeSingle();
       
       if (data?.value) {
         setOpenRouterConfig(prev => ({

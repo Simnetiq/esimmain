@@ -26,11 +26,11 @@ const ApplicationLogs = () => {
     try {
       const { data } = await supabase
         .from('users')
-        .select('email, actual_email')
+        .select('email')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
       if (data) {
-        return data.actual_email || data.email || userId;
+        return data.email || userId;
       }
       return userId;
     } catch {

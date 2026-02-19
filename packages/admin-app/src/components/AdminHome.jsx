@@ -119,7 +119,7 @@ const AdminHome = ({ onNavigate }) => {
           .from('app_config')
           .select('value')
           .eq('key', 'admin_shortcuts')
-          .single();
+          .maybeSingle();
         
         if (data?.value?.shortcuts) {
           setShortcuts(data.value.shortcuts);

@@ -6,45 +6,8 @@ import supabase from '../lib/supabase';
 import {
   Search,
   Users,
-  Globe,
-  Smartphone,
-  Monitor,
-  Apple
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-
-// Helper to get platform icon and label based on order data
-const getPlatformInfo = (platform, userAgent, hasOrders) => {
-  // Check if it's a native app based on userAgent
-  const isNativeApp = userAgent?.includes('eSIMMobile') || 
-                      userAgent?.includes('SimnetiqApp') ||
-                      userAgent?.includes('CFNetwork'); // iOS native indicator
-  
-  if (platform === 'ios') {
-    if (isNativeApp) {
-      return { icon: Apple, label: 'iOS App', color: 'text-gray-900 bg-gray-100' };
-    }
-    return { icon: Globe, label: 'Mobile Web (iOS)', color: 'text-gray-700 bg-gray-50' };
-  }
-  
-  if (platform === 'android') {
-    if (isNativeApp) {
-      return { icon: Smartphone, label: 'Android App', color: 'text-green-700 bg-green-100' };
-    }
-    return { icon: Globe, label: 'Mobile Web (Android)', color: 'text-green-700 bg-green-50' };
-  }
-  
-  if (platform === 'web') {
-    return { icon: Monitor, label: 'Web', color: 'text-indigo-700 bg-indigo-100' };
-  }
-  
-  // No platform detected
-  if (hasOrders === false) {
-    return { icon: Users, label: 'No orders', color: 'text-gray-400 bg-gray-50' };
-  }
-  
-  return { icon: Globe, label: 'Unknown', color: 'text-gray-500 bg-gray-100' };
-};
 
 const UserManagement = () => {
   const { currentUser } = useAuth();
@@ -53,7 +16,6 @@ const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [userSearchTerm, setUserSearchTerm] = useState('');
-  const [platformFilter, setPlatformFilter] = useState('all');
   const [loading, setLoading] = useState(false);
 
   // Load data on component mount
@@ -65,25 +27,14 @@ const UserManagement = () => {
 
   // Filter users based on search and platform
   useEffect(() => {
-    let filtered = users.filter(user => 
+    const filtered = users.filter(user =>
       user.email?.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
       user.role?.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
       user.id?.toLowerCase().includes(userSearchTerm.toLowerCase())
     );
-    
-    // Apply platform filter
-    if (platformFilter !== 'all') {
-      filtered = filtered.filter(user => {
-        if (platformFilter === 'ios') return user.detectedPlatform === 'ios';
-        if (platformFilter === 'android') return user.detectedPlatform === 'android';
-        if (platformFilter === 'web') return user.detectedPlatform === 'web';
-        if (platformFilter === 'unknown') return !user.detectedPlatform;
-        return true;
-      });
-    }
-    
+
     setFilteredUsers(filtered);
-  }, [users, userSearchTerm, platformFilter]);
+  }, [users, userSearchTerm]);
 
   // User Management Functions
   const loadUsersFromFirestore = async () => {
@@ -92,46 +43,29 @@ const UserManagement = () => {
       const { data: usersData, error: usersError } = await supabase
         .from('users')
         .select('*');
-      
+
       if (usersError) throw usersError;
-      
-      // Load all orders once to extract platform info
+
+      // Load order counts per user
       const { data: allOrders } = await supabase
         .from('orders')
-        .select('user_id, platform, security, created_at');
-      
-      // Group orders by userId and find the earliest order for each user
-      const userFirstOrders = {};
+        .select('user_id');
+
+      const userOrderCounts = {};
       (allOrders || []).forEach(order => {
-        const userId = order.user_id;
-        if (!userId) return;
-        
-        const orderDate = order.created_at ? new Date(order.created_at).getTime() : 0;
-        const existingDate = userFirstOrders[userId]?.created_at 
-          ? new Date(userFirstOrders[userId].created_at).getTime() : Infinity;
-        
-        if (!userFirstOrders[userId] || orderDate < existingDate) {
-          userFirstOrders[userId] = order;
+        if (order.user_id) {
+          userOrderCounts[order.user_id] = (userOrderCounts[order.user_id] || 0) + 1;
         }
       });
-      
-      // Merge platform info into users
-      const usersWithPlatform = (usersData || []).map(user => {
-        const firstOrder = userFirstOrders[user.id];
-        if (firstOrder) {
-          return {
-            ...user,
-            detectedPlatform: firstOrder.platform || null,
-            detectedUserAgent: firstOrder.security?.userAgent || null,
-            firstOrderDate: firstOrder.created_at,
-            hasOrders: true
-          };
-        }
-        return { ...user, detectedPlatform: null, detectedUserAgent: null, hasOrders: false };
-      });
-      
-      setUsers(usersWithPlatform);
-      setFilteredUsers(usersWithPlatform);
+
+      const usersWithInfo = (usersData || []).map(user => ({
+        ...user,
+        hasOrders: (userOrderCounts[user.id] || 0) > 0,
+        orderCount: userOrderCounts[user.id] || 0,
+      }));
+
+      setUsers(usersWithInfo);
+      setFilteredUsers(usersWithInfo);
     } catch (error) {
       console.error('Failed to load users:', error);
       toast.error('Failed to load users');
@@ -150,30 +84,15 @@ const UserManagement = () => {
       </div>
 
       {/* Search Bar and Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <input
-            type="text"
-            placeholder="Search users by email, role, or user ID..."
-            value={userSearchTerm}
-            onChange={(e) => setUserSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-          />
-        </div>
-        
-        {/* Platform Filter */}
-        <select
-          value={platformFilter}
-          onChange={(e) => setPlatformFilter(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 bg-white"
-        >
-          <option value="all">All Platforms</option>
-          <option value="ios">iOS App</option>
-          <option value="android">Android App</option>
-          <option value="web">Web</option>
-          <option value="unknown">Unknown</option>
-        </select>
+      <div className="relative max-w-md">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+        <input
+          type="text"
+          placeholder="Search users by email, role, or user ID..."
+          value={userSearchTerm}
+          onChange={(e) => setUserSearchTerm(e.target.value)}
+          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+        />
       </div>
 
       {/* Users Table */}
@@ -203,7 +122,7 @@ const UserManagement = () => {
                     Role
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Signup Source
+                    Orders
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Joined
@@ -251,16 +170,11 @@ const UserManagement = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {(() => {
-                        const platformInfo = getPlatformInfo(user.detectedPlatform, user.detectedUserAgent, user.hasOrders);
-                        const IconComponent = platformInfo.icon;
-                        return (
-                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full ${platformInfo.color}`}>
-                            <IconComponent className="w-3.5 h-3.5" />
-                            {platformInfo.label}
-                          </span>
-                        );
-                      })()}
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full ${
+                        user.orderCount > 0 ? 'text-green-700 bg-green-100' : 'text-gray-400 bg-gray-50'
+                      }`}>
+                        {user.orderCount || 0}
+                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown'}
