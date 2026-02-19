@@ -166,7 +166,7 @@ const AdminDashboard = () => {
                         <div className="flex items-center gap-3 text-sm">
                           <User className="w-4 h-4 text-gray-400" />
                           <span className="text-gray-600">User ID:</span>
-                          <span className="font-mono text-xs text-gray-900">{currentUser?.uid?.substring(0, 12)}...</span>
+                          <span className="font-mono text-xs text-gray-900">{currentUser?.id?.substring(0, 12)}...</span>
                         </div>
                       </div>
 

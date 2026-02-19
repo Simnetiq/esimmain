@@ -125,7 +125,7 @@ const Settings = () => {
       const { data, error } = await supabase
         .from('users')
         .select('*')
-        .eq('id', currentUser.uid)
+        .eq('id', currentUser.id)
         .single();
       
       if (data) {

@@ -24,7 +24,7 @@ const ReferralBottomSheet = ({ isOpen, onClose }) => {
     const checkReferralStatus = async () => {
       if (currentUser && isOpen) {
         try {
-          const hasUsed = await hasUserUsedReferralCode(currentUser.uid);
+          const hasUsed = await hasUserUsedReferralCode(currentUser.id);
           setHasUsedReferral(hasUsed);
         } catch (error) {
           console.error('Error checking referral status:', error);
@@ -96,7 +96,7 @@ const ReferralBottomSheet = ({ isOpen, onClose }) => {
     try {
       // Process referral code usage
       const { processReferralUsage } = await import('@esim/shared/services/referralService');
-      const result = await processReferralUsage(referralCode.trim().toUpperCase(), currentUser.uid);
+      const result = await processReferralUsage(referralCode.trim().toUpperCase(), currentUser.id);
       
       if (result.success) {
         // Update user profile to mark referral code as used
@@ -104,7 +104,7 @@ const ReferralBottomSheet = ({ isOpen, onClose }) => {
         await supabase.from('users').update({
           referralCodeUsed: true,
           referredBy: referralCode.trim().toUpperCase()
-        }).eq('id', currentUser.uid);
+        }).eq('id', currentUser.id);
 
         // Reload user profile to reflect changes
         await loadUserProfile();

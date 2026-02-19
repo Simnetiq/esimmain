@@ -205,7 +205,7 @@ const CountryEditModal = ({
         isActive: formData.isActive,
         region: formData.region,
         is_popular: formData.is_popular
-      }, currentUser?.uid || 'admin');
+      }, currentUser?.id || 'admin');
 
       toast.success(
         isEditing

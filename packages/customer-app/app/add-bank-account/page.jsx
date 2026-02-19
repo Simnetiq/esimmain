@@ -36,7 +36,7 @@ const AddBankAccountPage = () => {
         const { data: userData } = await supabase
           .from('users')
           .select('bank_account')
-          .eq('id', currentUser.uid)
+          .eq('id', currentUser.id)
           .single();
         
         if (userData?.bank_account) {
@@ -98,7 +98,7 @@ const AddBankAccountPage = () => {
             isVerified: false
           }
         })
-        .eq('id', currentUser.uid);
+        .eq('id', currentUser.id);
 
       toast.success('Bank account added successfully!');
       router.back(); // Go back to previous page

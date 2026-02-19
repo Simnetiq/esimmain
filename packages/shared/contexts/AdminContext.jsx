@@ -35,7 +35,7 @@ export const AdminProvider = ({ children }) => {
         setLoading(true);
         
         // Get user role
-        const role = await adminService.getUserRole(currentUser.uid);
+        const role = await adminService.getUserRole(currentUser.id);
         setUserRole(role);
         
         // Check if user is admin
@@ -114,7 +114,7 @@ export const AdminProvider = ({ children }) => {
     if (!currentUser) return;
     
     try {
-      const role = await adminService.getUserRole(currentUser.uid);
+      const role = await adminService.getUserRole(currentUser.id);
       setUserRole(role);
       setIsAdmin(role !== ADMIN_ROLES.USER);
       

@@ -1,8 +1,5 @@
 {
   "installCommand": "cd ../.. && npm install",
-  "buildCommand": "cd ../.. && npm run build:customer",
-  "outputDirectory": ".next",
-  "framework": "nextjs",
   "crons": [
     {
       "path": "/api/sync-airalo-v2",

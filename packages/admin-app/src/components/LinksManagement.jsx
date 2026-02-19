@@ -106,7 +106,7 @@ const LinksManagement = () => {
         return;
       }
       
-      await updateSettingsSection(section, settingsFormData[section], currentUser?.uid);
+      await updateSettingsSection(section, settingsFormData[section], currentUser?.id);
       toast.success(`${section} settings updated successfully!`);
       await loadSettings();
     } catch {
@@ -144,7 +144,7 @@ const LinksManagement = () => {
   const handleSaveBusinessHours = async () => {
     try {
       setSettingsLoading(true);
-      await updateSettingsSection('businessHours', businessHoursData, currentUser?.uid);
+      await updateSettingsSection('businessHours', businessHoursData, currentUser?.id);
       toast.success('Business hours updated successfully!');
       setShowBusinessHoursModal(false);
       await loadSettings();

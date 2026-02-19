@@ -81,7 +81,7 @@ const TariffManagement = ({
   const updatePlanPrice = async (planId, newPrice) => {
     try {
       setLoading(true);
-      await updatePlanPriceService(planId, newPrice, currentUser?.uid);
+      await updatePlanPriceService(planId, newPrice, currentUser?.id);
 
       toast.success(`Price updated to ${formatPrice(newPrice)}!`);
       await loadCountryPlans();

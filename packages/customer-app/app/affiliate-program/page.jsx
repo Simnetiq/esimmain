@@ -31,16 +31,16 @@ const AffiliateProgramPage = () => {
 
     try {
       setLoadingReferralStats(true);
-      const stats = await getReferralStats(currentUser.uid);
+      const stats = await getReferralStats(currentUser.id);
 
       if (stats.referralCode) {
         setReferralStats(stats);
       } else {
         // Create referral code if user doesn't have one
-        const result = await createReferralCode(currentUser.uid, currentUser.email);
+        const result = await createReferralCode(currentUser.id, currentUser.email);
         if (result.success) {
           // Reload stats after creating code
-          const newStats = await getReferralStats(currentUser.uid);
+          const newStats = await getReferralStats(currentUser.id);
           setReferralStats(newStats);
         }
       }
@@ -60,7 +60,7 @@ const AffiliateProgramPage = () => {
       const { data: userData } = await supabase
         .from('users')
         .select('bank_account')
-        .eq('id', currentUser.uid)
+        .eq('id', currentUser.id)
         .single();
       
       if (userData?.bank_account) {
@@ -94,7 +94,7 @@ const AffiliateProgramPage = () => {
         const { data: transactions } = await supabase
           .from('user_transactions')
           .select('*')
-          .eq('user_id', currentUser.uid)
+          .eq('user_id', currentUser.id)
           .eq('type', 'deposit')
           .eq('method', 'referral_commission')
           .eq('status', 'completed');
@@ -125,7 +125,7 @@ const AffiliateProgramPage = () => {
         
         // Create a withdrawal record
         await supabase.from('user_transactions').insert({
-          user_id: currentUser.uid,
+          user_id: currentUser.id,
           type: 'purchase',
           amount: totalAmount,
           description: `Withdrawal of ${updatedCount} referral earnings`,

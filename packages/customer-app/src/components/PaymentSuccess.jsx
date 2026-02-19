@@ -98,7 +98,7 @@ const PaymentSuccess = () => {
       amount: orderData.amount || 0,
       currency: orderData.currency || 'usd',
       customerEmail: orderData.customerEmail || orderData.userEmail,
-      userId: orderData.userId || currentUser?.uid || null
+      userId: orderData.userId || currentUser?.id || null
     };
     setOrderInfo(info);
 
@@ -175,7 +175,7 @@ const PaymentSuccess = () => {
           .from('esims')
           .select('*')
           .eq('id', orderParam)
-          .eq('user_id', currentUser.uid)
+          .eq('user_id', currentUser.id)
           .single();
         if (data) orderData = data;
       }
@@ -209,7 +209,7 @@ const PaymentSuccess = () => {
       }
 
       // SECURITY CHECK: Verify this order belongs to the user or has valid email
-      if (currentUser && orderData.userId && orderData.userId !== currentUser.uid) {
+      if (currentUser && orderData.userId && orderData.userId !== currentUser.id) {
         setError(t('paymentSuccess.errorUnauthorized', 'You are not authorized to view this order.'));
         setProcessing(false);
         return;

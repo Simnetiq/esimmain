@@ -141,7 +141,7 @@ const ConfigurationManagement = () => {
         value: {
           api_key: roamjetApiKey,
           base_url: roamjetBaseUrl,
-          updated_by: currentUser?.uid || 'admin'
+          updated_by: currentUser?.id || 'admin'
         },
         updated_at: new Date().toISOString()
       }, { onConflict: 'key' });
@@ -162,7 +162,7 @@ const ConfigurationManagement = () => {
           markup_percentage: markupPercentage,
           regular_discount_percentage: regularDiscountPercentage,
           transaction_commission_percentage: transactionCommissionPercentage,
-          updated_by: currentUser?.uid || 'admin'
+          updated_by: currentUser?.id || 'admin'
         },
         updated_at: new Date().toISOString()
       }, { onConflict: 'key' });
@@ -179,7 +179,7 @@ const ConfigurationManagement = () => {
             discountPercentage: regularDiscountPercentage,
             minimumPrice: 0.5
           },
-          updatedBy: currentUser?.uid || 'admin'
+          updatedBy: currentUser?.id || 'admin'
         },
         updated_at: new Date().toISOString()
       }, { onConflict: 'key' });
@@ -370,7 +370,7 @@ const ConfigurationManagement = () => {
         key: 'stripe',
         value: {
           livePublishableKey: stripeConfig.livePublishableKey.trim(),
-          updated_by: currentUser?.uid || 'admin'
+          updated_by: currentUser?.id || 'admin'
         },
         updated_at: new Date().toISOString()
       }, { onConflict: 'key' });
@@ -439,7 +439,7 @@ const ConfigurationManagement = () => {
           temperature: parseFloat(openRouterConfig.temperature) || 0.7,
           site_name: openRouterConfig.site_name || 'Simnetiq',
           site_url: openRouterConfig.site_url || 'https://simnetiq.shop',
-          updated_by: currentUser?.uid || 'admin'
+          updated_by: currentUser?.id || 'admin'
         },
         updated_at: new Date().toISOString()
       }, { onConflict: 'key' });

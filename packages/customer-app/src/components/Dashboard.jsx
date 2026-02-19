@@ -288,16 +288,16 @@ const Dashboard = () => {
     if (!currentUser) return;
 
     try {
-      const stats = await getReferralStats(currentUser.uid);
+      const stats = await getReferralStats(currentUser.id);
 
       if (stats.referralCode) {
         setReferralStats(stats);
       } else {
         // Create referral code if user doesn't have one
-        const result = await createReferralCode(currentUser.uid, currentUser.email);
+        const result = await createReferralCode(currentUser.id, currentUser.email);
         if (result.success) {
           // Reload stats after creating code
-          const newStats = await getReferralStats(currentUser.uid);
+          const newStats = await getReferralStats(currentUser.id);
           setReferralStats(newStats);
         }
       }
@@ -492,7 +492,7 @@ const Dashboard = () => {
         const { data: esimsData, error: esimsError } = await supabase
           .from('esims')
           .select('*')
-          .eq('user_id', currentUser.uid);
+          .eq('user_id', currentUser.id);
 
         if (esimsError) throw esimsError;
 
@@ -668,13 +668,13 @@ const Dashboard = () => {
         const { data: userDoc, error } = await supabase
           .from('users')
           .select('*')
-          .eq('id', currentUser.uid)
+          .eq('id', currentUser.id)
           .single();
 
         if (error || !userDoc) {
           // Create user profile if it doesn't exist
           await supabase.from('users').upsert({
-            id: currentUser.uid,
+            id: currentUser.id,
             email: currentUser.email,
             displayName: currentUser.displayName || 'Unknown User',
             createdAt: new Date().toISOString(),
@@ -952,7 +952,7 @@ const Dashboard = () => {
         updatedAt: new Date().toISOString(),
         countryUpdatedAt: new Date().toISOString(),
         countryUpdateReason: 'Updated from Airalo API eSIM details'
-      }).eq('id', order.id).eq('user_id', currentUser.uid);
+      }).eq('id', order.id).eq('user_id', currentUser.id);
 
       // Update local state
       setOrders(prevOrders =>
@@ -1040,14 +1040,14 @@ const Dashboard = () => {
         deleted: true,
         deletedAt: new Date().toISOString(),
         status: 'deleted'
-      }).eq('id', order.id).eq('user_id', currentUser.uid);
+      }).eq('id', order.id).eq('user_id', currentUser.id);
 
       // Also soft delete from global orders table (if it exists)
       try {
         await supabase.from('orders').update({
           deleted: true,
           deletedAt: new Date().toISOString(),
-          deletedByUser: currentUser.uid,
+          deletedByUser: currentUser.id,
           status: 'deleted'
         }).eq('id', order.id);
       } catch (globalError) {

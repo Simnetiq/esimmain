@@ -214,7 +214,7 @@ const CountryEditModal = ({
         description: formData.description.trim(),
         isActive: formData.isActive,
         updated_at: new Date().toISOString(),
-        updated_by: currentUser?.uid || 'admin'
+        updated_by: currentUser?.id || 'admin'
       };
       
       // Add created_at for new countries

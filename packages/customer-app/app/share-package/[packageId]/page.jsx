@@ -75,7 +75,7 @@ const SharePackagePage = () => {
   const checkReferralDiscount = useCallback(async () => {
     if (currentUser) {
       try {
-        const hasUsed = await hasUserUsedReferralCode(currentUser.uid);
+        const hasUsed = await hasUserUsedReferralCode(currentUser.id);
         setHasReferralDiscount(hasUsed);
       } catch {
         // Silent fail
@@ -183,7 +183,7 @@ const SharePackagePage = () => {
 
     try {
       // Check fraud status before proceeding
-      const fraudStatus = await checkFraudStatus(currentUser.uid, currentUser.email);
+      const fraudStatus = await checkFraudStatus(currentUser.id, currentUser.email);
 
       if (fraudStatus.blocked) {
         setProcessingPayment(false);
@@ -244,7 +244,7 @@ const SharePackagePage = () => {
         total: checkoutData.price,
         currency: checkoutData.currency.toLowerCase(),
         domain: window.location.origin,
-        userId: currentUser.uid,
+        userId: currentUser.id,
         language: currentLanguage,
         radarSessionId
       };
@@ -368,7 +368,7 @@ const SharePackagePage = () => {
         expiresAt={blockData?.expiresAt}
         remainingHours={blockData?.remainingHours}
         canContactSupport={blockData?.canContactSupport}
-        userId={currentUser?.uid}
+        userId={currentUser?.id}
         email={currentUser?.email}
       />
 

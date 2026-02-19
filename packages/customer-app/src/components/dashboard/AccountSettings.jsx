@@ -158,7 +158,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
       await supabase.from('users').update({
         displayName: newName.trim(),
         updatedAt: new Date().toISOString()
-      }).eq('id', currentUser.uid);
+      }).eq('id', currentUser.id);
 
       await onLoadUserProfile();
       setEditingName(false);
@@ -177,7 +177,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
       await supabase.from('users').update({
         phoneNumber: newPhone.trim(),
         updatedAt: new Date().toISOString()
-      }).eq('id', currentUser.uid);
+      }).eq('id', currentUser.id);
 
       await onLoadUserProfile();
       setEditingPhone(false);
@@ -220,7 +220,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
       await supabase.from('users').update({
         newsletterSubscribed: newStatus,
         newsletterUpdatedAt: new Date().toISOString()
-      }).eq('id', currentUser.uid);
+      }).eq('id', currentUser.id);
       await onLoadUserProfile();
       showToast('success', newStatus 
         ? t('settings.subscribedToNewsletter', 'Subscribed to newsletter')
@@ -246,16 +246,16 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
       await supabase.from('users').update({
         deleted: true,
         deletedAt: new Date().toISOString(),
-        email: `deleted_${currentUser.uid}@deleted.com`,
+        email: `deleted_${currentUser.id}@deleted.com`,
         displayName: 'Deleted User'
-      }).eq('id', currentUser.uid);
+      }).eq('id', currentUser.id);
 
       // Try to delete auth account via API route (admin operation)
       try {
         await fetch('/api/delete-account', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: currentUser.uid }),
+          body: JSON.stringify({ userId: currentUser.id }),
         });
       } catch (authError) {
         // If deletion fails, just log out

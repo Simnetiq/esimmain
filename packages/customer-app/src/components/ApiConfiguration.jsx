@@ -108,7 +108,7 @@ const ApiConfiguration = () => {
         value: {
           api_key: roamjetApiKey,
           base_url: roamjetBaseUrl,
-          updated_by: currentUser?.uid || 'admin'
+          updated_by: currentUser?.id || 'admin'
         },
         updated_at: new Date().toISOString()
       });
@@ -137,7 +137,7 @@ const ApiConfiguration = () => {
         value: {
           api_key: coinbaseApiKey,
           webhook_secret: coinbaseWebhookSecret,
-          updated_by: currentUser?.uid || 'admin'
+          updated_by: currentUser?.id || 'admin'
         },
         updated_at: new Date().toISOString()
       });
@@ -165,7 +165,7 @@ const ApiConfiguration = () => {
         key: 'openai',
         value: {
           api_key: openaiApiKey,
-          updated_by: currentUser?.uid || 'admin'
+          updated_by: currentUser?.id || 'admin'
         },
         updated_at: new Date().toISOString()
       });

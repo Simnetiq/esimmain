@@ -108,7 +108,7 @@ const CryptoCheckoutContent = () => {
         amount: packageData.price,
         currency: 'USD', // Coinbase charges in USD, user pays in selected crypto
         customerEmail: currentUser.email,
-        userId: currentUser.uid,
+        userId: currentUser.id,
       };
 
       const result = await coinbasePaymentService.createCheckoutSession(orderData);

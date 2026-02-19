@@ -177,7 +177,7 @@ const FinancesManagement = () => {
       const promoData = {
         ...promoForm,
         countries: selectedCountries.map(c => c.code),
-        createdBy: currentUser?.uid
+        createdBy: currentUser?.id
       };
       
       if (editingPromo) {

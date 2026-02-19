@@ -27,7 +27,7 @@ const TransactionsPage = () => {
       let query = supabase
         .from('user_transactions')
         .select('*')
-        .eq('user_id', currentUser.uid)
+        .eq('user_id', currentUser.id)
         .order('created_at', { ascending: false })
         .limit(20);
 

@@ -540,7 +540,7 @@ const CountryManagement = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    await handleJSONUpload(file, currentUser?.uid);
+    await handleJSONUpload(file, currentUser?.id);
     event.target.value = '';
   };
 

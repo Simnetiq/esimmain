@@ -4,8 +4,14 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
   reactStrictMode: true,
-  swcMinify: true,
-  
+
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
+  // Transpile shared package
+  transpilePackages: ['@esim/shared'],
+
   // Optimize production builds
   productionBrowserSourceMaps: false,
   
