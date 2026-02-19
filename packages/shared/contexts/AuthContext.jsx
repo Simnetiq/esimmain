@@ -20,6 +20,16 @@ export function AuthProvider({ children }) {
 
   const supabase = getSupabase();
 
+  // During build-time prerendering, supabase may be null. Render children with
+  // default context values so the page shell can be generated.
+  if (!supabase) {
+    return (
+      <AuthContext.Provider value={{ currentUser: null, loading: false, userProfile: null }}>
+        {children}
+      </AuthContext.Provider>
+    );
+  }
+
   async function loginAsGuest() {
     try {
       const { data, error } = await supabase.auth.signInAnonymously();

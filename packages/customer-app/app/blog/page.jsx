@@ -3,6 +3,8 @@ import Blog from '../../src/components/Blog';
 import Loading from '../../src/components/Loading';
 import RTLWrapper from '../../src/components/RTLWrapper';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Blog - eSIM Plans',
   description: 'Latest news, tips, and insights about eSIM technology, travel connectivity, and global data plans.',

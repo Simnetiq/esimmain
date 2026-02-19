@@ -27,6 +27,13 @@ export function isSupabaseAvailable() {
 
 export function getSupabase() {
   if (!supabase) {
+    // During build-time prerendering (next build), the browser client may not
+    // be available even when env vars are set (e.g. worker process isolation).
+    // Return null so callers (like AuthProvider) can render a loading shell
+    // instead of crashing the entire build.
+    if (typeof window === 'undefined') {
+      return null;
+    }
     throw new Error(
       'Supabase client not initialized. Please add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to your .env.local file.'
     );

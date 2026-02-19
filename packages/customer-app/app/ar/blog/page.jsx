@@ -2,6 +2,8 @@ import { Suspense } from 'react';
 import Blog from '../../../src/components/Blog';
 import Loading from '../../../src/components/Loading';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'مدونة eSIM - رؤى ودلائل تقنية eSIM | Simnetiq',
   description: 'اكتشف أحدث الاتجاهات والدلائل والرؤى في تقنية eSIM وحلول الاتصال العالمية.',

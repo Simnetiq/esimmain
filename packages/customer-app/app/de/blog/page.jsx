@@ -2,6 +2,8 @@ import { Suspense } from 'react';
 import Blog from '../../../src/components/Blog';
 import Loading from '../../../src/components/Loading';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'eSIM Blog - Einblicke und Leitfäden zur eSIM-Technologie | Simnetiq',
   description: 'Entdecke die neuesten Trends, Leitfäden und Einblicke in die eSIM-Technologie und globale Konnektivitätslösungen.',
