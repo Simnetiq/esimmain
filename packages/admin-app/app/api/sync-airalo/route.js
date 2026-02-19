@@ -1,12 +1,15 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseAdmin = createClient(
-  process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+function getSupabaseAdmin() {
+  return createClient(
+    process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+  );
+}
 
 export async function POST(request) {
+  const supabaseAdmin = getSupabaseAdmin();
   console.log('🔄 Sync API: POST request received');
   
   try {
@@ -469,6 +472,7 @@ export async function POST(request) {
 
 // GET endpoint to check sync status
 export async function GET() {
+  const supabaseAdmin = getSupabaseAdmin();
   try {
     // Get last sync logs
     const { data: recentSyncs } = await supabaseAdmin

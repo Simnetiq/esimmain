@@ -1,10 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
+}
 
 /**
  * GET /api/regions/promoted-countries
@@ -26,7 +28,7 @@ export async function GET(request) {
     }
 
     // Fetch promoted countries with country details
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('region_promoted_countries')
       .select(`
         id,
@@ -117,7 +119,7 @@ export async function POST(request) {
     }
 
     // Check if country is already promoted for this region
-    const { data: existing } = await supabase
+    const { data: existing } = await getSupabase()
       .from('region_promoted_countries')
       .select('id')
       .eq('region_id', regionId)
@@ -126,7 +128,7 @@ export async function POST(request) {
 
     if (existing) {
       // Update position instead
-      const { data, error } = await supabase
+      const { data, error } = await getSupabase()
         .from('region_promoted_countries')
         .update({ position: pos, is_active: true, updated_at: new Date().toISOString() })
         .eq('id', existing.id)
@@ -139,7 +141,7 @@ export async function POST(request) {
     }
 
     // Check if we already have 8 promoted countries
-    const { count } = await supabase
+    const { count } = await getSupabase()
       .from('region_promoted_countries')
       .select('*', { count: 'exact', head: true })
       .eq('region_id', regionId)
@@ -153,7 +155,7 @@ export async function POST(request) {
     }
 
     // Insert new promoted country
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('region_promoted_countries')
       .insert({
         region_id: regionId,
@@ -211,7 +213,7 @@ export async function PUT(request) {
     }
 
     // First, deactivate all existing promoted countries for this region
-    await supabase
+    await getSupabase()
       .from('region_promoted_countries')
       .update({ is_active: false, updated_at: new Date().toISOString() })
       .eq('region_id', regionId);
@@ -228,7 +230,7 @@ export async function PUT(request) {
     const results = [];
     for (const item of upsertData) {
       // Check if exists
-      const { data: existing } = await supabase
+      const { data: existing } = await getSupabase()
         .from('region_promoted_countries')
         .select('id')
         .eq('region_id', item.region_id)
@@ -237,7 +239,7 @@ export async function PUT(request) {
 
       if (existing) {
         // Update
-        const { data, error } = await supabase
+        const { data, error } = await getSupabase()
           .from('region_promoted_countries')
           .update({
             position: item.position,
@@ -252,7 +254,7 @@ export async function PUT(request) {
         results.push(data);
       } else {
         // Insert
-        const { data, error } = await supabase
+        const { data, error } = await getSupabase()
           .from('region_promoted_countries')
           .insert(item)
           .select()
@@ -300,7 +302,7 @@ export async function DELETE(request) {
       );
     }
 
-    let query = supabase.from('region_promoted_countries');
+    let query = getSupabase().from('region_promoted_countries');
 
     if (id) {
       query = query.delete().eq('id', id);
