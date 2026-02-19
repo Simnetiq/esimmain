@@ -50,6 +50,12 @@ const StripeCheckoutContent = () => {
   const [packageData, setPackageData] = useState(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
+  // Promo code state
+  const [promoInput, setPromoInput]       = useState('');
+  const [promoValidating, setPromoValidating] = useState(false);
+  const [promoResult, setPromoResult]     = useState(null);
+  // promoResult shape: { valid, code, discountPercent, discountAmount, finalPrice, error }
+
   useEffect(() => {
     // Load package data from localStorage or URL params
     const loadPackageData = () => {
@@ -82,6 +88,49 @@ const StripeCheckoutContent = () => {
     loadPackageData();
   }, [searchParams, router]);
 
+  /** Validate promo code against the server — preview only, no side effects */
+  const handleValidatePromo = async () => {
+    const code = promoInput.trim().toUpperCase();
+    if (!code) return;
+    if (!packageData) { toast.error('Package data not loaded'); return; }
+
+    setPromoValidating(true);
+    setPromoResult(null);
+
+    try {
+      const res = await fetch('/api/promo/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code,
+          packageId: packageData.packageId,
+          email: currentUser?.email || '',
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.valid) {
+        setPromoResult(data);
+        toast.success(`Promo applied! ${data.discountPercent}% off`);
+      } else {
+        setPromoResult({ valid: false, error: data.error || 'Invalid promo code' });
+        toast.error(data.error || 'Invalid promo code');
+      }
+    } catch {
+      setPromoResult({ valid: false, error: 'Could not validate promo code' });
+      toast.error('Could not validate promo code');
+    } finally {
+      setPromoValidating(false);
+    }
+  };
+
+  /** Clear applied promo */
+  const handleRemovePromo = () => {
+    setPromoInput('');
+    setPromoResult(null);
+  };
+
   const handlePayment = async () => {
     if (!currentUser) {
       setShowAuthModal(true);
@@ -96,15 +145,22 @@ const StripeCheckoutContent = () => {
     setLoading(true);
 
     try {
+      // Server re-validates everything — we send the promo code and let the
+      // server compute the final price. The total we send must match what the
+      // server computes (price check). If a promo is applied, send its finalPrice.
+      const activePromoCode = promoResult?.valid ? promoResult.code : undefined;
+      const expectedTotal   = promoResult?.valid ? promoResult.finalPrice : packageData.price;
+
       // Process with Stripe Checkout
       const orderData = {
-        order: packageData.packageId,
-        email: currentUser.email,
-        name: packageData.packageName,
-        total: packageData.price,
-        currency: (packageData.currency || 'USD').toLowerCase(),
-        domain: window.location.origin,
-        language: currentLanguage // Pass current language for localized redirect URLs
+        order:      packageData.packageId,
+        email:      currentUser.email,
+        name:       packageData.packageName,
+        total:      expectedTotal,
+        currency:   (packageData.currency || 'USD').toLowerCase(),
+        domain:     window.location.origin,
+        language:   currentLanguage,
+        promoCode:  activePromoCode,   // undefined if no promo — server ignores it
       };
 
       const response = await fetch('/api/create-payment-order', {
@@ -208,13 +264,86 @@ const StripeCheckoutContent = () => {
                     </span>
                   </div>
                 )}
+
+                {/* ── Promo discount row ── */}
+                {promoResult?.valid && (
+                  <div className={`flex justify-between items-center text-sm text-green-600 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <span className="flex items-center gap-1">
+                      <span>🏷️</span>
+                      <span>{promoResult.code} ({promoResult.discountPercent}% off)</span>
+                    </span>
+                    <span className="font-semibold">-{formatPrice(promoResult.discountAmount)}</span>
+                  </div>
+                )}
+
                 <div className="flex justify-between items-center pt-3 border-t text-lg font-bold">
                   <span className="text-gray-900">{t('stripeCheckout.total', 'Total')}</span>
                   <span className="text-tufts-blue">
-                    {formatPrice(packageData.price)} {packageData.currency || 'USD'}
+                    {promoResult?.valid
+                      ? formatPrice(promoResult.finalPrice)
+                      : formatPrice(packageData.price)
+                    } {packageData.currency || 'USD'}
                   </span>
                 </div>
               </div>
+            </div>
+
+            {/* ── Promo Code Section ── */}
+            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+              <h2 className={`text-lg font-semibold text-gray-900 mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+                {t('stripeCheckout.promoCode', 'Promo Code')}
+              </h2>
+
+              {promoResult?.valid ? (
+                /* Applied state */
+                <div className={`flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <div className={`flex items-center gap-2 text-green-700 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <span>✅</span>
+                    <span className="font-mono font-semibold">{promoResult.code}</span>
+                    <span className="text-sm">— {promoResult.discountPercent}% off</span>
+                  </div>
+                  <button
+                    onClick={handleRemovePromo}
+                    className="text-sm text-red-500 hover:text-red-700 transition-colors ml-4"
+                    type="button"
+                  >
+                    {t('stripeCheckout.removePromo', 'Remove')}
+                  </button>
+                </div>
+              ) : (
+                /* Input state */
+                <div className={`flex gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <input
+                    type="text"
+                    value={promoInput}
+                    onChange={(e) => {
+                      setPromoInput(e.target.value.toUpperCase());
+                      if (promoResult) setPromoResult(null); // clear old result on edit
+                    }}
+                    onKeyDown={(e) => e.key === 'Enter' && handleValidatePromo()}
+                    placeholder={t('stripeCheckout.promoPlaceholder', 'Enter promo code')}
+                    maxLength={50}
+                    className={`flex-1 px-4 py-2 border rounded-lg font-mono text-sm focus:outline-none focus:ring-2 focus:ring-tufts-blue uppercase ${
+                      promoResult?.valid === false ? 'border-red-400 bg-red-50' : 'border-gray-300'
+                    } ${isRTL ? 'text-right' : 'text-left'}`}
+                  />
+                  <button
+                    onClick={handleValidatePromo}
+                    disabled={promoValidating || !promoInput.trim()}
+                    type="button"
+                    className="px-4 py-2 bg-tufts-blue text-white rounded-lg text-sm font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity whitespace-nowrap"
+                  >
+                    {promoValidating
+                      ? t('stripeCheckout.promoApplying', 'Applying...')
+                      : t('stripeCheckout.promoApply', 'Apply')}
+                  </button>
+                </div>
+              )}
+
+              {/* Error message */}
+              {promoResult?.valid === false && promoResult.error && (
+                <p className="mt-2 text-sm text-red-600">{promoResult.error}</p>
+              )}
             </div>
 
             {/* Payment Method Info */}
@@ -287,7 +416,10 @@ const StripeCheckoutContent = () => {
               ) : (
                 <div className={`flex items-center justify-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <Lock className="w-5 h-5" />
-                  <span>{currentUser ? t('stripeCheckout.payNow', `Pay ${formatPrice(packageData.price)} Securely`) : t('stripeCheckout.loginToPay', 'Log in to Pay')}</span>
+                  <span>{currentUser
+                    ? t('stripeCheckout.payNow', `Pay ${formatPrice(promoResult?.valid ? promoResult.finalPrice : packageData.price)} Securely`)
+                    : t('stripeCheckout.loginToPay', 'Log in to Pay')
+                  }</span>
                 </div>
               )}
             </button>

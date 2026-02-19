@@ -9,6 +9,10 @@ import {
   recordBlockedPayment,
   syncToStripeRadar
 } from '@esim/shared/services/fraudSignalsService';
+import {
+  confirmPromoRedemption,
+  releasePromoReservation,
+} from '@esim/shared/services/promoServerService';
 
 const getStripeSecretKey = () => {
   const stripeMode = process.env.STRIPE_MODE || 'live';
@@ -169,6 +173,9 @@ async function handleCheckoutSessionCompleted(session) {
 
     await supabase.from('orders').update({ status: 'processing', payment_status: 'completed', payment_completed_at: now, stripe_session_id: session.id, stripe_payment_intent_id: session.payment_intent, updated_at: now }).eq('id', orderId);
 
+    // Confirm promo reservation — payment is good, slot is officially consumed
+    await confirmPromoRedemption(supabase, orderId);
+
     try {
       await createAiraloEsim(orderId, orderData, supabase);
     } catch (airaloError) {
@@ -249,6 +256,9 @@ async function handlePaymentIntentFailed(paymentIntent) {
     await supabase.from('orders').update({ status: wasBlockedByRadar ? 'blocked' : 'failed', payment_status: wasBlockedByRadar ? 'blocked' : 'failed', failure_reason: paymentIntent.last_payment_error?.message || 'Payment failed', failure_code: paymentIntent.last_payment_error?.code, decline_code: paymentIntent.last_payment_error?.decline_code, was_blocked_by_radar: wasBlockedByRadar, blocked_card: cardFingerprint ? `${cardBrand} ****${cardLast4}` : null, updated_at: now }).eq('id', orderId);
 
     await trackFailedPurchase(supabase, { attemptId: orderData.fraud_check?.attemptId, failureReason: paymentIntent.last_payment_error?.message || 'Payment failed', metadata: { orderId, stripePaymentIntentId: paymentIntent.id, failureCode: paymentIntent.last_payment_error?.code, wasBlockedByRadar, cardFingerprint } });
+
+    // Release promo reservation — payment failed, return the slot
+    await releasePromoReservation(supabase, orderId);
   } catch (error) { console.error('Error handling payment intent failed:', error); }
 }
 

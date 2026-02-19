@@ -12,6 +12,10 @@ import {
   analyzeIpRisk,
   FRAUD_SIGNALS_CONFIG
 } from '@esim/shared/services/fraudSignalsService';
+import {
+  validatePromoForCheckout,
+  reservePromo,
+} from '@esim/shared/services/promoServerService';
 
 const SECURITY_CONFIG = {
   MAX_PRICE_TOLERANCE: 0.01,
@@ -79,7 +83,16 @@ async function logPaymentAttempt(supabase, data) {
   } catch (error) { /* ignore */ }
 }
 
-async function validateAndGetPrice(supabase, packageId, userId, submittedPrice) {
+/**
+ * Compute the server-authoritative price for a package.
+ * Does NOT check the submitted price — caller does that after promo is applied.
+ *
+ * Returns:
+ *   { valid: true, basePrice, packageData, hasReferralDiscount,
+ *     referralDiscountPct, databasePrice, packageCountryCode }
+ *   { valid: false, error, code, details? }
+ */
+async function validateAndGetPrice(supabase, packageId, userId) {
   const { data: packageData, error } = await supabase
     .from('dataplans')
     .select('*')
@@ -92,7 +105,7 @@ async function validateAndGetPrice(supabase, packageId, userId, submittedPrice) 
   const databasePrice = parseFloat(packageData.price);
   if (isNaN(databasePrice) || databasePrice <= 0) return { valid: false, error: 'Invalid package price', code: 'INVALID_DB_PRICE' };
 
-  let discountPercentage = 0, minimumPrice = 0.5, hasReferralDiscount = false;
+  let referralDiscountPct = 0, minimumPrice = 0.5, hasReferralDiscount = false;
 
   if (userId) {
     try {
@@ -102,29 +115,60 @@ async function validateAndGetPrice(supabase, packageId, userId, submittedPrice) 
       }
       const { data: settings } = await supabase.from('app_config').select('*').eq('id', 'general').single();
       if (settings) {
-        discountPercentage = settings.referral?.discountPercentage || 17;
+        referralDiscountPct = settings.referral?.discountPercentage || 17;
         minimumPrice = settings.referral?.minimumPrice || 0.5;
       }
-    } catch (error) {
-      console.error('Error checking referral discount:', error);
+    } catch (err) {
+      console.error('Error checking referral discount:', err);
     }
   }
 
-  let validPrice = databasePrice;
-  if (hasReferralDiscount && discountPercentage > 0) {
-    validPrice = Math.max(minimumPrice, databasePrice * (100 - discountPercentage) / 100);
+  let basePrice = databasePrice;
+  if (hasReferralDiscount && referralDiscountPct > 0) {
+    basePrice = Math.max(minimumPrice, databasePrice * (100 - referralDiscountPct) / 100);
   }
 
-  const roundedValidPrice = Math.round(validPrice * 100) / 100;
-  const roundedSubmittedPrice = Math.round(parseFloat(submittedPrice) * 100) / 100;
-  const priceDifference = Math.abs(roundedValidPrice - roundedSubmittedPrice);
+  return {
+    valid: true,
+    basePrice: Math.round(basePrice * 100) / 100,
+    packageData,
+    hasReferralDiscount,
+    referralDiscountPct,
+    databasePrice,
+    packageCountryCode: packageData.country_code || null,
+  };
+}
+
+/**
+ * Check submitted price against expected final price.
+ * Logs manipulation attempt and returns error payload if mismatch.
+ */
+async function checkSubmittedPrice(supabase, {
+  packageId, userId, email, ip, userAgent,
+  submittedPrice, expectedFinalPrice, databasePrice,
+  promoCode,
+}) {
+  const roundedExpected  = Math.round(expectedFinalPrice * 100) / 100;
+  const roundedSubmitted = Math.round(parseFloat(submittedPrice) * 100) / 100;
+  const priceDifference  = Math.abs(roundedExpected - roundedSubmitted);
 
   if (priceDifference > SECURITY_CONFIG.MAX_PRICE_TOLERANCE) {
-    console.error('🚨🚨🚨 PRICE MANIPULATION DETECTED 🚨🚨🚨', { packageId, userId, databasePrice, expectedPrice: roundedValidPrice, submittedPrice: roundedSubmittedPrice, difference: priceDifference });
-    return { valid: false, error: 'Price validation failed', code: 'PRICE_MISMATCH', details: { expected: roundedValidPrice, received: roundedSubmittedPrice, difference: priceDifference, databasePrice } };
+    console.error('🚨🚨🚨 PRICE MANIPULATION DETECTED 🚨🚨🚨', {
+      packageId, userId, databasePrice,
+      expectedPrice: roundedExpected,
+      submittedPrice: roundedSubmitted,
+      difference: priceDifference,
+      promoCode: promoCode || 'none',
+    });
+    return {
+      ok: false,
+      error: 'Price validation failed',
+      code: 'PRICE_MISMATCH',
+      details: { expected: roundedExpected, received: roundedSubmitted, difference: priceDifference, databasePrice },
+    };
   }
 
-  return { valid: true, price: roundedValidPrice, packageData, hasReferralDiscount, discountPercentage, databasePrice };
+  return { ok: true };
 }
 
 export async function POST(request) {
@@ -136,7 +180,12 @@ export async function POST(request) {
 
   try {
     const body = await request.json();
-    const { order, email, name, total, currency = 'usd', domain, userId, language = 'en', radarSessionId, isMobile, platform, timestamp, nonce } = body;
+    const {
+      order, email, name, total, currency = 'usd', domain,
+      userId, language = 'en', radarSessionId, isMobile, platform,
+      timestamp, nonce,
+      promoCode,  // optional — raw promo code string from client
+    } = body;
 
     if (!order || !email) return NextResponse.json({ error: 'Missing required fields', code: 'MISSING_FIELDS' }, { status: 400 });
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return NextResponse.json({ error: 'Invalid email format', code: 'INVALID_EMAIL' }, { status: 400 });
@@ -166,14 +215,79 @@ export async function POST(request) {
       return NextResponse.json({ error: fraudSignalsCheck.reason, code: 'FRAUD_BLOCKED', blockType: fraudSignalsCheck.blockType, canContactSupport: fraudSignalsCheck.canContactSupport, supportMessage: fraudSignalsCheck.supportMessage, expiresAt: fraudSignalsCheck.expiresAt, remainingHours: fraudSignalsCheck.remainingHours }, { status: 403 });
     }
 
-    const priceValidation = await validateAndGetPrice(supabase, order, userId, total || 0);
+    // ── Price validation (Step 1): compute server-authoritative base price ──────
+    const priceValidation = await validateAndGetPrice(supabase, order, userId);
     if (!priceValidation.valid) {
-      await logPriceManipulationAttempt(supabase, { packageId: order, userId: userId || null, email, databasePrice: priceValidation.details?.databasePrice, submittedPrice: parseFloat(total), priceDifference: priceValidation.details?.difference, ipAddress: ip, userAgent, autoBlock: SECURITY_CONFIG.AUTO_BLOCK_ON_PRICE_MANIPULATION, metadata: { code: priceValidation.code, provider: 'stripe', timestamp: new Date().toISOString() } });
-      await logPaymentAttempt(supabase, { packageId: order, email, userId, ip, userAgent, submittedPrice: total, validatedPrice: priceValidation.details?.expected, priceMatch: false, status: 'price_manipulation', blocked: true, blockReason: 'Price manipulation detected' });
+      await logPaymentAttempt(supabase, { packageId: order, email, userId, ip, userAgent, submittedPrice: total, status: 'price_validation_failed', blocked: true, blockReason: priceValidation.error });
       return NextResponse.json({ error: 'Payment validation failed. Please refresh and try again.', code: priceValidation.code }, { status: 400 });
     }
 
-    const validatedPrice = priceValidation.price;
+    // ── Promo validation (Step 2): server-side — client value NEVER trusted ───
+    let promoApplied = null; // populated if a valid promo is found
+    let finalPrice = priceValidation.basePrice;
+
+    const rawPromo = (promoCode || '').trim().toUpperCase();
+    if (rawPromo.length > 0) {
+      const promoResult = await validatePromoForCheckout(supabase, {
+        code: rawPromo,
+        userId: userId || null,
+        userEmail: email,
+        packageId: order,
+        packageCountryCode: priceValidation.packageCountryCode,
+        basePrice: priceValidation.basePrice,  // price after referral discount
+      });
+
+      if (promoResult.valid) {
+        // Anti-stacking: only apply the better of referral vs promo
+        if (priceValidation.hasReferralDiscount && promoResult.finalPrice >= priceValidation.basePrice) {
+          // Referral is already better — ignore promo silently
+          console.info(`[create-payment-order] Promo ${rawPromo} ignored: referral discount is better`);
+        } else {
+          finalPrice = promoResult.finalPrice;
+          promoApplied = {
+            promoId:         promoResult.promoId,
+            promoCode:       promoResult.promoCode,
+            discountType:    promoResult.discountType,
+            discountPercent: promoResult.discountPercent,
+            discountAmount:  promoResult.discountAmount,
+          };
+        }
+      } else {
+        // Promo invalid — don't fail the request, but the submitted price must
+        // match the non-discounted price. If client expected a discount and
+        // submitted a lower total, the checkSubmittedPrice below will catch it.
+        console.info(`[create-payment-order] Promo ${rawPromo} invalid: ${promoResult.errorCode}`);
+      }
+    }
+
+    // ── Price integrity check (Step 3): submitted price must match server price ─
+    const priceCheck = await checkSubmittedPrice(supabase, {
+      packageId: order,
+      userId,
+      email,
+      ip,
+      userAgent,
+      submittedPrice: total || 0,
+      expectedFinalPrice: finalPrice,
+      databasePrice: priceValidation.databasePrice,
+      promoCode: rawPromo || null,
+    });
+
+    if (!priceCheck.ok) {
+      await logPriceManipulationAttempt(supabase, {
+        packageId: order, userId: userId || null, email,
+        databasePrice: priceValidation.databasePrice,
+        submittedPrice: parseFloat(total),
+        priceDifference: priceCheck.details?.difference,
+        ipAddress: ip, userAgent,
+        autoBlock: SECURITY_CONFIG.AUTO_BLOCK_ON_PRICE_MANIPULATION,
+        metadata: { code: priceCheck.code, provider: 'stripe', promoCode: rawPromo || null, timestamp: new Date().toISOString() },
+      });
+      await logPaymentAttempt(supabase, { packageId: order, email, userId, ip, userAgent, submittedPrice: total, validatedPrice: priceCheck.details?.expected, priceMatch: false, status: 'price_manipulation', blocked: true, blockReason: 'Price manipulation detected' });
+      return NextResponse.json({ error: 'Payment validation failed. Please refresh and try again.', code: priceCheck.code }, { status: 400 });
+    }
+
+    const validatedPrice = finalPrice;
     const packageName = priceValidation.packageData?.name || name || 'eSIM Plan';
 
     let accountAge = null;
@@ -236,7 +350,18 @@ export async function POST(request) {
       unique_order_id: uniqueOrderId,
       original_order_id: order,
       security: { ip, userAgent, requestTimestamp: timestamp || null, nonce: nonce || null, priceValidatedAt: now, databasePrice: priceValidation.databasePrice, submittedPrice: parseFloat(total) || 0, priceValidationPassed: true },
-      price_validation: { databasePrice: priceValidation.databasePrice, finalPrice: validatedPrice, hasReferralDiscount: priceValidation.hasReferralDiscount || false, discountPercentage: priceValidation.discountPercentage || 0, submittedPrice: parseFloat(total) || 0, validatedAt: now },
+      price_validation: {
+        databasePrice: priceValidation.databasePrice,
+        basePrice: priceValidation.basePrice,
+        finalPrice: validatedPrice,
+        hasReferralDiscount: priceValidation.hasReferralDiscount || false,
+        referralDiscountPct: priceValidation.referralDiscountPct || 0,
+        promoCode: promoApplied?.promoCode || null,
+        promoDiscountPct: promoApplied?.discountPercent || 0,
+        promoDiscountAmount: promoApplied?.discountAmount || 0,
+        submittedPrice: parseFloat(total) || 0,
+        validatedAt: now,
+      },
       fraud_check: { attemptId, riskScore: fraudCheck.riskScore, riskFactors: fraudCheck.riskFactors, requiresReview: fraudCheck.requiresReview || false, checkedAt: now }
     };
 
@@ -253,27 +378,123 @@ export async function POST(request) {
       const paymentIntentConfig = {
         amount: Math.round(validatedPrice * 100),
         currency: currency.toLowerCase(),
-        metadata: { order_id: uniqueOrderId, email, name: packageName, language: language || 'en', userId: userId || '', source: 'web', platform: platform || 'web', validated_price: validatedPrice.toString(), database_price: priceValidation.databasePrice.toString(), country_code: countryCode || '', country_region: countryName || '', is_regional: isRegional ? 'true' : 'false' },
+        metadata: {
+          order_id: uniqueOrderId,
+          email,
+          name: packageName,
+          language: language || 'en',
+          userId: userId || '',
+          source: 'web',
+          platform: platform || 'web',
+          validated_price: validatedPrice.toString(),
+          database_price: priceValidation.databasePrice.toString(),
+          country_code: countryCode || '',
+          country_region: countryName || '',
+          is_regional: isRegional ? 'true' : 'false',
+          promo_code: promoApplied?.promoCode || '',
+          promo_discount_pct: promoApplied ? promoApplied.discountPercent.toString() : '0',
+        },
         payment_method_types: ['card'],
       };
       if (radarSessionId) paymentIntentConfig.radar_session = radarSessionId;
 
       const paymentIntent = await stripe.paymentIntents.create(paymentIntentConfig);
-      return NextResponse.json({ clientSecret: paymentIntent.client_secret, paymentIntentId: paymentIntent.id, id: paymentIntent.id, orderId: uniqueOrderId, uniqueOrderId, total: validatedPrice, currency, status: 'success' });
+
+      // Reserve promo slot for mobile path as well
+      if (promoApplied) {
+        const reserveResult = await reservePromo(supabase, {
+          promoId:         promoApplied.promoId,
+          promoCode:       promoApplied.promoCode,
+          userId:          userId || null,
+          userEmail:       email,
+          orderId:         uniqueOrderId,
+          originalPrice:   priceValidation.basePrice,
+          discountedPrice: validatedPrice,
+          discountPercent: promoApplied.discountPercent,
+          discountAmount:  promoApplied.discountAmount,
+          metadata: { stripePaymentIntentId: paymentIntent.id, packageId: order, platform },
+        });
+        if (!reserveResult.success) {
+          // Cancel the payment intent — rare race condition
+          console.error('[create-payment-order] reservePromo failed (mobile):', reserveResult);
+          try { await stripe.paymentIntents.cancel(paymentIntent.id); } catch { /* best-effort */ }
+          return NextResponse.json({
+            error: reserveResult.error || 'This promo code is no longer available. Please try again without it.',
+            code: reserveResult.errorCode || 'PROMO_RESERVATION_FAILED',
+          }, { status: 409 });
+        }
+      }
+
+      return NextResponse.json({ clientSecret: paymentIntent.client_secret, paymentIntentId: paymentIntent.id, id: paymentIntent.id, orderId: uniqueOrderId, uniqueOrderId, total: validatedPrice, currency, status: 'success', promoApplied: promoApplied ? { code: promoApplied.promoCode, discountPercent: promoApplied.discountPercent, discountAmount: promoApplied.discountAmount } : null });
     } else {
       const sessionConfig = {
         payment_method_types: ['card'],
-        line_items: [{ price_data: { currency: currency.toLowerCase(), product_data: { name: packageName, description: `Order ID: ${order}` }, unit_amount: Math.round(validatedPrice * 100) }, quantity: 1 }],
+        line_items: [{
+          price_data: {
+            currency: currency.toLowerCase(),
+            product_data: {
+              name: packageName,
+              description: promoApplied
+                ? `Promo: ${promoApplied.promoCode} (${promoApplied.discountPercent}% off) | Order: ${order}`
+                : `Order ID: ${order}`,
+            },
+            unit_amount: Math.round(validatedPrice * 100),
+          },
+          quantity: 1,
+        }],
         mode: 'payment',
         success_url: getLocalizedUrl(`/payment-success?order_id=${uniqueOrderId}&plan_id=${order}&email=${email}&total=${validatedPrice}&name=${encodeURIComponent(packageName)}&currency=${currency}`),
         cancel_url: getLocalizedUrl('/esim-plans?canceled=true'),
         customer_email: email,
-        metadata: { order_id: uniqueOrderId, package_id: order, email, name: packageName, language: language || 'en', source: 'web', platform: platform || 'web', validated_price: validatedPrice.toString(), database_price: priceValidation.databasePrice.toString(), country_code: countryCode || '', country_region: countryName || '', is_regional: isRegional ? 'true' : 'false' }
+        metadata: {
+          order_id: uniqueOrderId,
+          package_id: order,
+          email,
+          name: packageName,
+          language: language || 'en',
+          source: 'web',
+          platform: platform || 'web',
+          validated_price: validatedPrice.toString(),
+          database_price: priceValidation.databasePrice.toString(),
+          country_code: countryCode || '',
+          country_region: countryName || '',
+          is_regional: isRegional ? 'true' : 'false',
+          promo_code: promoApplied?.promoCode || '',
+          promo_discount_pct: promoApplied ? promoApplied.discountPercent.toString() : '0',
+        }
       };
       if (radarSessionId) sessionConfig.metadata.radar_session_id = radarSessionId;
 
       const session = await stripe.checkout.sessions.create(sessionConfig);
-      return NextResponse.json({ sessionUrl: session.url, sessionId: session.id, total: validatedPrice, currency, status: 'success' });
+
+      // Reserve promo slot AFTER Stripe session created — roll back on failure
+      if (promoApplied) {
+        const reserveResult = await reservePromo(supabase, {
+          promoId:         promoApplied.promoId,
+          promoCode:       promoApplied.promoCode,
+          userId:          userId || null,
+          userEmail:       email,
+          orderId:         uniqueOrderId,
+          originalPrice:   priceValidation.basePrice,
+          discountedPrice: validatedPrice,
+          discountPercent: promoApplied.discountPercent,
+          discountAmount:  promoApplied.discountAmount,
+          metadata: { stripeSessionId: session.id, packageId: order },
+        });
+        if (!reserveResult.success) {
+          // Reservation failed — the code was just exhausted or already used.
+          // The session was created at the discounted price but we can't honour it.
+          // Expire the session and return an error. This is rare (concurrent race).
+          console.error('[create-payment-order] reservePromo failed after session create:', reserveResult);
+          try { await stripe.checkout.sessions.expire(session.id); } catch { /* best-effort */ }
+          return NextResponse.json({
+            error: reserveResult.error || 'This promo code is no longer available. Please try again without it.',
+            code: reserveResult.errorCode || 'PROMO_RESERVATION_FAILED',
+          }, { status: 409 });
+        }
+      }
+
+      return NextResponse.json({ sessionUrl: session.url, sessionId: session.id, total: validatedPrice, currency, status: 'success', promoApplied: promoApplied ? { code: promoApplied.promoCode, discountPercent: promoApplied.discountPercent, discountAmount: promoApplied.discountAmount } : null });
     }
 
   } catch (error) {
