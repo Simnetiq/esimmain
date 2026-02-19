@@ -5,10 +5,6 @@ const nextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
 
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-
   // Transpile shared package
   transpilePackages: ['@esim/shared'],
 
@@ -142,13 +138,8 @@ const nextConfig = {
       },
     ];
   },
-  webpack: (config) => {
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      fs: false,
-    };
-    return config;
-  },
+  // Acknowledge Turbopack (Next.js 16 default)
+  turbopack: {},
 };
 
 module.exports = nextConfig;

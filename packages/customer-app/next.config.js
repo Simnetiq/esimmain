@@ -2,12 +2,6 @@
 const nextConfig = {
   reactStrictMode: true,
 
-  // Skip ESLint during builds (run separately in CI)
-  // This avoids the circular structure warning from eslint-config-next v16
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  
   // Optimize images
   images: {
     formats: ['image/avif', 'image/webp'],
@@ -127,33 +121,8 @@ const nextConfig = {
     ];
   },
 
-  // Webpack optimizations for better performance
-  webpack: (config, { isServer }) => {
-    // Ensure consistent module IDs between builds
-    config.optimization = {
-      ...config.optimization,
-      moduleIds: 'deterministic',
-    };
-
-    // Client-side chunk splitting for better caching and parallel loading
-    if (!isServer) {
-      config.optimization.splitChunks = {
-        ...config.optimization.splitChunks,
-        cacheGroups: {
-          ...config.optimization.splitChunks?.cacheGroups,
-          // Separate Stripe into its own chunk
-          stripe: {
-            test: /[\\/]node_modules[\\/](@stripe)[\\/]/,
-            name: 'stripe',
-            chunks: 'all',
-            priority: 25,
-          },
-        },
-      };
-    }
-
-    return config;
-  },
+  // Acknowledge Turbopack (Next.js 16 default)
+  turbopack: {},
 
   // Transpile shared package
   transpilePackages: ['@esim/shared'],
