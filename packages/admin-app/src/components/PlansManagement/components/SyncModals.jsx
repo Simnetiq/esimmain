@@ -80,7 +80,7 @@ export const FirebaseSyncModal = ({
               {syncResult.details && (
                 <div className="mt-3 text-sm space-y-1">
                   <p>• From Airalo API: <strong>{syncResult.details.from_airalo_api?.toLocaleString()}</strong> packages</p>
-                  <p>• Currently in Firebase: <strong>{syncResult.details.existing_in_firebase?.toLocaleString()}</strong> packages</p>
+                  <p>• Currently in Database: <strong>{syncResult.details.existing_in_firebase?.toLocaleString()}</strong> packages</p>
                   <p>• New packages: <strong>{syncResult.details.packages?.added || 0}</strong></p>
                   <p>• Updated packages: <strong>{syncResult.details.packages?.updated || 0}</strong></p>
                   <p className="text-amber-700">• To be removed: <strong>{syncResult.details.total_deprecated || 0}</strong></p>

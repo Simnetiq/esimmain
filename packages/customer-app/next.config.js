@@ -59,10 +59,6 @@ const nextConfig = {
       '@react-email/components',
       '@tanstack/react-query',
       'react-hot-toast',
-      'firebase',
-      'firebase/auth',
-      'firebase/firestore',
-      'firebase/storage',
       '@stripe/stripe-js',
       '@stripe/react-stripe-js',
     ],
@@ -146,13 +142,6 @@ const nextConfig = {
         ...config.optimization.splitChunks,
         cacheGroups: {
           ...config.optimization.splitChunks?.cacheGroups,
-          // Separate Firebase into its own chunk (large library)
-          firebase: {
-            test: /[\\/]node_modules[\\/](firebase|@firebase)[\\/]/,
-            name: 'firebase',
-            chunks: 'all',
-            priority: 30,
-          },
           // Separate Stripe into its own chunk
           stripe: {
             test: /[\\/]node_modules[\\/](@stripe)[\\/]/,

@@ -246,7 +246,7 @@ const StandardTable = ({
 
                 {/* Actions */}
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  {dataSource === 'firebase' ? (
+                  {dataSource === 'supabase' ? (
                     <button
                       onClick={() => onDeletePlan(plan.id, plan.name || 'Unnamed Plan')}
                       disabled={loading}
