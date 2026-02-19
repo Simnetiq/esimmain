@@ -31,6 +31,7 @@
     "./services/plansService": "./services/plansService.js",
     "./services/plansServiceSupabase": "./services/plansServiceSupabase.js",
     "./services/promoCodeService": "./services/promoCodeService.js",
+    "./services/promoServerService": "./services/promoServerService.js",
     "./services/referralService": "./services/referralService.js",
     "./services/settingsService": "./services/settingsService.js",
     "./utils/priceUtils": "./utils/priceUtils.js",
