@@ -1,5 +1,6 @@
 {
   "installCommand": "cd ../.. && npm install",
+  "buildCommand": "next build && echo '{\"version\":1,\"success\":true,\"outDirectory\":\".next\"}' > .next/export-detail.json",
   "framework": "nextjs",
   "crons": [
     {
