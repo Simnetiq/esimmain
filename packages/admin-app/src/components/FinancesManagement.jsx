@@ -53,7 +53,10 @@ const FinancesManagement = () => {
     countries: [],
     validFrom: '',
     validUntil: '',
-    enabled: true
+    enabled: true,
+    maxGlobalUses: '',     // '' = unlimited
+    maxUsesPerUser: '1',   // default: once per user
+    minOrderAmount: '',    // '' = no minimum
   });
   
   // Countries for selector
@@ -91,12 +94,17 @@ const FinancesManagement = () => {
       let totalRevenue = 0;
       
       ordersData.forEach(order => {
-        if (order.status === 'completed' || order.paymentStatus === 'paid') {
-          const amount = parseFloat(order.amount) || 0;
+        // payment_status is snake_case from PostgREST; status 'completed' is the primary gate
+        const isPaid = order.status === 'completed'
+          || order.payment_status === 'completed'
+          || order.payment_status === 'paid';
+
+        if (isPaid) {
+          // 'amount' is the new canonical column; fall back to 'price' for older rows
+          const amount = parseFloat(order.amount ?? order.price) || 0;
           totalRevenue += amount;
           
-          // Extract country from order metadata or planName
-          const country = order.country || order.metadata?.country || 'Unknown';
+          const country = order.country_code || order.country || order.metadata?.country || 'Unknown';
           if (!countryMap[country]) {
             countryMap[country] = { count: 0, revenue: 0 };
           }
@@ -177,7 +185,11 @@ const FinancesManagement = () => {
       const promoData = {
         ...promoForm,
         countries: selectedCountries.map(c => c.code),
-        createdBy: currentUser?.id
+        createdBy: currentUser?.id,
+        discountType: 'percentage',   // admin UI only supports percentage
+        maxGlobalUses:  promoForm.maxGlobalUses  ? parseInt(promoForm.maxGlobalUses)  : null,
+        maxUsesPerUser: promoForm.maxUsesPerUser ? parseInt(promoForm.maxUsesPerUser) : 1,
+        minOrderAmount: promoForm.minOrderAmount ? parseFloat(promoForm.minOrderAmount) : null,
       };
       
       if (editingPromo) {
@@ -237,13 +249,16 @@ const FinancesManagement = () => {
   const handleEditPromo = (promo) => {
     setEditingPromo(promo);
     setPromoForm({
-      code: promo.code,
-      name: promo.name || '',
+      code:            promo.code,
+      name:            promo.name || '',
       discountPercentage: promo.discountPercentage?.toString() || '',
-      countries: promo.countries || [],
-      validFrom: promo.validFrom ? promo.validFrom.toISOString().split('T')[0] : '',
-      validUntil: promo.validUntil ? promo.validUntil.toISOString().split('T')[0] : '',
-      enabled: promo.enabled
+      countries:       promo.countries || [],
+      validFrom:       promo.validFrom  ? promo.validFrom.toISOString().split('T')[0]  : '',
+      validUntil:      promo.validUntil ? promo.validUntil.toISOString().split('T')[0] : '',
+      enabled:         promo.enabled,
+      maxGlobalUses:   promo.maxGlobalUses  != null ? promo.maxGlobalUses.toString()  : '',
+      maxUsesPerUser:  promo.maxUsesPerUser != null ? promo.maxUsesPerUser.toString() : '1',
+      minOrderAmount:  promo.minOrderAmount != null ? promo.minOrderAmount.toString() : '',
     });
     setSelectedCountries(
       countries.filter(c => promo.countries?.includes(c.code))
@@ -256,13 +271,16 @@ const FinancesManagement = () => {
     setShowPromoModal(false);
     setEditingPromo(null);
     setPromoForm({
-      code: '',
-      name: '',
+      code:            '',
+      name:            '',
       discountPercentage: '',
-      countries: [],
-      validFrom: '',
-      validUntil: '',
-      enabled: true
+      countries:       [],
+      validFrom:       '',
+      validUntil:      '',
+      enabled:         true,
+      maxGlobalUses:   '',
+      maxUsesPerUser:  '1',
+      minOrderAmount:  '',
     });
     setSelectedCountries([]);
     setCountrySearch('');
@@ -518,7 +536,13 @@ const FinancesManagement = () => {
                       </span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                      {promo.usageCount || 0}
+                      <span className={promo.maxGlobalUses && (promo.usageCount || 0) >= promo.maxGlobalUses ? 'text-red-600 font-semibold' : ''}>
+                        {promo.usageCount || 0}
+                        {promo.maxGlobalUses ? `/${promo.maxGlobalUses}` : ''}
+                      </span>
+                      {promo.maxUsesPerUser != null && (
+                        <span className="block text-xs text-gray-400">{promo.maxUsesPerUser}x/user</span>
+                      )}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-2">
@@ -704,6 +728,57 @@ const FinancesManagement = () => {
                 </div>
               </div>
               
+              {/* Usage Limits */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Global Usage Limit
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={promoForm.maxGlobalUses}
+                    onChange={(e) => setPromoForm({ ...promoForm, maxGlobalUses: e.target.value })}
+                    placeholder="Unlimited"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">Max times this code can be used in total</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Per-User Limit
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={promoForm.maxUsesPerUser}
+                    onChange={(e) => setPromoForm({ ...promoForm, maxUsesPerUser: e.target.value })}
+                    placeholder="1"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">Max uses per email address</p>
+                </div>
+              </div>
+
+              {/* Minimum Order */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Minimum Order Amount (USD)
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={promoForm.minOrderAmount}
+                    onChange={(e) => setPromoForm({ ...promoForm, minOrderAmount: e.target.value })}
+                    placeholder="No minimum"
+                    className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
+                  />
+                </div>
+              </div>
+
               {/* Enabled */}
               <div className="flex items-center gap-2">
                 <input
