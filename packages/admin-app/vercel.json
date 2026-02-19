@@ -1,5 +1,6 @@
 {
   "buildCommand": "cd ../.. && npm run build:admin",
+  "outputDirectory": ".next",
   "installCommand": "cd ../.. && npm install",
   "framework": "nextjs",
   "regions": ["iad1"],
