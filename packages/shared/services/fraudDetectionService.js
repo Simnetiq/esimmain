@@ -1,5 +1,6 @@
 /**
  * Fraud Detection Service - Supabase version
+ * All columns use snake_case matching the actual DB schema.
  */
 
 import { getSupabase, isSupabaseAvailable } from '../lib/supabase';
@@ -86,7 +87,7 @@ async function getUserPurchaseCount(userId, startTime) {
     const { count, error } = await supabase
       .from('fraud_tracking_purchases')
       .select('*', { count: 'exact', head: true })
-      .eq('userId', userId)
+      .eq('user_id', userId)
       .gte('created_at', startTime.toISOString())
       .in('status', ['completed', 'pending']);
     if (error) throw error;
@@ -114,7 +115,7 @@ async function getCardPurchaseCount(cardFingerprint, startTime) {
     const { count, error } = await supabase
       .from('fraud_tracking_purchases')
       .select('*', { count: 'exact', head: true })
-      .eq('paymentMethodFingerprint', cardFingerprint)
+      .eq('payment_method_fingerprint', cardFingerprint)
       .gte('created_at', startTime.toISOString())
       .in('status', ['completed', 'pending']);
     if (error) throw error;
@@ -130,7 +131,7 @@ async function getFailedAttempts(userId, email, startTime) {
       const { count } = await supabase
         .from('fraud_tracking_attempts')
         .select('*', { count: 'exact', head: true })
-        .eq('userId', userId)
+        .eq('user_id', userId)
         .eq('status', 'failed')
         .gte('created_at', startTime.toISOString());
       total += count || 0;
@@ -154,12 +155,14 @@ export async function trackPurchaseAttempt(db, data) {
     const { data: result, error } = await supabase
       .from('fraud_tracking_attempts')
       .insert({
-        userId: data.userId || null,
+        user_id: data.userId || null,
         email: data.email?.toLowerCase() || null,
+        ip_address: data.ip || data.ipAddress || null,
         amount: data.amount || 0,
         currency: data.currency || 'usd',
-        paymentMethodFingerprint: data.paymentMethodFingerprint || null,
+        payment_method_fingerprint: data.paymentMethodFingerprint || null,
         status: 'pending',
+        action: 'purchase_attempt',
         metadata: data.metadata || {}
       })
       .select('id')
@@ -180,17 +183,18 @@ export async function trackCompletedPurchase(db, data) {
       .from('fraud_tracking_purchases')
       .upsert({
         id: data.orderId || `purchase_${Date.now()}`,
-        orderId: data.orderId,
-        userId: data.userId || null,
+        order_id: data.orderId || null,
+        user_id: data.userId || null,
         email: data.email?.toLowerCase() || null,
+        ip_address: data.ip || data.ipAddress || null,
         amount: data.amount || 0,
         currency: data.currency || 'usd',
-        paymentMethodFingerprint: data.paymentMethodFingerprint || null,
-        paymentMethodLast4: data.paymentMethodLast4 || null,
-        paymentMethodBrand: data.paymentMethodBrand || null,
+        payment_method_fingerprint: data.paymentMethodFingerprint || null,
+        payment_method_last4: data.paymentMethodLast4 || null,
+        payment_method_brand: data.paymentMethodBrand || null,
         status: 'completed',
-        riskScore: data.riskScore || 0,
-        riskFactors: data.riskFactors || [],
+        risk_score: data.riskScore || 0,
+        risk_factors: data.riskFactors || [],
         metadata: data.metadata || {}
       });
 
@@ -199,7 +203,11 @@ export async function trackCompletedPurchase(db, data) {
     if (data.attemptId) {
       await supabase
         .from('fraud_tracking_attempts')
-        .update({ status: 'completed', orderId: data.orderId, updated_at: new Date().toISOString() })
+        .update({
+          status: 'completed',
+          order_id: data.orderId || null,
+          metadata: { order_id: data.orderId, updated_at: new Date().toISOString() }
+        })
         .eq('id', data.attemptId);
     }
 
@@ -216,7 +224,12 @@ export async function trackFailedPurchase(db, data) {
       const supabase = getSupabase();
       await supabase
         .from('fraud_tracking_attempts')
-        .update({ status: 'failed', failureReason: data.failureReason || 'unknown', updated_at: new Date().toISOString() })
+        .update({
+          status: 'failed',
+          failure_reason: data.failureReason || 'unknown',
+          success: false,
+          metadata: { failure_reason: data.failureReason, updated_at: new Date().toISOString() }
+        })
         .eq('id', data.attemptId);
     }
     return true;
@@ -236,19 +249,19 @@ export async function getUserFraudStats(db, userId) {
     const { count: purchases24h } = await supabase
       .from('fraud_tracking_purchases')
       .select('*', { count: 'exact', head: true })
-      .eq('userId', userId)
+      .eq('user_id', userId)
       .gte('created_at', last24Hours.toISOString());
 
     const { count: purchases7d } = await supabase
       .from('fraud_tracking_purchases')
       .select('*', { count: 'exact', head: true })
-      .eq('userId', userId)
+      .eq('user_id', userId)
       .gte('created_at', last7Days.toISOString());
 
     const { count: failedAttempts } = await supabase
       .from('fraud_tracking_attempts')
       .select('*', { count: 'exact', head: true })
-      .eq('userId', userId)
+      .eq('user_id', userId)
       .eq('status', 'failed')
       .gte('created_at', last7Days.toISOString());
 
@@ -270,13 +283,13 @@ export async function checkBlocklist(db, userId, email, cardFingerprint = null) 
     const queries = [];
 
     if (userId) {
-      queries.push(supabase.from('fraud_blocklist').select('id').eq('userId', userId).eq('active', true).limit(1));
+      queries.push(supabase.from('fraud_blocklist').select('id').eq('user_id', userId).eq('active', true).limit(1));
     }
     if (email) {
       queries.push(supabase.from('fraud_blocklist').select('id').eq('email', email.toLowerCase()).eq('active', true).limit(1));
     }
     if (cardFingerprint) {
-      queries.push(supabase.from('fraud_blocklist').select('id').eq('cardFingerprint', cardFingerprint).eq('active', true).limit(1));
+      queries.push(supabase.from('fraud_blocklist').select('id').eq('card_fingerprint', cardFingerprint).eq('active', true).limit(1));
     }
 
     const results = await Promise.all(queries);
@@ -298,12 +311,13 @@ export async function addToBlocklist(db, data) {
     const { data: result, error } = await supabase
       .from('fraud_blocklist')
       .insert({
-        userId: data.userId || null,
+        user_id: data.userId || null,
         email: data.email?.toLowerCase() || null,
-        cardFingerprint: data.cardFingerprint || null,
+        card_fingerprint: data.cardFingerprint || null,
         reason: data.reason || 'Manual block',
         active: true,
-        createdBy: data.createdBy || 'system',
+        is_active: true,
+        created_by: data.createdBy || 'system',
         metadata: data.metadata || {}
       })
       .select('id')
@@ -323,20 +337,27 @@ export async function logPriceManipulationAttempt(db, data) {
     const { data: result, error } = await supabase
       .from('fraud_attempts')
       .insert({
-        type: 'price_manipulation',
-        userId: data.userId || null,
+        action: 'price_manipulation',
+        user_id: data.userId || null,
         email: data.email?.toLowerCase() || null,
-        packageId: data.packageId || null,
-        databasePrice: data.databasePrice || null,
-        submittedPrice: data.submittedPrice || null,
-        priceDifference: data.priceDifference || null,
-        ipAddress: data.ipAddress || null,
-        userAgent: data.userAgent || null,
-        cardFingerprint: data.cardFingerprint || null,
-        cardLast4: data.cardLast4 || null,
-        cardBrand: data.cardBrand || null,
-        sessionId: data.sessionId || null,
-        metadata: data.metadata || {}
+        ip_address: data.ipAddress || null,
+        package_id: data.packageId || null,
+        amount: data.submittedPrice || null,
+        currency: 'usd',
+        card_fingerprint: data.cardFingerprint || null,
+        auto_block: data.autoBlock || false,
+        auto_block_reason: data.autoBlock ? `Price manipulation: submitted ${data.submittedPrice}, expected ${data.databasePrice}` : null,
+        risk_score: 100,
+        blocked: data.autoBlock || false,
+        signals: JSON.stringify({ type: 'price_manipulation', database_price: data.databasePrice, submitted_price: data.submittedPrice, difference: data.priceDifference }),
+        metadata: {
+          database_price: data.databasePrice,
+          submitted_price: data.submittedPrice,
+          price_difference: data.priceDifference,
+          user_agent: data.userAgent,
+          promo_code: data.metadata?.promoCode || null,
+          ...(data.metadata || {})
+        }
       })
       .select('id')
       .single();
@@ -354,7 +375,7 @@ export async function logPriceManipulationAttempt(db, data) {
       await addToBlocklist(db, {
         userId: data.userId, email: data.email, cardFingerprint: data.cardFingerprint,
         reason: blockReason, createdBy: 'fraud_detection_system',
-        metadata: { attemptId: result.id, packageId: data.packageId, databasePrice: data.databasePrice, submittedPrice: data.submittedPrice }
+        metadata: { attempt_id: result.id, package_id: data.packageId, database_price: data.databasePrice, submitted_price: data.submittedPrice }
       });
     }
 
@@ -369,7 +390,7 @@ export async function getFraudAttempts(db, options = {}) {
   try {
     const supabase = getSupabase();
     let query = supabase.from('fraud_attempts').select('*');
-    if (options.type) query = query.eq('type', options.type);
+    if (options.type) query = query.eq('action', options.type);
 
     const { data, error } = await query.order('created_at', { ascending: false });
     if (error) throw error;

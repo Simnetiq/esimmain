@@ -75,7 +75,15 @@ const FraudManagement = () => {
       
       const paymentsMapped = (payments || []).map(row => ({
         ...row,
-        createdAt: row.created_at ? new Date(row.created_at) : null
+        createdAt: row.created_at ? new Date(row.created_at) : null,
+        // Normalize to consistent camelCase for display (DB uses snake_case)
+        userId: row.user_id,
+        cardLast4: row.card_last4,
+        cardBrand: row.card_brand,
+        blockReason: row.block_reason,
+        riskLevel: row.risk_level,
+        countryCode: row.country_code,
+        isHighRiskRegion: row.is_high_risk_region,
       }));
       setBlockedPayments(paymentsMapped);
 
@@ -88,7 +96,10 @@ const FraudManagement = () => {
       
       const appealsMapped = (appeals || []).map(row => ({
         ...row,
-        createdAt: row.created_at ? new Date(row.created_at) : null
+        createdAt: row.created_at ? new Date(row.created_at) : null,
+        // Normalize snake_case → camelCase for display
+        contactEmail: row.contact_email,
+        additionalInfo: row.additional_info,
       }));
       setPendingAppeals(appealsMapped);
 
@@ -101,7 +112,13 @@ const FraudManagement = () => {
       
       const warningsMapped = (warnings || []).map(row => ({
         ...row,
-        createdAt: row.created_at ? new Date(row.created_at) : null
+        createdAt: row.created_at ? new Date(row.created_at) : null,
+        // Normalize snake_case → camelCase for display
+        userId: row.user_id,
+        orderId: row.order_id,
+        fraudType: row.fraud_type,
+        cardBrand: row.card_brand,
+        cardLast4: row.card_last4,
       }));
       setFraudWarnings(warningsMapped);
 

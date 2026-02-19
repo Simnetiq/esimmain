@@ -15,7 +15,7 @@ const getStripeSecretKey = () => {
 
 const stripeSecretKey = getStripeSecretKey();
 const stripe = stripeSecretKey ? new Stripe(stripeSecretKey, {
-  apiVersion: '2023-10-16',
+  apiVersion: '2025-01-27.acacia',
 }) : null;
 
 export async function POST(request) {

@@ -168,29 +168,31 @@ export async function blockUser(db, userId, email, options = {}) {
     });
 
     await supabase.from('fraud_blocklist').insert({
-      userId: userId || null,
+      user_id: userId || null,
       email: email?.toLowerCase() || null,
-      cardFingerprint: options.cardFingerprint || null,
+      card_fingerprint: options.cardFingerprint || null,
       reason: options.reason || 'Auto-blocked due to suspicious activity',
       active: true,
-      blockType,
-      expiresAt: blockType === 'temporary' ? blockExpiresAt.toISOString() : null,
-      createdBy: options.createdBy || 'fraud_signals_system',
-      metadata: { blockedPaymentId: options.blockedPaymentId, temporaryBlockCount }
+      is_active: true,
+      block_type: blockType,
+      expires_at: blockType === 'temporary' ? blockExpiresAt.toISOString() : null,
+      created_by: options.createdBy || 'fraud_signals_system',
+      metadata: { blocked_payment_id: options.blockedPaymentId, temporary_block_count: temporaryBlockCount }
     });
 
     if (options.cardFingerprint) {
       await supabase.from('fraud_blocklist').upsert({
         id: `card_${options.cardFingerprint}`,
-        cardFingerprint: options.cardFingerprint,
-        cardLast4: options.cardLast4 || null,
-        cardBrand: options.cardBrand || null,
+        card_fingerprint: options.cardFingerprint,
+        card_last4: options.cardLast4 || null,
+        card_brand: options.cardBrand || null,
         reason: `Card blocked: ${options.reason || 'Suspicious activity'}`,
         active: true,
-        blockType: 'permanent',
-        createdBy: 'fraud_signals_system',
-        relatedUserId: userId || null,
-        relatedEmail: email?.toLowerCase() || null
+        is_active: true,
+        block_type: 'permanent',
+        created_by: 'fraud_signals_system',
+        related_user_id: userId || null,
+        related_email: email?.toLowerCase() || null
       });
     }
 
@@ -235,7 +237,7 @@ export async function checkUserBlocked(db, userId, email, cardFingerprint = null
     }
 
     if (ipAddress) {
-      const { data } = await supabase.from('fraud_blocklist').select('id').eq('ipAddress', ipAddress).eq('active', true).limit(1);
+      const { data } = await supabase.from('fraud_blocklist').select('id').eq('ip_address', ipAddress).eq('active', true).limit(1);
       if (data && data.length > 0) {
         return { blocked: true, blockType: 'ip_blocked', reason: 'Access from your location has been restricted.', canContactSupport: true };
       }
@@ -258,13 +260,13 @@ export async function unblockUser(db, userId, email) {
     // Deactivate user-based blocklist entries (keep card blocks)
     const { data: blocklistEntries } = await supabase
       .from('fraud_blocklist')
-      .select('id, cardFingerprint')
-      .eq('userId', userId || '')
+      .select('id, card_fingerprint')
+      .eq('user_id', userId || '')
       .eq('active', true);
 
     for (const entry of (blocklistEntries || [])) {
-      if (!entry.cardFingerprint) {
-        await supabase.from('fraud_blocklist').update({ active: false, deactivatedAt: new Date().toISOString() }).eq('id', entry.id);
+      if (!entry.card_fingerprint) {
+        await supabase.from('fraud_blocklist').update({ active: false, is_active: false, deactivated_at: new Date().toISOString() }).eq('id', entry.id);
       }
     }
 
@@ -328,11 +330,11 @@ export async function syncToStripeRadar(db, stripe) {
 
     const { data: blocklistEntries } = await supabase.from('fraud_blocklist').select('*').eq('active', true);
     for (const entry of (blocklistEntries || [])) {
-      if (entry.cardFingerprint) {
+      if (entry.card_fingerprint) {
         try {
-          await stripe.radar.valueListItems.create({ value_list: blocklist.id, value: entry.cardFingerprint });
+          await stripe.radar.valueListItems.create({ value_list: blocklist.id, value: entry.card_fingerprint });
           synced++;
-          await supabase.from('fraud_blocklist').update({ stripeSyncedAt: new Date().toISOString(), stripeRadarListId: blocklist.id }).eq('id', entry.id);
+          await supabase.from('fraud_blocklist').update({ stripe_synced_at: new Date().toISOString(), stripe_radar_list_id: blocklist.id }).eq('id', entry.id);
         } catch (err) {
           if (err.code === 'resource_already_exists') skipped++;
         }
