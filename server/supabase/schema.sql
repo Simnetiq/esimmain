@@ -244,3 +244,26 @@ CREATE TABLE public.translation_jobs (
   batch_id uuid,
   CONSTRAINT translation_jobs_pkey PRIMARY KEY (id)
 );
+CREATE TABLE public.esim_topups (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  order_id text NOT NULL,
+  iccid text NOT NULL,
+  airalo_package_id text NOT NULL,
+  package_name text,
+  data_amount text,
+  validity text,
+  price numeric NOT NULL,
+  currency text DEFAULT 'USD'::text,
+  stripe_session_id text,
+  stripe_payment_intent_id text,
+  airalo_order_id text,
+  status text NOT NULL DEFAULT 'topup_pending_payment'::text CHECK (status = ANY (ARRAY['topup_pending_payment'::text, 'topup_payment_confirmed'::text, 'topup_submitting_to_airalo'::text, 'topup_success'::text, 'topup_failed'::text])),
+  error_message text,
+  platform text DEFAULT 'web'::text,
+  is_test_mode boolean DEFAULT false,
+  security jsonb,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT esim_topups_pkey PRIMARY KEY (id)
+);
