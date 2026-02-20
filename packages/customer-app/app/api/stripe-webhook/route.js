@@ -215,9 +215,134 @@ async function createAiraloEsim(orderId, orderData, supabase) {
   return { airaloOrder, simData, esimUpdateData };
 }
 
+async function handleTopupPayment(metadata, paidAmountCents, stripeObjectId, stripeObjectType, supabase) {
+  const topupId = metadata.topup_id;
+  if (!topupId) return;
+
+  const now = new Date().toISOString();
+
+  // Fetch topup record
+  const { data: topup, error: fetchErr } = await supabase
+    .from('esim_topups')
+    .select('*')
+    .eq('id', topupId)
+    .single();
+
+  if (fetchErr || !topup) {
+    console.error(`[webhook-topup] Topup ${topupId} not found:`, fetchErr?.message);
+    return;
+  }
+
+  // Idempotency guard: only process if still pending payment
+  if (topup.status !== 'topup_pending_payment') {
+    console.info(`[webhook-topup] Topup ${topupId} already processed (status: ${topup.status})`);
+    return;
+  }
+
+  // Verify paid amount matches expected
+  const paidAmount = paidAmountCents / 100;
+  if (Math.abs(paidAmount - parseFloat(topup.price)) > 0.01) {
+    console.error(`[webhook-topup] Amount mismatch: paid ${paidAmount}, expected ${topup.price}`);
+    await supabase.from('esim_topups').update({
+      status: 'topup_failed',
+      error_message: `Payment amount mismatch: paid ${paidAmount}, expected ${topup.price}`,
+      updated_at: now,
+    }).eq('id', topupId);
+    return;
+  }
+
+  // Atomic status transition: pending_payment -> submitting_to_airalo
+  const stripeColumn = stripeObjectType === 'session' ? 'stripe_session_id' : 'stripe_payment_intent_id';
+  const { data: claimed, error: claimErr } = await supabase
+    .from('esim_topups')
+    .update({
+      status: 'topup_submitting_to_airalo',
+      [stripeColumn]: stripeObjectId,
+      updated_at: now,
+    })
+    .eq('id', topupId)
+    .eq('status', 'topup_pending_payment')
+    .select('id')
+    .single();
+
+  if (claimErr || !claimed) {
+    console.warn(`[webhook-topup] Topup ${topupId} claim failed — already processing`);
+    return;
+  }
+
+  // ── Submit top-up to Airalo ─────────────────────────────────────────────
+  try {
+    const airaloMode = process.env.AIRALO_MODE || 'production';
+    const isSandbox = airaloMode === 'sandbox' || airaloMode === 'test';
+    const clientId = isSandbox ? (process.env.AIRALO_CLIENT_ID_SANDBOX || process.env.AIRALO_CLIENT_ID) : process.env.AIRALO_CLIENT_ID;
+    const clientSecret = isSandbox ? (process.env.AIRALO_CLIENT_SECRET_SANDBOX || process.env.AIRALO_CLIENT_SECRET) : process.env.AIRALO_CLIENT_SECRET;
+    const airaloBaseUrl = isSandbox ? (process.env.AIRALO_BASE_URL_SANDBOX || 'https://sandbox-partners-api.airalo.com') : (process.env.AIRALO_BASE_URL || 'https://partners-api.airalo.com');
+
+    if (!clientId || !clientSecret) throw new Error('Airalo API credentials not configured');
+
+    // Authenticate
+    const authResponse = await fetch(`${airaloBaseUrl}/v2/token`, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ client_id: clientId, client_secret: clientSecret, grant_type: 'client_credentials' }),
+    });
+    if (!authResponse.ok) throw new Error(`Airalo auth failed: ${await authResponse.text()}`);
+    const authData = await authResponse.json();
+    const accessToken = authData.data?.access_token;
+    if (!accessToken) throw new Error('No access token from Airalo');
+
+    // Submit top-up order
+    const orderResponse = await fetch(`${airaloBaseUrl}/v2/orders`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        package_id: topup.airalo_package_id,
+        quantity: 1,
+        type: 'sim',
+        iccid: topup.iccid,
+        description: `Top-up for ICCID ${topup.iccid}`,
+      }),
+    });
+
+    if (!orderResponse.ok) {
+      const errorText = await orderResponse.text();
+      throw new Error(`Airalo top-up order failed (${orderResponse.status}): ${errorText}`);
+    }
+
+    const airaloResult = await orderResponse.json();
+    const airaloOrder = airaloResult.data;
+
+    if (!airaloOrder?.id) throw new Error('No order ID returned from Airalo');
+
+    // Success
+    await supabase.from('esim_topups').update({
+      status: 'topup_success',
+      airalo_order_id: String(airaloOrder.id),
+      updated_at: new Date().toISOString(),
+    }).eq('id', topupId);
+
+    console.info(`[webhook-topup] Top-up ${topupId} succeeded. Airalo order: ${airaloOrder.id}`);
+  } catch (airaloError) {
+    console.error(`[webhook-topup] Airalo error for topup ${topupId}:`, airaloError.message);
+    await supabase.from('esim_topups').update({
+      status: 'topup_failed',
+      error_message: airaloError.message,
+      updated_at: new Date().toISOString(),
+    }).eq('id', topupId);
+  }
+}
+
 async function handleCheckoutSessionCompleted(session) {
   try {
     if (session.payment_status !== 'paid') return;
+
+    // ── Top-up handling ─────────────────────────────────────────────────────
+    if (session.metadata?.type === 'topup') {
+      const supabase = getSupabase();
+      await handleTopupPayment(session.metadata, session.amount_total, session.id, 'session', supabase);
+      return;
+    }
+
     const orderId = session.metadata?.order_id;
     if (!orderId) return;
 
@@ -288,6 +413,13 @@ async function handleCheckoutSessionCompleted(session) {
 
 async function handlePaymentIntentSucceeded(paymentIntent) {
   try {
+    // ── Top-up handling ─────────────────────────────────────────────────────
+    if (paymentIntent.metadata?.type === 'topup') {
+      const supabase = getSupabase();
+      await handleTopupPayment(paymentIntent.metadata, paymentIntent.amount, paymentIntent.id, 'payment_intent', supabase);
+      return;
+    }
+
     const orderId = paymentIntent.metadata?.order_id;
     if (!orderId) return;
 
