@@ -161,7 +161,9 @@ export default function RootLayout({ children }) {
         <link rel="preconnect" href="https://cdn.airalo.com" />
 
         {/* Preconnect to Supabase for faster auth/db initialization */}
-        <link rel="preconnect" href={process.env.NEXT_PUBLIC_SUPABASE_URL || ''} />
+        {process.env.NEXT_PUBLIC_SUPABASE_URL && (
+          <link rel="preconnect" href={process.env.NEXT_PUBLIC_SUPABASE_URL} />
+        )}
 
         {/* DNS prefetch for non-critical third-party domains (deferred loading) */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />

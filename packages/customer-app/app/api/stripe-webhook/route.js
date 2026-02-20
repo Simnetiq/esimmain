@@ -14,6 +14,10 @@ import {
   releasePromoReservation,
 } from '@esim/shared/services/promoServerService';
 
+// Allow up to 60 s — Airalo auth + order creation requires ~3-8 s.
+// Without this, Vercel kills the function at the 10 s default.
+export const maxDuration = 60;
+
 const getStripeSecretKey = () => {
   const stripeMode = process.env.STRIPE_MODE || 'live';
   if (stripeMode === 'test' || stripeMode === 'sandbox') return process.env.STRIPE_SECRET_KEY_TEST || process.env.STRIPE_SECRET_KEY;
@@ -34,16 +38,37 @@ const stripe = stripeSecretKey ? new Stripe(stripeSecretKey, {
 
 function getSupabase() { return getSupabaseAdmin(); }
 
+/** Persist every event to webhook_events for forensic debugging. */
+async function logWebhookEvent(supabase, eventId, type, status, orderId, errorMessage, payload) {
+  try {
+    await supabase.from('webhook_events').upsert({
+      id: eventId,
+      type,
+      status,
+      order_id: orderId || null,
+      error_message: errorMessage || null,
+      raw_payload: payload || null,
+      processed_at: new Date().toISOString(),
+    });
+  } catch (e) {
+    console.error('[stripe-webhook] Failed to log event:', e.message);
+  }
+}
+
 export async function POST(request) {
+  const supabase = getSupabase();
+  let event = null;
+
   try {
     const webhookSecret = getWebhookSecret();
-    if (!stripe || !stripeSecretKey) { console.error('Stripe not configured'); return NextResponse.json({ error: 'Stripe not configured' }, { status: 503 }); }
+    if (!stripe || !stripeSecretKey) {
+      console.error('[stripe-webhook] Stripe not configured — STRIPE_SECRET_KEY_LIVE missing');
+      return NextResponse.json({ error: 'Stripe not configured' }, { status: 503 });
+    }
 
     // ── SECURITY: Webhook signature MUST be verified. Never skip. ─────────────
-    // Falling back to JSON.parse() when the secret is absent lets any caller
-    // forge arbitrary events (fake payments, fulfillment without payment, etc.)
     if (!webhookSecret) {
-      console.error('[stripe-webhook] STRIPE_WEBHOOK_SECRET not configured — rejecting request');
+      console.error('[stripe-webhook] STRIPE_WEBHOOK_SECRET not configured — rejecting. STRIPE_MODE =', process.env.STRIPE_MODE);
       return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 });
     }
 
@@ -55,13 +80,25 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
     }
 
-    let event;
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
     } catch (err) {
       console.error('[stripe-webhook] Signature verification failed:', err.message);
+      // Log to DB so we can see it in admin
+      await supabase.from('webhook_events').upsert({
+        id: `sig_fail_${Date.now()}`,
+        type: 'signature_failure',
+        status: 'failed',
+        error_message: err.message,
+        raw_payload: { stripeMode: process.env.STRIPE_MODE || 'live', secretConfigured: !!webhookSecret },
+        processed_at: new Date().toISOString(),
+      }).catch(() => {});
       return NextResponse.json({ error: `Webhook signature invalid: ${err.message}` }, { status: 400 });
     }
+
+    // Log received event immediately — lets us confirm delivery
+    await logWebhookEvent(supabase, event.id, event.type, 'received',
+      event.data.object?.metadata?.order_id || null, null, null);
 
     switch (event.type) {
       case 'checkout.session.completed': await handleCheckoutSessionCompleted(event.data.object); break;
@@ -76,9 +113,16 @@ export async function POST(request) {
       default: break;
     }
 
+    await logWebhookEvent(supabase, event.id, event.type, 'processed',
+      event.data.object?.metadata?.order_id || null, null, null);
+
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error('Webhook handler error:', error);
+    console.error('[stripe-webhook] Unhandled error:', error);
+    if (event) {
+      await logWebhookEvent(supabase, event.id, event.type, 'failed',
+        event.data.object?.metadata?.order_id || null, error.message, null).catch(() => {});
+    }
     return NextResponse.json({ error: `Webhook handler failed: ${error.message}` }, { status: 500 });
   }
 }
@@ -220,13 +264,13 @@ async function handleCheckoutSessionCompleted(session) {
       .update({ status: 'creating_esim', payment_status: 'completed', payment_completed_at: now, stripe_session_id: session.id, stripe_payment_intent_id: session.payment_intent, updated_at: now })
       .eq('id', orderId)
       .eq('esim_created', false)
-      .not('status', 'in', '("creating_esim","completed","esim_creation_failed")')
+      .not('status', 'in', '(creating_esim,completed,esim_creation_failed)')
       .select('id')
       .single();
 
     if (claimErr || !claimed) {
       // Another process already claimed this order — idempotent, do nothing
-      console.info(`[webhook] Order ${orderId} already being processed or completed — skipping`);
+      console.warn(`[webhook] Order ${orderId} claim failed — already processed or not found. claimErr:`, claimErr?.message);
       return;
     }
 
@@ -287,7 +331,7 @@ async function handlePaymentIntentSucceeded(paymentIntent) {
         .update({ status: 'creating_esim', payment_status: 'completed', payment_completed_at: now, stripe_payment_intent_id: paymentIntent.id, updated_at: now })
         .eq('id', orderId)
         .eq('esim_created', false)
-        .not('status', 'in', '("creating_esim","completed","esim_creation_failed")')
+        .not('status', 'in', '(creating_esim,completed,esim_creation_failed)')
         .select('id')
         .single();
 
