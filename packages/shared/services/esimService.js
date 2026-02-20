@@ -261,5 +261,40 @@ export const esimService = {
       console.error('Error getting eSIM package history:', error);
       return { success: false, error: error.message || 'Failed to get package history' };
     }
-  }
+  },
+
+  async getAvailableTopups(iccid, authToken = null) {
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+      const response = await fetch(`/api/esims/${encodeURIComponent(iccid)}/topups`, {
+        method: 'GET',
+        headers,
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Failed to fetch top-up packages');
+      return result;
+    } catch (error) {
+      console.error('Error fetching available top-ups:', error);
+      throw error;
+    }
+  },
+
+  async createTopupCheckout(data, authToken = null) {
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+      const response = await fetch('/api/topups/create-checkout', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Failed to create top-up checkout');
+      return result;
+    } catch (error) {
+      console.error('Error creating top-up checkout:', error);
+      throw error;
+    }
+  },
 };
