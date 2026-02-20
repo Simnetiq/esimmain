@@ -2,7 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import {
   QrCode, Smartphone, Clock, Wifi, Phone, MessageSquare,
   Copy, Check, ChevronDown, ChevronUp, X, ExternalLink,
-  Signal, AlertCircle, CheckCircle, Trash2, BookOpen, Globe
+  Signal, AlertCircle, CheckCircle, Trash2, BookOpen, Globe,
+  Plus, ArrowLeft
 } from 'lucide-react';
 import LPAQRCodeDisplay from './LPAQRCodeDisplay';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
@@ -35,6 +36,11 @@ const QRCodeModal = ({
   const [showInstructions, setShowInstructions] = useState(false);
   const [copiedField, setCopiedField] = useState(null);
   const [countryImage, setCountryImage] = useState(null);
+  const [showTopupPackages, setShowTopupPackages] = useState(false);
+  const [topupPackages, setTopupPackages] = useState([]);
+  const [loadingTopups, setLoadingTopups] = useState(false);
+  const [topupError, setTopupError] = useState(null);
+  const [processingTopup, setProcessingTopup] = useState(null);
 
   // Detect language direction
   const direction = useMemo(() => {
@@ -56,7 +62,7 @@ const QRCodeModal = ({
     return getLocalizedName(countryCode, fallbackName);
   }, [selectedOrder, getLocalizedName]);
 
-  // Fetch country/region image from Firebase
+  // Fetch country/region image from Supabase
   useEffect(() => {
     const fetchCountryImage = async () => {
       if (!selectedOrder) {
@@ -130,6 +136,57 @@ const QRCodeModal = ({
     if (window.confirm(t('dashboard.confirmDelete', 'Are you sure you want to delete this eSIM? This action cannot be undone.'))) {
       onDeleteOrder?.(selectedOrder);
       onClose();
+    }
+  };
+
+  const handleTopUpClick = async () => {
+    if (!iccid) return;
+    setShowTopupPackages(true);
+    setLoadingTopups(true);
+    setTopupError(null);
+    try {
+      const supabase = getSupabase();
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      const response = await fetch(`/api/esims/${encodeURIComponent(iccid)}/topups`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Failed to load packages');
+      setTopupPackages(result.data || []);
+    } catch (err) {
+      setTopupError(err.message);
+    } finally {
+      setLoadingTopups(false);
+    }
+  };
+
+  const handleTopupPurchase = async (pkg) => {
+    setProcessingTopup(pkg.id);
+    try {
+      const supabase = getSupabase();
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      const response = await fetch('/api/topups/create-checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          iccid,
+          packageId: pkg.id,
+          language: locale || 'en',
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Checkout failed');
+      if (result.sessionUrl) {
+        window.location.href = result.sessionUrl;
+      }
+    } catch (err) {
+      toast.error(err.message || t('dashboard.topupFailed', 'Top-up failed'));
+      setProcessingTopup(null);
     }
   };
 
@@ -334,7 +391,80 @@ const QRCodeModal = ({
 
         {/* Content */}
         <div className="overflow-y-auto max-h-[calc(90vh-180px)] p-6">
-          
+
+          {/* Top-Up Packages View */}
+          {showTopupPackages && (
+            <div className="space-y-4">
+              <div className={`flex items-center gap-3 mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <button
+                  onClick={() => { setShowTopupPackages(false); setTopupError(null); }}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <ArrowLeft className={`w-5 h-5 text-gray-600 ${isRTL ? 'rotate-180' : ''}`} />
+                </button>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {t('dashboard.selectTopup', 'Select Top-Up Package')}
+                </h3>
+              </div>
+
+              {loadingTopups && (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-10 w-10 border-3 border-tufts-blue border-t-transparent mx-auto mb-3"></div>
+                  <p className="text-gray-500">{t('dashboard.loadingTopups', 'Loading packages...')}</p>
+                </div>
+              )}
+
+              {topupError && (
+                <div className="text-center py-8">
+                  <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-3" />
+                  <p className="text-red-600">{topupError}</p>
+                  <button
+                    onClick={handleTopUpClick}
+                    className="mt-3 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+                  >
+                    {t('common.retry', 'Retry')}
+                  </button>
+                </div>
+              )}
+
+              {!loadingTopups && !topupError && topupPackages.length === 0 && (
+                <div className="text-center py-8">
+                  <AlertCircle className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+                  <p className="text-gray-500">{t('dashboard.noTopups', 'No top-up packages available for this eSIM')}</p>
+                </div>
+              )}
+
+              {!loadingTopups && !topupError && topupPackages.map((pkg) => (
+                <button
+                  key={pkg.id}
+                  onClick={() => handleTopupPurchase(pkg)}
+                  disabled={processingTopup !== null}
+                  className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+                    processingTopup === pkg.id
+                      ? 'border-tufts-blue bg-blue-50'
+                      : 'border-gray-200 hover:border-tufts-blue hover:bg-gray-50'
+                  } ${isRTL ? 'text-right' : ''} disabled:opacity-60`}
+                >
+                  <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div>
+                      <p className="font-semibold text-gray-900">{pkg.dataDisplay}</p>
+                      <p className="text-sm text-gray-500">{pkg.validityDays} {t('dashboard.days', 'days')}</p>
+                    </div>
+                    <div className={isRTL ? 'text-left' : 'text-right'}>
+                      {processingTopup === pkg.id ? (
+                        <div className="animate-spin rounded-full h-6 w-6 border-2 border-tufts-blue border-t-transparent"></div>
+                      ) : (
+                        <p className="text-lg font-bold text-tufts-blue">${pkg.price.toFixed(2)}</p>
+                      )}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {!showTopupPackages && (
+          <>
           {/* QR Code Tab */}
           {activeTab === 'qrcode' && (
             <div className="space-y-5">
@@ -800,11 +930,24 @@ const QRCodeModal = ({
               )}
             </div>
           )}
+          </>
+          )}
         </div>
 
         {/* Footer */}
         <div className="border-t border-gray-200 p-4 bg-gray-50">
           <div className={`flex gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            {/* Top Up Button - only for completed eSIMs */}
+            {!showTopupPackages && iccid && selectedOrder?.status === 'completed' && (
+              <button
+                type="button"
+                onClick={handleTopUpClick}
+                className="flex items-center justify-center gap-2 py-3 px-4 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600 transition-colors"
+              >
+                <Plus className="w-5 h-5" />
+                <span>{t('dashboard.topUp', 'Top Up')}</span>
+              </button>
+            )}
             {/* Main Action */}
             {activeTab === 'qrcode' && iccid && (
               <button
