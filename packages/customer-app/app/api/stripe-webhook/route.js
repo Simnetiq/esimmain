@@ -84,7 +84,7 @@ export async function POST(request) {
 }
 
 async function createAiraloEsim(orderId, orderData, supabase) {
-  const packageId = orderData.package_id || orderData.plan_id;
+  const packageId = orderData.plan_id;
   if (!packageId) throw new Error('No package ID found in order data');
 
   const airaloMode = process.env.AIRALO_MODE || 'production';
@@ -134,14 +134,37 @@ async function createAiraloEsim(orderId, orderData, supabase) {
     esimUpdateData.sim_data = simData;
   }
 
-  await supabase.from('orders').update(esimUpdateData).eq('id', orderId);
+  const { error: orderUpdateErr } = await supabase.from('orders').update(esimUpdateData).eq('id', orderId);
+  if (orderUpdateErr) console.error('[webhook] orders update failed:', orderUpdateErr);
 
   if (orderData.user_id) {
-    const { data: existing } = await supabase.from('user_esims').select('id').eq('id', orderId).eq('user_id', orderData.user_id).single();
+    // user_esims doesn't have 'order_data' column — exclude it
+    const { order_data: _od, ...userEsimUpdateData } = esimUpdateData;
+    const { data: existing } = await supabase.from('user_esims').select('id').eq('id', orderId).eq('user_id', orderData.user_id).maybeSingle();
     if (existing) {
-      await supabase.from('user_esims').update(esimUpdateData).eq('id', orderId).eq('user_id', orderData.user_id);
+      const { error: ueErr } = await supabase.from('user_esims').update(userEsimUpdateData).eq('id', orderId).eq('user_id', orderData.user_id);
+      if (ueErr) console.error('[webhook] user_esims update failed:', ueErr);
     } else {
-      await supabase.from('user_esims').upsert({ ...orderData, ...esimUpdateData, id: orderId, user_id: orderData.user_id });
+      // Whitelist only columns that exist in user_esims
+      const USER_ESIM_COLS = new Set([
+        'id','user_id','order_id','unique_order_id','original_order_id',
+        'plan_id','plan_name','country','country_code','country_region',
+        'country_codes','is_regional','amount','currency','customer_email',
+        'customer_name','user_email','status','payment_status',
+        'payment_completed_at','stripe_session_id','stripe_payment_intent_id',
+        'airalo_order_id','airalo_order_data','esim_created','esim_created_at',
+        'completed_at','esim_error','iccid','qr_code','qr_code_url',
+        'direct_apple_installation_url','matching_id','activation_code',
+        'smdp_address','sim_data','language','source','platform',
+        'is_test_mode','mode','security','price_validation','fraud_check',
+        'metadata','created_at','updated_at'
+      ]);
+      const merged = { ...orderData, ...userEsimUpdateData, id: orderId, user_id: orderData.user_id };
+      const filtered = Object.fromEntries(
+        Object.entries(merged).filter(([k]) => USER_ESIM_COLS.has(k))
+      );
+      const { error: ueErr } = await supabase.from('user_esims').upsert(filtered);
+      if (ueErr) console.error('[webhook] user_esims upsert failed:', ueErr);
     }
   }
 

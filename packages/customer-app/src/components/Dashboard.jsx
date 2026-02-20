@@ -154,7 +154,7 @@ const Dashboard = () => {
   const packageIds = useMemo(() => {
     if (!orders || orders.length === 0) return [];
     const ids = orders
-      .map(order => order.packageId || order.planId || order.packageSlug)
+      .map(order => order.packageSlug || order.package_id || order.plan_id)
       .filter(Boolean)
       .filter((id, index, self) => self.indexOf(id) === index); // unique
     return ids;
@@ -183,7 +183,7 @@ const Dashboard = () => {
     isActive: false
   });
 
-  // Helper: Check if an eSIM is likely expired based on Firebase data
+  // Helper: Check if an eSIM is likely expired based on stored order data
   // Returns { isExpired: boolean, reason: string, cachedUsage: object | null }
   const checkEsimExpiration = useCallback((order, cachedUsage) => {
     // 1. Check cached usage data first (from previous API calls)
@@ -205,7 +205,7 @@ const Dashboard = () => {
     // 3. Calculate expiration from creation date + validity
     const validity = order.planDetails?.validity || order.airaloOrderData?.validity || 0;
     if (validity > 0 && order.createdAt) {
-      const createdDate = order.createdAt?.toDate?.() || new Date(order.createdAt);
+      const createdDate = new Date(order.createdAt || 0);
       const expirationDate = new Date(createdDate);
       expirationDate.setDate(expirationDate.getDate() + validity);
 
@@ -217,7 +217,7 @@ const Dashboard = () => {
     return { isExpired: false, reason: null, cachedUsage };
   }, []);
 
-  // Helper: Create synthetic usage data for expired eSIMs from Firebase data
+  // Helper: Create synthetic usage data for expired eSIMs from stored order data
   const createExpiredUsageData = useCallback((order) => {
     const planDetails = order.planDetails || {};
     const airaloOrderData = order.airaloOrderData || {};
@@ -232,7 +232,7 @@ const Dashboard = () => {
     // Calculate expiration date
     let expiredAt = null;
     if (order.createdAt && validity > 0) {
-      const createdDate = order.createdAt?.toDate?.() || new Date(order.createdAt);
+      const createdDate = new Date(order.createdAt || 0);
       const expirationDate = new Date(createdDate);
       expirationDate.setDate(expirationDate.getDate() + validity);
       expiredAt = expirationDate.toISOString();
@@ -248,7 +248,7 @@ const Dashboard = () => {
       total_text: totalText,
       is_unlimited: isUnlimited,
       expired_at: expiredAt,
-      fromFirebase: true // Flag to indicate this is synthetic data
+      fromStoredData: true
     };
   }, []);
 
@@ -487,38 +487,36 @@ const Dashboard = () => {
         // Load referral stats
         await loadReferralStats();
 
-        // Fetch eSIMs from Supabase esims table
+        // Fetch orders from Supabase orders table
         const supabase = getSupabase();
         const { data: esimsData, error: esimsError } = await supabase
-          .from('esims')
+          .from('orders')
           .select('*')
-          .eq('user_id', currentUser.id);
+          .eq('user_id', currentUser.id)
+          .not('status', 'in', '("deleted","payment_mismatch","blocked","failed")');
 
         if (esimsError) throw esimsError;
 
         const ordersData = await Promise.all((esimsData || [])
           .filter(data => {
-            // Filter out deleted orders
-            if (data.deleted === true) return false;
-            // Filter out test/sandbox orders
-            if (data.isTestMode === true || data.mode === 'sandbox' || data.test === true) return false;
+            // Filter out soft-deleted orders
+            if (data.deleted_at !== null && data.deleted_at !== undefined) return false;
             return true;
           })
           .map(async (data) => {
             try {
               const docId = data.id;
 
-              // Extract QR code data from orderData.sims[0] structure (Airalo format)
-              // Use both direct fields and nested structure for compatibility
-              const simData = data.orderData?.sims?.[0] || data.simData;
+              // Extract QR code data from order_data.sims[0] structure (Airalo format)
+              const simData = data.order_data?.sims?.[0];
 
               // Use the shared utility to map SIM data consistently
               const mappedQrData = simData ? mapAiraloSimData(simData) : null;
 
               // Determine the correct status - prioritize completed status for orders with eSIM data
               let orderStatus = data.status || 'pending';
-              const hasQrData = mappedQrData || data.qrCode || data.qr_code;
-              if (hasQrData && (data.paymentStatus === 'completed' || data.paymentStatus === 'paid')) {
+              const hasQrData = mappedQrData || data.qr_code;
+              if (hasQrData && (data.payment_status === 'paid' || data.payment_status === 'succeeded' || data.payment_status === 'completed')) {
                 orderStatus = 'active'; // Mark as active if we have eSIM data and payment is complete
               }
 
@@ -537,7 +535,7 @@ const Dashboard = () => {
               }
 
               // Extract plan details using shared utility
-              const planData = data.orderData || data.planDetails || {};
+              const planData = data.order_data || {};
               const mappedPlanDetails = mapPlanDetails(planData);
 
               // Merge with direct fields from data if available
@@ -559,48 +557,48 @@ const Dashboard = () => {
               const apnInfo = simData?.apn || planData.apn || {};
 
               // Extract plan title
-              const packageSlug = data.orderData?.package_id ||
-                data.orderData?.package ||
-                data.packageId ||
-                data.planId ||
+              const packageSlug = data.order_data?.package_id ||
+                data.order_data?.package ||
+                data.package_id ||
+                data.plan_id ||
                 docId;
-              let displayPlanName = data.planName || planData.package || data.customerName || packageSlug || 'Unknown Plan';
+              let displayPlanName = data.plan_name || planData.package || packageSlug || 'Unknown Plan';
 
               // Build QR code object with all formats for complete compatibility
               const qrCodeObject = mappedQrData ? {
                 ...mappedQrData,
                 isReal: true
               } : {
-                // Fallback for orders with direct fields (both formats)
-                qr_code: data.qr_code || data.qrCode || data.lpa,
-                qr_code_url: data.qr_code_url || data.qrCodeUrl,
-                direct_apple_installation_url: data.direct_apple_installation_url || data.directAppleInstallationUrl || data.qr_code_url || data.qrCodeUrl,
+                // Fallback for orders with direct qr_code fields (snake_case from orders table)
+                qr_code: data.qr_code || data.lpa,
+                qr_code_url: data.qr_code_url,
+                direct_apple_installation_url: data.direct_apple_installation_url || data.qr_code_url,
                 iccid: data.iccid,
-                matching_id: data.matching_id || data.matchingId,
-                activation_code: data.activation_code || data.activationCode,
-                // camelCase aliases
-                qrCode: data.qrCode || data.qr_code || data.lpa,
-                qrCodeUrl: data.qrCodeUrl || data.qr_code_url,
-                directAppleInstallationUrl: data.directAppleInstallationUrl || data.direct_apple_installation_url || data.qrCodeUrl || data.qr_code_url,
-                lpa: data.lpa || data.qrCode || data.qr_code,
-                matchingId: data.matchingId || data.matching_id,
-                activationCode: data.activationCode || data.activation_code,
-                isReal: !!(data.qrCode || data.qr_code || data.lpa)
+                matching_id: data.matching_id,
+                activation_code: data.activation_code,
+                // camelCase aliases for component compatibility
+                qrCode: data.qr_code || data.lpa,
+                qrCodeUrl: data.qr_code_url,
+                directAppleInstallationUrl: data.direct_apple_installation_url || data.qr_code_url,
+                lpa: data.lpa || data.qr_code,
+                matchingId: data.matching_id,
+                activationCode: data.activation_code,
+                isReal: !!(data.qr_code || data.lpa)
               };
 
               return {
                 id: docId,
                 ...data,
-                // Map mobile app fields to web app expected fields
-                orderId: data.orderResult?.orderId || data.order_id || data.orderId || docId,
-                airaloOrderId: data.airaloOrderId || planData.id,
+                // Normalized fields for components
+                orderId: data.airalo_order_id || docId,
+                airaloOrderId: data.airalo_order_id,
                 planName: displayPlanName,
-                amount: data.amount || data.price || data.orderResult?.price || planData.price || 0,
+                amount: data.amount || data.price || 0,
                 status: orderStatus,
-                paymentStatus: data.paymentStatus || data.orderResult?.paymentStatus || 'unknown',
-                customerEmail: data.customerEmail || data.userEmail || currentUser.email,
-                createdAt: data.createdAt || data.created_at,
-                updatedAt: data.updatedAt || data.updated_at,
+                paymentStatus: data.payment_status || 'unknown',
+                customerEmail: data.customer_email || currentUser.email,
+                createdAt: data.created_at,
+                updatedAt: data.updated_at,
                 // Map country/region information (both formats)
                 countryCode: countryCodeFromData,
                 countryName: countryNameFromData,
@@ -620,8 +618,8 @@ const Dashboard = () => {
                 },
                 // QR code data (with all formats for compatibility)
                 qrCode: qrCodeObject,
-                // Include the raw orderData for reference
-                airaloOrderData: data.orderData
+                // Include the raw order_data for reference
+                airaloOrderData: data.order_data
               };
             } catch {
               return null;
@@ -632,14 +630,14 @@ const Dashboard = () => {
 
         // CRITICAL: Sort orders by creation date (newest first)
         const sortedOrders = filteredOrders.sort((a, b) => {
-          const dateA = a.createdAt?.toDate?.() || a.createdAt || new Date(0);
-          const dateB = b.createdAt?.toDate?.() || b.createdAt || new Date(0);
+          const dateA = new Date(a.createdAt || 0);
+          const dateB = new Date(b.createdAt || 0);
           return dateB - dateA; // Newest first
         });
 
 
         const visibleOrders = sortedOrders.filter(o => {
-          const paid = (o.paymentStatus === 'completed' || o.paymentStatus === 'paid');
+          const paid = (o.paymentStatus === 'paid' || o.paymentStatus === 'succeeded' || o.paymentStatus === 'completed');
           const completed = (o.status === 'completed' || o.status === 'active');
           return paid || completed;
         });
@@ -676,8 +674,8 @@ const Dashboard = () => {
           await supabase.from('users').upsert({
             id: currentUser.id,
             email: currentUser.email,
-            displayName: currentUser.displayName || 'Unknown User',
-            createdAt: new Date().toISOString(),
+            display_name: currentUser.user_metadata?.display_name || currentUser.user_metadata?.full_name || '',
+            created_at: new Date().toISOString(),
             role: 'customer'
           });
           await loadUserProfile();
@@ -944,15 +942,16 @@ const Dashboard = () => {
         return;
       }
 
-      // Update the order in Supabase
-      const supabase = getSupabase();
-      await supabase.from('esims').update({
-        countryCode: countryCode.toUpperCase(),
-        countryName: countryName,
-        updatedAt: new Date().toISOString(),
-        countryUpdatedAt: new Date().toISOString(),
-        countryUpdateReason: 'Updated from Airalo API eSIM details'
-      }).eq('id', order.id).eq('user_id', currentUser.id);
+      // Update the order in Supabase (via API to respect RLS — service_role required)
+      await fetch('/api/orders/update-country', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: order.id,
+          country_code: countryCode.toLowerCase(),
+          country_region: countryName
+        })
+      });
 
       // Update local state
       setOrders(prevOrders =>
@@ -1034,24 +1033,15 @@ const Dashboard = () => {
     if (!confirmed) return;
 
     try {
-      const supabase = getSupabase();
-      // Soft delete from esims table
-      await supabase.from('esims').update({
-        deleted: true,
-        deletedAt: new Date().toISOString(),
-        status: 'deleted'
-      }).eq('id', order.id).eq('user_id', currentUser.id);
+      // Soft delete via API route (service_role required — RLS blocks direct client updates)
+      const deleteResponse = await fetch('/api/orders/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId: order.id })
+      });
 
-      // Also soft delete from global orders table (if it exists)
-      try {
-        await supabase.from('orders').update({
-          deleted: true,
-          deletedAt: new Date().toISOString(),
-          deletedByUser: currentUser.id,
-          status: 'deleted'
-        }).eq('id', order.id);
-      } catch (globalError) {
-        // Global order might not exist or already deleted - this is OK
+      if (!deleteResponse.ok) {
+        throw new Error('Failed to delete order');
       }
 
       // Update local state - remove from orders list
@@ -1227,7 +1217,7 @@ const Dashboard = () => {
         onDeleteOrder={handleDeleteOrder}
         esimUsage={esimUsage}
         esimDetails={esimDetails}
-        planMetadata={selectedOrder ? planMetadataMap[selectedOrder.packageId || selectedOrder.planId || selectedOrder.packageSlug] : null}
+        planMetadata={selectedOrder ? planMetadataMap[selectedOrder.packageSlug || selectedOrder.package_id || selectedOrder.plan_id] : null}
       />
 
       {/* Referral Bottom Sheet */}

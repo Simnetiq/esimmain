@@ -18,10 +18,10 @@ import { appStoreLinks } from '@esim/shared/utils/appStoreLinks';
  * eSIMs are ONLY created by webhooks (stripe-webhook, coinbase webhook).
  * 
  * This component:
- * 1. Fetches order from Firebase
+ * 1. Fetches order from Supabase (orders table)
  * 2. Displays QR code if order is completed
  * 3. Shows "processing" message if order is pending
- * 4. Polls/listens for order updates
+ * 4. Polls for order updates every 3s
  */
 const PaymentSuccess = () => {
   const router = useRouter();
@@ -116,9 +116,9 @@ const PaymentSuccess = () => {
           await generateQRCode(qrData.lpa || qrData.qrCode);
         }
       }
-    } else if (orderData.status === 'failed' || orderData.status === 'esim_creation_failed') {
+    } else if (['failed', 'esim_creation_failed', 'payment_mismatch', 'blocked'].includes(orderData.status)) {
       setOrderStatus('failed');
-      setError(orderData.esim_error || orderData.failure_reason || t('paymentSuccess.errorActivation', 'eSIM activation failed. Please contact support.'));
+      setError(orderData.esim_error || orderData.failure_reason || orderData.error_message || orderData.blocked_reason || t('paymentSuccess.errorActivation', 'eSIM activation failed. Please contact support.'));
     } else {
       // Order is pending - webhook hasn't processed yet
       setOrderStatus('pending');
@@ -144,7 +144,8 @@ const PaymentSuccess = () => {
             .single();
           if (!error && orderData) {
             await processOrderData(orderData, orderId);
-            if (orderData.status === 'completed' || orderData.status === 'failed') break;
+            const terminalStatuses = ['completed', 'failed', 'esim_creation_failed', 'payment_mismatch', 'blocked', 'refunded', 'disputed'];
+            if (terminalStatuses.includes(orderData.status)) break;
           }
         } catch (error) {
           console.error('Order poll error:', error);
@@ -172,24 +173,24 @@ const PaymentSuccess = () => {
       const supabase = getSupabase();
       let orderData = null;
       
-      // Check user's esims first
+      // Check user's orders first (authenticated path uses RLS)
       if (currentUser) {
         const { data } = await supabase
-          .from('esims')
+          .from('orders')
           .select('*')
           .eq('id', orderParam)
           .eq('user_id', currentUser.id)
-          .single();
+          .maybeSingle();
         if (data) orderData = data;
       }
-      
-      // Check global orders collection
+
+      // Fallback: query without user filter (for guest checkout or RLS mismatch)
       if (!orderData) {
         const { data } = await supabase
           .from('orders')
           .select('*')
           .eq('id', orderParam)
-          .single();
+          .maybeSingle();
         if (data) orderData = data;
       }
       
@@ -201,8 +202,8 @@ const PaymentSuccess = () => {
           .from('orders')
           .select('*')
           .eq('id', orderParam)
-          .single();
-        
+          .maybeSingle();
+
         if (!data) {
           setError(`${t('paymentSuccess.errorOrderNotFound', 'Order not found. Please wait a moment and refresh, or contact support with order ID:')} ${orderParam}`);
           setProcessing(false);
@@ -228,8 +229,9 @@ const PaymentSuccess = () => {
       // Process the order data
       await processOrderData(orderData, orderParam);
 
-      // Subscribe to real-time updates if order is pending
-      if (orderData.status !== 'completed') {
+      // Subscribe to real-time updates if order is still in a non-terminal state
+      const terminalStatuses = ['completed', 'failed', 'esim_creation_failed', 'payment_mismatch', 'blocked', 'refunded', 'disputed'];
+      if (!terminalStatuses.includes(orderData.status)) {
         unsubscribeRef.current = subscribeToOrder(orderParam);
       }
       

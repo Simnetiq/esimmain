@@ -151,11 +151,6 @@ const QRCodeModal = ({
   const formatDate = (dateValue) => {
     if (!dateValue) return '—';
     try {
-      // Handle Firestore Timestamp
-      if (dateValue?.toDate) {
-        return dateValue.toDate().toLocaleDateString();
-      }
-      // Handle ISO string or timestamp
       const date = new Date(dateValue);
       if (isNaN(date.getTime())) return '—';
       return date.toLocaleDateString();

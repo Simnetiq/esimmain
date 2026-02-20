@@ -22,12 +22,6 @@ const Edit3Icon = ({ className }) => (
   </svg>
 );
 
-const KeyIcon = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/>
-  </svg>
-);
-
 const PhoneIcon = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
@@ -123,26 +117,21 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
   
   const [editingName, setEditingName] = useState(false);
   const [editingPhone, setEditingPhone] = useState(false);
-  const [newName, setNewName] = useState(currentUser?.displayName || '');
-  const [newPhone, setNewPhone] = useState(userProfile?.phoneNumber || '');
+  const [newName, setNewName] = useState(userProfile?.display_name || currentUser?.user_metadata?.display_name || currentUser?.user_metadata?.full_name || '');
+  const [newPhone, setNewPhone] = useState(userProfile?.phone || '');
   const [isUpdating, setIsUpdating] = useState(false);
-  const [isSendingReset, setIsSendingReset] = useState(false);
   const [isUnsubscribing, setIsUnsubscribing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
 
-  // Newsletter subscription status
-  const isSubscribedToNewsletter = userProfile?.newsletterSubscribed !== false;
+  // Newsletter subscription status (stored in metadata jsonb since no dedicated column)
+  const isSubscribedToNewsletter = userProfile?.metadata?.newsletter_subscribed !== false;
 
-  // Check if user is authenticated with Google or Apple
-  const isGoogleUser = currentUser?.providerData?.some(
-    provider => provider.providerId === 'google.com'
-  );
-  const isAppleUser = currentUser?.providerData?.some(
-    provider => provider.providerId === 'apple.com'
-  );
-  const isSocialUser = isGoogleUser || isAppleUser;
+  // Check if user is authenticated with Google or Apple (Supabase auth)
+  const authProvider = currentUser?.app_metadata?.provider;
+  const isGoogleUser = authProvider === 'google';
+  const isAppleUser = authProvider === 'apple';
 
   const handleUpdateName = useCallback(async () => {
     if (!newName.trim()) {
@@ -156,8 +145,8 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
       await supabase.auth.updateUser({ data: { display_name: newName.trim() } });
 
       await supabase.from('users').update({
-        displayName: newName.trim(),
-        updatedAt: new Date().toISOString()
+        display_name: newName.trim(),
+        updated_at: new Date().toISOString()
       }).eq('id', currentUser.id);
 
       await onLoadUserProfile();
@@ -175,8 +164,8 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
     try {
       const supabase = getSupabase();
       await supabase.from('users').update({
-        phoneNumber: newPhone.trim(),
-        updatedAt: new Date().toISOString()
+        phone: newPhone.trim(),
+        updated_at: new Date().toISOString()
       }).eq('id', currentUser.id);
 
       await onLoadUserProfile();
@@ -189,28 +178,15 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
     }
   }, [newPhone, currentUser, onLoadUserProfile, t]);
 
-  const handlePasswordReset = useCallback(async () => {
-    setIsSendingReset(true);
-    try {
-      const supabase = getSupabase();
-      await supabase.auth.resetPasswordForEmail(currentUser.email);
-      showToast('success', t('dashboard.passwordResetEmailSent', 'Password reset email sent! Check your inbox.'));
-    } catch {
-      showToast('error', t('dashboard.failedToSendPasswordReset', 'Failed to send password reset email'));
-    } finally {
-      setIsSendingReset(false);
-    }
-  }, [currentUser, t]);
-
   const cancelNameEdit = useCallback(() => {
-    setNewName(currentUser?.displayName || '');
+    setNewName(userProfile?.display_name || currentUser?.user_metadata?.display_name || currentUser?.user_metadata?.full_name || '');
     setEditingName(false);
-  }, [currentUser?.displayName]);
+  }, [userProfile?.display_name, currentUser?.user_metadata]);
 
   const cancelPhoneEdit = useCallback(() => {
-    setNewPhone(userProfile?.phoneNumber || '');
+    setNewPhone(userProfile?.phone || '');
     setEditingPhone(false);
-  }, [userProfile?.phoneNumber]);
+  }, [userProfile?.phone]);
 
   const handleNewsletterToggle = useCallback(async () => {
     setIsUnsubscribing(true);
@@ -218,8 +194,12 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
       const supabase = getSupabase();
       const newStatus = !isSubscribedToNewsletter;
       await supabase.from('users').update({
-        newsletterSubscribed: newStatus,
-        newsletterUpdatedAt: new Date().toISOString()
+        metadata: {
+          ...(userProfile?.metadata || {}),
+          newsletter_subscribed: newStatus,
+          newsletter_updated_at: new Date().toISOString()
+        },
+        updated_at: new Date().toISOString()
       }).eq('id', currentUser.id);
       await onLoadUserProfile();
       showToast('success', newStatus 
@@ -244,10 +224,11 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
       const supabase = getSupabase();
       // Soft delete user data
       await supabase.from('users').update({
-        deleted: true,
-        deletedAt: new Date().toISOString(),
+        is_blocked: true,
+        block_reason: 'user_requested_deletion',
         email: `deleted_${currentUser.id}@deleted.com`,
-        displayName: 'Deleted User'
+        display_name: 'Deleted User',
+        updated_at: new Date().toISOString()
       }).eq('id', currentUser.id);
 
       // Try to delete auth account via API route (admin operation)
@@ -332,7 +313,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
                   </div>
                 ) : (
                   <div className={`flex items-center justify-between p-3.5 bg-white border border-gray-200 rounded-xl `}>
-                    <span className="text-sm text-eerie-black">{currentUser.displayName || t('dashboard.notSet', 'Not set')}</span>
+                    <span className="text-sm text-eerie-black">{userProfile?.display_name || currentUser?.user_metadata?.display_name || currentUser?.user_metadata?.full_name || t('dashboard.notSet', 'Not set')}</span>
                     <button
                       onClick={() => setEditingName(true)}
                       className="text-tufts-blue hover:text-tufts-blue/80 transition-colors p-1.5 hover:bg-tufts-blue/10 rounded-lg"
@@ -374,7 +355,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
                   </div>
                 ) : (
                   <div className={`flex items-center justify-between p-3.5 bg-white border border-gray-200 rounded-xl `}>
-                    <span className="text-sm text-eerie-black">{userProfile?.phoneNumber || t('dashboard.notSet', 'Not set')}</span>
+                    <span className="text-sm text-eerie-black">{userProfile?.phone || t('dashboard.notSet', 'Not set')}</span>
                     <button
                       onClick={() => setEditingPhone(true)}
                       className="text-tufts-blue hover:text-tufts-blue/80 transition-colors p-1.5 hover:bg-tufts-blue/10 rounded-lg"
@@ -393,12 +374,9 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
                 </label>
                 <div className={`flex items-center justify-between p-3.5 bg-white border border-gray-200 rounded-xl `}>
                   <span className="text-sm text-eerie-black">
-                    {userProfile?.createdAt ? 
-                      (userProfile.createdAt.toDate ? 
-                        new Date(userProfile.createdAt.toDate()).toLocaleDateString() :
-                        new Date(userProfile.createdAt).toLocaleDateString()
-                      ) : 
-                      t('dashboard.unknown', 'Unknown')
+                    {userProfile?.created_at
+                      ? new Date(userProfile.created_at).toLocaleDateString()
+                      : t('dashboard.unknown', 'Unknown')
                     }
                   </span>
                 </div>
@@ -406,41 +384,13 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
             </div>
           </div>
 
-          {/* Security - Only show for non-social users */}
-          {!isSocialUser && (
-            <div className="bg-white shadow-lg shadow-gray-200/50 p-5 sm:p-6">
-              <h3 className={`text-base font-semibold text-eerie-black mb-5 ${isRTL ? 'text-right' : ''}`}>
-                {t('dashboard.security', 'Security')}
-              </h3>
-              <div className="space-y-2">
-                <label className={`flex items-center gap-1.5 text-sm font-medium text-gray-600 `}>
-                  <KeyIcon className="w-4 h-4" />
-                  {t('dashboard.password', 'Password')}
-                </label>
-                <div className={`flex items-center justify-between p-3.5 bg-white border border-gray-200 rounded-xl `}>
-                  <span className="text-sm text-eerie-black">••••••••</span>
-                  <button
-                    onClick={handlePasswordReset}
-                    disabled={isSendingReset}
-                    className="text-sm font-medium bg-tufts-blue text-white px-4 py-2 rounded-full hover:bg-tufts-blue/90 transition-colors disabled:opacity-50"
-                  >
-                    {isSendingReset ? t('dashboard.sending', 'Sending...') : t('dashboard.resetPassword', 'Reset Password')}
-                  </button>
-                </div>
-                <p className={`text-xs text-gray-500 mt-2 ${isRTL ? 'text-right' : ''}`}>
-                  {t('dashboard.passwordResetInfo', "We'll send a password reset link to your email address")}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Social Account Info - Show for Google/Apple users */}
-          {isSocialUser && (
-            <div className={`shadow-lg shadow-gray-200/50 p-5 sm:p-6`}>  
+          {/* Social Account Info */}
+          {(isGoogleUser || isAppleUser) && (
+            <div className={`shadow-lg shadow-gray-200/50 p-5 sm:p-6`}>
               <div className={`flex items-center gap-3 `}>
                 {isGoogleUser ? <GoogleIcon /> : <AppleIcon />}
                 <span className={`text-sm font-semibold text-eerie-black`}>
-                  {isGoogleUser 
+                  {isGoogleUser
                     ? t('dashboard.googleAccount', 'Signed in with Google')
                     : t('dashboard.appleAccount', 'Signed in with Apple')
                   }
