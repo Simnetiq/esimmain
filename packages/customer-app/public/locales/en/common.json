@@ -846,6 +846,12 @@
     "countries": "countries",
     "tapToView": "Tap to view all countries",
     "fairUsage": "Fair Usage Policy",
+    "promoPlaceholder": "Promo code",
+    "applyPromo": "Apply",
+    "promoAppliedPct": "{{pct}}% off applied",
+    "promoAppliedAmt": "${{amt}} off applied",
+    "promoInvalid": "Invalid or expired promo code",
+    "promoError": "Could not validate promo code",
     "metaDescription": "Buy {planName} eSIM for {country}. Instant activation, secure checkout, global coverage. Starting from ${price}. Perfect for travelers and digital nomads.",
     "metaTitle": "Buy {planName} eSIM - {country} | Secure Checkout"
   },

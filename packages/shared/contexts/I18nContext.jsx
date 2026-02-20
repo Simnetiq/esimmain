@@ -106,19 +106,20 @@ export const I18nProvider = ({ children }) => {
       if (value && typeof value === 'object' && k in value) {
         value = value[k];
       } else {
-        return fallback || key;
+        value = undefined;
+        break;
       }
     }
-    
-    let result = typeof value === 'string' ? value : fallback || key;
-    
+
+    let result = (typeof value === 'string' ? value : undefined) || fallback || key;
+
     if (typeof result === 'string' && variables && typeof variables === 'object') {
       Object.keys(variables).forEach(varKey => {
         const placeholder = `{{${varKey}}}`;
         result = result.replace(new RegExp(placeholder, 'g'), variables[varKey]);
       });
     }
-    
+
     return result;
   };
 

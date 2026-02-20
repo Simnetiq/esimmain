@@ -325,7 +325,7 @@ export async function POST(request) {
     const attemptId = await trackPurchaseAttempt(supabase, { userId, email, amount: validatedPrice, currency: currency.toLowerCase(), metadata: { orderId: order, planName: packageName, riskScore: fraudCheck.riskScore, riskFactors: fraudCheck.riskFactors, ip, userAgent } });
 
     // Always use server-side env — never the client-supplied domain value.
-    const finalDomain = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const finalDomain = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.simnetiq.store';
     const stripeMode = process.env.STRIPE_MODE || 'live';
     const isTestMode = stripeMode === 'test' || stripeMode === 'sandbox';
 
@@ -343,7 +343,6 @@ export async function POST(request) {
     const pendingOrderData = {
       id: uniqueOrderId,
       order_id: order,
-      package_id: order,
       plan_id: order,
       plan_name: packageName,
       customer_name: name || 'Customer',
@@ -371,10 +370,7 @@ export async function POST(request) {
         ip,
         userAgent,
         requestTimestamp: timestamp || null,
-        // Client nonce is stored for audit only — NOT used for validation.
-        // A client can forge any nonce value; it provides no replay protection here.
         clientNonce: nonce || null,
-        // Server-generated trace ID for this specific request
         serverTraceId: `${Date.now()}_${Math.random().toString(36).substr(2, 12)}`,
         priceValidatedAt: now,
         databasePrice: priceValidation.databasePrice,
@@ -396,9 +392,16 @@ export async function POST(request) {
       fraud_check: { attemptId, riskScore: fraudCheck.riskScore, riskFactors: fraudCheck.riskFactors, requiresReview: fraudCheck.requiresReview || false, checkedAt: now }
     };
 
-    await supabase.from('orders').upsert(pendingOrderData);
+    const { error: orderError } = await supabase.from('orders').upsert(pendingOrderData);
+    if (orderError) {
+      console.error('[create-payment-order] Failed to create order:', orderError);
+      return NextResponse.json({ error: 'Failed to create order. Please try again.', code: 'ORDER_CREATION_FAILED' }, { status: 500 });
+    }
     if (userId) {
-      await supabase.from('user_esims').upsert({ ...pendingOrderData, user_id: userId });
+      // user_esims table doesn't have 'quantity' column — omit it
+      const { quantity: _q, ...esimData } = pendingOrderData;
+      const { error: esimError } = await supabase.from('user_esims').upsert({ ...esimData, user_id: userId });
+      if (esimError) console.error('[create-payment-order] Failed to create user_esim:', esimError);
     }
 
     await logPaymentAttempt(supabase, { packageId: order, email, userId, ip, userAgent, submittedPrice: total, validatedPrice, priceMatch: true, status: 'validated', blocked: false });

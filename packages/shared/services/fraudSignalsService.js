@@ -25,17 +25,21 @@ function hashEmail(email) {
   return `email_${Math.abs(hash).toString(36)}`;
 }
 
+/**
+ * Look up a fraud signal by user_id (uuid) or email_hash (text).
+ * Uses .maybeSingle() to avoid PostgREST 406 when no rows exist.
+ */
 export async function getFraudSignal(db, userId, email) {
   try {
     const supabase = getSupabase();
     if (userId) {
-      const { data } = await supabase.from('fraud_signals').select('*').eq('id', userId).single();
-      if (data) return { id: data.id, ...data };
+      const { data } = await supabase.from('fraud_signals').select('*').eq('user_id', userId).maybeSingle();
+      if (data) return data;
     }
     if (email) {
       const emailHash = hashEmail(email);
-      const { data } = await supabase.from('fraud_signals').select('*').eq('id', emailHash).single();
-      if (data) return { id: data.id, ...data };
+      const { data } = await supabase.from('fraud_signals').select('*').eq('email_hash', emailHash).maybeSingle();
+      if (data) return data;
     }
     return null;
   } catch (error) { return null; }
@@ -44,13 +48,12 @@ export async function getFraudSignal(db, userId, email) {
 export async function upsertFraudSignal(db, data) {
   try {
     const supabase = getSupabase();
-    const docId = data.userId || hashEmail(data.email);
-    
-    const { data: existing } = await supabase.from('fraud_signals').select('*').eq('id', docId).single();
+
+    const existing = await getFraudSignal(db, data.userId, data.email);
 
     if (existing) {
       const updateData = { last_attempt_at: new Date().toISOString(), updated_at: new Date().toISOString() };
-      
+
       if (data.cardFingerprint) {
         const fingerprints = existing.card_fingerprints || [];
         if (!fingerprints.includes(data.cardFingerprint)) fingerprints.push(data.cardFingerprint);
@@ -70,10 +73,9 @@ export async function upsertFraudSignal(db, data) {
         updateData.attempts = (existing.attempts || 0) + 1;
       }
 
-      await supabase.from('fraud_signals').update(updateData).eq('id', docId);
+      await supabase.from('fraud_signals').update(updateData).eq('id', existing.id);
     } else {
       await supabase.from('fraud_signals').insert({
-        id: docId,
         user_id: data.userId || null,
         email: data.email?.toLowerCase() || null,
         email_hash: data.email ? hashEmail(data.email) : null,
@@ -91,7 +93,7 @@ export async function upsertFraudSignal(db, data) {
       });
     }
 
-    return { success: true, docId };
+    return { success: true };
   } catch (error) { return { success: false, error: error.message }; }
 }
 
@@ -140,21 +142,19 @@ export async function recordBlockedPayment(db, data) {
 export async function blockUser(db, userId, email, options = {}) {
   try {
     const supabase = getSupabase();
-    const docId = userId || hashEmail(email);
 
-    const { data: existing } = await supabase.from('fraud_signals').select('temporary_block_count').eq('id', docId).single();
+    const existing = await getFraudSignal(db, userId, email);
+    let temporaryBlockCount = (existing?.temporary_block_count || 0) + 1;
 
     let blockType = 'temporary';
     let blockExpiresAt = new Date(Date.now() + FRAUD_SIGNALS_CONFIG.TEMPORARY_BLOCK_DURATION_MS);
-    let temporaryBlockCount = (existing?.temporary_block_count || 0) + 1;
 
     if (temporaryBlockCount >= FRAUD_SIGNALS_CONFIG.MAX_TEMPORARY_BLOCKS_BEFORE_PERMANENT || options.permanent) {
       blockType = 'permanent';
       blockExpiresAt = null;
     }
 
-    await supabase.from('fraud_signals').upsert({
-      id: docId,
+    const blockData = {
       user_id: userId || null,
       email: email?.toLowerCase() || null,
       email_hash: email ? hashEmail(email) : null,
@@ -165,7 +165,13 @@ export async function blockUser(db, userId, email, options = {}) {
       block_reason: options.reason || 'Blocked due to suspicious activity',
       temporary_block_count: temporaryBlockCount,
       updated_at: new Date().toISOString()
-    });
+    };
+
+    if (existing) {
+      await supabase.from('fraud_signals').update(blockData).eq('id', existing.id);
+    } else {
+      await supabase.from('fraud_signals').insert(blockData);
+    }
 
     await supabase.from('fraud_blocklist').insert({
       user_id: userId || null,
@@ -230,7 +236,7 @@ export async function checkUserBlocked(db, userId, email, cardFingerprint = null
     }
 
     if (cardFingerprint) {
-      const { data } = await supabase.from('fraud_blocklist').select('id').eq('id', `card_${cardFingerprint}`).eq('active', true).limit(1);
+      const { data } = await supabase.from('fraud_blocklist').select('id').eq('card_fingerprint', cardFingerprint).eq('active', true).limit(1);
       if (data && data.length > 0) {
         return { blocked: true, blockType: 'card_blocked', reason: 'This payment method has been blocked.', canContactSupport: true };
       }
@@ -250,23 +256,27 @@ export async function checkUserBlocked(db, userId, email, cardFingerprint = null
 export async function unblockUser(db, userId, email) {
   try {
     const supabase = getSupabase();
-    const docId = userId || hashEmail(email);
 
-    await supabase.from('fraud_signals').update({
-      blocked: false, block_type: null, block_expires_at: null,
-      unblocked_at: new Date().toISOString(), updated_at: new Date().toISOString()
-    }).eq('id', docId);
+    const existing = await getFraudSignal(db, userId, email);
+    if (existing) {
+      await supabase.from('fraud_signals').update({
+        blocked: false, block_type: null, block_expires_at: null,
+        unblocked_at: new Date().toISOString(), updated_at: new Date().toISOString()
+      }).eq('id', existing.id);
+    }
 
     // Deactivate user-based blocklist entries (keep card blocks)
-    const { data: blocklistEntries } = await supabase
-      .from('fraud_blocklist')
-      .select('id, card_fingerprint')
-      .eq('user_id', userId || '')
-      .eq('active', true);
+    if (userId) {
+      const { data: blocklistEntries } = await supabase
+        .from('fraud_blocklist')
+        .select('id, card_fingerprint')
+        .eq('user_id', userId)
+        .eq('active', true);
 
-    for (const entry of (blocklistEntries || [])) {
-      if (!entry.card_fingerprint) {
-        await supabase.from('fraud_blocklist').update({ active: false, is_active: false, deactivated_at: new Date().toISOString() }).eq('id', entry.id);
+      for (const entry of (blocklistEntries || [])) {
+        if (!entry.card_fingerprint) {
+          await supabase.from('fraud_blocklist').update({ active: false, is_active: false, deactivated_at: new Date().toISOString() }).eq('id', entry.id);
+        }
       }
     }
 
