@@ -201,6 +201,72 @@ export default function ActivationSection() {
           </div>
         </div>
 
+        {/* Doppler VPN Promo */}
+        <div className="mx-auto w-full max-w-9xl">
+          <div className="mx-auto w-full max-w-7xl mt-6">
+            <div className="px-4 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
+              <div className="relative overflow-hidden rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm animate-fade-in-up">
+                <div className="px-6 py-8 md:px-10 md:py-10">
+                  <div className={`flex flex-col md:flex-row items-center gap-6 md:gap-10 ${isRTL ? 'md:flex-row-reverse' : ''}`}>
+                    {/* App Icon */}
+                    <div className="flex-shrink-0">
+                      <img
+                        src="/images/doppler-icon.jpg"
+                        alt="Doppler VPN"
+                        width={80}
+                        height={80}
+                        className="w-[72px] h-[72px] md:w-20 md:h-20 rounded-[18px] md:rounded-[22px] shadow-lg"
+                      />
+                    </div>
+
+                    {/* Text */}
+                    <div className={`flex-1 min-w-0 ${isRTL ? 'text-right' : ''}`}>
+                      <span className="text-xs font-semibold tracking-widest uppercase text-tufts-blue mb-1 block">
+                        {t('activation.doppler.badge', 'By Simnetiq')}
+                      </span>
+                      <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-2">
+                        {t('activation.doppler.title', 'Doppler VPN')}
+                      </h3>
+                      <p className="text-sm text-gray-500 leading-relaxed max-w-lg mb-3">
+                        {t('activation.doppler.description', 'Fast, no-logs VPN powered by WireGuard on mobile and advanced VLESS via Telegram bot. All major platforms, up to 10 devices.')}
+                      </p>
+                      <div className={`inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <span className="text-xs font-semibold text-emerald-700">
+                          {t('activation.doppler.promo', 'Launch offer: use code 20 for 20% off')}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* CTA Buttons */}
+                    <div className={`flex flex-col sm:flex-row gap-3 flex-shrink-0 ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
+                      <a
+                        href="https://apps.apple.com/at/app/doppler-vpn-fast-secure/id6757091773"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`inline-flex items-center gap-2.5 rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-150 hover:bg-gray-800 hover:scale-[1.02] ${isRTL ? 'flex-row-reverse' : ''}`}
+                      >
+                        <AppleIcon />
+                        <span>{t('activation.doppler.appStore', 'Get on App Store')}</span>
+                      </a>
+                      <a
+                        href="https://dopplervpn.org/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`inline-flex items-center gap-2.5 rounded-full bg-white px-5 py-2.5 text-sm font-medium text-gray-900 ring-1 ring-gray-200 shadow-sm transition-all duration-150 hover:bg-gray-50 hover:scale-[1.02] ${isRTL ? 'flex-row-reverse' : ''}`}
+                      >
+                        <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/>
+                        </svg>
+                        <span>{t('activation.doppler.learnMore', 'Learn More')}</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* FAQ Section Header */}
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">

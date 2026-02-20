@@ -5,7 +5,9 @@ import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { createContactRequest } from '@esim/shared/services/contactService';
 import { getLanguageDirection, detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
 import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 import BlogAppDownload from './BlogAppDownload';
+import BackgroundDecor from './ui/BackgroundDecor';
 
 // Lazy load toast
 const showToast = async (type, message) => {
@@ -68,33 +70,39 @@ const MailIcon = ({ className }) => (
   </svg>
 );
 
-// Grid pattern style
-const gridPatternStyle = {
-  backgroundSize: '10px 10px',
-  backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-};
+const ArrowRightIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
+  </svg>
+);
+
+const BookOpenIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+  </svg>
+);
 
 // FAQ Item Component
 const FAQItem = ({ question, answer, isOpen, onToggle, isRTL, steps }) => (
   <div className="border-b border-gray-100 last:border-b-0">
     <button
       onClick={onToggle}
-      className={`w-full px-4 py-4 flex items-center justify-between gap-4 hover:bg-gray-50/50 transition-colors ${isRTL ? 'flex-row-reverse text-right' : 'text-left'}`}
+      className={`w-full px-5 py-4 flex items-center justify-between gap-4 hover:bg-gray-50/50 transition-colors duration-150 ease-out ${isRTL ? 'flex-row-reverse text-right' : 'text-left'}`}
     >
-      <span className="font-medium text-eerie-black text-sm sm:text-base">{question}</span>
+      <span className="font-medium text-gray-900 text-sm sm:text-base">{question}</span>
       <ChevronDownIcon className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
     </button>
     {isOpen && (
-      <div className={`px-4 pb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
-        <p className="text-cool-black leading-relaxed text-sm mb-3">{answer}</p>
+      <div className={`px-5 pb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+        <p className="text-gray-600 leading-relaxed text-sm mb-3">{answer}</p>
         {steps && steps.length > 0 && (
-          <div className="mt-3 space-y-2">
+          <div className="mt-3 space-y-2.5">
             {steps.map((step, idx) => (
-              <div key={idx} className={`flex gap-3 `}>
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-tufts-blue/10 text-tufts-blue flex items-center justify-center text-xs font-semibold">
+              <div key={idx} className={`flex gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <span className="flex-shrink-0 w-7 h-7 rounded-full bg-tufts-blue/10 text-tufts-blue flex items-center justify-center text-xs font-semibold mt-0.5">
                   {idx + 1}
                 </span>
-                <p className="text-sm text-gray-600">{step}</p>
+                <p className="text-sm text-gray-700 leading-relaxed pt-1">{step}</p>
               </div>
             ))}
           </div>
@@ -106,12 +114,12 @@ const FAQItem = ({ question, answer, isOpen, onToggle, isRTL, steps }) => (
 
 // FAQ Category Component
 const FAQCategory = ({ icon: Icon, title, faqs, openFaq, onToggle, categoryIndex, isRTL }) => (
-  <div className="bg-white shadow-lg shadow-gray-200/50 overflow-hidden">
-    <div className={`p-5 border-b border-gray-100 flex items-center gap-3 `}>
-      <div className="w-10 h-10 bg-tufts-blue/10 flex items-center justify-center">
+  <div className="rounded-xl border border-gray-200 overflow-hidden bg-white/80 backdrop-blur-sm">
+    <div className={`p-5 border-b border-gray-100 flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+      <div className="w-9 h-9 bg-tufts-blue/10 rounded-lg flex items-center justify-center flex-shrink-0">
         <Icon className="w-5 h-5 text-tufts-blue" />
       </div>
-      <h3 className="text-lg font-semibold text-eerie-black">{title}</h3>
+      <h3 className="text-base font-semibold text-gray-900">{title}</h3>
     </div>
     <div>
       {faqs.map((faq, faqIndex) => (
@@ -148,6 +156,7 @@ const Contact = () => {
   }, [locale, pathname]);
 
   const isRTL = mounted ? getLanguageDirection(currentLanguage) === 'rtl' : false;
+  const guideHref = currentLanguage === 'en' ? '/help/install-esim' : `/${currentLanguage}/help/install-esim`;
 
   const [formData, setFormData] = useState({
     name: '',
@@ -343,43 +352,35 @@ const Contact = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white relative overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Gradient Orbs - subtle background effect */}
-      <div className="absolute top-0 left-0 w-[600px] h-[600px] rounded-full blur-[120px] -translate-x-1/3 -translate-y-1/3 pointer-events-none" style={{ backgroundColor: 'rgba(83, 116, 205, 0.08)' }} />
-      <div className="absolute top-1/2 right-0 w-[500px] h-[500px] rounded-full blur-[100px] translate-x-1/3 pointer-events-none" style={{ backgroundColor: 'rgba(83, 116, 205, 0.06)' }} />
-
-      {/* Grid Pattern - sides */}
-      <div className="hidden xl:block absolute left-0 top-0 bottom-0 w-24 pointer-events-none" style={gridPatternStyle} />
-      <div className="hidden xl:block absolute right-0 top-0 bottom-0 w-24 pointer-events-none" style={gridPatternStyle} />
+    <div className="min-h-screen relative" dir={isRTL ? 'rtl' : 'ltr'}>
+      <BackgroundDecor />
 
       {/* Header Section */}
-      <div className="relative pt-8 lg:pt-16 pb-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="max-w-3xl">
-            <p className="text-sm font-medium tracking-widest uppercase text-gray-500 mb-4">
-              {t('contact.title', 'Help Center')}
-            </p>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-eerie-black tracking-tight mb-4">
-              {t('contact.subtitle', "We're here to help with all your needs")}
-            </h1>
-            <p className="text-gray-600 text-base sm:text-lg">
-              {t('contact.description', 'Find answers to common questions or send us a message. Our support team typically responds within a few hours.')}
-            </p>
-          </div>
+      <div className="relative border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6">
+          <p className={`text-sm font-medium tracking-widest uppercase text-gray-500 mb-3 ${isRTL ? 'text-right' : ''}`}>
+            {t('contact.title', 'Help Center')}
+          </p>
+          <h1 className={`text-2xl font-bold text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+            {t('contact.subtitle', "We're here to help with all your needs")}
+          </h1>
+          <p className={`mt-1.5 text-sm text-gray-500 ${isRTL ? 'text-right' : ''}`}>
+            {t('contact.description', 'Find answers to common questions or send us a message. Our support team typically responds within a few hours.')}
+          </p>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 pb-16">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           {/* Contact Form - Sticky on desktop */}
           <div className="lg:col-span-1">
-            <h2 className={`text-xl sm:text-2xl font-semibold text-eerie-black mb-6 ${isRTL ? 'text-right' : ''}`}>
+            <h2 className={`text-base font-semibold text-gray-900 mb-4 ${isRTL ? 'text-right' : ''}`}>
               {t('contact.sendMessage', 'Send us a Message')}
             </h2>
             <div className="lg:sticky lg:top-24">
-              <div className="bg-white border-gray-100 shadow-lg shadow-gray-200/50 p-6 sm:p-8">
+              <div className="rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm p-5 sm:p-6">
 
                 <div className="flex border-b border-gray-100 mb-6">
                   <button
@@ -531,10 +532,31 @@ const Contact = () => {
           </div>
 
           {/* FAQ Categories */}
-          <div className="lg:col-span-2 space-y-6">
-            <h2 className={`text-xl sm:text-2xl font-semibold text-eerie-black mb-6 ${isRTL ? 'text-right' : ''}`}>
+          <div className="lg:col-span-2 space-y-4">
+            <h2 className={`text-base font-semibold text-gray-900 mb-4 ${isRTL ? 'text-right' : ''}`}>
               {t('contact.faqTitle', 'Frequently Asked Questions')}
             </h2>
+
+            {/* Installation Guide CTA */}
+            <Link
+              href={guideHref}
+              className={`group block rounded-xl border border-tufts-blue/20 bg-tufts-blue/5 p-5 hover:bg-tufts-blue/10 transition-colors duration-150 ease-out`}
+            >
+              <div className={`flex items-center gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className="w-11 h-11 bg-tufts-blue/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <BookOpenIcon className="w-5 h-5 text-tufts-blue" />
+                </div>
+                <div className={`flex-1 min-w-0 ${isRTL ? 'text-right' : ''}`}>
+                  <p className="text-sm font-semibold text-gray-900">
+                    {t('contact.guideCard.title', 'eSIM Installation Guide')}
+                  </p>
+                  <p className="text-sm text-gray-500 mt-0.5">
+                    {t('contact.guideCard.description', 'Step-by-step instructions for iPhone, Android, and manual installation')}
+                  </p>
+                </div>
+                <ArrowRightIcon className={`w-5 h-5 text-tufts-blue flex-shrink-0 group-hover:translate-x-0.5 transition-transform duration-150 ${isRTL ? 'rotate-180 group-hover:-translate-x-0.5' : ''}`} />
+              </div>
+            </Link>
 
             {faqCategories.map((category, categoryIndex) => (
               <FAQCategory
@@ -553,7 +575,7 @@ const Contact = () => {
       </div>
 
       {/* App Download CTA */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 pb-16">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-6">
         <BlogAppDownload
           language={currentLanguage}
           isRTL={isRTL}

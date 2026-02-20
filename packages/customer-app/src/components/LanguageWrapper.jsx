@@ -23,8 +23,11 @@ const LanguageWrapper = ({ children }) => {
   // Check for special pages that should always have i18n context
   const isSpecialPage = pathname === '/not-found' || pathname === '/404';
   
+  // Check for help pages
+  const isHelpPage = pathname.startsWith('/help');
+
   // Check for blog pages (both old and new language routes)
-  const isBlogPage = pathname.startsWith('/blog') || 
+  const isBlogPage = pathname.startsWith('/blog') ||
                     // New language-code blog routes
                     pathname.startsWith('/he/blog') || 
                     pathname.startsWith('/ar/blog') || 
@@ -55,7 +58,7 @@ const LanguageWrapper = ({ children }) => {
                                 pathname.startsWith('/french/') || 
                                 pathname.startsWith('/spanish/');
   
-  if (!translatedPages.includes(pathname) && !isBlogPage && !isLanguageSpecificPage && !isSpecialPage && !isSharePackagePage) {
+  if (!translatedPages.includes(pathname) && !isBlogPage && !isHelpPage && !isLanguageSpecificPage && !isSpecialPage && !isSharePackagePage) {
     return children;
   }
   

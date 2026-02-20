@@ -132,6 +132,14 @@
     "appDescription": "Get instant eSIM data plans for 200+ countries. No physical SIM needed, activate in minutes.",
     "appStore": "App Store",
     "googlePlay": "Google Play",
+    "doppler": {
+      "badge": "By Simnetiq",
+      "title": "Doppler VPN",
+      "description": "Fast, no-logs VPN powered by WireGuard on mobile and advanced VLESS via Telegram bot. All major platforms, up to 10 devices.",
+      "promo": "Launch offer: use code 20 for 20% off",
+      "appStore": "Get on App Store",
+      "learnMore": "Learn More"
+    },
     "downloads": "Downloads",
     "appAvailable": "Our App Available for both iOS and Android devices.",
     "downloadOurApp": "Download Our App",
@@ -369,6 +377,10 @@
     "title": "Get in touch",
     "subtitle": "We're here to help with all your needs",
     "description": "Get in touch with our team for support, questions, or partnerships. We're here to help with all your connectivity needs.",
+    "guideCard": {
+      "title": "eSIM Installation Guide",
+      "description": "Step-by-step instructions for iPhone, Android, and manual installation"
+    },
     "sendMessage": "Send us a Message",
     "fullName": "Full Name",
     "fullNamePlaceholder": "Enter your full name",
@@ -650,7 +662,29 @@
     "esimLpaQrCode": "eSIM LPA QR Code",
     "qrGenerationFailed": "QR generation failed",
     "accessDenied": "Access Denied",
-    "accessDeniedMessage": "You don't have permission to access this area."
+    "accessDeniedMessage": "You don't have permission to access this area.",
+    "remaining": "remaining",
+    "expiresOn": "Expires {{date}}",
+    "expiredOnDate": "Expired on {{date}}",
+    "showQrCode": "Show QR Code",
+    "hideQrCode": "Hide QR Code",
+    "topUp": "Top Up",
+    "topUpFailed": "Top-up failed",
+    "selectTopup": "Select Top-Up Package",
+    "loadingTopups": "Loading packages...",
+    "noTopups": "No top-up packages available for this eSIM",
+    "installStepsTitle": "How to install your eSIM",
+    "installStepIos1": "Open Settings → Cellular (or Mobile Data)",
+    "installStepIos2": "Tap Add eSIM or Add Cellular Plan",
+    "installStepIos3": "Tap Use QR Code and scan the code above",
+    "installStepIos4": "Choose a label for your eSIM (e.g., \"Travel Data\")",
+    "installStepIos5": "Enable Data Roaming and you're ready!",
+    "installStepAndroid1": "Open Settings → Connections → SIM Manager",
+    "installStepAndroid2": "Tap Add eSIM and scan the QR code above",
+    "installStepAndroid3": "Wait for the eSIM to download and activate",
+    "installStepAndroid4": "Enable Mobile Data and Data Roaming for your eSIM",
+    "iosTab": "iPhone",
+    "androidTab": "Android"
   },
   "plansManagement": {
     "errorLoadingPlans": "Error loading plans: {{error}}",
@@ -761,8 +795,10 @@
     "accountDeleted": "Your account has been deleted",
     "failedToDeleteAccount": "Failed to delete account. Please contact support.",
     "signOut": "Sign Out",
-    "signOutDescription": "Sign out of your account on this device. You can sign back in anytime.",
-    "signingOut": "Signing out..."
+    "signOutDescription": "Sign out of your account on this device.",
+    "signingOut": "Signing out...",
+    "signOutButton": "Sign Out",
+    "backToDashboard": "Back to Dashboard"
   },
   "referral": {
     "applyReferralCode": "Apply Referral Code",
@@ -958,5 +994,88 @@
     "callsSmsAnswer": "Our eSIM plans are primarily data-only. However, you can use VoIP services like WhatsApp, Skype, or FaceTime for calls and messaging over your data connection.",
     "checkUsage": "How do I check my data usage?",
     "checkUsageAnswer": "You can monitor your data usage through your device's settings or our mobile app. We also send notifications when you're approaching your data limit."
+  },
+  "installGuide": {
+    "pageTitle": "eSIM Installation Guide",
+    "pageSubtitle": "Step-by-step instructions to install and activate your eSIM",
+    "backToHelp": "Back to Help",
+    "intro": {
+      "title": "What is an eSIM?",
+      "p1": "An eSIM (embedded SIM) is a digital SIM card built into your device. It allows you to activate a mobile data plan without inserting a physical SIM card.",
+      "p2": "After purchasing a plan, you will receive a QR code. Scan it with your device to install the eSIM profile and get connected.",
+      "p3": "Your device must support eSIM technology. Most modern smartphones released after 2018 are compatible."
+    },
+    "beforeYouStart": {
+      "title": "Before You Start",
+      "wifi": "Ensure you have a stable internet connection (WiFi recommended).",
+      "unlocked": "Your device must be carrier-unlocked to use an eSIM.",
+      "vpn": "Disable any active VPN before installing.",
+      "qrReady": "Have your QR code visible on another screen or printed out."
+    },
+    "iphone": {
+      "title": "iPhone Installation",
+      "step1": "Open the Settings app on your iPhone.",
+      "step2": "Tap Mobile Data (or Cellular).",
+      "step3": "Tap Add eSIM (or Add Cellular Plan).",
+      "step4": "Select Use QR Code and scan the QR code you received.",
+      "step5": "Tap Continue to confirm the plan installation.",
+      "step6": "Choose a label for the new line (e.g. \"Travel Data\").",
+      "step7": "When prompted, set your eSIM as the default data line.",
+      "step8": "Go to Settings → Mobile Data → your eSIM and enable Data Roaming."
+    },
+    "android": {
+      "title": "Android Installation",
+      "step1": "Open the Settings app on your Android device.",
+      "step2": "Tap Network & Internet (or Connections on Samsung).",
+      "step3": "Tap SIMs or SIM Manager.",
+      "step4": "Tap Add eSIM (or Download SIM).",
+      "step5": "Scan the QR code you received.",
+      "step6": "Wait for the eSIM profile to download, then tap Confirm to activate.",
+      "step7": "Set the eSIM as your preferred line for mobile data.",
+      "step8": "Enable Data Roaming if your plan requires it."
+    },
+    "manual": {
+      "title": "Manual Installation (LPA)",
+      "description": "If you cannot scan the QR code, you can enter the activation details manually.",
+      "smdpLabel": "SM-DP+ Address",
+      "activationCodeLabel": "Activation Code",
+      "matchingIdLabel": "Matching ID (if provided)",
+      "howTo": "In your device eSIM settings, choose \"Enter Details Manually\" instead of scanning a QR code, then paste the values above into the corresponding fields."
+    },
+    "activation": {
+      "title": "Activation Notes",
+      "p1": "Your eSIM activates when your device connects to a supported network in the destination country.",
+      "p2": "It may take a few minutes after the first data session for the connection to fully establish.",
+      "tip1": "Toggle Airplane Mode on and off.",
+      "tip2": "Restart your device.",
+      "tip3": "Make sure Data Roaming is enabled for the eSIM line.",
+      "notActivating": "If the eSIM does not activate:"
+    },
+    "troubleshooting": {
+      "title": "Troubleshooting",
+      "noInternet": {
+        "q": "No internet after installation",
+        "a": "Make sure the eSIM is set as your default data line and that Data Roaming is enabled. Try toggling Airplane Mode or restarting your device."
+      },
+      "qrNotScanning": {
+        "q": "QR code not scanning",
+        "a": "Ensure the QR code is displayed clearly and your camera can focus on it. Try adjusting brightness or distance. You can also use the manual installation method."
+      },
+      "alreadyInUse": {
+        "q": "\"Plan already in use\" error",
+        "a": "Each QR code can only be used once. If you have already installed the eSIM, check your device SIM settings. If you need a replacement, contact our support team."
+      },
+      "noSignal": {
+        "q": "No signal after activation",
+        "a": "Make sure you are in an area with network coverage. Try manually selecting a network operator in your device settings. Toggle Airplane Mode and restart your device."
+      }
+    },
+    "support": {
+      "title": "Need Help?",
+      "description": "Our support team is available to help you with any questions about your eSIM installation or activation.",
+      "helpCenter": "Visit Help Center",
+      "telegram": "Chat on Telegram",
+      "contactSupport": "Contact Support"
+    }
   }
 }

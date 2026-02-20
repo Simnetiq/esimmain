@@ -98,6 +98,14 @@
     "appDescription": "Erhalten Sie sofortige eSIM-Datentarife für über 200 Länder. Keine physische SIM erforderlich, Aktivierung in Minuten.",
     "appStore": "App Store",
     "googlePlay": "Google Play",
+    "doppler": {
+      "badge": "Von Simnetiq",
+      "title": "Doppler VPN",
+      "description": "Schnelles VPN ohne Protokollierung, basierend auf WireGuard für Mobilgeräte und erweitertem VLESS über Telegram-Bot. Alle gängigen Plattformen, bis zu 10 Geräte.",
+      "promo": "Startangebot: Code 20 für 20% Rabatt",
+      "appStore": "Im App Store laden",
+      "learnMore": "Mehr erfahren"
+    },
     "downloads": "Downloads",
     "appAvailable": "Unsere App ist für iOS- und Android-Geräte verfügbar.",
     "downloadOurApp": "Laden Sie unsere App herunter",
@@ -354,6 +362,10 @@
     "title": "Kontakt aufnehmen",
     "subtitle": "Wir helfen Ihnen bei allen eSIM-Bedürfnissen",
     "description": "Kontaktieren Sie unser Team für Support, Fragen oder Partnerschaften. Wir helfen Ihnen bei allen Konnektivitätsbedürfnissen.",
+    "guideCard": {
+      "title": "eSIM-Installationsanleitung",
+      "description": "Schritt-für-Schritt-Anleitung für iPhone, Android und manuelle Installation"
+    },
     "sendMessage": "Nachricht senden",
     "fullName": "Vollständiger Name",
     "fullNamePlaceholder": "Geben Sie Ihren vollständigen Namen ein",
@@ -623,7 +635,29 @@
     "esimLpaQrCode": "eSIM LPA QR-Code",
     "qrGenerationFailed": "QR-Generierung fehlgeschlagen",
     "accessDenied": "Zugriff verweigert",
-    "accessDeniedMessage": "Sie haben keine Berechtigung, auf diesen Bereich zuzugreifen."
+    "accessDeniedMessage": "Sie haben keine Berechtigung, auf diesen Bereich zuzugreifen.",
+    "remaining": "verbleibend",
+    "expiresOn": "Läuft ab am {{date}}",
+    "expiredOnDate": "Abgelaufen am {{date}}",
+    "showQrCode": "QR-Code anzeigen",
+    "hideQrCode": "QR-Code ausblenden",
+    "topUp": "Aufladen",
+    "topUpFailed": "Aufladung fehlgeschlagen",
+    "selectTopup": "Aufladungspaket wählen",
+    "loadingTopups": "Pakete werden geladen...",
+    "noTopups": "Keine Aufladungspakete für diese eSIM verfügbar",
+    "installStepsTitle": "So installieren Sie Ihre eSIM",
+    "installStepIos1": "Öffnen Sie Einstellungen → Mobilfunk",
+    "installStepIos2": "Tippen Sie auf eSIM hinzufügen oder Mobilfunktarif hinzufügen",
+    "installStepIos3": "Tippen Sie auf QR-Code verwenden und scannen Sie den Code oben",
+    "installStepIos4": "Wählen Sie ein Label für Ihre eSIM (z.B. \"Reisedaten\")",
+    "installStepIos5": "Aktivieren Sie Datenroaming und Sie sind bereit!",
+    "installStepAndroid1": "Öffnen Sie Einstellungen → Verbindungen → SIM-Manager",
+    "installStepAndroid2": "Tippen Sie auf eSIM hinzufügen und scannen Sie den QR-Code oben",
+    "installStepAndroid3": "Warten Sie, bis die eSIM heruntergeladen und aktiviert ist",
+    "installStepAndroid4": "Aktivieren Sie mobile Daten und Datenroaming für Ihre eSIM",
+    "iosTab": "iPhone",
+    "androidTab": "Android"
   },
   "plansManagement": {
     "errorLoadingPlans": "Fehler beim Laden der Pläne: {{error}}",
@@ -750,8 +784,10 @@
     "accountDeleted": "Ihr Konto wurde gelöscht",
     "failedToDeleteAccount": "Konto konnte nicht gelöscht werden. Bitte kontaktieren Sie den Support.",
     "signOut": "Abmelden",
-    "signOutDescription": "Melden Sie sich auf diesem Gerät von Ihrem Konto ab. Sie können sich jederzeit wieder anmelden.",
-    "signingOut": "Abmelden..."
+    "signOutDescription": "Melden Sie sich auf diesem Gerät von Ihrem Konto ab.",
+    "signingOut": "Abmelden...",
+    "signOutButton": "Abmelden",
+    "backToDashboard": "Zurück zum Dashboard"
   },
   "referral": {
     "applyReferralCode": "Empfehlungscode einlösen",
@@ -922,5 +958,88 @@
     "callsSmsAnswer": "Unsere eSIM-Tarife sind hauptsächlich nur für Daten. Sie können jedoch VoIP-Dienste wie WhatsApp, Skype oder FaceTime für Anrufe und Nachrichten über Ihre Datenverbindung verwenden.",
     "checkUsage": "Wie überprüfe ich meinen Datenverbrauch?",
     "checkUsageAnswer": "Sie können Ihren Datenverbrauch über die Einstellungen Ihres Geräts oder unsere mobile App überwachen. Wir senden auch Benachrichtigungen, wenn Sie sich Ihrem Datenlimit nähern."
+  },
+  "installGuide": {
+    "pageTitle": "eSIM-Installationsanleitung",
+    "pageSubtitle": "Schritt-für-Schritt-Anleitung zur Installation und Aktivierung Ihrer eSIM",
+    "backToHelp": "Zurück zur Hilfe",
+    "intro": {
+      "title": "Was ist eine eSIM?",
+      "p1": "Eine eSIM (eingebettete SIM) ist eine digitale SIM-Karte, die in Ihr Gerät integriert ist. Sie ermöglicht es Ihnen, einen mobilen Datentarif zu aktivieren, ohne eine physische SIM-Karte einzulegen.",
+      "p2": "Nach dem Kauf eines Tarifs erhalten Sie einen QR-Code. Scannen Sie ihn mit Ihrem Gerät, um das eSIM-Profil zu installieren und sich zu verbinden.",
+      "p3": "Ihr Gerät muss die eSIM-Technologie unterstützen. Die meisten modernen Smartphones, die nach 2018 veröffentlicht wurden, sind kompatibel."
+    },
+    "beforeYouStart": {
+      "title": "Bevor Sie beginnen",
+      "wifi": "Stellen Sie sicher, dass Sie eine stabile Internetverbindung haben (WLAN empfohlen).",
+      "unlocked": "Ihr Gerät muss SIM-Lock-frei sein, um eine eSIM zu verwenden.",
+      "vpn": "Deaktivieren Sie alle aktiven VPNs vor der Installation.",
+      "qrReady": "Halten Sie Ihren QR-Code auf einem anderen Bildschirm sichtbar oder ausgedruckt bereit."
+    },
+    "iphone": {
+      "title": "Installation auf dem iPhone",
+      "step1": "Öffnen Sie die Einstellungen-App auf Ihrem iPhone.",
+      "step2": "Tippen Sie auf Mobilfunk.",
+      "step3": "Tippen Sie auf eSIM hinzufügen (oder Mobilfunktarif hinzufügen).",
+      "step4": "Wählen Sie QR-Code verwenden und scannen Sie den QR-Code, den Sie erhalten haben.",
+      "step5": "Tippen Sie auf Weiter, um die Tarifinstallation zu bestätigen.",
+      "step6": "Wählen Sie eine Bezeichnung für die neue Leitung (z. B. \"Reisedaten\").",
+      "step7": "Wenn Sie dazu aufgefordert werden, legen Sie Ihre eSIM als Standard-Datenleitung fest.",
+      "step8": "Gehen Sie zu Einstellungen → Mobilfunk → Ihre eSIM und aktivieren Sie Datenroaming."
+    },
+    "android": {
+      "title": "Installation auf Android",
+      "step1": "Öffnen Sie die Einstellungen-App auf Ihrem Android-Gerät.",
+      "step2": "Tippen Sie auf Netzwerk & Internet (oder Verbindungen bei Samsung).",
+      "step3": "Tippen Sie auf SIMs oder SIM-Manager.",
+      "step4": "Tippen Sie auf eSIM hinzufügen (oder SIM herunterladen).",
+      "step5": "Scannen Sie den QR-Code, den Sie erhalten haben.",
+      "step6": "Warten Sie, bis das eSIM-Profil heruntergeladen wurde, und tippen Sie dann auf Bestätigen, um zu aktivieren.",
+      "step7": "Legen Sie die eSIM als bevorzugte Leitung für mobile Daten fest.",
+      "step8": "Aktivieren Sie Datenroaming, falls Ihr Tarif dies erfordert."
+    },
+    "manual": {
+      "title": "Manuelle Installation (LPA)",
+      "description": "Wenn Sie den QR-Code nicht scannen können, können Sie die Aktivierungsdaten manuell eingeben.",
+      "smdpLabel": "SM-DP+-Adresse",
+      "activationCodeLabel": "Aktivierungscode",
+      "matchingIdLabel": "Zuordnungs-ID (falls angegeben)",
+      "howTo": "Wählen Sie in den eSIM-Einstellungen Ihres Geräts \"Details manuell eingeben\" anstatt einen QR-Code zu scannen und fügen Sie dann die obigen Werte in die entsprechenden Felder ein."
+    },
+    "activation": {
+      "title": "Hinweise zur Aktivierung",
+      "p1": "Ihre eSIM wird aktiviert, wenn sich Ihr Gerät mit einem unterstützten Netzwerk im Zielland verbindet.",
+      "p2": "Es kann einige Minuten nach der ersten Datensitzung dauern, bis die Verbindung vollständig hergestellt ist.",
+      "tip1": "Schalten Sie den Flugmodus ein und wieder aus.",
+      "tip2": "Starten Sie Ihr Gerät neu.",
+      "tip3": "Stellen Sie sicher, dass Datenroaming für die eSIM-Leitung aktiviert ist.",
+      "notActivating": "Wenn sich die eSIM nicht aktiviert:"
+    },
+    "troubleshooting": {
+      "title": "Fehlerbehebung",
+      "noInternet": {
+        "q": "Kein Internet nach der Installation",
+        "a": "Stellen Sie sicher, dass die eSIM als Standard-Datenleitung festgelegt ist und Datenroaming aktiviert ist. Versuchen Sie, den Flugmodus ein-/auszuschalten oder Ihr Gerät neu zu starten."
+      },
+      "qrNotScanning": {
+        "q": "QR-Code lässt sich nicht scannen",
+        "a": "Stellen Sie sicher, dass der QR-Code klar angezeigt wird und Ihre Kamera ihn fokussieren kann. Versuchen Sie, die Helligkeit oder den Abstand anzupassen. Sie können auch die manuelle Installationsmethode verwenden."
+      },
+      "alreadyInUse": {
+        "q": "Fehler \"Tarif wird bereits verwendet\"",
+        "a": "Jeder QR-Code kann nur einmal verwendet werden. Wenn Sie die eSIM bereits installiert haben, überprüfen Sie die SIM-Einstellungen Ihres Geräts. Wenn Sie einen Ersatz benötigen, kontaktieren Sie unser Support-Team."
+      },
+      "noSignal": {
+        "q": "Kein Signal nach der Aktivierung",
+        "a": "Stellen Sie sicher, dass Sie sich in einem Gebiet mit Netzabdeckung befinden. Versuchen Sie, in den Geräteeinstellungen manuell einen Netzbetreiber auszuwählen. Schalten Sie den Flugmodus ein/aus und starten Sie Ihr Gerät neu."
+      }
+    },
+    "support": {
+      "title": "Brauchen Sie Hilfe?",
+      "description": "Unser Support-Team steht Ihnen bei allen Fragen zur Installation oder Aktivierung Ihrer eSIM zur Verfügung.",
+      "helpCenter": "Hilfecenter besuchen",
+      "telegram": "Auf Telegram chatten",
+      "contactSupport": "Support kontaktieren"
+    }
   }
 }
