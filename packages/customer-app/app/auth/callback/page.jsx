@@ -1,33 +1,65 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getSupabase } from '@esim/shared/lib/supabase';
 
 export default function AuthCallback() {
   const router = useRouter();
+  const [statusMessage, setStatusMessage] = useState('Signing you in...');
 
   useEffect(() => {
     const supabase = getSupabase();
-    
-    // Listen for auth state change (handles both OAuth redirect and hash tokens)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        router.replace('/dashboard');
+    if (!supabase) return;
+
+    // Parse query params without useSearchParams (avoids Suspense requirement)
+    const params = new URLSearchParams(window.location.search);
+    const oauthError = params.get('error');
+    const oauthErrorDescription = params.get('error_description');
+
+    if (oauthError) {
+      // Provider returned an error (e.g. user cancelled, access denied)
+      setStatusMessage('Authentication cancelled. Redirecting...');
+      router.replace(`/login?error=${encodeURIComponent(oauthErrorDescription || oauthError)}`);
+      return;
+    }
+
+    let redirected = false;
+
+    const redirect = (session) => {
+      if (redirected || !session?.user) return;
+      redirected = true;
+      // Locale-aware redirect: read language stored before OAuth navigation
+      const lang =
+        typeof window !== 'undefined'
+          ? localStorage.getItem('Simnetiq-language') || 'en'
+          : 'en';
+      const dashboardUrl = lang === 'en' ? '/dashboard' : `/${lang}/dashboard`;
+      router.replace(dashboardUrl);
+    };
+
+    // Subscribe BEFORE getSession to avoid the race where SIGNED_IN
+    // fires during AuthProvider's getSession() call on page mount.
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        redirect(session);
       }
     });
 
-    // Check if session already exists
+    // Also check for an already-established session (handles the case where
+    // SIGNED_IN fired before the subscription above was registered).
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        router.replace('/dashboard');
-      }
+      redirect(session);
     });
 
-    // Timeout fallback
+    // Timeout fallback — 15s gives mobile Safari enough time for PKCE exchange
     const timeout = setTimeout(() => {
-      router.replace('/login?error=auth_timeout');
-    }, 10000);
+      if (!redirected) {
+        router.replace('/login?error=auth_timeout');
+      }
+    }, 15000);
 
     return () => {
       clearTimeout(timeout);
@@ -38,8 +70,8 @@ export default function AuthCallback() {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">Signing you in...</p>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4" />
+        <p className="text-gray-600">{statusMessage}</p>
       </div>
     </div>
   );

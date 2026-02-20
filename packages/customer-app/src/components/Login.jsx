@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
@@ -48,11 +48,9 @@ const gridPatternStyle = {
 const Login = () => {
   const [loading, setLoading] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState(null);
-  const [redirecting, setRedirecting] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { signInWithGoogle, signInWithApple } = useAuth();
   const { t, locale, isLoading: i18nLoading } = useI18n();
-  const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
@@ -86,52 +84,36 @@ const Login = () => {
       setLoading(true);
       setLoadingProvider('google');
       await signInWithGoogle();
-      showToast('success', t('auth.login.signInSuccessful', 'Signed in successfully!'));
-      setRedirecting(true);
-      const dashboardUrl = currentLanguage === 'en' ? '/dashboard' : `/${currentLanguage}/dashboard`;
-      router.push(dashboardUrl);
+      // signInWithOAuth resolves before the browser navigates to Google.
+      // Do NOT show success or redirect here — /auth/callback handles that
+      // after the PKCE exchange completes and session is confirmed.
     } catch (error) {
       console.error('Google sign-in error:', error);
       showToast('error', t('auth.login.signInFailed', 'Failed to sign in. Please try again.'));
       setLoading(false);
       setLoadingProvider(null);
     }
-  }, [signInWithGoogle, t, currentLanguage, router]);
+  }, [signInWithGoogle, t]);
 
   const handleAppleSignIn = useCallback(async () => {
     try {
       setLoading(true);
       setLoadingProvider('apple');
       await signInWithApple();
-      showToast('success', t('auth.login.signInSuccessful', 'Signed in successfully!'));
-      setRedirecting(true);
-      const dashboardUrl = currentLanguage === 'en' ? '/dashboard' : `/${currentLanguage}/dashboard`;
-      router.push(dashboardUrl);
+      // Same as Google — browser navigates to Apple; /auth/callback handles the rest.
     } catch (error) {
       console.error('Apple sign-in error:', error);
       showToast('error', t('auth.login.signInFailed', 'Failed to sign in. Please try again.'));
       setLoading(false);
       setLoadingProvider(null);
     }
-  }, [signInWithApple, t, currentLanguage, router]);
+  }, [signInWithApple, t]);
 
   // Loading skeleton
   if (!mounted) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(to bottom right, rgba(83, 116, 205, 0.25), rgba(240, 249, 255, 0.4), rgba(239, 246, 255, 1))' }}>
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-tufts-blue" />
-      </div>
-    );
-  }
-
-  // Redirecting state
-  if (redirecting) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center" style={{ background: 'linear-gradient(to bottom right, rgba(83, 116, 205, 0.25), rgba(240, 249, 255, 0.4), rgba(239, 246, 255, 1))' }}>
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tufts-blue mx-auto mb-4" />
-          <p className="text-gray-600 font-medium">{t('auth.login.redirecting', 'Taking you to your dashboard...')}</p>
-        </div>
       </div>
     );
   }
