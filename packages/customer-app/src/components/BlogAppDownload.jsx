@@ -12,7 +12,7 @@ import { subscribeToNewsletter } from '@esim/shared/services/newsletterService';
  * Blog App Download & Newsletter CTA Component
  * Features two beautiful cards:
  * 1. App download CTA with background image
- * 2. Newsletter signup that saves to Firebase
+ * 2. Newsletter signup that saves to Supabase
  */
 
 const BlogAppDownload = ({

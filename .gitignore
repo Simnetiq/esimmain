@@ -72,11 +72,6 @@ ENV/
 env.bak/
 venv.bak/
 
-# Firebase
-.firebase/
-firebase-debug.log
-firebase-debug.*.log
-
 # Vercel
 .vercel
 
@@ -85,4 +80,4 @@ firebase-debug.*.log
 *.temp
 esim-service.json
 .env*.local
-firebase-service-account.json
+

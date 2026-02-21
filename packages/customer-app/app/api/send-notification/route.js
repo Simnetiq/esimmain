@@ -1,36 +1,12 @@
 import { NextResponse } from 'next/server';
-import admin from 'firebase-admin';
-
-// Initialize Firebase Admin SDK for FCM (push notifications only)
-if (!admin.apps.length) {
-  try {
-    let credential;
-    
-    if (process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_CLIENT_EMAIL) {
-      credential = admin.credential.cert({
-        projectId: process.env.FIREBASE_PROJECT_ID || 'esim-f0e3e',
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-      });
-    } else {
-      credential = admin.credential.cert('./esim-service.json');
-    }
-
-    admin.initializeApp({
-      credential,
-      projectId: process.env.FIREBASE_PROJECT_ID || 'esim-f0e3e',
-    });
-  } catch {
-    // Ignore initialization errors
-  }
-}
+import { sendFCMMessage, sendFCMToMultiple, sendFCMToTopic } from '@esim/shared/lib/fcm';
 
 export async function POST(request) {
   try {
     const requestBody = await request.json();
-    const { 
-      title, 
-      body: messageBody, 
+    const {
+      title,
+      body: messageBody,
       tokens = [],
       topic,
       data = {},
@@ -45,11 +21,11 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Either tokens or topic is required' }, { status: 400 });
     }
 
-    const message = {
+    const messageBase = {
       notification: {
         title,
         body: messageBody,
-        ...(imageUrl && { imageUrl })
+        ...(imageUrl && { image: imageUrl })
       },
       data: {
         ...data,
@@ -58,7 +34,7 @@ export async function POST(request) {
       },
       android: {
         priority: 'high',
-        notification: { channelId: 'fcm_notifications', sound: 'default', clickAction: 'FLUTTER_NOTIFICATION_CLICK' }
+        notification: { channel_id: 'fcm_notifications', sound: 'default', click_action: 'FLUTTER_NOTIFICATION_CLICK' }
       },
       apns: {
         payload: { aps: { alert: { title, body: messageBody }, sound: 'default', badge: 1 } }
@@ -66,36 +42,18 @@ export async function POST(request) {
     };
 
     let response;
-    const messaging = admin.messaging();
 
     if (topic) {
-      message.topic = topic;
-      response = await messaging.send(message);
+      const result = await sendFCMToTopic(messageBase, topic);
+      response = { messageId: result.name || 'sent', successCount: 1, failureCount: 0 };
     } else {
-      const results = [];
-      let successCount = 0;
-      let failureCount = 0;
-      const failedTokens = [];
-
-      for (let i = 0; i < tokens.length; i++) {
-        try {
-          const result = await messaging.send({ ...message, token: tokens[i] });
-          results.push({ success: true, messageId: result });
-          successCount++;
-        } catch (error) {
-          results.push({ success: false, error: error.message });
-          failedTokens.push(tokens[i]);
-          failureCount++;
-        }
-      }
-
-      response = { results, successCount, failureCount, failedTokens };
+      response = await sendFCMToMultiple(messageBase, tokens);
     }
 
     return NextResponse.json({
       success: true,
       messageId: response.messageId || 'multiple',
-      sentCount: tokens.length,
+      sentCount: tokens.length || 1,
       successCount: response.successCount || 1,
       failureCount: response.failureCount || 0,
       details: response

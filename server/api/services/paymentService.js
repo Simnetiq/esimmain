@@ -1,13 +1,7 @@
 const Stripe = require('stripe');
 const paypal = require('@paypal/checkout-server-sdk');
 const logger = require('../utils/logger');
-const admin = require('firebase-admin');
-
-// Initialize Firebase Admin if not already done
-if (!admin.apps.length) {
-  admin.initializeApp();
-}
-const db = admin.firestore();
+const supabase = require('../config/supabase');
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -33,43 +27,51 @@ const SECURITY_CONFIG = {
  */
 async function validateAndGetPrice(packageId, userId, submittedPrice) {
   try {
-    const packageDoc = await db.collection('dataplans').doc(packageId).get();
-    
-    if (!packageDoc.exists) {
+    const { data: packageData, error: pkgError } = await supabase
+      .from('dataplans')
+      .select('*')
+      .eq('id', packageId)
+      .single();
+
+    if (pkgError || !packageData) {
       return { valid: false, error: 'Package not found', code: 'PACKAGE_NOT_FOUND' };
     }
-    
-    const packageData = packageDoc.data();
-    
-    if (packageData.enabled === false || packageData.status === 'disabled') {
+
+    if (packageData.is_enabled === false || packageData.status === 'disabled') {
       return { valid: false, error: 'Package not available', code: 'PACKAGE_DISABLED' };
     }
-    
+
     const databasePrice = parseFloat(packageData.price);
-    
+
     if (isNaN(databasePrice) || databasePrice <= 0) {
       return { valid: false, error: 'Invalid package price', code: 'INVALID_DB_PRICE' };
     }
-    
+
     // Check referral discount
     let discountPercentage = 0;
     let minimumPrice = 0.5;
     let hasReferralDiscount = false;
-    
+
     if (userId) {
       try {
-        const userDoc = await db.collection('users').doc(userId).get();
-        if (userDoc.exists) {
-          const userData = userDoc.data();
-          hasReferralDiscount = userData.usedReferralCode || 
-                               userData.hasUsedReferralCode || 
-                               userData.referralCodeUsed || 
-                               false;
+        const { data: userData } = await supabase
+          .from('users')
+          .select('referral_code_used')
+          .eq('id', userId)
+          .single();
+
+        if (userData) {
+          hasReferralDiscount = userData.referral_code_used || false;
         }
-        
-        const settingsDoc = await db.collection('settings').doc('general').get();
-        if (settingsDoc.exists) {
-          const settings = settingsDoc.data();
+
+        const { data: settingsData } = await supabase
+          .from('app_config')
+          .select('value')
+          .eq('key', 'general')
+          .single();
+
+        if (settingsData?.value) {
+          const settings = settingsData.value;
           discountPercentage = settings.referral?.discountPercentage || 17;
           minimumPrice = settings.referral?.minimumPrice || 0.5;
         }
@@ -77,18 +79,18 @@ async function validateAndGetPrice(packageId, userId, submittedPrice) {
         logger.error('Error checking referral discount:', error);
       }
     }
-    
+
     let validPrice = databasePrice;
     if (hasReferralDiscount && discountPercentage > 0) {
       validPrice = Math.max(minimumPrice, databasePrice * (100 - discountPercentage) / 100);
     }
-    
+
     const roundedValidPrice = Math.round(validPrice * 100) / 100;
     const roundedSubmittedPrice = Math.round(parseFloat(submittedPrice) * 100) / 100;
-    
+
     const priceDifference = Math.abs(roundedValidPrice - roundedSubmittedPrice);
     const priceMatches = priceDifference <= SECURITY_CONFIG.MAX_PRICE_TOLERANCE;
-    
+
     if (!priceMatches) {
       logger.error('🚨 PRICE MANIPULATION DETECTED', {
         packageId,
@@ -98,39 +100,46 @@ async function validateAndGetPrice(packageId, userId, submittedPrice) {
         submittedPrice: roundedSubmittedPrice,
         difference: priceDifference
       });
-      
+
       // Log fraud attempt
-      await db.collection('fraud_attempts').add({
-        type: 'price_manipulation',
-        provider: 'server_api',
-        packageId,
-        userId: userId || null,
-        databasePrice,
-        expectedPrice: roundedValidPrice,
-        submittedPrice: roundedSubmittedPrice,
-        difference: priceDifference,
-        timestamp: admin.firestore.FieldValue.serverTimestamp()
+      await supabase.from('fraud_attempts').insert({
+        action: 'price_manipulation',
+        package_id: packageId,
+        user_id: userId || null,
+        amount: roundedSubmittedPrice,
+        metadata: {
+          type: 'price_manipulation',
+          provider: 'server_api',
+          databasePrice,
+          expectedPrice: roundedValidPrice,
+          submittedPrice: roundedSubmittedPrice,
+          difference: priceDifference,
+        },
+        blocked: true,
+        created_at: new Date().toISOString()
       });
-      
+
       // Auto-block attacker
       if (SECURITY_CONFIG.AUTO_BLOCK_ON_PRICE_MANIPULATION && userId) {
-        await db.collection('fraud_blocklist').add({
-          userId,
+        await supabase.from('fraud_blocklist').insert({
+          user_id: userId,
           reason: `Auto-blocked: Price manipulation attempt. Tried to pay ${roundedSubmittedPrice} for item priced at ${roundedValidPrice}`,
           active: true,
-          createdAt: admin.firestore.FieldValue.serverTimestamp(),
-          createdBy: 'security_system'
+          is_active: true,
+          block_type: 'auto',
+          created_by: 'security_system',
+          created_at: new Date().toISOString()
         });
       }
-      
-      return { 
-        valid: false, 
+
+      return {
+        valid: false,
         error: 'Price validation failed',
         code: 'PRICE_MISMATCH',
         details: { expected: roundedValidPrice, received: roundedSubmittedPrice, databasePrice }
       };
     }
-    
+
     return {
       valid: true,
       price: roundedValidPrice,
@@ -151,30 +160,36 @@ async function validateAndGetPrice(packageId, userId, submittedPrice) {
 async function checkBlocklist(userId, email) {
   try {
     const queries = [];
-    
+
     if (userId) {
-      const userQuery = db.collection('fraud_blocklist')
-        .where('userId', '==', userId)
-        .where('active', '==', true)
-        .get();
-      queries.push(userQuery);
+      queries.push(
+        supabase
+          .from('fraud_blocklist')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('active', true)
+          .limit(1)
+      );
     }
-    
+
     if (email) {
-      const emailQuery = db.collection('fraud_blocklist')
-        .where('email', '==', email.toLowerCase())
-        .where('active', '==', true)
-        .get();
-      queries.push(emailQuery);
+      queries.push(
+        supabase
+          .from('fraud_blocklist')
+          .select('id')
+          .eq('email', email.toLowerCase())
+          .eq('active', true)
+          .limit(1)
+      );
     }
-    
+
     const results = await Promise.all(queries);
-    const blocked = results.some(snapshot => !snapshot.empty);
-    
+    const blocked = results.some(({ data }) => data && data.length > 0);
+
     if (blocked) {
       return { blocked: true, reason: 'Account blocked. Contact support.' };
     }
-    
+
     return { blocked: false };
   } catch (error) {
     logger.error('Blocklist check error:', error);
@@ -204,25 +219,25 @@ class PaymentService {
 
       // 2. PRICE VALIDATION (CRITICAL)
       const priceValidation = await validateAndGetPrice(order, userId, total);
-      
+
       if (!priceValidation.valid) {
         logger.error('Price validation failed', { order, email, error: priceValidation.error });
         throw new Error('Price validation failed. Please refresh and try again.');
       }
-      
+
       const validatedPrice = priceValidation.price;
       const packageName = priceValidation.packageData?.name || name || 'eSIM Plan';
 
-      logger.info('Creating Stripe Checkout Session', { 
-        order, 
-        email, 
+      logger.info('Creating Stripe Checkout Session', {
+        order,
+        email,
         validatedPrice,
-        submittedPrice: total 
+        submittedPrice: total
       });
 
       // 3. Create session with VALIDATED PRICE
       const uniqueOrderId = `${order}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      
+
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: [
@@ -251,7 +266,7 @@ class PaymentService {
         },
       });
 
-      logger.info('Stripe Checkout Session created', { 
+      logger.info('Stripe Checkout Session created', {
         sessionId: session.id,
         validatedPrice
       });
@@ -280,11 +295,11 @@ class PaymentService {
 
       // 2. PRICE VALIDATION
       const priceValidation = await validateAndGetPrice(packageId, userId, submittedAmount);
-      
+
       if (!priceValidation.valid) {
         throw new Error('Price validation failed');
       }
-      
+
       const validatedPrice = priceValidation.price;
 
       const uniqueOrderId = `${packageId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -304,9 +319,9 @@ class PaymentService {
         },
       });
 
-      logger.info('Stripe payment created', { 
+      logger.info('Stripe payment created', {
         paymentId: paymentIntent.id,
-        validatedPrice 
+        validatedPrice
       });
 
       return {
@@ -333,11 +348,11 @@ class PaymentService {
 
       // 2. PRICE VALIDATION
       const priceValidation = await validateAndGetPrice(packageId, userId, submittedAmount);
-      
+
       if (!priceValidation.valid) {
         throw new Error('Price validation failed');
       }
-      
+
       const validatedPrice = priceValidation.price;
 
       const request = new paypal.orders.OrdersCreateRequest();
@@ -355,9 +370,9 @@ class PaymentService {
 
       const order = await paypalClient.execute(request);
 
-      logger.info('PayPal order created', { 
+      logger.info('PayPal order created', {
         orderId: order.result.id,
-        validatedPrice 
+        validatedPrice
       });
 
       return {
@@ -404,21 +419,21 @@ class PaymentService {
 
       switch (event.type) {
         case 'checkout.session.completed':
-          logger.info('Checkout session completed', { 
+          logger.info('Checkout session completed', {
             sessionId: event.data.object.id,
-            orderId: event.data.object.metadata?.orderId 
+            orderId: event.data.object.metadata?.orderId
           });
           break;
 
         case 'payment_intent.succeeded':
-          logger.info('Payment intent succeeded', { 
-            paymentIntentId: event.data.object.id 
+          logger.info('Payment intent succeeded', {
+            paymentIntentId: event.data.object.id
           });
           break;
 
         case 'payment_intent.payment_failed':
-          logger.error('Payment intent failed', { 
-            paymentIntentId: event.data.object.id 
+          logger.error('Payment intent failed', {
+            paymentIntentId: event.data.object.id
           });
           break;
       }

@@ -33,7 +33,7 @@ export const apiService = {
 
   /**
    * Get QR code for an eSIM order
-   * This is safe - it only reads existing data from Firebase
+   * This is safe - it only reads existing data from Supabase
    * Returns both snake_case and camelCase field names for compatibility
    */
   async getQrCode(orderId, orderData = {}) {

@@ -20,6 +20,7 @@ const nextConfig = {
   
   images: {
     remotePatterns: [
+      // TODO: Remove once all legacy images are migrated from Firebase Storage to Supabase Storage
       {
         protocol: 'https',
         hostname: 'firebasestorage.googleapis.com',

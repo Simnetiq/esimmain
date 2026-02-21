@@ -4,7 +4,7 @@ import { getSupabase, isSupabaseAvailable } from '../lib/supabase';
  * Blog Service - Supabase operations for blog posts
  *
  * This service provides the same interface as blogServiceSeparate.js
- * but uses Supabase instead of Firebase.
+ * using Supabase as the data source.
  *
  * Structure:
  * - blog_posts: Base post data (author, category, tags, featured_image, status, etc.)
@@ -98,7 +98,7 @@ export const blogServiceSupabase = {
    * Returns posts with their requested language translation (with fallback)
    *
    * @param {number} limitCount - Maximum number of posts to fetch
-   * @param {number} offset - Offset for pagination (replaces lastDoc from Firebase)
+   * @param {number} offset - Offset for pagination
    * @param {string} language - Language code (en, es, fr, de, ar, he, ru)
    * @returns {Promise<{posts: Array, hasMore: boolean}>}
    */
@@ -430,12 +430,12 @@ export const blogServiceSupabase = {
       const supabase = getSupabase();
 
       // Prepare base post data
-      // Note: author_id is UUID in Supabase, but Firebase uses different ID format
+      // Note: author_id is UUID in Supabase
       // We store the author name in 'author' field instead
       const basePost = {
         base_slug: postData.baseSlug || generateSlug(postData.translations?.en?.title || ''),
         author: postData.author || '',
-        author_id: null, // Firebase UIDs are not compatible with Supabase UUID
+        author_id: null,
         category: postData.category || 'General',
         tags: postData.tags || [],
         featured_image: postData.featuredImage || null,

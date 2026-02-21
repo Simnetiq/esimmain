@@ -451,13 +451,13 @@ const ApiConfiguration = () => {
               <h4 className="font-semibold text-gray-900">Sync Countries</h4>
             </div>
             <p className="text-sm text-gray-600 mb-4">
-              Fetch all countries from RoamJet API and save to Firestore
+              Fetch all countries from RoamJet API and save to Supabase
             </p>
             <div className="border border-gray-200 rounded-lg p-3 mb-4">
               <p className="text-xs text-green-800">
                 <strong>Safe:</strong> Preserves your translations & images
                 <br />
-                <strong>Note:</strong> This will fetch countries from RoamJet API and save to Firestore.
+                <strong>Note:</strong> This will fetch countries from RoamJet API and save to Supabase.
                 
                 
               </p>
@@ -490,7 +490,7 @@ const ApiConfiguration = () => {
               <h4 className="font-semibold text-gray-900">Sync Plans</h4>
             </div>
             <p className="text-sm text-gray-600 mb-4">
-              Fetch all eSIM plans from RoamJet API and save to Firestore
+              Fetch all eSIM plans from RoamJet API and save to Supabase
             </p>
             <div className="border border-gray-200 rounded-lg p-3 mb-4">
               <p className="text-xs text-blue-800">

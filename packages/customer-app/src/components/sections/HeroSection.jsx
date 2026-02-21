@@ -91,23 +91,29 @@ export default function HeroSection() {
     setIsMobile(window.innerWidth < 768);
   }, []);
 
+  // SSR-safe language: always use pathname-based detection to avoid
+  // hydration mismatch from localStorage reads
+  const ssrSafeLanguage = useMemo(() => detectLanguageFromPath(pathname) || 'en', [pathname]);
+
   const detectedLanguage = useMemo(() => {
     try {
       if (i18nLoading) {
+        // On client, prefer localStorage; on server, fall back to pathname
         if (typeof window !== 'undefined') {
           const savedLanguage = localStorage.getItem('Simnetiq-language');
           if (savedLanguage) return savedLanguage;
         }
-        return detectLanguageFromPath(pathname) || 'en';
+        return ssrSafeLanguage;
       }
       return locale || 'en';
     } catch {
       return 'en';
     }
-  }, [locale, pathname, i18nLoading]);
+  }, [locale, ssrSafeLanguage, i18nLoading]);
 
-  const direction = mounted ? getLanguageDirection(detectedLanguage) : 'ltr';
-  const isRTL = direction === 'rtl';
+  // Use pathname-based language for direction to prevent CLS on hydration.
+  // The dir attribute must match between server and client first render.
+  const direction = getLanguageDirection(ssrSafeLanguage);
 
   // Apply IBM Plex Sans Italic for "anywhere" only in EN and DE
   const useIbmPlexSansItalic = detectedLanguage === 'en' || detectedLanguage === 'de';
@@ -161,7 +167,7 @@ export default function HeroSection() {
               </p>
 
               {/* CTA Buttons - Explore Store is PRIMARY */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 lg:mb-12 pointer-events-auto" style={isRTL && isMobile ? { display: 'flex', flexDirection: 'column' } : undefined}>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 lg:mb-12 pointer-events-auto">
                 {/* Primary CTA - Explore eSIM Store */}
                 <ExploreStoreCTA
                   variant="dark"
@@ -177,8 +183,8 @@ export default function HeroSection() {
                 />
               </div>
 
-              {/* Trust Indicators - lighter visual weight on mobile */}
-              <div className="flex flex-wrap items-center gap-4 sm:gap-8 text-xs sm:text-sm text-gray-500 justify-center">
+              {/* Trust Indicators - stable min-h prevents bottom-line shift */}
+              <div className="flex flex-wrap items-center gap-4 sm:gap-8 text-xs sm:text-sm text-gray-500 justify-center min-h-[24px] sm:min-h-[28px]">
                 {trustIndicators.map(({ Icon, label, key }, index) => (
                   <React.Fragment key={key}>
                     <div className="flex items-center gap-1.5 sm:gap-2 text-gray-600 sm:text-eerie-black">

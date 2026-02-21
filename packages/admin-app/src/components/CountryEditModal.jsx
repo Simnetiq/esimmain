@@ -130,7 +130,7 @@ const CountryEditModal = ({
     }
   };
 
-  // Upload photo to Firebase Storage
+  // Upload photo to Supabase Storage
   const uploadPhoto = async () => {
     if (!photoFile) return formData.photo;
     

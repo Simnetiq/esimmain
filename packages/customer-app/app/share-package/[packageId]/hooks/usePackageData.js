@@ -16,12 +16,12 @@ import toast from 'react-hot-toast';
  *
  * DATA FLOW:
  * - Plan data: Fetched from Supabase (single source of truth for display)
- * - Images/Translations: Fetched from Firebase (countries/regions collections)
- * - Payment validation: Server-side Firebase (handled by /api/create-payment-order)
+ * - Images/Translations: Fetched from Supabase (countries/regions tables)
+ * - Payment validation: Server-side Supabase (handled by /api/create-payment-order)
  *
  * SECURITY NOTE:
  * All plan data fetched here is for DISPLAY ONLY.
- * The payment API re-validates price and plan data server-side from Firebase.
+ * The payment API re-validates price and plan data server-side from Supabase.
  */
 export const usePackageData = () => {
   const params = useParams();
@@ -95,14 +95,14 @@ export const usePackageData = () => {
   }, []);
 
   /**
-   * Helper to extract image URL from Firebase document data
+   * Helper to extract image URL from document data
    */
   const extractImageUrl = (data) => {
     return data?.image?.url || data?.photo || data?.imageUrl?.url || data?.image_url || null;
   };
 
   /**
-   * Fetch image and translations from Firebase (countries/regions collections)
+   * Fetch image and translations from Supabase (countries/regions tables)
    */
   const fetchImageAndTranslations = useCallback(async (planData, urlCode, urlName) => {
     try {
@@ -203,7 +203,7 @@ export const usePackageData = () => {
 
   /**
    * Main package data loading function
-   * Fetches from Supabase (primary) with Firebase fallback
+   * Fetches from Supabase
    */
   const loadPackageData = useCallback(async () => {
     try {
@@ -223,7 +223,7 @@ export const usePackageData = () => {
             return;
           }
         } catch (supabaseError) {
-          console.warn('[usePackageData] Supabase fetch failed, trying Firebase:', supabaseError);
+          console.warn('[usePackageData] Supabase fetch failed:', supabaseError);
         }
       }
 

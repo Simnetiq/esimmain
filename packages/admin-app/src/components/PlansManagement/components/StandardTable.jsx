@@ -14,7 +14,7 @@ import { formatPrice } from '@esim/shared/utils/priceUtils';
 import { getFlagEmoji, categorizePlan, planHasSms, planHasVoice } from '../utils/helpers';
 
 /**
- * Standard table for Firebase/Airalo/Topups data
+ * Standard table for Legacy/Airalo/Topups data
  */
 const StandardTable = ({
   plans,

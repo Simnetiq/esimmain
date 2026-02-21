@@ -127,7 +127,7 @@ const PaymentSuccess = () => {
     setProcessing(false);
   }, [currentUser, extractQrData, generateQRCode, t]);
 
-  // Poll for order updates (replaces Firebase onSnapshot)
+  // Poll for order updates
   const subscribeToOrder = useCallback((orderId) => {
     const supabase = getSupabase();
     let cancelled = false;

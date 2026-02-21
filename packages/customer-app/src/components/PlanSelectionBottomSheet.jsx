@@ -339,8 +339,7 @@ const PlanSelectionBottomSheet = ({
     return data?.image_url || data?.image?.url || data?.photo || data?.imageUrl?.url || null;
   };
 
-  // Fetch country image from Firebase when plans are available
-  // Following the same robust pattern as EsimCard.jsx
+  // Fetch country image from Supabase when plans are available
   useEffect(() => {
     const fetchCountryImage = async () => {
       if (!availablePlans || availablePlans.length === 0) {
@@ -651,7 +650,7 @@ const PlanSelectionBottomSheet = ({
     const countryName = matchingCountry?.displayName || matchingCountry?.name ||
       firstPlan.country_name || firstPlan.country_title || countryCode;
 
-    // Use countryImage from state (fetched from Firebase) or fallback to plan/country image
+    // Use countryImage from state or fallback to plan/country image
     const imageUrl = countryImage?.url || matchingCountry?.imageUrl || matchingCountry?.image?.url || firstPlan.image?.url;
 
     return {

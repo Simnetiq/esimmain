@@ -13,7 +13,7 @@ const PlansStatusBanner = ({
   onRefreshStatus,
   dataSource
 }) => {
-  // Show Supabase status when Supabase is selected, otherwise show Firebase
+  // Show Supabase status when Supabase is selected, otherwise show legacy
   const showSupabase = dataSource === 'supabase';
 
   if (showSupabase && supabaseStatus) {

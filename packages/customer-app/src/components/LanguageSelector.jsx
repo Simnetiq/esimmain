@@ -133,7 +133,7 @@ const LanguageSelector = () => {
   const handleLanguageChange = async (language) => {
     setIsOpen(false);
     
-    // IMPORTANT: Change language first (this saves to localStorage and Firebase)
+    // IMPORTANT: Change language first (this saves to localStorage and Supabase)
     if (changeLanguage && typeof changeLanguage === 'function') {
       await changeLanguage(language.code);
     } else {

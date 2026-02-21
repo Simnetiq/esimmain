@@ -176,12 +176,12 @@ export function mapPlanDetails(planData) {
 }
 
 /**
- * Map a complete order from Firebase to component-ready format
- * @param {Object} orderDoc - Order document from Firebase
+ * Map a complete order document to component-ready format
+ * @param {Object} orderDoc - Order document from database
  * @param {string} docId - Document ID
  * @returns {Object} Fully mapped order object
  */
-export function mapFirebaseOrder(orderDoc, docId) {
+export function mapOrder(orderDoc, docId) {
   if (!orderDoc) return null;
   
   const data = orderDoc;
@@ -370,18 +370,35 @@ export function buildQrCodeData(order) {
   };
 }
 
+/**
+ * Shared in-memory cache for country images.
+ * Prevents redundant Supabase lookups when the same country image
+ * is needed by both EsimCard (dashboard) and QRCodeModal.
+ */
+const _countryImageCache = new Map();
+
+export function getCachedCountryImage(key) {
+  return _countryImageCache.get(key?.toLowerCase()) || null;
+}
+
+export function setCachedCountryImage(key, url) {
+  if (key && url) _countryImageCache.set(key.toLowerCase(), url);
+}
+
 export default {
   formatDataAmount,
   mapAiraloSimData,
   mapPackageCountryData,
   mapPlanDetails,
-  mapFirebaseOrder,
+  mapOrder,
   getQrCodeValue,
   getQrCodeUrl,
   getAppleInstallUrl,
   getIccid,
   buildOrderDetailsForQrCode,
-  buildQrCodeData
+  buildQrCodeData,
+  getCachedCountryImage,
+  setCachedCountryImage
 };
 
 

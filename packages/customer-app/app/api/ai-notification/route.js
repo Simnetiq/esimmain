@@ -1,30 +1,6 @@
 import { NextResponse } from 'next/server';
-import admin from 'firebase-admin';
+import { sendFCMMessage } from '@esim/shared/lib/fcm';
 import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
-
-// Initialize Firebase Admin SDK for FCM (push notifications only)
-if (!admin.apps.length) {
-  try {
-    let credential;
-    
-    if (process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_CLIENT_EMAIL) {
-      credential = admin.credential.cert({
-        projectId: process.env.FIREBASE_PROJECT_ID || 'esim-f0e3e',
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-      });
-    } else {
-      credential = admin.credential.cert('./esim-service.json');
-    }
-
-    admin.initializeApp({
-      credential,
-      projectId: process.env.FIREBASE_PROJECT_ID || 'esim-f0e3e',
-    });
-  } catch {
-    // Ignore
-  }
-}
 
 async function generateNotificationWithAI(prompt, config) {
   const response = await fetch(`${config.baseUrl}/chat/completions`, {
@@ -136,20 +112,20 @@ export async function POST(request) {
       });
     }
 
-    const message = {
-      notification: { title: title || 'Simnetiq Update', body: aiGeneratedBody },
+    const notifTitle = title || 'Simnetiq Update';
+    const messageBase = {
+      notification: { title: notifTitle, body: aiGeneratedBody },
       data: { type: 'ai_daily_notification', timestamp: Date.now().toString(), source: 'ai_generator' },
-      android: { priority: 'high', notification: { channelId: 'fcm_notifications', sound: 'default', clickAction: 'FLUTTER_NOTIFICATION_CLICK' } },
-      apns: { payload: { aps: { alert: { title: title || 'Simnetiq Update', body: aiGeneratedBody }, sound: 'default', badge: 1 } } }
+      android: { priority: 'high', notification: { channel_id: 'fcm_notifications', sound: 'default', click_action: 'FLUTTER_NOTIFICATION_CLICK' } },
+      apns: { payload: { aps: { alert: { title: notifTitle, body: aiGeneratedBody }, sound: 'default', badge: 1 } } }
     };
 
-    const messaging = admin.messaging();
     let successCount = 0, failureCount = 0;
     const failedTokens = [];
 
     for (const token of tokens) {
       try {
-        await messaging.send({ ...message, token });
+        await sendFCMMessage({ ...messageBase, token });
         successCount++;
       } catch {
         failedTokens.push(token);

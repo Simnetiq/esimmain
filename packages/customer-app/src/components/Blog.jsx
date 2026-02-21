@@ -8,6 +8,8 @@ import { useI18n } from '@esim/shared/contexts/I18nContext';
 import blogServiceSupabase from '@esim/shared/services/blogServiceSupabase';
 import { detectLanguageFromPath, getLocalizedBlogUrl, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { formatBlogDate } from '@esim/shared/utils/blogUtils';
+import BackgroundDecor from './ui/BackgroundDecor';
+import { BlogFeaturedSkeleton, BlogGridSkeleton } from './ui/PageSkeleton';
 
 // Lazy load non-critical components
 import dynamic from 'next/dynamic';
@@ -38,9 +40,9 @@ const getCategoryStyle = (category) => CATEGORY_STYLES[category] || CATEGORY_STY
 // Large Featured Card (memoized)
 const LargeFeaturedCard = memo(({ post, language, isRTL, onPostClick }) => {
   if (!post) return null;
-  
+
   return (
-    <Link 
+    <Link
       href={getLocalizedBlogUrl(post.baseSlug || post.slug, language)}
       onClick={() => onPostClick(post, 0)}
       className="group/article-preview flex flex-col h-full"
@@ -53,7 +55,7 @@ const LargeFeaturedCard = memo(({ post, language, isRTL, onPostClick }) => {
               alt={post.title}
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
-              className="absolute inset-0 size-full scale-[1.01] object-cover transition-all duration-300 ease-out group-hover/article-preview:scale-[1.03]"
+              className="absolute inset-0 size-full scale-[1.01] object-cover transition-transform duration-200 ease-out group-hover/article-preview:scale-[1.03]"
               quality={80}
               priority
               fetchPriority="high"
@@ -86,9 +88,9 @@ LargeFeaturedCard.displayName = 'LargeFeaturedCard';
 // Small Featured Card (memoized)
 const SmallFeaturedCard = memo(({ post, language, isRTL, onPostClick, index }) => {
   if (!post) return null;
-  
+
   return (
-    <Link 
+    <Link
       href={getLocalizedBlogUrl(post.baseSlug || post.slug, language)}
       onClick={() => onPostClick(post, index)}
       className="group/article-preview flex flex-row gap-4 items-start"
@@ -101,7 +103,7 @@ const SmallFeaturedCard = memo(({ post, language, isRTL, onPostClick, index }) =
               alt={post.title}
               fill
               sizes="(max-width: 768px) 33vw, 15vw"
-              className="absolute inset-0 size-full scale-[1.01] object-cover transition-all duration-300 ease-out group-hover/article-preview:scale-[1.07]"
+              className="absolute inset-0 size-full scale-[1.01] object-cover transition-transform duration-200 ease-out group-hover/article-preview:scale-[1.07]"
               quality={70}
               loading="lazy"
             />
@@ -133,9 +135,9 @@ SmallFeaturedCard.displayName = 'SmallFeaturedCard';
 // Grid Article Card (memoized)
 const GridArticleCard = memo(({ post, language, isRTL, onPostClick, index }) => {
   if (!post) return null;
-  
+
   return (
-    <Link 
+    <Link
       href={getLocalizedBlogUrl(post.baseSlug || post.slug, language)}
       onClick={() => onPostClick(post, index)}
       className="group/article-preview flex shrink-0 flex-row items-center gap-3 md:flex-col"
@@ -148,7 +150,7 @@ const GridArticleCard = memo(({ post, language, isRTL, onPostClick, index }) => 
               alt={post.title}
               fill
               sizes="(max-width: 768px) 25vw, 33vw"
-              className="absolute inset-0 size-full scale-[1.01] object-cover transition-all duration-300 ease-out group-hover/article-preview:scale-[1.07]"
+              className="absolute inset-0 size-full scale-[1.01] object-cover transition-transform duration-200 ease-out group-hover/article-preview:scale-[1.07]"
               quality={70}
               loading="lazy"
             />
@@ -182,7 +184,7 @@ const CategoryButton = memo(({ category, isSelected, onClick }) => (
   <button
     type="button"
     onClick={onClick}
-    className={`flex h-8 w-fit shrink-0 cursor-pointer items-center rounded-full px-3 transition-all duration-200 ${
+    className={`flex h-8 w-fit shrink-0 cursor-pointer items-center rounded-full px-3 transition-colors duration-150 ease-out ${
       isSelected
         ? 'bg-gray-900 text-white shadow-sm'
         : 'shadow-[inset_0_0_0_1px_rgba(0,0,0,0.15)] hover:bg-gray-100 text-gray-700'
@@ -197,7 +199,7 @@ CategoryButton.displayName = 'CategoryButton';
 const PaginationButton = memo(({ page, currentPage, onClick }) => (
   <button
     onClick={() => onClick(page)}
-    className={`w-10 h-10 text-sm font-medium rounded-full transition-colors ${
+    className={`w-10 h-10 text-sm font-medium rounded-full transition-colors duration-150 ease-out ${
       currentPage === page
         ? 'bg-gray-900 text-white'
         : 'text-gray-700 hover:bg-gray-100'
@@ -211,18 +213,18 @@ PaginationButton.displayName = 'PaginationButton';
 const Blog = () => {
   const pathname = usePathname();
   const { locale, t } = useI18n();
-  
+
   const detectedLanguage = useMemo(() => {
     const urlLanguage = detectLanguageFromPath(pathname);
     return urlLanguage || locale || 'en';
   }, [pathname, locale]);
-  
+
   const [blogPosts, setBlogPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  
+
   const isRTL = useMemo(() => getLanguageDirection(detectedLanguage) === 'rtl', [detectedLanguage]);
   const postsPerPage = 12;
 
@@ -232,17 +234,17 @@ const Blog = () => {
       setLoading(true);
       const result = await blogServiceSupabase.getPublishedPosts(50, 0, detectedLanguage);
       setBlogPosts(result.posts);
-      
+
       // Track view after loading (non-blocking)
       loadTracking().then(tracking => {
-        tracking?.trackBlogListView?.(detectedLanguage, selectedCategory);
+        tracking?.trackBlogListView?.(detectedLanguage, 'all');
       });
     } catch {
       setBlogPosts([]);
     } finally {
       setLoading(false);
     }
-  }, [detectedLanguage, selectedCategory]);
+  }, [detectedLanguage]);
 
   // Load categories
   const loadCategories = useCallback(async () => {
@@ -298,7 +300,7 @@ const Blog = () => {
     const gridPosts = filteredPosts.slice(3);
     const paginated = gridPosts.slice((currentPage - 1) * postsPerPage, currentPage * postsPerPage);
     const pages = Math.ceil(gridPosts.length / postsPerPage);
-    
+
     return {
       featuredPost: featured,
       secondaryPosts: secondary,
@@ -308,9 +310,11 @@ const Blog = () => {
   }, [filteredPosts, currentPage, postsPerPage]);
 
   return (
-    <div className="min-h-screen bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Header Section */}
-      <div className="mx-auto w-full max-w-9xl">
+    <div className="min-h-screen relative" dir={isRTL ? 'rtl' : 'ltr'}>
+      <BackgroundDecor />
+
+      {/* Header Section — hero-style spacing */}
+      <div className="relative mx-auto w-full max-w-9xl">
         <div className="mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl w-full lg:mt-20 mt-10">
           <div className="px-4 pt-6 lg:pt-0 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
             <p className="font-mono text-sm max-w-2xl sm:text-base font-medium tracking-widest uppercase text-gray-500 rtl:font-bold rtl:tracking-tight">
@@ -324,7 +328,7 @@ const Blog = () => {
       </div>
 
       {/* Category Filters & Blog Grid */}
-      <div className="mx-auto w-full max-w-9xl">
+      <div className="relative mx-auto w-full max-w-9xl">
         <div className="mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl w-full">
           <div className="px-4">
             {/* Category Filter Pills */}
@@ -346,10 +350,11 @@ const Blog = () => {
               </div>
             </div>
 
-            {/* Loading State */}
+            {/* Loading Skeleton — maintains final layout proportions */}
             {loading ? (
-              <div className="flex items-center justify-center py-20">
-                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-tufts-blue" />
+              <div className="py-4 space-y-12">
+                <BlogFeaturedSkeleton />
+                <BlogGridSkeleton count={6} />
               </div>
             ) : filteredPosts.length === 0 ? (
               <div className="flex items-center justify-center py-20">
@@ -361,7 +366,7 @@ const Blog = () => {
                 </p>
               </div>
             ) : (
-              <>
+              <div className="transition-opacity duration-150 ease-out opacity-100">
                 {/* Newest Section */}
                 {featuredPost && (
                   <>
@@ -370,15 +375,15 @@ const Blog = () => {
                         {t('blog.newest', 'Newest')}
                       </h3>
                     </div>
-                    
+
                     <div className="grid gap-6 md:gap-8 lg:grid-cols-2 mb-12 md:mb-16 pb-10 md:pb-14 border-b border-gray-200">
-                      <LargeFeaturedCard 
+                      <LargeFeaturedCard
                         post={featuredPost}
                         language={detectedLanguage}
                         isRTL={isRTL}
                         onPostClick={handlePostClick}
                       />
-                      
+
                       {secondaryPosts.length > 0 && (
                         <div className="flex flex-col gap-6 md:gap-8">
                           {secondaryPosts.map((post, index) => (
@@ -396,7 +401,7 @@ const Blog = () => {
                     </div>
                   </>
                 )}
-                    
+
                 {/* All Posts Section */}
                 {paginatedGridPosts.length > 0 && (
                   <>
@@ -405,7 +410,7 @@ const Blog = () => {
                         {t('blog.allPosts', 'All Posts')}
                       </h3>
                     </div>
-                    
+
                     <div className="grid gap-x-6 gap-y-8 md:grid-cols-2 md:gap-x-8 md:gap-y-10 lg:grid-cols-3">
                       {paginatedGridPosts.map((post, index) => (
                         <div key={post.id} className={index >= 6 ? 'content-visibility-auto-sm' : ''}>
@@ -428,7 +433,7 @@ const Blog = () => {
                     <button
                       onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
                       disabled={currentPage === 1}
-                      className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${
+                      className={`px-4 py-2 text-sm font-medium rounded-full transition-colors duration-150 ease-out ${
                         currentPage === 1
                           ? 'text-gray-300 cursor-not-allowed'
                           : 'text-gray-700 hover:bg-gray-100'
@@ -436,7 +441,7 @@ const Blog = () => {
                     >
                       {t('blog.pagination.previous', 'Previous')}
                     </button>
-                    
+
                     <div className="flex gap-1">
                       {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                         <PaginationButton
@@ -447,11 +452,11 @@ const Blog = () => {
                         />
                       ))}
                     </div>
-                    
+
                     <button
                       onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
                       disabled={currentPage === totalPages}
-                      className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${
+                      className={`px-4 py-2 text-sm font-medium rounded-full transition-colors duration-150 ease-out ${
                         currentPage === totalPages
                           ? 'text-gray-300 cursor-not-allowed'
                           : 'text-gray-700 hover:bg-gray-100'
@@ -461,12 +466,12 @@ const Blog = () => {
                     </button>
                   </div>
                 )}
-              </>
+              </div>
             )}
 
             {/* Download App Widget - Lazy loaded */}
             {!loading && filteredPosts.length > 0 && (
-              <BlogAppDownload 
+              <BlogAppDownload
                 language={detectedLanguage}
                 isRTL={isRTL}
                 location="blog_list"

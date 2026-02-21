@@ -50,16 +50,16 @@ const DashboardSkeleton = () => (
       <div className="hidden sm:block absolute top-0 left-0 right-0 h-px bg-gray-200/70" />
       <div className="hidden sm:block absolute bottom-0 left-0 right-0 h-px bg-gray-200/70" />
 
-      {/* Header Section Skeleton - exact match to DashboardHeader */}
+      {/* Header Section Skeleton - matches DashboardHeader dimensions exactly */}
       <div className="bg-white">
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl w-full lg:mt-20 mt-10">
             <div className="px-4 pt-6 lg:pt-0 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              {/* Subtitle skeleton */}
-              <div className="h-4 w-80 max-w-full bg-gray-200 rounded animate-pulse" />
+              {/* Subtitle skeleton — matches font-mono text-sm/text-base uppercase tracking-widest */}
+              <div className="h-5 sm:h-5 w-96 max-w-full bg-gray-200 rounded animate-pulse" />
 
-              {/* Title skeleton */}
-              <div className="h-8 sm:h-9 lg:h-10 w-72 max-w-full bg-gray-200 rounded animate-pulse my-4" />
+              {/* Title skeleton — matches text-xl sm:text-2xl lg:text-3xl xl:text-4xl + line-height */}
+              <div className="h-7 sm:h-8 lg:h-10 xl:h-12 w-96 max-w-full bg-gray-200 rounded animate-pulse my-4" />
 
               {/* Divider */}
               <div className="w-full h-px bg-gray-200 my-4" />
@@ -70,8 +70,8 @@ const DashboardSkeleton = () => (
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 bg-gray-200 rounded animate-pulse" />
                   <div>
-                    <div className="h-3 w-16 bg-gray-200 rounded animate-pulse mb-1" />
-                    <div className="h-4 w-6 bg-gray-200 rounded animate-pulse" />
+                    <div className="h-3.5 w-20 bg-gray-200 rounded animate-pulse mb-1" />
+                    <div className="h-4 w-8 bg-gray-200 rounded animate-pulse" />
                   </div>
                 </div>
 
@@ -81,8 +81,8 @@ const DashboardSkeleton = () => (
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 bg-gray-200 rounded animate-pulse" />
                   <div>
-                    <div className="h-3 w-16 bg-gray-200 rounded animate-pulse mb-1" />
-                    <div className="h-4 w-6 bg-gray-200 rounded animate-pulse" />
+                    <div className="h-3.5 w-20 bg-gray-200 rounded animate-pulse mb-1" />
+                    <div className="h-4 w-8 bg-gray-200 rounded animate-pulse" />
                   </div>
                 </div>
 
@@ -92,17 +92,17 @@ const DashboardSkeleton = () => (
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 bg-gray-200 rounded animate-pulse" />
                   <div>
-                    <div className="h-3 w-16 bg-gray-200 rounded animate-pulse mb-1" />
-                    <div className="h-4 w-12 bg-gray-200 rounded animate-pulse" />
+                    <div className="h-3.5 w-20 bg-gray-200 rounded animate-pulse mb-1" />
+                    <div className="h-4 w-14 bg-gray-200 rounded animate-pulse" />
                   </div>
                 </div>
               </div>
 
-              {/* Quick Actions skeleton */}
+              {/* Quick Actions skeleton — matches px-4 py-2.5 text-sm + icon + text width */}
               <div className="mt-6">
                 <div className="flex flex-wrap gap-3">
-                  <div className="h-10 w-32 bg-gray-200 rounded-lg animate-pulse" />
-                  <div className="h-10 w-36 bg-gray-100 rounded-lg animate-pulse" />
+                  <div className="h-10 w-40 bg-gray-200 rounded-lg animate-pulse" />
+                  <div className="h-10 w-44 bg-gray-100 rounded-lg animate-pulse" />
                 </div>
               </div>
             </div>
@@ -112,15 +112,15 @@ const DashboardSkeleton = () => (
         <div className="w-full h-px bg-gray-100 mt-6" />
       </div>
 
-      {/* Recent Orders Section Skeleton - exact match to RecentOrders */}
+      {/* Recent Orders Section Skeleton - matches RecentOrders dimensions */}
       <div className="bg-white flex-1">
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl">
             <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              {/* Section title skeleton */}
-              <div className="h-7 w-36 bg-gray-200 rounded animate-pulse mb-6" />
+              {/* Section title skeleton — matches text-xl sm:text-2xl font-semibold */}
+              <div className="h-7 sm:h-8 w-44 bg-gray-200 rounded animate-pulse mb-6" />
 
-              {/* Empty state / Loading indicator */}
+              {/* Loading indicator */}
               <div className="flex justify-center items-center py-12">
                 <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-tufts-blue" />
               </div>
@@ -256,17 +256,15 @@ const Dashboard = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Get current language for RTL detection
-  const getCurrentLanguage = () => {
+  // Memoize language detection to avoid recreating on every render
+  const currentLanguage = useMemo(() => {
     if (locale) return locale;
     if (typeof window !== 'undefined') {
       const savedLanguage = localStorage.getItem('Simnetiq-language');
       if (savedLanguage) return savedLanguage;
     }
     return detectLanguageFromPath(pathname);
-  };
-
-  const currentLanguage = getCurrentLanguage();
+  }, [locale, pathname]);
   const isRTL = getLanguageDirection(currentLanguage) === 'rtl';
 
   // Close dropdown when clicking outside
@@ -316,7 +314,9 @@ const Dashboard = () => {
   }, [searchParams]);
 
   // Extract country/region information from order data directly
-  const extractLocationInfo = (data) => {
+  // Memoized as useCallback since it's a pure function with no dependencies
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const extractLocationInfo = useCallback((data) => {
     // PRIORITY 0: Check for direct country_code and country_region fields (from server-side order creation)
     if (data.country_code && data.country_region) {
       return {
@@ -475,7 +475,7 @@ const Dashboard = () => {
     }
 
     return null;
-  };
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -701,8 +701,8 @@ const Dashboard = () => {
   }, [authLoading, currentUser, router, currentLanguage]);
 
   // Preload usage data for visible eSIMs (for card previews)
-  // OPTIMIZED: First checks Firebase data to determine if eSIM is expired
-  // - Expired eSIMs: Use synthetic data from Firebase (no API call needed)
+  // OPTIMIZED: First checks stored data to determine if eSIM is expired
+  // - Expired eSIMs: Use synthetic data (no API call needed)
   // - Active eSIMs: Fetch real-time usage from Airalo API
   useEffect(() => {
     if (orders.length === 0) return;
@@ -721,7 +721,7 @@ const Dashboard = () => {
 
       if (ordersWithIccid.length === 0) return;
 
-      // STEP 1: Categorize eSIMs as expired vs active based on Firebase data
+      // STEP 1: Categorize eSIMs as expired vs active based on stored data
       const expiredOrders = [];
       const activeOrders = [];
 
@@ -734,7 +734,7 @@ const Dashboard = () => {
         }
       }
 
-      // STEP 2: For expired eSIMs - use synthetic data from Firebase (instant, no API call)
+      // STEP 2: For expired eSIMs - use synthetic data (instant, no API call)
       if (expiredOrders.length > 0 && !isCancelled) {
         const expiredUsageUpdates = {};
         for (const { iccid, order, expirationCheck } of expiredOrders) {
@@ -921,7 +921,7 @@ const Dashboard = () => {
     }
   };
 
-  // Update Firebase order with correct country information from Airalo API response
+  // Update order with correct country information from Airalo API response
   const updateOrderCountryInfo = async (order, esimDetails) => {
     try {
       if (!esimDetails) return;
@@ -1089,7 +1089,7 @@ const Dashboard = () => {
       // OPTIMIZATION: Check if eSIM is expired before making API call
       const expirationCheck = checkEsimExpiration(selectedOrder, null);
       if (expirationCheck.isExpired) {
-        // Use synthetic data from Firebase for expired eSIMs
+        // Use synthetic data for expired eSIMs
         const expiredUsageData = createExpiredUsageData(selectedOrder);
         setEsimUsage(expiredUsageData);
         setUsageCache(prev => ({ ...prev, [iccid]: expiredUsageData }));
@@ -1127,7 +1127,7 @@ const Dashboard = () => {
 
         setEsimUsage(combinedUsageData);
         setUsageCache(prev => ({ ...prev, [iccid]: combinedUsageData }));
-        toast.success(t('dashboard.usageDataLoaded', 'Usage data loaded successfully'));
+
       } else {
         // Handle specific error cases
         if (result.isUnsupported) {
@@ -1156,7 +1156,7 @@ const Dashboard = () => {
 
 
   return (
-    <div className="min-h-screen bg-white flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-white flex flex-col transition-opacity duration-150 opacity-100" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Access Denied Alert */}
       <AccessDeniedAlert show={searchParams.get('error') === 'access_denied'} />
 
@@ -1167,20 +1167,14 @@ const Dashboard = () => {
 
         {/* Grid Pattern - Left Side */}
         <div
-          className="hidden xl:block absolute left-0 top-0 bottom-0 w-32 "
-          style={{
-            backgroundSize: '10px 10px',
-            backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-          }}
+          className="hidden xl:block absolute left-0 top-0 bottom-0 w-32 pointer-events-none"
+          style={gridPatternStyle}
         ></div>
 
         {/* Grid Pattern - Right Side */}
         <div
-          className="hidden xl:block absolute right-0 top-0 bottom-0 w-32 "
-          style={{
-            backgroundSize: '10px 10px',
-            backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-          }}
+          className="hidden xl:block absolute right-0 top-0 bottom-0 w-32 pointer-events-none"
+          style={gridPatternStyle}
         ></div>
 
         {/* Header Section */}

@@ -7,7 +7,7 @@ This is a monorepo containing the eSIM customer application and admin panel as s
 ```
 esimmain/
 ├── packages/
-│   ├── shared/              # Shared code (Firebase, contexts, services, utils)
+│   ├── shared/              # Shared code (contexts, services, utils)
 │   ├── customer-app/        # Customer-facing application (NO admin code)
 │   └── admin-app/           # Admin panel application
 ├── package.json             # Root workspace configuration
@@ -56,10 +56,10 @@ npm run build:all
 ## 📦 Packages
 
 ### @esim/shared
-Shared utilities, services, contexts, and Firebase configuration used by both apps.
+Shared utilities, services, contexts, and Supabase configuration used by both apps.
 
 **Exports:**
-- Firebase configuration
+- Supabase configuration
 - Authentication context
 - Admin context
 - Services (admin, referral, etc.)
@@ -120,23 +120,6 @@ Admin panel for managing the eSIM platform.
    - Output Directory: `.next`
    - Install Command: `cd ../.. && npm install`
 
-3. **Set Environment Variables:**
-
-   Both projects need the same Firebase environment variables:
-   ```
-   NEXT_PUBLIC_FIREBASE_API_KEY
-   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
-   NEXT_PUBLIC_FIREBASE_PROJECT_ID
-   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
-   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
-   NEXT_PUBLIC_FIREBASE_APP_ID
-   NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
-   FIREBASE_ADMIN_PROJECT_ID
-   FIREBASE_ADMIN_CLIENT_EMAIL
-   FIREBASE_ADMIN_PRIVATE_KEY
-   ```
-
-   Customer app also needs:
    ```
    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
    STRIPE_SECRET_KEY
@@ -149,8 +132,6 @@ Admin panel for managing the eSIM platform.
    - Customer app: `simnetiq.com` (or your main domain)
    - Admin app: `admin.simnetiq.com` (subdomain)
 
-5. **Update Firebase Authorized Domains:**
-   - Add both domains to Firebase Console → Authentication → Settings → Authorized domains
 
 ## 📊 Performance Benefits
 
@@ -168,7 +149,7 @@ By separating the admin panel:
 - Admin panel has `noindex, nofollow` robots meta tags
 - Admin routes protected by `AdminGuard` component
 - Role-based access control (RBAC)
-- Firebase Authentication required
+
 - Admin domain can be IP-restricted if needed
 
 ## 🛠️ Development Tips
@@ -206,8 +187,8 @@ npm install
 - Ensure all environment variables are set
 
 ### Admin panel not accessible
-- Verify user has `admin` or `super_admin` role in Firestore
-- Check Firebase authorized domains include admin domain
+- Verify user has `admin` or `super_admin` role in the `users` table
+
 - Verify AdminGuard is working correctly
 
 ## 📄 License

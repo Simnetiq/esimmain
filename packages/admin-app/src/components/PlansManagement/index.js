@@ -3,7 +3,7 @@
  *
  * A modular plans management system with:
  * - Supabase as primary data source (server-side filtering)
- * - Firebase as secondary/legacy data source
+ * - Airalo API for sync operations
  * - Airalo API for sync/recovery operations
  *
  * Architecture:
@@ -25,7 +25,7 @@ export { default as PlansSearch } from './components/PlansSearch';
 export { default as SupabaseTable } from './components/SupabaseTable';
 export { default as StandardTable } from './components/StandardTable';
 export { default as PlansPagination } from './components/PlansPagination';
-export { FirebaseSyncModal, SupabaseSyncModal } from './components/SyncModals';
+export { AiraloSyncModal, SupabaseSyncModal } from './components/SyncModals';
 
 // Hooks
 export { default as usePlansData } from './hooks/usePlansData';

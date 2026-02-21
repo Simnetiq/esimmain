@@ -123,8 +123,8 @@ export function getProviderInfo(slug) {
 }
 
 /**
- * Get provider info from Firebase plan data
- * @param {object} planData - Plan data from Firebase
+ * Get provider info from plan data
+ * @param {object} planData - Plan data from database
  * @returns {object} Provider info { name, icon, color }
  */
 export function getProviderFromPlanData(planData) {

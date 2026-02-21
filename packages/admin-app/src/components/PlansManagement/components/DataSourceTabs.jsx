@@ -43,14 +43,14 @@ const DataSourceTabs = ({
                 Supabase ({supabasePlansCount})
               </button>
               <button
-                onClick={() => onDataSourceChange(DATA_SOURCES.FIREBASE)}
+                onClick={() => onDataSourceChange(DATA_SOURCES.LEGACY)}
                 className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                  dataSource === DATA_SOURCES.FIREBASE
+                  dataSource === DATA_SOURCES.LEGACY
                     ? 'bg-white text-gray-900 shadow-sm'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                Firebase ({allPlansCount})
+                Legacy ({allPlansCount})
               </button>
               <button
                 onClick={() => onDataSourceChange(DATA_SOURCES.AIRALO)}

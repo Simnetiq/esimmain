@@ -121,8 +121,7 @@ export function toCountryViewModel(supabaseCountry, options = {}) {
     // Source tracking
     source: supabaseCountry.provider || 'supabase',
 
-    // Backward compatibility with legacy Firebase field names
-    // These can be removed after full migration
+    // Backward compatibility with legacy field names
     isHidden: supabaseCountry.is_active === false,
     image: supabaseCountry.image_url ? { url: supabaseCountry.image_url } : null,
     lastPriceSync: supabaseCountry.synced_at

@@ -24,6 +24,12 @@ import {
   ActivationInstructions
 } from './components';
 
+const gridPatternStyle = {
+  backgroundSize: '10px 10px',
+  backgroundAttachment: 'fixed',
+  backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
+};
+
 const SharePackagePage = () => {
   const router = useRouter();
   const { currentUser } = useAuth();
@@ -353,13 +359,45 @@ const SharePackagePage = () => {
     }
   }, [metadata]);
 
-  // Loading state
+  // Loading state — skeleton matching page layout
   if (loading || !translationsLoaded) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center" dir={isRTL ? 'rtl' : 'ltr'}>
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-tufts-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('sharePackage.loading', 'Loading package information...')}</p>
+      <div className="bg-white min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="relative isolate">
+          <div className="hidden xl:block absolute left-0 top-0 bottom-0 w-32 pointer-events-none" style={gridPatternStyle} />
+          <div className="hidden xl:block absolute right-0 top-0 bottom-0 w-32 pointer-events-none" style={gridPatternStyle} />
+          <div className="mx-auto w-full max-w-9xl">
+            {/* Header skeleton */}
+            <div className="mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl w-full px-4 pt-10 lg:pt-20">
+              <div className="h-4 sm:h-5 bg-gray-100 rounded w-40 animate-pulse" />
+              <div className="h-8 sm:h-10 lg:h-12 bg-gray-100 rounded w-72 mt-3 animate-pulse" />
+              <div className="h-4 bg-gray-100 rounded w-56 mt-3 animate-pulse" />
+            </div>
+            <div className="w-full h-px bg-gray-100 mt-6" />
+            {/* Payment skeleton */}
+            <div className="mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl w-full px-4 py-8">
+              <div className="max-w-md">
+                <div className="h-6 bg-gray-100 rounded w-32 mb-4 animate-pulse" />
+                <div className="h-12 bg-gray-100 rounded w-full mb-3 animate-pulse" />
+                <div className="h-12 bg-gray-50 rounded w-full animate-pulse" />
+              </div>
+            </div>
+            <div className="w-full h-px bg-gray-100" />
+            {/* Stats skeleton */}
+            <div className="mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl w-full px-4 py-8">
+              <div className="flex flex-wrap gap-6">
+                {[1,2,3,4].map(i => (
+                  <div key={i} className="flex items-center gap-2">
+                    <div className="w-10 h-10 bg-gray-100 rounded animate-pulse" />
+                    <div>
+                      <div className="h-3 bg-gray-100 rounded w-16 mb-1 animate-pulse" />
+                      <div className="h-4 bg-gray-100 rounded w-20 animate-pulse" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -389,7 +427,7 @@ const SharePackagePage = () => {
   }
 
   return (
-    <div className="bg-white min-h-screen flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="bg-white min-h-screen flex flex-col transition-opacity duration-150" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Load Stripe.js only on this page where it's needed */}
       <Script src="https://js.stripe.com/v3/" strategy="lazyOnload" />
 
@@ -439,22 +477,8 @@ const SharePackagePage = () => {
         <div className="hidden sm:block absolute bottom-0 left-0 right-0 h-px bg-gray-200"></div>
 
         {/* Grid Patterns */}
-        <div
-          className="hidden xl:block absolute left-0 top-0 bottom-0 w-32"
-          style={{
-            backgroundSize: '10px 10px',
-            backgroundAttachment: 'fixed',
-            backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-          }}
-        ></div>
-        <div
-          className="hidden xl:block absolute right-0 top-0 bottom-0 w-32"
-          style={{
-            backgroundSize: '10px 10px',
-            backgroundAttachment: 'fixed',
-            backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-          }}
-        ></div>
+        <div className="hidden xl:block absolute left-0 top-0 bottom-0 w-32 pointer-events-none" style={gridPatternStyle} />
+        <div className="hidden xl:block absolute right-0 top-0 bottom-0 w-32 pointer-events-none" style={gridPatternStyle} />
 
         <div className="mx-auto w-full max-w-9xl">
           {/* Package Header */}

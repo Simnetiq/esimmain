@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { getLanguageDirection, detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
@@ -9,18 +9,17 @@ import { ShoppingBag, Wifi, DollarSign, Store, Settings, ArrowRight } from 'luci
 const DashboardHeader = ({ currentUser, orders = [] }) => {
   const { t, locale } = useI18n();
   const pathname = usePathname();
-  
-  // Get current language for RTL detection
-  const getCurrentLanguage = () => {
+
+  // Memoize language detection
+  const currentLanguage = useMemo(() => {
     if (locale) return locale;
     if (typeof window !== 'undefined') {
       const savedLanguage = localStorage.getItem('Simnetiq-language');
       if (savedLanguage) return savedLanguage;
     }
     return detectLanguageFromPath(pathname);
-  };
+  }, [locale, pathname]);
 
-  const currentLanguage = getCurrentLanguage();
   const isRTL = getLanguageDirection(currentLanguage) === 'rtl';
 
   // Generate localized URLs
@@ -33,7 +32,7 @@ const DashboardHeader = ({ currentUser, orders = [] }) => {
 
   // Calculate stats
   const totalOrders = orders.length;
-  const activeEsims = orders.filter(order => 
+  const activeEsims = orders.filter(order =>
     order?.status === 'active' || order?.status === 'completed'
   ).length;
   const totalSpent = orders.reduce((sum, order) => sum + (order?.amount || 0), 0);
@@ -43,7 +42,7 @@ const DashboardHeader = ({ currentUser, orders = [] }) => {
       {/* Header Section */}
       <div className="mx-auto w-full max-w-9xl">
         <div className="mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl w-full lg:mt-20 mt-10">
-          
+
           <div className={`px-4 pt-6 lg:pt-0 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl ${isRTL ? 'text-right' : 'text-left'}`}>
           <p className="font-mono text-sm max-w-2xl sm:text-base font-medium tracking-widest uppercase text-gray-500 rtl:font-bold rtl:tracking-tight">
               {t('dashboard.manageOrders', 'Manage your eSIM orders and account settings')}
@@ -55,80 +54,44 @@ const DashboardHeader = ({ currentUser, orders = [] }) => {
             {/* Divider */}
             <div className="w-full h-px bg-gray-200 my-4"></div>
 
-            {/* Stats Line */}
+            {/* Stats Line — single JSX per stat; global [dir="rtl"] .flex handles icon/text order */}
             <div className="flex flex-wrap items-center gap-4 sm:gap-6 justify-start">
               {/* Total Orders */}
-              {isRTL ? (
-                <div className="flex items-center gap-2">
-                  <div>
-                    <p className="text-xs text-gray-500">{t('dashboard.totalOrders', 'Total Orders')}</p>
-                    <p className="text-sm font-semibold text-gray-900">{totalOrders}</p>
-                  </div>
-                  <div className="w-8 h-8 bg-tufts-blue/10 rounded flex items-center justify-center">
-                    <ShoppingBag className="w-4 h-4 text-tufts-blue" />
-                  </div>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-tufts-blue/10 rounded flex items-center justify-center">
+                  <ShoppingBag className="w-4 h-4 text-tufts-blue" />
                 </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-tufts-blue/10 rounded flex items-center justify-center">
-                    <ShoppingBag className="w-4 h-4 text-tufts-blue" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">{t('dashboard.totalOrders', 'Total Orders')}</p>
-                    <p className="text-sm font-semibold text-gray-900">{totalOrders}</p>
-                  </div>
+                <div>
+                  <p className="text-xs text-gray-500">{t('dashboard.totalOrders', 'Total Orders')}</p>
+                  <p className="text-sm font-semibold text-gray-900">{totalOrders}</p>
                 </div>
-              )}
+              </div>
 
               <div className="w-px h-8 bg-gray-200 hidden sm:block"></div>
 
               {/* Active eSIMs */}
-              {isRTL ? (
-                <div className="flex items-center gap-2">
-                  <div>
-                    <p className="text-xs text-gray-500">{t('dashboard.activeEsims', 'Active eSIMs')}</p>
-                    <p className="text-sm font-semibold text-gray-900">{activeEsims}</p>
-                  </div>
-                  <div className="w-8 h-8 bg-tufts-blue/10 rounded flex items-center justify-center">
-                    <Wifi className="w-4 h-4 text-tufts-blue" />
-                  </div>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-tufts-blue/10 rounded flex items-center justify-center">
+                  <Wifi className="w-4 h-4 text-tufts-blue" />
                 </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-tufts-blue/10 rounded flex items-center justify-center">
-                    <Wifi className="w-4 h-4 text-tufts-blue" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">{t('dashboard.activeEsims', 'Active eSIMs')}</p>
-                    <p className="text-sm font-semibold text-gray-900">{activeEsims}</p>
-                  </div>
+                <div>
+                  <p className="text-xs text-gray-500">{t('dashboard.activeEsims', 'Active eSIMs')}</p>
+                  <p className="text-sm font-semibold text-gray-900">{activeEsims}</p>
                 </div>
-              )}
+              </div>
 
               <div className="w-px h-8 bg-gray-200 hidden sm:block"></div>
 
               {/* Total Spent */}
-              {isRTL ? (
-                <div className="flex items-center gap-2">
-                  <div>
-                    <p className="text-xs text-gray-500">{t('dashboard.totalSpent', 'Total Spent')}</p>
-                    <p className="text-sm font-semibold text-gray-900">{formatPrice(totalSpent)}</p>
-                  </div>
-                  <div className="w-8 h-8 bg-tufts-blue/10 rounded flex items-center justify-center">
-                    <DollarSign className="w-4 h-4 text-tufts-blue" />
-                  </div>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-tufts-blue/10 rounded flex items-center justify-center">
+                  <DollarSign className="w-4 h-4 text-tufts-blue" />
                 </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-tufts-blue/10 rounded flex items-center justify-center">
-                    <DollarSign className="w-4 h-4 text-tufts-blue" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">{t('dashboard.totalSpent', 'Total Spent')}</p>
-                    <p className="text-sm font-semibold text-gray-900">{formatPrice(totalSpent)}</p>
-                  </div>
+                <div>
+                  <p className="text-xs text-gray-500">{t('dashboard.totalSpent', 'Total Spent')}</p>
+                  <p className="text-sm font-semibold text-gray-900">{formatPrice(totalSpent)}</p>
                 </div>
-              )}
+              </div>
             </div>
 
             {/* Quick Actions */}

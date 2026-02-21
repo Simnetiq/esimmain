@@ -11,9 +11,9 @@ import {
 } from 'lucide-react';
 
 /**
- * Firebase Sync Modal
+ * Airalo Sync Modal
  */
-export const FirebaseSyncModal = ({
+export const AiraloSyncModal = ({
   isOpen,
   onClose,
   allPlansCount,
@@ -34,7 +34,7 @@ export const FirebaseSyncModal = ({
             Sync Plans with Airalo API
           </h3>
           <p className="text-gray-600 mt-1">
-            Fetch the latest packages from Airalo and update your Firebase database
+            Fetch the latest packages from Airalo and update your database
           </p>
         </div>
 
@@ -44,7 +44,7 @@ export const FirebaseSyncModal = ({
             <h4 className="font-medium text-gray-900 mb-2">Current Status</h4>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-gray-500">Plans in Firebase:</span>
+                <span className="text-gray-500">Plans in Database:</span>
                 <span className="ml-2 font-medium">{allPlansCount.toLocaleString()}</span>
               </div>
               <div>
@@ -80,7 +80,7 @@ export const FirebaseSyncModal = ({
               {syncResult.details && (
                 <div className="mt-3 text-sm space-y-1">
                   <p>• From Airalo API: <strong>{syncResult.details.from_airalo_api?.toLocaleString()}</strong> packages</p>
-                  <p>• Currently in Database: <strong>{syncResult.details.existing_in_firebase?.toLocaleString()}</strong> packages</p>
+                  <p>• Currently in Database: <strong>{syncResult.details.existing_in_db?.toLocaleString()}</strong> packages</p>
                   <p>• New packages: <strong>{syncResult.details.packages?.added || 0}</strong></p>
                   <p>• Updated packages: <strong>{syncResult.details.packages?.updated || 0}</strong></p>
                   <p className="text-amber-700">• To be removed: <strong>{syncResult.details.total_deprecated || 0}</strong></p>
@@ -207,7 +207,7 @@ export const SupabaseSyncModal = ({
                 <h4 className="font-medium text-blue-800">Direct Airalo → Supabase Sync</h4>
                 <p className="text-sm text-blue-700 mt-1">
                   This syncs package data directly from the Airalo API to your Supabase database,
-                  bypassing Firebase. Use this to populate your read-only catalog data in Supabase.
+                  Use this to populate your read-only catalog data in Supabase.
                 </p>
               </div>
             </div>
@@ -289,4 +289,4 @@ export const SupabaseSyncModal = ({
   );
 };
 
-export default { FirebaseSyncModal, SupabaseSyncModal };
+export default { AiraloSyncModal, SupabaseSyncModal };

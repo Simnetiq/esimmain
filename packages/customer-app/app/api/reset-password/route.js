@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getAdminDb, getAdminAuth } from '@esim/shared/lib/firebaseAdmin';
+import { getAdminDb, getAdminAuth } from '@esim/shared/lib/supabaseServiceClient';
 
 export async function POST(request) {
   try {

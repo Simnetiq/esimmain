@@ -6,7 +6,7 @@ import { Globe, Wifi, Phone, MessageSquare, Clock, ArrowRight, TrendingUp, Trend
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
-import { mapPackageCountryData, mapPlanDetails } from '@esim/shared/utils/esimFieldMapper';
+import { mapPackageCountryData, mapPlanDetails, getCachedCountryImage, setCachedCountryImage } from '@esim/shared/utils/esimFieldMapper';
 import { useCountryNames } from '@esim/shared/hooks/useCountriesSupabase';
 import { getSupabase } from '@esim/shared/lib/supabase';
 import Image from 'next/image';
@@ -24,7 +24,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
     setMounted(true);
   }, []);
 
-  // Fetch country/region image from Firebase
+  // Fetch country/region image from Supabase
   useEffect(() => {
     const fetchCountryImage = async () => {
       const countryData = mapPackageCountryData(order);
@@ -41,6 +41,11 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
         setCountryImage(null);
         return;
       }
+
+      // Check shared cache first
+      const cacheKey = code || countryName;
+      const cached = getCachedCountryImage(cacheKey);
+      if (cached) { setCountryImage(cached); return; }
 
       try {
         const supabase = getSupabase();
@@ -69,6 +74,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
           if (data) imageUrl = data.image_url;
         }
 
+        if (imageUrl) setCachedCountryImage(cacheKey, imageUrl);
         setCountryImage(imageUrl || null);
       } catch (error) {
         console.error('Error fetching country image:', error);
@@ -310,7 +316,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
       </div>
 
 
-      {/* Features Tags (only if present) - Use Supabase data if available, fallback to Firebase */}
+      {/* Features Tags (only if present) */}
       {(() => {
         const hasVoice = planMetadata?.hasVoice || planDetails.voice > 0;
         const hasSms = planMetadata?.hasSms || planDetails.sms > 0;

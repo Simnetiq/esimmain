@@ -91,7 +91,7 @@ export const planHasVoice = (plan) => {
  */
 export const DATA_SOURCES = {
   SUPABASE: 'supabase',
-  FIREBASE: 'firebase', // Legacy label kept for UI compatibility
+  LEGACY: 'legacy',
   AIRALO: 'airalo',
   TOPUPS: 'topups'
 };

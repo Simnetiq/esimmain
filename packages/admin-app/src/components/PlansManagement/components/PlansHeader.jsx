@@ -6,7 +6,7 @@ import { RefreshCw, Database } from 'lucide-react';
 /**
  * Header component with title and sync action buttons
  */
-const PlansHeader = ({ onOpenFirebaseSync, onOpenSupabaseSync }) => {
+const PlansHeader = ({ onOpenAiraloSync, onOpenSupabaseSync }) => {
   return (
     <div className="flex justify-between items-start">
       <div>
@@ -15,11 +15,11 @@ const PlansHeader = ({ onOpenFirebaseSync, onOpenSupabaseSync }) => {
       </div>
       <div className="flex gap-3">
         <button
-          onClick={onOpenFirebaseSync}
+          onClick={onOpenAiraloSync}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
           <RefreshCw className="w-4 h-4" />
-          Sync to Firebase
+          Sync from Airalo
         </button>
         <button
           onClick={onOpenSupabaseSync}

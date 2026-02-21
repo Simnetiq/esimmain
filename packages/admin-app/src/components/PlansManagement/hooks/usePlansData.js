@@ -25,7 +25,7 @@ export const usePlansData = (t) => {
     totalPages: 0
   });
 
-  // Firebase data state (LEGACY)
+  // Legacy data state
   const [allPlans, setAllPlans] = useState([]);
   const [loading, setLoading] = useState(false);
   const [availableCountries, setAvailableCountries] = useState([]);
@@ -77,7 +77,7 @@ export const usePlansData = (t) => {
   // Countries list from Supabase
   const [supabaseCountries, setSupabaseCountries] = useState([]);
 
-  // Price editing state (Firebase)
+  // Price editing state
   const [editingPrices, setEditingPrices] = useState({});
   const [pendingPriceChanges, setPendingPriceChanges] = useState({});
 
@@ -276,10 +276,6 @@ export const usePlansData = (t) => {
     }
   }, []);
 
-  // ============================================
-  // FIREBASE DATA FETCHING (LEGACY)
-  // ============================================
-
   const loadAllPlans = useCallback(async () => {
     try {
       setLoading(true);
@@ -365,9 +361,7 @@ export const usePlansData = (t) => {
     }
   }, []);
 
-  // ============================================
-  // FIREBASE MUTATIONS
-  // ============================================
+
 
   const updatePlanPrice = useCallback(async (planId, newPrice) => {
     try {
@@ -594,7 +588,7 @@ export const usePlansData = (t) => {
         loadSupabaseCountries()
       ]);
 
-      // Load Firebase data in background (for legacy tab support)
+      // Load legacy data in background (for legacy tab support)
       loadAllPlans();
     };
 
@@ -632,7 +626,7 @@ export const usePlansData = (t) => {
     loadSupabaseStatus,
     supabaseCountries,
 
-    // Firebase data (legacy)
+    // Legacy data
     allPlans,
     loading,
     availableCountries,
@@ -686,7 +680,7 @@ export const usePlansData = (t) => {
     denseMode,
     setDenseMode,
 
-    // Price editing (Firebase)
+    // Price editing
     editingPrices,
     setEditingPrices,
     pendingPriceChanges,

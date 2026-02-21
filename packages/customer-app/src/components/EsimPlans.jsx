@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
+import { getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { useSearchParams, useRouter } from 'next/navigation';
 import CountriesGrid from './CountriesGrid';
 import RegionTabs from './RegionTabs';
@@ -60,137 +61,60 @@ const FlexiblePlanCard = ({ plan, t, onClick, isRTL = false }) => {
             <div className={`absolute top-0 w-16 h-16 bg-tufts-blue/5 transition-transform group-hover:scale-110 ${isRTL ? 'left-0 rounded-br-full -ml-8 -mt-8' : 'right-0 rounded-bl-full -mr-8 -mt-8'}`} />
 
             <div>
-                {isRTL ? (
-                    <>
-                        {/* RTL Layout */}
-                        <h4 className="font-bold text-lg text-eerie-black mb-2 text-right">
-                            {validity ? `${validity} - ${dataAmount}` : dataAmount}
-                        </h4>
+                <h4 className="font-bold text-lg text-eerie-black mb-2 text-left">
+                    {validity ? (isRTL ? `${validity} - ${dataAmount}` : `${dataAmount} - ${validity}`) : dataAmount}
+                </h4>
 
-                        {/* All badges - right aligned for RTL */}
-                        <div className="flex flex-wrap items-center gap-1.5 mb-2 justify-end">
-                            {/* Featured badge */}
-                            {plan.isFeatured && (
-                                <span className="inline-flex items-center flex-row-reverse gap-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
-                                    {t('plans.featured', 'Featured')}
-                                </span>
-                            )}
-                            {/* Best Value badge */}
-                            {!plan.isFeatured && plan.isBestValue && (
-                                <span className="inline-flex items-center bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                                    {t('plans.bestValue', 'Best Value')}
-                                </span>
-                            )}
-                            {/* Voice minutes badge */}
-                            {hasVoice && (
-                                <span className="inline-flex items-center flex-row-reverse gap-1 bg-blue-50 text-blue-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">
-                                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                    </svg>
-                                    {voiceMinutes} {t('plans.mins', 'mins')}
-                                </span>
-                            )}
-                            {/* SMS badge */}
-                            {hasSms && (
-                                <span className="inline-flex items-center flex-row-reverse gap-1 bg-purple-50 text-purple-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">
-                                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                                    </svg>
-                                    {smsCount} SMS
-                                </span>
-                            )}
-                        </div>
+                {/* Badges — global CSS handles flex/inline-flex reversal in RTL */}
+                <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                    {plan.isFeatured && (
+                        <span className="inline-flex items-center gap-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                            {t('plans.featured', 'Featured')}
+                        </span>
+                    )}
+                    {!plan.isFeatured && plan.isBestValue && (
+                        <span className="inline-flex items-center bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                            {t('plans.bestValue', 'Best Value')}
+                        </span>
+                    )}
+                    {hasVoice && (
+                        <span className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                            {voiceMinutes} {t('plans.mins', 'mins')}
+                        </span>
+                    )}
+                    {hasSms && (
+                        <span className="inline-flex items-center gap-1 bg-purple-50 text-purple-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                            </svg>
+                            {smsCount} SMS
+                        </span>
+                    )}
+                </div>
 
-                        {/* Country coverage - right aligned */}
-                        {countryCount > 0 && (
-                            <p className="text-xs text-tufts-blue/80 font-medium truncate pl-4 text-right">
-                                {t('deals.covers', 'Covers')} {countryCount} {countryCount === 1 ? t('deals.country', 'country') : t('deals.countries', 'countries')}
-                            </p>
-                        )}
-                    </>
-                ) : (
-                    <>
-                        {/* LTR Layout */}
-                        <h4 className="font-bold text-lg text-eerie-black mb-2 text-left">
-                            {validity ? `${dataAmount} - ${validity}` : dataAmount}
-                        </h4>
-
-                        {/* All badges - left aligned for LTR */}
-                        <div className="flex flex-wrap items-center gap-1.5 mb-2">
-                            {/* Featured badge */}
-                            {plan.isFeatured && (
-                                <span className="inline-flex items-center gap-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
-                                    {t('plans.featured', 'Featured')}
-                                </span>
-                            )}
-                            {/* Best Value badge */}
-                            {!plan.isFeatured && plan.isBestValue && (
-                                <span className="inline-flex items-center bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                                    {t('plans.bestValue', 'Best Value')}
-                                </span>
-                            )}
-                            {/* Voice minutes badge */}
-                            {hasVoice && (
-                                <span className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">
-                                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                    </svg>
-                                    {voiceMinutes} {t('plans.mins', 'mins')}
-                                </span>
-                            )}
-                            {/* SMS badge */}
-                            {hasSms && (
-                                <span className="inline-flex items-center gap-1 bg-purple-50 text-purple-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">
-                                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                                    </svg>
-                                    {smsCount} SMS
-                                </span>
-                            )}
-                        </div>
-
-                        {/* Country coverage - left aligned */}
-                        {countryCount > 0 && (
-                            <p className="text-xs text-tufts-blue/80 font-medium truncate pr-4 text-left">
-                                {t('deals.covers', 'Covers')} {countryCount} {countryCount === 1 ? t('deals.country', 'country') : t('deals.countries', 'countries')}
-                            </p>
-                        )}
-                    </>
+                {countryCount > 0 && (
+                    <p className={`text-xs text-tufts-blue/80 font-medium truncate text-left ${isRTL ? 'pl-4' : 'pr-4'}`}>
+                        {t('deals.covers', 'Covers')} {countryCount} {countryCount === 1 ? t('deals.country', 'country') : t('deals.countries', 'countries')}
+                    </p>
                 )}
             </div>
 
+            {/* Price + arrow — global CSS reverses flex order in RTL */}
             <div className="mt-4 flex items-center justify-between">
-                {isRTL ? (
-                    <>
-                        {/* RTL: Arrow first (appears on LEFT), then price (appears on RIGHT) */}
-                        <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-tufts-blue group-hover:text-white transition-colors rotate-180">
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
-                        </div>
-                        <span className="font-bold text-eerie-black text-lg">
-                            ${plan.price}
-                        </span>
-                    </>
-                ) : (
-                    <>
-                        {/* LTR: Price first (appears on LEFT), then arrow (appears on RIGHT) */}
-                        <span className="font-bold text-eerie-black text-lg">
-                            ${plan.price}
-                        </span>
-                        <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-tufts-blue group-hover:text-white transition-colors">
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
-                        </div>
-                    </>
-                )}
+                <span className="font-bold text-eerie-black text-lg">
+                    ${plan.price}
+                </span>
+                <div className={`w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-tufts-blue group-hover:text-white transition-colors ${isRTL ? 'rotate-180' : ''}`}>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                </div>
             </div>
         </div>
     );
@@ -213,7 +137,7 @@ const EsimPlans = ({ isHomePage = false }) => {
         return locale || 'en';
     }, [locale]);
 
-    const isRTL = currentLanguage === 'ar' || currentLanguage === 'he';
+    const isRTL = getLanguageDirection(currentLanguage) === 'rtl';
 
     // State
     const [searchTerm, setSearchTerm] = useState('');
@@ -437,11 +361,44 @@ const EsimPlans = ({ isHomePage = false }) => {
     const isPlansPage = true;
 
     if (!isMounted) {
-        return <div className="min-h-screen bg-white" />;
+        return (
+            <div className="min-h-screen bg-white">
+                {/* Header skeleton */}
+                <div className="w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-8 sm:mt-12 lg:mt-20">
+                    <div className="h-4 sm:h-5 bg-gray-100 rounded w-32 animate-pulse" />
+                    <div className="h-7 sm:h-8 lg:h-10 xl:h-12 bg-gray-100 rounded w-80 mt-3 sm:mt-4 animate-pulse" />
+                </div>
+                <div className="w-full h-px bg-gray-100 mt-4 sm:mt-6" />
+
+                {/* Search skeleton */}
+                <div className="w-full border-b border-gray-100">
+                    <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
+                        <div className="h-10 sm:h-11 bg-gray-100 rounded w-full animate-pulse" />
+                    </div>
+                </div>
+
+                {/* Content skeleton */}
+                <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+                    {/* Region tabs skeleton */}
+                    <div className="flex gap-2 mb-8">
+                        {[1,2,3,4,5].map(i => (
+                            <div key={i} className="h-8 bg-gray-100 rounded-full w-20 animate-pulse" />
+                        ))}
+                    </div>
+                    {/* Countries grid skeleton */}
+                    <div className="h-5 bg-gray-100 rounded w-28 mb-4 animate-pulse" />
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                        {Array.from({length: 8}).map((_, i) => (
+                            <div key={i} className="h-16 bg-gray-50 rounded animate-pulse" />
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
     }
 
     return (
-        <div className="min-h-screen bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className={`min-h-screen bg-white transition-opacity duration-150 ${isMounted ? 'opacity-100' : 'opacity-0'}`} dir={isRTL ? 'rtl' : 'ltr'}>
             {/* Header */}
             <div className="w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-8 sm:mt-12 lg:mt-20">
                 <p className="font-mono text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 rtl:font-bold rtl:tracking-tight">

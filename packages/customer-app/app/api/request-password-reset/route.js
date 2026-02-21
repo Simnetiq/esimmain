@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { render } from '@react-email/render';
 import { sendEmail } from '@esim/shared/lib/email';
 import PasswordResetEmail from '../../../emails/PasswordResetEmail';
-import { getAdminDb } from '@esim/shared/lib/firebaseAdmin';
+import { getAdminDb } from '@esim/shared/lib/supabaseServiceClient';
 import crypto from 'crypto';
 
 export async function POST(request) {

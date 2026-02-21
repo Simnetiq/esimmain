@@ -350,7 +350,6 @@ const BlogManagement = () => {
         status: formData.status,
         seoKeywords: formData.seoKeywords,
         translations: formData.translations
-        // Note: authorId removed - Firebase UIDs are not compatible with Supabase UUID
       };
 
       console.log('Saving post with data:', postData);

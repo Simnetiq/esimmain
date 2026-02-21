@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
+import BackgroundDecor from './ui/BackgroundDecor';
 
 // Lazy load toast to reduce initial bundle
 const showToast = async (type, message) => {
@@ -39,12 +40,6 @@ const SmartphoneIcon = ({ className }) => (
   </svg>
 );
 
-// Grid pattern style
-const gridPatternStyle = {
-  backgroundSize: '10px 10px',
-  backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-};
-
 const Login = () => {
   const [loading, setLoading] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState(null);
@@ -57,6 +52,9 @@ const Login = () => {
     setMounted(true);
   }, []);
 
+  // SSR-safe language from pathname — consistent between server and client
+  const ssrSafeLanguage = useMemo(() => detectLanguageFromPath(pathname) || 'en', [pathname]);
+
   const currentLanguage = useMemo(() => {
     try {
       if (i18nLoading) {
@@ -64,15 +62,16 @@ const Login = () => {
           const savedLanguage = localStorage.getItem('Simnetiq-language');
           if (savedLanguage) return savedLanguage;
         }
-        return detectLanguageFromPath(pathname) || 'en';
+        return ssrSafeLanguage;
       }
       return locale || 'en';
     } catch {
       return 'en';
     }
-  }, [locale, pathname, i18nLoading]);
+  }, [locale, ssrSafeLanguage, i18nLoading]);
 
-  const isRTL = mounted ? getLanguageDirection(currentLanguage) === 'rtl' : false;
+  // Use pathname-based language for direction to avoid hydration mismatch
+  const isRTL = getLanguageDirection(ssrSafeLanguage) === 'rtl';
 
   const getLocalizedUrl = useCallback((path) => {
     if (currentLanguage === 'en') return path;
@@ -109,40 +108,15 @@ const Login = () => {
     }
   }, [signInWithApple, t]);
 
-  // Loading skeleton
-  if (!mounted) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(to bottom right, rgba(83, 116, 205, 0.25), rgba(240, 249, 255, 0.4), rgba(239, 246, 255, 1))' }}>
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-tufts-blue" />
-      </div>
-    );
-  }
-
   return (
-    <div 
-      className="min-h-screen relative overflow-hidden" 
+    <div
+      className="min-h-screen relative overflow-hidden"
       dir={isRTL ? 'rtl' : 'ltr'}
- 
     >
-      {/* Gradient Orbs */}
+      <BackgroundDecor />
 
-      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full blur-[100px] translate-x-1/4 translate-y-1/4" style={{ backgroundColor: 'rgba(83, 116, 205, 0.15)' }} />
-      <div className="absolute top-1/2 right-1/3 w-[400px] h-[400px] rounded-full blur-[80px]" style={{ backgroundColor: 'rgba(83, 116, 205, 0.1)' }} />
-      
-      {/* Grid Pattern - Left Side */}
-      <div 
-        className="hidden xl:block absolute left-0 top-0 bottom-0 w-32"
-        style={gridPatternStyle}
-      />
-      
-      {/* Grid Pattern - Right Side */}
-      <div 
-        className="hidden xl:block absolute right-0 top-0 bottom-0 w-32"
-        style={gridPatternStyle}
-      />
-
-      {/* Content - Centered */}
-      <div className="relative min-h-screen flex items-center justify-center px-4 py-12">
+      {/* Content - Centered. Opacity transition prevents blink on hydration. */}
+      <div className={`relative min-h-screen flex items-center justify-center px-4 py-12 transition-opacity duration-150 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
         <div className="w-full max-w-md">
           {/* Card */}
           <div className="bg-white/80 backdrop-blur-sm shadow-2xl shadow-gray-200/40 p-8 sm:p-10">
@@ -167,7 +141,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={handleGoogleSignIn}
-                disabled={loading}
+                disabled={loading || !mounted}
                 className="group w-full flex items-center justify-center gap-3 px-6 py-4 bg-white border border-gray-200 rounded-full hover:bg-gray-50 hover:border-gray-300 hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loadingProvider === 'google' ? (
@@ -183,7 +157,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={handleAppleSignIn}
-                disabled={loading}
+                disabled={loading || !mounted}
                 className="group w-full flex items-center justify-center gap-3 px-6 py-4 bg-eerie-black text-white rounded-full hover:bg-gray-800 hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loadingProvider === 'apple' ? (

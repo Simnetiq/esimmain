@@ -3,74 +3,25 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { ArrowLeft, LogOut } from 'lucide-react';
 import { getSupabase } from '@esim/shared/lib/supabase';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { getLanguageDirection, detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
 import AccountSettings from './dashboard/AccountSettings';
+import BackgroundDecor from './ui/BackgroundDecor';
+import { AccountSettingsSkeleton } from './ui/PageSkeleton';
 
-// Lazy load toast
 const showToast = async (type, message) => {
   const toast = (await import('react-hot-toast')).default;
-  if (type === 'success') {
-    toast.success(message);
-  } else {
-    toast.error(message);
-  }
+  type === 'success' ? toast.success(message) : toast.error(message);
 };
 
-
-
-const ArrowLeftIcon = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
-  </svg>
-);
-
-const LogOutIcon = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" x2="9" y1="12" y2="12"/>
-  </svg>
-);
-
-// Grid pattern style
-const gridPatternStyle = {
-  backgroundSize: '10px 10px',
-  backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-};
-
-// Skeleton component
 const SettingsSkeleton = () => (
-  <div className="min-h-screen bg-white relative overflow-hidden">
-    <div className="hidden xl:block absolute left-0 top-0 bottom-0 w-24 pointer-events-none" style={gridPatternStyle} />
-    <div className="hidden xl:block absolute right-0 top-0 bottom-0 w-24 pointer-events-none" style={gridPatternStyle} />
-    
-    <div className="relative pt-8 lg:pt-16 pb-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6">
-        {/* Header skeleton */}
-        <div className="flex items-center gap-4 mb-8">
-          <div className="w-10 h-10 bg-gray-200 animate-pulse" />
-          <div>
-            <div className="h-8 w-32 bg-gray-200 rounded animate-pulse mb-2" />
-            <div className="h-4 w-48 bg-gray-200 rounded animate-pulse" />
-          </div>
-        </div>
-        
-        {/* Content skeleton */}
-        <div className="space-y-6">
-          <div className="bg-gray-50 p-6">
-            <div className="h-5 w-40 bg-gray-200 rounded animate-pulse mb-4" /> 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="space-y-2">
-                  <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
-                  <div className="h-12 w-full bg-gray-200 rounded animate-pulse" />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
+  <div className="min-h-screen relative">
+    <BackgroundDecor />
+    <div className="relative">
+      <AccountSettingsSkeleton />
     </div>
   </div>
 );
@@ -80,7 +31,7 @@ const Settings = () => {
   const { currentUser, logout, loading: authLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  
+
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -127,7 +78,7 @@ const Settings = () => {
         .select('*')
         .eq('id', currentUser.id)
         .single();
-      
+
       if (data) {
         setUserProfile(data);
       }
@@ -172,60 +123,49 @@ const Settings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white relative overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Gradient Orbs */}
-      <div className="absolute top-0 left-0 w-[600px] h-[600px] rounded-full blur-[120px] -translate-x-1/3 -translate-y-1/3 pointer-events-none" style={{ backgroundColor: 'rgba(83, 116, 205, 0.08)' }} />
-      <div className="absolute top-1/2 right-0 w-[500px] h-[500px] rounded-full blur-[100px] translate-x-1/3 pointer-events-none" style={{ backgroundColor: 'rgba(83, 116, 205, 0.06)' }} />
+    <div className="min-h-screen relative" dir={isRTL ? 'rtl' : 'ltr'}>
+      <BackgroundDecor />
 
-      {/* Grid Pattern */}
-      <div className="hidden xl:block absolute left-0 top-0 bottom-0 w-24 pointer-events-none" style={gridPatternStyle} />
-      <div className="hidden xl:block absolute right-0 top-0 bottom-0 w-24 pointer-events-none" style={gridPatternStyle} />
-
-      {/* Header Section */}
-      <div className="relative pt-8 lg:pt-16 pb-8">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+      <div className="relative transition-opacity duration-150 ease-out opacity-100">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 pt-6">
           {/* Back Link */}
-          <Link 
+          <Link
             href={getLocalizedUrl('/dashboard')}
-            className={`inline-flex items-center gap-2 text-eerie-black hover:text-tufts-blue font-medium transition-colors mb-6 `}
+            className={`inline-flex items-center gap-2 text-gray-600 hover:text-tufts-blue text-sm font-medium transition-colors duration-150 ease-out mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}
           >
-            <ArrowLeftIcon className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
+            <ArrowLeft className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
             {t('settings.backToDashboard', 'Back to Dashboard')}
           </Link>
-
         </div>
-      </div>
 
-      {/* Account Settings Section */}
-      <div className="relative">
-        <AccountSettings 
-          currentUser={currentUser} 
-          userProfile={userProfile} 
+        {/* Account Settings */}
+        <AccountSettings
+          currentUser={currentUser}
+          userProfile={userProfile}
           onLoadUserProfile={loadUserProfile}
         />
-      </div>
 
-      {/* Logout Section */}
-      <div className="relative max-w-4xl mx-auto px-4 sm:px-6 pb-8">
-        <div className="bg-white shadow-lg shadow-gray-200/50 p-6">
-          <div className={`flex items-start gap-4 `}>
-          
-            <div className="flex-1">
-              <h3 className={`text-lg font-semibold text-eerie-black ${isRTL ? 'text-right' : ''}`}>
-                {t('settings.signOut', 'Sign Out')}
-              </h3>
-              <p className={`text-sm text-gray-600 mt-1 ${isRTL ? 'text-right' : ''}`}>
-                {t('settings.signOutDescription', 'Sign out of your account on this device. You can sign back in anytime.')}
-              </p>
+        {/* Sign Out Section */}
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 pb-8">
+          <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-5">
+            <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className={isRTL ? 'text-right' : ''}>
+                <h3 className="text-sm font-semibold text-gray-900">
+                  {t('settings.signOut', 'Sign Out')}
+                </h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {t('settings.signOutDescription', 'Sign out of your account on this device.')}
+                </p>
+              </div>
               <button
                 onClick={handleLogout}
                 disabled={isLoggingOut}
-                className={`mt-4 inline-flex items-center gap-2 px-6 py-3 bg-red-600 text-white font-medium rounded-full hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed `}
+                className={`inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-50 transition-colors duration-150 ease-out disabled:opacity-50 disabled:cursor-not-allowed ${isRTL ? 'flex-row-reverse' : ''}`}
               >
                 {isLoggingOut ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400" />
                 ) : (
-                  <LogOutIcon className="w-4 h-4" /> 
+                  <LogOut className="w-4 h-4" />
                 )}
                 {isLoggingOut ? t('settings.signingOut', 'Signing out...') : t('settings.signOutButton', 'Sign Out')}
               </button>
@@ -233,7 +173,6 @@ const Settings = () => {
           </div>
         </div>
       </div>
-
     </div>
   );
 };

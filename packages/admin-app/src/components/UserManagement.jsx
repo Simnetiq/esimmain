@@ -21,7 +21,7 @@ const UserManagement = () => {
   // Load data on component mount
   useEffect(() => {
     if (currentUser) {
-      loadUsersFromFirestore();
+      loadUsers();
     }
   }, [currentUser]);
 
@@ -37,7 +37,7 @@ const UserManagement = () => {
   }, [users, userSearchTerm]);
 
   // User Management Functions
-  const loadUsersFromFirestore = async () => {
+  const loadUsers = async () => {
     try {
       setLoading(true);
       const { data: usersData, error: usersError } = await supabase

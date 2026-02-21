@@ -16,7 +16,7 @@ import PlansSearch from './components/PlansSearch';
 import SupabaseTable from './components/SupabaseTable';
 import StandardTable from './components/StandardTable';
 import PlansPagination from './components/PlansPagination';
-import { FirebaseSyncModal, SupabaseSyncModal } from './components/SyncModals';
+import { AiraloSyncModal, SupabaseSyncModal } from './components/SyncModals';
 
 // Hooks and utilities
 import usePlansData from './hooks/usePlansData';
@@ -27,8 +27,7 @@ import { DATA_SOURCES, PAGINATION } from './utils/helpers';
  *
  * Architecture:
  * - Supabase is the PRIMARY data source with server-side filtering
- * - Firebase is maintained as a SECONDARY/LEGACY data source
- * - Airalo API is for recovery/sync operations only
+ * - Airalo API is for sync operations
  */
 const PlansManagement = () => {
   const { currentUser } = useAuth();
@@ -73,7 +72,7 @@ const PlansManagement = () => {
     loadSupabaseStatus,
     supabaseCountries,
 
-    // Firebase data (legacy)
+    // Airalo data
     allPlans,
     loading,
     availableCountries,
@@ -127,7 +126,7 @@ const PlansManagement = () => {
     denseMode,
     setDenseMode,
 
-    // Price editing (Firebase)
+    // Price editing
     editingPrices,
     setEditingPrices,
     pendingPriceChanges,
@@ -255,7 +254,7 @@ const PlansManagement = () => {
   };
 
   // ============================================
-  // PRICE EDITING HANDLERS (Firebase)
+  // PRICE EDITING HANDLERS
   // ============================================
 
   const handlePriceChange = (planId, newPrice) => {
@@ -344,7 +343,7 @@ const PlansManagement = () => {
     <div className="space-y-6" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Header */}
       <PlansHeader
-        onOpenFirebaseSync={() => setShowSyncModal(true)}
+        onOpenAiraloSync={() => setShowSyncModal(true)}
         onOpenSupabaseSync={() => setShowSupabaseModal(true)}
       />
 
@@ -357,8 +356,8 @@ const PlansManagement = () => {
         dataSource={dataSource}
       />
 
-      {/* Firebase Sync Modal */}
-      <FirebaseSyncModal
+      {/* Airalo Sync Modal */}
+      <AiraloSyncModal
         isOpen={showSyncModal}
         onClose={() => {
           setShowSyncModal(false);

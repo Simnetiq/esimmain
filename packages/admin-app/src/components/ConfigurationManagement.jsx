@@ -225,7 +225,7 @@ const ConfigurationManagement = () => {
       setPlansLoading(true);
       setSyncStatus('Syncing plans from Airalo API...');
 
-      // Call the Next.js API endpoint instead of Firebase function
+      // Call the Next.js API endpoint
       const response = await fetch('/api/sync-airalo', {
         method: 'POST',
         headers: {
