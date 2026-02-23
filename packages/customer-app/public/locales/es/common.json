@@ -1036,5 +1036,25 @@
       "telegram": "Chatear en Telegram",
       "contactSupport": "Contactar Soporte"
     }
+  },
+  "countryPage": {
+    "title": "eSIM para {{country}}",
+    "subtitle": "Mantente conectado con planes de datos eSIM instantáneos",
+    "plansAvailable": "Planes disponibles",
+    "startingFrom": "Desde",
+    "activation": "Activación",
+    "instant": "Instantánea",
+    "dataPlans": "Planes de datos eSIM para {{country}}",
+    "noPlans": "No hay planes disponibles para {{country}} en este momento.",
+    "browseAll": "Explorar todos los destinos",
+    "aboutTitle": "Acerca de eSIM para {{country}}",
+    "aboutDescription": "Obtén datos móviles instantáneos en {{country}} con una eSIM de Simnetiq. No necesitas una tarjeta SIM física — solo escanea, activa y conéctate. Nuestros planes eSIM para {{country}} funcionan con todos los dispositivos compatibles con eSIM, incluyendo iPhone, Samsung Galaxy, Google Pixel y más.",
+    "whyChooseTitle": "¿Por qué elegir Simnetiq para {{country}}?",
+    "benefit1": "Activación instantánea — sin esperas, sin envíos",
+    "benefit2": "Planes desde ${{price}} USD",
+    "benefit3": "Sin cargos de roaming ni sorpresas",
+    "benefit4": "Mantén tu número principal activo mientras usas datos en el extranjero",
+    "benefit5": "Soporte al cliente 24/7",
+    "regionalPlans": "Planes regionales de {{region}}"
   }
 }

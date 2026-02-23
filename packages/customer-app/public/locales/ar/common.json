@@ -1090,5 +1090,25 @@
       "telegram": "الدردشة على Telegram",
       "contactSupport": "التواصل مع الدعم"
     }
+  },
+  "countryPage": {
+    "title": "eSIM لـ {{country}}",
+    "subtitle": "ابقَ متصلاً مع خطط بيانات eSIM الفورية",
+    "plansAvailable": "الخطط المتاحة",
+    "startingFrom": "تبدأ من",
+    "activation": "التفعيل",
+    "instant": "فوري",
+    "dataPlans": "خطط بيانات eSIM لـ {{country}}",
+    "noPlans": "لا توجد خطط متاحة لـ {{country}} حالياً.",
+    "browseAll": "تصفح جميع الوجهات",
+    "aboutTitle": "حول eSIM لـ {{country}}",
+    "aboutDescription": "احصل على بيانات جوال فورية في {{country}} مع Simnetiq eSIM. لا حاجة لبطاقة SIM فعلية — فقط امسح، فعّل، واتصل. خطط eSIM لدينا لـ {{country}} تعمل مع جميع الأجهزة المتوافقة مع eSIM بما في ذلك iPhone و Samsung Galaxy و Google Pixel والمزيد.",
+    "whyChooseTitle": "لماذا تختار Simnetiq لـ {{country}}؟",
+    "benefit1": "تفعيل فوري — بدون انتظار، بدون شحن",
+    "benefit2": "خطط تبدأ من ${{price}} USD",
+    "benefit3": "بدون رسوم تجوال أو رسوم مفاجئة",
+    "benefit4": "احتفظ برقمك الأساسي أثناء استخدام البيانات في الخارج",
+    "benefit5": "دعم عملاء على مدار الساعة",
+    "regionalPlans": "خطط {{region}} الإقليمية"
   }
 }

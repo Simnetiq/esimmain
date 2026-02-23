@@ -1029,5 +1029,25 @@
       "telegram": "צ'אט בטלגרם",
       "contactSupport": "צור קשר עם התמיכה"
     }
+  },
+  "countryPage": {
+    "title": "eSIM עבור {{country}}",
+    "subtitle": "הישאר מחובר עם תוכניות נתונים מיידיות של eSIM",
+    "plansAvailable": "תוכניות זמינות",
+    "startingFrom": "החל מ-",
+    "activation": "הפעלה",
+    "instant": "מיידית",
+    "dataPlans": "תוכניות נתונים eSIM עבור {{country}}",
+    "noPlans": "אין תוכניות זמינות עבור {{country}} כרגע.",
+    "browseAll": "עיין בכל היעדים",
+    "aboutTitle": "אודות eSIM עבור {{country}}",
+    "aboutDescription": "קבל נתונים סלולריים מיידיים ב-{{country}} עם Simnetiq eSIM. אין צורך בכרטיס SIM פיזי — פשוט סרוק, הפעל והתחבר. תוכניות ה-eSIM שלנו עבור {{country}} עובדות עם כל המכשירים התומכים ב-eSIM כולל iPhone, Samsung Galaxy, Google Pixel ועוד.",
+    "whyChooseTitle": "למה לבחור ב-Simnetiq עבור {{country}}?",
+    "benefit1": "הפעלה מיידית — ללא המתנה, ללא משלוח",
+    "benefit2": "תוכניות החל מ-${{price}} USD",
+    "benefit3": "ללא חיובי נדידה או עמלות מפתיעות",
+    "benefit4": "שמור על המספר הראשי שלך בזמן שימוש בנתונים בחו\"ל",
+    "benefit5": "תמיכת לקוחות 24/7",
+    "regionalPlans": "תוכניות אזוריות ל{{region}}"
   }
 }

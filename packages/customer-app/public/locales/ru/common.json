@@ -1041,5 +1041,25 @@
       "telegram": "Написать в Telegram",
       "contactSupport": "Связаться с поддержкой"
     }
+  },
+  "countryPage": {
+    "title": "eSIM для {{country}}",
+    "subtitle": "Оставайтесь на связи с мгновенными тарифами eSIM",
+    "plansAvailable": "Доступные тарифы",
+    "startingFrom": "От",
+    "activation": "Активация",
+    "instant": "Мгновенная",
+    "dataPlans": "Тарифы eSIM для {{country}}",
+    "noPlans": "Тарифы для {{country}} пока недоступны.",
+    "browseAll": "Все направления",
+    "aboutTitle": "Об eSIM для {{country}}",
+    "aboutDescription": "Получите мобильный интернет в {{country}} мгновенно с Simnetiq eSIM. Физическая SIM-карта не нужна — просто отсканируйте, активируйте и подключитесь. Наши тарифы eSIM для {{country}} работают со всеми устройствами с поддержкой eSIM, включая iPhone, Samsung Galaxy, Google Pixel и другие.",
+    "whyChooseTitle": "Почему стоит выбрать Simnetiq для {{country}}?",
+    "benefit1": "Мгновенная активация — без ожидания, без доставки",
+    "benefit2": "Тарифы от ${{price}} USD",
+    "benefit3": "Без роуминговых сборов и скрытых платежей",
+    "benefit4": "Сохраняйте основной номер при использовании данных за рубежом",
+    "benefit5": "Поддержка клиентов 24/7",
+    "regionalPlans": "Региональные тарифы {{region}}"
   }
 }
