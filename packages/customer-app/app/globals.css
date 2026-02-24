@@ -38,7 +38,7 @@
     background-color: var(--white);
     color: var(--eerie-black);
     /* Font family with size-adjusted fallback for CLS prevention */
-    font-family: var(--font-dm-sans), 'DM Sans Fallback', var(--font-heebo), var(--font-ibm-plex-arabic), var(--font-rubik), ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-dm-sans), 'DM Sans Fallback', var(--font-open-sans), var(--font-ibm-plex-arabic), ui-sans-serif, system-ui, sans-serif;
     overflow-x: hidden;
     max-width: 100vw;
   }
@@ -46,7 +46,12 @@
   /* RTL Language Support - Hebrew and Arabic */
   [dir="rtl"] body,
   html[dir="rtl"] body {
-    font-family: var(--font-heebo), var(--font-ibm-plex-arabic), var(--font-rubik), ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-open-sans), var(--font-ibm-plex-arabic), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  /* Russian (Cyrillic) — Open Sans covers it */
+  html[lang="ru"] body {
+    font-family: var(--font-open-sans), var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
   }
 
   /* Critical RTL fixes for flex and grid */
@@ -183,6 +188,15 @@
   .border-jordy-blue { border-color: var(--jordy-blue); }
   .border-tufts-blue { border-color: var(--tufts-blue); }
   .border-cobalt-blue { border-color: var(--cobalt-blue); }
+
+  /* Hide scrollbar but keep scroll functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 
   /* Content-visibility for off-screen sections (INP/render performance) */
   .content-visibility-auto {

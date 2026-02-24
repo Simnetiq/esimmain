@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 // dynamic import moved to ClientOnlyScripts
-import { Heebo, IBM_Plex_Sans_Arabic, Rubik, DM_Sans, IBM_Plex_Sans } from 'next/font/google'
+import { Open_Sans, IBM_Plex_Sans_Arabic, DM_Sans, IBM_Plex_Sans } from 'next/font/google'
 import { Analytics as VercelAnalytics } from '@vercel/analytics/react'
 import Providers from '../src/components/Providers'
 import ConditionalNavbar from '../src/components/ConditionalNavbar'
@@ -27,30 +27,21 @@ const dmSans = DM_Sans({
   fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
 })
 
-// RTL fonts - use 'optional' display to prevent layout shift and reduce LCP
-// These fonts only load when actually needed (RTL language detected)
-const heebo = Heebo({
-  subsets: ['hebrew'],
+// Open Sans — Hebrew + Russian (Cyrillic) support
+const openSans = Open_Sans({
+  subsets: ['hebrew', 'cyrillic', 'latin'],
   weight: ['400', '600', '700'],
-  variable: '--font-heebo',
-  display: 'optional', // Prevents blocking render if font fails to load
-  preload: false,
-  fallback: ['system-ui', 'sans-serif'],
-})
-
-const ibmPlexArabic = IBM_Plex_Sans_Arabic({
-  subsets: ['arabic'],
-  weight: ['400', '600', '700'],
-  variable: '--font-ibm-plex-arabic',
+  variable: '--font-open-sans',
   display: 'optional',
   preload: false,
   fallback: ['system-ui', 'sans-serif'],
 })
 
-const rubik = Rubik({
-  subsets: ['hebrew'],
+// IBM Plex Sans Arabic — Arabic support
+const ibmPlexArabic = IBM_Plex_Sans_Arabic({
+  subsets: ['arabic'],
   weight: ['400', '600', '700'],
-  variable: '--font-rubik',
+  variable: '--font-ibm-plex-arabic',
   display: 'optional',
   preload: false,
   fallback: ['system-ui', 'sans-serif'],
@@ -200,7 +191,7 @@ export default function RootLayout({ children }) {
           }}
         />
       </head>
-      <body suppressHydrationWarning className={`${dmSans.variable} ${heebo.variable} ${ibmPlexArabic.variable} ${rubik.variable} ${ibmPlexSans.variable}`}>
+      <body suppressHydrationWarning className={`${dmSans.variable} ${openSans.variable} ${ibmPlexArabic.variable} ${ibmPlexSans.variable}`}>
         <Providers>
           <LanguageWrapper>
             <DynamicHtmlLang />

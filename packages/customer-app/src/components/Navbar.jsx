@@ -110,7 +110,6 @@ const Navbar = ({ hideLanguageSelector = false }) => {
   }, [i18nLoading, locale]);
 
   const direction = getLanguageDirection(currentLanguage);
-  const isRTL = direction === 'rtl';
 
   // Generate localized URLs based on currentLanguage (SSR-safe on initial render)
   const getLocalizedUrl = (path) => {
@@ -217,16 +216,16 @@ const Navbar = ({ hideLanguageSelector = false }) => {
 
   return (
     <header
-      className={`navbar-header fixed bg-white/80 backdrop-blur-sm w-full left-0 right-0 justify-center top-0 transition-transform duration-150 ${
+      className={`navbar-header fixed bg-white/80 backdrop-blur-sm w-full inset-x-0 justify-center top-0 transition-transform duration-150 ${
         isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}
       style={{ zIndex: 9999 }}
       dir={direction}
       lang={currentLanguage}
     >
-      <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-2 px-4">  
-        <div className={`flex lg:flex-1 items-center ${isRTL ? 'justify-end' : 'justify-start'}`}> 
-          <Link href={getLocalizedUrl("/")} className={`flex items-center gap-2 `}>
+      <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-2 px-4">
+        <div className="flex lg:flex-1 items-center justify-start">
+          <Link href={getLocalizedUrl(currentUser ? "/dashboard" : "/")} className="flex items-center gap-2">
             <span className="sr-only">Simnetiq</span>
             <Image
               src="/images/logoblack.png"
@@ -239,8 +238,8 @@ const Navbar = ({ hideLanguageSelector = false }) => {
             <span className="text-base sm:text-lg font-light text-eerie-black">simnetiq</span>
           </Link>
         </div>
-        
-        <div className={`flex lg:hidden items-center ${isRTL ? 'justify-start gap-x-2' : 'justify-end gap-x-2'}`}>
+
+        <div className="flex lg:hidden items-center justify-end gap-x-2">
           {process.env.NEXT_PUBLIC_ENABLE_CURRENCY_TOGGLE === 'true' && <CurrencyToggle />}
           {!hideLanguageSelector && <LanguageSelector />}
           {/* User Avatar for mobile - only show when logged in */}
@@ -283,7 +282,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
             
             {/* Store Dropdown Menu */}
             {isStoreDropdownOpen && (
-              <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-200  shadow-xl shadow-gray-100/30 z-50">
+              <div className="absolute top-full start-0 mt-2 w-48 bg-white border border-gray-200 shadow-xl shadow-gray-100/30 z-50">
                 <ul className="p-2 text-sm font-medium text-gray-700">
                   {regions
                     .filter(r => r.id !== 'popular' && r.id !== 'all')
@@ -326,17 +325,19 @@ const Navbar = ({ hideLanguageSelector = false }) => {
             {t('navbar.blog', 'Blog')}
           </Link>
 
-          {/* About link */}
-          <Link
-            href={getLocalizedUrl('/about')}
-            className="text-sm font-semibold text-eerie-black hover:text-tufts-blue transition-colors"
-          >
-            {t('navbar.about', 'About')}
-          </Link>
+          {/* About link — hide for authenticated users */}
+          {!currentUser && (
+            <Link
+              href={getLocalizedUrl('/about')}
+              className="text-sm font-semibold text-eerie-black hover:text-tufts-blue transition-colors"
+            >
+              {t('navbar.about', 'About')}
+            </Link>
+          )}
         </div>
         
         {/* Right side with language selector, login, and user avatar */}
-        <div className={`hidden lg:flex lg:flex-1 lg:items-center lg:gap-x-3 ${isRTL ? 'lg:justify-start' : 'lg:justify-end'}`}>
+        <div className="hidden lg:flex lg:flex-1 lg:items-center lg:gap-x-3 lg:justify-end">
           {/* Login button for non-authenticated users - styled with black bg */}
           {!currentUser && (
             <Link
@@ -363,13 +364,13 @@ const Navbar = ({ hideLanguageSelector = false }) => {
               
               {/* User Dropdown Menu */}
               {isUserDropdownOpen && (
-                <div className={`absolute top-full mt-2 w-48 bg-white border border-gray-200  shadow-xl shadow-gray-100/30 z-50 ${isRTL ? 'left-0' : 'right-0'}`}>
+                <div className="absolute top-full mt-2 w-48 bg-white border border-gray-200 shadow-xl shadow-gray-100/30 z-50 end-0">
                   {/* User info header */}
                   <div className="px-4 py-3 border-b border-gray-100">
-                    <p className={`text-sm font-medium text-eerie-black truncate ${isRTL ? 'text-right' : 'text-left'}`}>
+                    <p className="text-sm font-medium text-eerie-black truncate text-start">
                       {currentUser.displayName || t('navbar.user', 'User')}
                     </p>
-                    <p className={`text-xs text-gray-500 truncate ${isRTL ? 'text-right' : 'text-left'}`}>
+                    <p className="text-xs text-gray-500 truncate text-start">
                       {currentUser.email}
                     </p>
                   </div>
@@ -378,7 +379,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                     <li>
                       <Link 
                         href={getLocalizedUrl('/settings')} 
-                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-gray-100 hover:text-eerie-black rounded transition-colors `}
+                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-gray-100 hover:text-eerie-black rounded transition-colors`}
                         onClick={() => setIsUserDropdownOpen(false)}
                       >
                         <SettingsIcon className="w-4 h-4" />
@@ -388,7 +389,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                     <li>
                       <Link 
                         href={getLocalizedUrl('/contact')} 
-                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-gray-100 hover:text-eerie-black rounded transition-colors `}
+                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-gray-100 hover:text-eerie-black rounded transition-colors`}
                         onClick={() => setIsUserDropdownOpen(false)}
                       >
                         <Headphones className="w-4 h-4" />
@@ -405,7 +406,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                         href="https://apps.apple.com/gb/app/simnetiq-global-esim/id6755963262" 
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-gray-100 hover:text-eerie-black rounded transition-colors `}
+                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-gray-100 hover:text-eerie-black rounded transition-colors`}
                         onClick={() => {
                           setIsUserDropdownOpen(false);
                           handleDownloadApp();
@@ -420,7 +421,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                         href="https://play.google.com/store/apps/details?id=com.simnetiq.storeAndroid&hl=en"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-gray-100 hover:text-eerie-black rounded transition-colors `}
+                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-gray-100 hover:text-eerie-black rounded transition-colors`}
                         onClick={() => {
                           setIsUserDropdownOpen(false);
                           handleDownloadApp();
@@ -434,9 +435,9 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                       <button 
                         onClick={handleLogout}
                         disabled={isLoggingOut}
-                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-red-50 text-red-600 hover:text-red-700 rounded transition-colors disabled:opacity-50 `}
+                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-red-50 text-red-600 hover:text-red-700 rounded transition-colors disabled:opacity-50`}
                       >
-                        <LogOut className="w-4 h-4" />
+                        <LogOut className="w-4 h-4 rtl:-scale-x-100" />
                         {isLoggingOut ? t('navbar.loggingOut', 'Logging out...') : t('navbar.logout', 'Log out')}
                       </button>
                     </li>
@@ -456,8 +457,8 @@ const Navbar = ({ hideLanguageSelector = false }) => {
             style={{ zIndex: 99999 }}
           >
             {/* Header with logo and close button */}
-            <div className="flex items-center justify-between p-6"> 
-              <Link href={getLocalizedUrl("/")} className={`flex items-center gap-2 `} onClick={() => setIsMenuOpen(false)}>
+            <div className="flex items-center justify-between p-6">
+              <Link href={getLocalizedUrl(currentUser ? "/dashboard" : "/")} className="flex items-center gap-2" onClick={() => setIsMenuOpen(false)}>
                 <span className="sr-only">Simnetiq</span>
                 <Image
                   src="/images/logoblack.png"

@@ -670,9 +670,7 @@ const TermsOfService = () => {
           </div>
 
           {/* App Download CTA */}
-          <BlogAppDownload 
-            language={currentLanguage}
-            isRTL={isRTL}
+          <BlogAppDownload
             location="terms_of_service"
             context={{
               page: 'terms_of_service'

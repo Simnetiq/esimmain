@@ -472,8 +472,6 @@ const Blog = () => {
             {/* Download App Widget - Lazy loaded */}
             {!loading && filteredPosts.length > 0 && (
               <BlogAppDownload
-                language={detectedLanguage}
-                isRTL={isRTL}
                 location="blog_list"
                 context={{
                   page: 'blog_list',

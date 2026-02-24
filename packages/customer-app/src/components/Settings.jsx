@@ -19,7 +19,7 @@ const LogOutIcon = ({ className }) => (
 import { getSupabase } from '@esim/shared/lib/supabase';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
-import { getLanguageDirection, detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
+import { detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
 import AccountSettings from './dashboard/AccountSettings';
 import BackgroundDecor from './ui/BackgroundDecor';
 import { AccountSettingsSkeleton } from './ui/PageSkeleton';
@@ -47,12 +47,6 @@ const Settings = () => {
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   // Language detection
   const currentLanguage = useMemo(() => {
     try {
@@ -68,8 +62,6 @@ const Settings = () => {
       return 'en';
     }
   }, [locale, pathname, i18nLoading]);
-
-  const isRTL = mounted ? getLanguageDirection(currentLanguage) === 'rtl' : false;
 
   const getLocalizedUrl = useCallback((path) => {
     if (currentLanguage === 'en') return path;
@@ -125,7 +117,7 @@ const Settings = () => {
   }, [logout, t, router, getLocalizedUrl]);
 
   // Loading state
-  if (!mounted || authLoading || loading) {
+  if (authLoading || loading) {
     return <SettingsSkeleton />;
   }
 
@@ -135,7 +127,7 @@ const Settings = () => {
   }
 
   return (
-    <div className="min-h-screen relative" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen relative">
       <BackgroundDecor />
 
       <div className="relative transition-opacity duration-300 opacity-100">
@@ -145,9 +137,9 @@ const Settings = () => {
               {/* Back Link */}
               <Link
                 href={getLocalizedUrl('/dashboard')}
-                className={`inline-flex items-center gap-2 text-gray-500 hover:text-tufts-blue text-sm font-medium transition-colors duration-300 mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}
+                className="inline-flex items-center gap-2 text-gray-500 hover:text-tufts-blue text-sm font-medium transition-colors duration-300 mb-4 rtl-native-flex"
               >
-                <ArrowLeftIcon className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
+                <ArrowLeftIcon className="w-4 h-4 rtl:-scale-x-100" />
                 {t('settings.backToDashboard', 'Back to Dashboard')}
               </Link>
             </div>
@@ -167,7 +159,7 @@ const Settings = () => {
             <div className="px-4 pb-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
               <div className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 p-5">
                 <span
-                  className={`absolute top-3 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-400/20 select-none pointer-events-none ${isRTL ? 'left-4' : 'right-4'}`}
+                  className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-400/20 select-none pointer-events-none"
                   aria-hidden="true"
                 >
                   {/* Dynamic step number based on whether social provider section exists */}
@@ -175,21 +167,21 @@ const Settings = () => {
                 </span>
 
                 <div className="relative">
-                  <div className={`flex items-center gap-3 mb-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <div className="flex items-center gap-3 mb-2 rtl-native-flex">
                     <div className="w-11 h-11 rounded-lg bg-tufts-blue/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                      <LogOutIcon className="w-5 h-5 text-tufts-blue" />
+                      <LogOutIcon className="w-5 h-5 text-tufts-blue rtl:-scale-x-100" />
                     </div>
                     <h3 className="text-xs font-medium tracking-widest uppercase text-tufts-blue">
                       {t('settings.signOut', 'Sign Out')}
                     </h3>
                   </div>
-                  <p className={`text-sm text-gray-500 leading-relaxed mt-2 mb-4 ${isRTL ? 'text-right' : ''}`}>
+                  <p className="text-sm text-gray-500 leading-relaxed mt-2 mb-4 text-start">
                     {t('settings.signOutDescription', 'Sign out of your account on this device.')}
                   </p>
                   <button
                     onClick={handleLogout}
                     disabled={isLoggingOut}
-                    className={`inline-flex items-center gap-2 px-5 py-2.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-full hover:bg-gray-200 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${isRTL ? 'flex-row-reverse' : ''}`}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-full hover:bg-gray-200 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed rtl-native-flex"
                   >
                     {isLoggingOut ? (
                       <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-400 border-t-transparent" />

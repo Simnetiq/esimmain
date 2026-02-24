@@ -189,13 +189,13 @@ const AiraloPlans = () => {
             {/* Search */}
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                <Search className="absolute start-3 top-3 w-5 h-5 text-gray-400" />
                 <input
                   type="text"
                   placeholder={t('search.packagesPlaceholder', 'Search packages, countries, or descriptions...')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full ps-10 pe-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -205,7 +205,7 @@ const AiraloPlans = () => {
               onClick={() => setShowFilters(!showFilters)}
               className="flex items-center px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
             >
-              <Filter className="w-5 h-5 mr-2" />
+              <Filter className="w-5 h-5 me-2" />
               {t('search.filters', 'Filters')}
             </button>
           </div>
@@ -309,26 +309,26 @@ const AiraloPlans = () => {
               <div className="p-6">
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center text-gray-600">
-                    <Wifi className="w-4 h-4 mr-2" />
+                    <Wifi className="w-4 h-4 me-2" />
                     <span className="text-sm">
                       {formatData(pkg.data, pkg.data_unit)}
                     </span>
                   </div>
                   <div className="flex items-center text-gray-600">
-                    <Clock className="w-4 h-4 mr-2" />
+                    <Clock className="w-4 h-4 me-2" />
                     <span className="text-sm">
                       {pkg.validity} {pkg.validity_unit}
                     </span>
                   </div>
                   <div className="flex items-center text-gray-600">
-                    <MapPin className="w-4 h-4 mr-2" />
+                    <MapPin className="w-4 h-4 me-2" />
                     <span className="text-sm">
                       {pkg.country_code?.toUpperCase() || 'Global'}
                     </span>
                   </div>
                   {pkg.is_roaming && (
                     <div className="flex items-center text-blue-600">
-                      <Globe className="w-4 h-4 mr-2" />
+                      <Globe className="w-4 h-4 me-2" />
                       <span className="text-sm font-medium">Roaming</span>
                         </div>
                   )}
@@ -348,7 +348,7 @@ const AiraloPlans = () => {
                 <div className="space-y-2 mb-6">
                   {pkg.features?.map((feature, index) => (
                     <div key={index} className="flex items-center text-sm text-gray-600">
-                      <CheckCircle className="w-4 h-4 mr-2 text-green-500" />
+                      <CheckCircle className="w-4 h-4 me-2 text-green-500" />
                       {feature}
                     </div>
                   ))}

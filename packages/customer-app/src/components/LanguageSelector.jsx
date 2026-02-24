@@ -157,7 +157,7 @@ const LanguageSelector = () => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 py-2 px-2 lg:px-3 text-sm font-medium text-eerie-black hover:text-tufts-blue transition-colors rounded-md"
+        className="flex rtl-native-flex items-center gap-1.5 py-2 px-2 lg:px-3 text-sm font-medium text-eerie-black hover:text-tufts-blue transition-colors rounded-md"
         aria-label="Select Language"
       >
         {/* Mobile: Globe icon only */}
@@ -178,13 +178,13 @@ const LanguageSelector = () => {
             onClick={() => setIsOpen(false)}
           />
           {/* Dropdown menu */}
-          <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200  shadow-xl shadow-gray-100/30 z-50">
+          <div className="absolute end-0 mt-2 w-44 bg-white border border-gray-200 shadow-xl shadow-gray-100/30 z-50">
             <ul className="p-2 text-sm font-medium text-gray-700">
             {languages.map((language) => (
                 <li key={language.code}>
               <button
                 onClick={() => handleLanguageChange(language)}
-                    className={`inline-flex items-center justify-between w-full p-2 rounded hover:bg-gray-100 hover:text-eerie-black transition-colors ${
+                    className={`inline-flex rtl-native-flex items-center justify-between w-full p-2 rounded hover:bg-gray-100 hover:text-eerie-black transition-colors ${
                       language.code === locale ? 'bg-tufts-blue/10 text-tufts-blue' : ''
                 }`}
               >

@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
-import { getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
 
 // Arrow icon (45 degrees up-right)
@@ -29,8 +28,6 @@ export default function ExploreStoreCTA({
   source = 'hero_secondary_cta'
 }) {
   const { t, locale } = useI18n();
-  const direction = getLanguageDirection(locale || 'en');
-  const isRTL = direction === 'rtl';
 
   // Build localized URL
   const esimPlansUrl = locale && locale !== 'en' ? `/${locale}/esim-plans` : '/esim-plans';
@@ -52,11 +49,11 @@ export default function ExploreStoreCTA({
     secondary: 'bg-white text-gray-900 border border-gray-200 shadow-sm hover:border-tufts-blue hover:text-tufts-blue'
   };
 
-  // Button padding: left side has normal padding, right side is minimal (arrow circle sits flush)
+  // Button padding: start side has normal padding, end side is minimal (arrow circle sits flush)
   const sizeConfig = {
-    sm: { outer: 'pl-5 pr-1 py-1 text-sm', circle: 'w-8 h-8', icon: 'w-3.5 h-3.5' },
-    md: { outer: 'pl-6 pr-1.5 py-1.5 text-base', circle: 'w-9 h-9', icon: 'w-4 h-4' },
-    lg: { outer: 'pl-10 pr-2 py-2 text-lg', circle: 'w-11 h-11', icon: 'w-5 h-5' },
+    sm: { outer: 'ps-5 pe-1 py-1 text-sm', circle: 'w-8 h-8', icon: 'w-3.5 h-3.5' },
+    md: { outer: 'ps-6 pe-1.5 py-1.5 text-base', circle: 'w-9 h-9', icon: 'w-4 h-4' },
+    lg: { outer: 'ps-10 pe-2 py-2 text-lg', circle: 'w-11 h-11', icon: 'w-5 h-5' },
   };
 
   const config = sizeConfig[size];
@@ -67,15 +64,15 @@ export default function ExploreStoreCTA({
       onClick={handleClick}
       className={`
         inline-flex items-center rounded-full font-semibold
-        transition-all duration-200
+        transition-all duration-200 rtl-native-flex
         ${config.outer}
         ${variantClasses[variant]}
         ${className}
       `}
     >
       <span className="flex-1 text-center">{t('hero.exploreStore', 'Explore eSIM Store')}</span>
-      <span className={`${isRTL ? 'mr-3' : 'ml-3'} flex-shrink-0 inline-flex items-center justify-center rounded-full bg-white ${config.circle}`}>
-        <ArrowUpRightIcon className={`${config.icon} text-eerie-black ${isRTL ? '-scale-x-100' : ''}`} />
+      <span className={`ms-3 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-white rtl-native-flex ${config.circle}`}>
+        <ArrowUpRightIcon className={`${config.icon} text-eerie-black rtl:-scale-x-100`} />
       </span>
     </Link>
   );

@@ -37,11 +37,11 @@ const RegionTabs = ({ selectedRegion, onRegionChange }) => {
 
   if (isLoading) {
     return (
-      <div className={`flex flex-wrap gap-3 justify-start `} dir={direction} lang={detectedLanguage}>
+      <div className="flex gap-2 overflow-x-auto scrollbar-hide rtl-native-flex" dir={direction} lang={detectedLanguage}>
         {[...Array(7)].map((_, i) => (
           <div
             key={i}
-            className="px-4 py-2 h-9 w-24 bg-gray-100 animate-pulse"
+            className="px-4 py-2 h-9 w-24 rounded-full bg-gray-100 animate-pulse flex-shrink-0"
           />
         ))}
       </div>
@@ -49,26 +49,20 @@ const RegionTabs = ({ selectedRegion, onRegionChange }) => {
   }
 
   return (
-    <div className={`flex flex-wrap gap-3 justify-start `} dir={direction} lang={detectedLanguage}>
+    <div className="flex gap-2 overflow-x-auto scrollbar-hide rtl-native-flex" dir={direction} lang={detectedLanguage}>
       {regions.map(region => {
         const icon = getRegionIcon(region.id);
+        const isSelected = selectedRegion === region.id;
 
         return (
           <button
             key={region.id}
             onClick={() => onRegionChange(region.id)}
-            className={`px-4 py-2 font-medium text-sm border-2 flex items-center gap-2 `}
-            style={{
-              backgroundColor: selectedRegion === region.id
-                ? `${region.color}20`
-                : 'transparent',
-              borderColor: selectedRegion === region.id
-                ? region.color
-                : 'transparent',
-              color: selectedRegion === region.id
-                ? region.color
-                : '#1f2937'
-            }}
+            className={`px-4 py-2 font-medium text-sm rounded-full flex items-center gap-2 flex-shrink-0 whitespace-nowrap transition-colors duration-200 rtl-native-flex ${
+              isSelected
+                ? 'bg-eerie-black text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
           >
             {icon}
             {region.displayName}

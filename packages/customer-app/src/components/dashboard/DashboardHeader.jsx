@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
-import { getLanguageDirection, detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
+import { detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
 import { usePathname } from 'next/navigation';
 
@@ -56,8 +56,6 @@ const DashboardHeader = ({ currentUser, orders = [] }) => {
     return detectLanguageFromPath(pathname);
   }, [locale, pathname]);
 
-  const isRTL = getLanguageDirection(currentLanguage) === 'rtl';
-
   const getLocalizedUrl = (path) => {
     if (currentLanguage === 'en') return path;
     return `/${currentLanguage}${path}`;
@@ -77,15 +75,15 @@ const DashboardHeader = ({ currentUser, orders = [] }) => {
   ];
 
   return (
-    <div className="bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="bg-white">
       {/* Page Header */}
       <div className="mx-auto w-full max-w-9xl">
         <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
-          <div className={`px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl ${isRTL ? 'text-right' : 'text-left'}`}>
-            <p className={`text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+          <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl text-start">
+            <p className="text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 mb-4 text-start">
               {t('dashboard.manageOrders', 'Manage your eSIM orders and account settings')}
             </p>
-            <h2 className={`text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-eerie-black max-w-5xl ${isRTL ? 'text-right' : 'text-left'}`}>
+            <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-eerie-black max-w-5xl text-start">
               {t('dashboard.welcomeBack', 'Welcome back, {{name}}!', { name: currentUser.displayName || currentUser.email })}
             </h2>
           </div>
@@ -107,17 +105,17 @@ const DashboardHeader = ({ currentUser, orders = [] }) => {
                 >
                   {/* Actual value as faded watermark — zero-padded if <10 */}
                   <span
-                    className={`absolute top-3 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-400/20 select-none pointer-events-none ${isRTL ? 'left-4' : 'right-4'}`}
+                    className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-200 select-none pointer-events-none"
                     aria-hidden="true"
                   >
                     {typeof stat.value === 'number' && stat.value < 10 ? `0${stat.value}` : stat.value}
                   </span>
 
                   <div className="relative">
-                    <div className={`w-11 h-11 rounded-lg bg-tufts-blue/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 ${isRTL ? 'ml-auto' : ''}`}>
+                    <div className="w-11 h-11 rounded-lg bg-tufts-blue/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                       <stat.icon className="w-5 h-5 text-tufts-blue" />
                     </div>
-                    <p className={`text-xs font-medium tracking-widest uppercase text-tufts-blue ${isRTL ? 'text-right' : 'text-left'}`}>
+                    <p className="text-xs font-medium tracking-widest uppercase text-tufts-blue text-start">
                       {stat.label}
                     </p>
                   </div>
@@ -126,20 +124,20 @@ const DashboardHeader = ({ currentUser, orders = [] }) => {
             </div>
 
             {/* Quick Actions */}
-            <div className={`flex flex-wrap gap-3 ${isRTL ? 'justify-end' : 'justify-start'}`}>
+            <div className="flex flex-wrap gap-3 rtl-native-flex">
               <Link
                 href={getLocalizedUrl('/esim-plans')}
-                className="relative inline-flex items-center justify-center pl-5 pr-12 py-3 bg-eerie-black text-white text-sm font-medium rounded-full hover:bg-gray-800 transition-colors"
+                className="relative inline-flex items-center justify-center ps-5 pe-12 py-3 bg-eerie-black text-white text-sm font-medium rounded-full hover:bg-gray-800 transition-colors rtl-native-flex"
               >
                 <span>{t('dashboard.browseEsims', 'Browse eSIMs')}</span>
-                <span className={`absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white flex items-center justify-center ${isRTL ? 'left-3' : 'right-3'}`}>
-                  <ArrowUpRightIcon className="w-3.5 h-3.5 text-eerie-black" />
+                <span className="absolute top-1/2 -translate-y-1/2 end-3 w-6 h-6 rounded-full bg-white flex items-center justify-center">
+                  <ArrowUpRightIcon className="w-3.5 h-3.5 text-eerie-black rtl:-scale-x-100" />
                 </span>
               </Link>
 
               <Link
                 href={getLocalizedUrl('/settings')}
-                className={`inline-flex items-center gap-2 px-5 py-3 bg-gray-100 text-gray-700 text-sm font-medium rounded-full hover:bg-gray-200 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
+                className="inline-flex items-center gap-2 px-5 py-3 bg-gray-100 text-gray-700 text-sm font-medium rounded-full hover:bg-gray-200 transition-colors rtl-native-flex"
               >
                 <SettingsIcon className="w-4 h-4" />
                 <span>{t('dashboard.accountSettings', 'Account Settings')}</span>

@@ -43,7 +43,7 @@ const CurrencyToggle = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1 py-2 px-2 lg:px-3 text-sm font-medium text-eerie-black hover:text-tufts-blue transition-colors rounded-md"
+        className="flex rtl-native-flex items-center gap-1 py-2 px-2 lg:px-3 text-sm font-medium text-eerie-black hover:text-tufts-blue transition-colors rounded-md"
         aria-label="Select Currency"
       >
         <span className="text-sm">{currentCurrency.symbol}</span>
@@ -56,7 +56,7 @@ const CurrencyToggle = () => {
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className="absolute right-0 mt-2 w-52 bg-white border border-gray-200 shadow-xl shadow-gray-100/30 z-50">
+          <div className="absolute end-0 mt-2 w-52 bg-white border border-gray-200 shadow-xl shadow-gray-100/30 z-50">
             <ul className="p-2 text-sm font-medium text-gray-700">
               {SUPPORTED_CURRENCIES.map((c) => (
                 <li key={c.code}>
@@ -65,7 +65,7 @@ const CurrencyToggle = () => {
                       setCurrency(c.code);
                       setIsOpen(false);
                     }}
-                    className={`inline-flex items-center justify-between w-full p-2 rounded hover:bg-gray-100 hover:text-eerie-black transition-colors ${
+                    className={`inline-flex rtl-native-flex items-center justify-between w-full p-2 rounded hover:bg-gray-100 hover:text-eerie-black transition-colors ${
                       c.code === currency ? 'bg-tufts-blue/10 text-tufts-blue' : ''
                     }`}
                   >

@@ -1,9 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
-import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import Image from 'next/image';
 
 // Inline SVG icons to avoid lucide-react bundle overhead
@@ -32,31 +29,7 @@ const SmartphoneIcon = ({ className }) => (
 );
 
 export default function FeaturesSection() {
-  const pathname = usePathname();
-  const { t, locale, isLoading: i18nLoading } = useI18n();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const detectedLanguage = useMemo(() => {
-    try {
-      if (i18nLoading) {
-        if (typeof window !== 'undefined') {
-          const savedLanguage = localStorage.getItem('Simnetiq-language');
-          if (savedLanguage) return savedLanguage;
-        }
-        return detectLanguageFromPath(pathname) || 'en';
-      }
-      return locale || 'en';
-    } catch {
-      return 'en';
-    }
-  }, [locale, pathname, i18nLoading]);
-
-  const direction = mounted ? getLanguageDirection(detectedLanguage) : 'ltr';
-  const isRTL = direction === 'rtl';
+  const { t } = useI18n();
 
   const features = [
     {
@@ -101,16 +74,16 @@ export default function FeaturesSection() {
   const gridFeatures = features.slice(1);
 
   return (
-    <div className="features-section bg-white flex flex-col overflow-hidden" dir={direction} lang={detectedLanguage}>
+    <div className="features-section bg-white flex flex-col overflow-hidden">
       <div className="relative flex-1 flex flex-col">
         {/* Header Section */}
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
             <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              <p className={`text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 mb-4 animate-fade-in-up ${isRTL ? 'text-right' : 'text-left'}`}>
+              <p className="text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 mb-4 animate-fade-in-up text-start">
                 {t('features.title', 'Why Choose Us')}
               </p>
-              <h2 className={`text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-eerie-black max-w-5xl animate-fade-in-up animation-delay-100 ${isRTL ? 'text-right' : 'text-left'}`}>
+              <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-eerie-black max-w-5xl animate-fade-in-up animation-delay-100 text-start">
                 {t('features.subtitle', 'Everything you need to stay connected abroad')}
               </h2>
             </div>
@@ -124,10 +97,8 @@ export default function FeaturesSection() {
             <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
 
               {/* Hero Feature Card — full width, horizontal on desktop */}
-              <div
-                className={`relative bg-gray-50 overflow-hidden animate-fade-in-up mb-4 ${isRTL ? 'md:flex-row-reverse' : ''}`}
-              >
-                <div className={`flex flex-col md:flex-row ${isRTL ? 'md:flex-row-reverse' : ''}`}>
+              <div className="relative bg-gray-50 overflow-hidden animate-fade-in-up mb-4">
+                <div className="flex flex-col md:flex-row rtl-native-flex">
                   {/* Image — left half on desktop, full width on mobile */}
                   <div className="relative h-56 sm:h-64 md:h-auto md:w-1/2 overflow-hidden">
                     <Image
@@ -145,23 +116,23 @@ export default function FeaturesSection() {
                   {/* Content — right half */}
                   <div className="relative flex-1 p-6 lg:p-10 flex flex-col justify-center">
                     {/* Large step number */}
-                    <span className={`absolute top-4 text-[5rem] md:text-[7rem] lg:text-[9rem] font-semibold leading-none text-eerie-black/[0.04] select-none pointer-events-none ${isRTL ? 'left-4 lg:left-8' : 'right-4 lg:right-8'}`} aria-hidden="true">
+                    <span className="absolute top-4 end-4 lg:end-8 text-[5rem] md:text-[7rem] lg:text-[9rem] font-semibold leading-none text-eerie-black/[0.04] select-none pointer-events-none" aria-hidden="true">
                       {heroFeature.number}
                     </span>
 
                     <div className="relative">
                       {/* Icon pill */}
-                      <div className={`w-11 h-11 rounded-lg bg-tufts-blue/10 hidden md:flex items-center justify-center mb-5 ${isRTL ? 'ml-auto' : ''}`}>
+                      <div className="w-11 h-11 rounded-lg bg-tufts-blue/10 hidden md:flex items-center justify-center mb-5">
                         <heroFeature.Icon className="w-5 h-5 text-tufts-blue" />
                       </div>
 
-                      <p className={`text-xs font-medium tracking-widest uppercase text-tufts-blue mb-2 ${isRTL ? 'text-right' : 'text-left'}`}>
+                      <p className="text-xs font-medium tracking-widest uppercase text-tufts-blue mb-2 text-start">
                         {heroFeature.tag}
                       </p>
-                      <h3 className={`text-xl lg:text-2xl font-semibold text-eerie-black mb-3 tracking-tight ${isRTL ? 'text-right' : 'text-left'}`}>
+                      <h3 className="text-xl lg:text-2xl font-semibold text-eerie-black mb-3 tracking-tight text-start">
                         {heroFeature.title}
                       </h3>
-                      <p className={`text-gray-500 text-sm sm:text-base leading-relaxed max-w-md ${isRTL ? 'text-right' : 'text-left'}`}>
+                      <p className="text-gray-500 text-sm sm:text-base leading-relaxed max-w-md text-start">
                         {heroFeature.description}
                       </p>
                     </div>
@@ -194,17 +165,17 @@ export default function FeaturesSection() {
                     {/* Content */}
                     <div className="relative p-5 lg:p-6">
                       {/* Large step number */}
-                      <span className={`absolute -top-10 text-[5rem] lg:text-[6rem] font-semibold leading-none text-eerie-black/[0.04] select-none pointer-events-none ${isRTL ? 'left-4' : 'right-4'}`} aria-hidden="true">
+                      <span className="absolute -top-10 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-eerie-black/[0.04] select-none pointer-events-none" aria-hidden="true">
                         {feature.number}
                       </span>
 
-                      <p className={`text-xs font-medium tracking-widest uppercase text-tufts-blue mb-2 ${isRTL ? 'text-right' : 'text-left'}`}>
+                      <p className="text-xs font-medium tracking-widest uppercase text-tufts-blue mb-2 text-start">
                         {feature.tag}
                       </p>
-                      <h3 className={`text-lg lg:text-xl font-semibold text-eerie-black mb-2 ${isRTL ? 'text-right' : 'text-left'}`}>
+                      <h3 className="text-lg lg:text-xl font-semibold text-eerie-black mb-2 text-start">
                         {feature.title}
                       </h3>
-                      <p className={`text-gray-500 text-sm leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
+                      <p className="text-gray-500 text-sm leading-relaxed text-start">
                         {feature.description}
                       </p>
                     </div>

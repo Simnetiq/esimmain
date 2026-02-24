@@ -3,7 +3,6 @@
 import React, { memo, useMemo } from 'react';
 import Link from 'next/link';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
-import { getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { appStoreLinks } from '@esim/shared/utils/appStoreLinks';
 
 // Inline SVG icons for optimization
@@ -51,7 +50,7 @@ const AndroidIcon = memo(() => (
 AndroidIcon.displayName = 'AndroidIcon';
 
 // Footer link component
-const FooterLink = memo(({ href, children, external = false, icon: Icon = null, isRTL = false }) => {
+const FooterLink = memo(({ href, children, external = false, icon: Icon = null }) => {
   const linkProps = external
     ? { target: '_blank', rel: 'noopener noreferrer' }
     : {};
@@ -61,7 +60,7 @@ const FooterLink = memo(({ href, children, external = false, icon: Icon = null, 
   return (
     <Component
       href={href}
-      className={`text-gray-600 hover:text-tufts-blue transition-colors duration-200 text-sm py-1 flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}
+      className="text-gray-600 hover:text-tufts-blue transition-colors duration-200 text-sm py-1 flex items-center gap-2 rtl-native-flex"
       {...linkProps}
     >
       {Icon && <Icon />}
@@ -72,12 +71,12 @@ const FooterLink = memo(({ href, children, external = false, icon: Icon = null, 
 FooterLink.displayName = 'FooterLink';
 
 // Footer column component
-const FooterColumn = memo(({ title, children, isRTL = false }) => (
-  <div className={`flex flex-col gap-4 ${isRTL ? 'items-end' : 'items-start'}`}>
-    <h3 className={`text-xs font-bold text-eerie-black uppercase tracking-wider ${isRTL ? 'rtl:tracking-tight' : ''}`}>
+const FooterColumn = memo(({ title, children }) => (
+  <div className="flex flex-col gap-4 items-start">
+    <h3 className="text-xs font-bold text-eerie-black uppercase tracking-wider rtl:tracking-tight">
       {title}
     </h3>
-    <div className={`flex flex-col gap-2 ${isRTL ? 'items-end' : 'items-start'}`}>
+    <div className="flex flex-col gap-2 items-start">
       {children}
     </div>
   </div>
@@ -100,9 +99,6 @@ SocialLink.displayName = 'SocialLink';
 
 const Footer = () => {
   const { t, locale } = useI18n();
-
-  const direction = getLanguageDirection(locale);
-  const isRTL = direction === 'rtl';
 
   // Localize internal URLs — same pattern as Navbar
   const getLocalizedUrl = (path) => {
@@ -157,29 +153,27 @@ const Footer = () => {
   return (
     <footer
       className="relative bg-white overflow-hidden"
-      dir={direction}
-      lang={locale}
     >
       {/* Top Border — gradient fade */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
         {/* Main Footer Content */}
         <div className="py-16 lg:py-20">
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 lg:gap-12">
             {/* Brand Column — gradient card */}
-            <div className={`col-span-2 lg:col-span-2 relative ${isRTL ? 'items-end text-right' : 'items-start text-left'}`}>
-              <div className={`flex flex-col ${isRTL ? 'items-end' : 'items-start'} bg-gradient-to-br from-blue-50 to-white  p-6 -mx-2`}>
+            <div className="col-span-2 lg:col-span-2 relative items-start text-start">
+              <div className="flex flex-col items-start bg-gradient-to-br from-blue-50 to-white p-6 -mx-2">
                 <Link href={getLocalizedUrl("/")} className="inline-block mb-4 group">
                   <span className="text-3xl font-bold text-eerie-black group-hover:text-tufts-blue transition-colors">
                     {t('footer.brandName', 'Simnetiq')}
                   </span>
                 </Link>
-                <p className={`text-gray-600 text-sm max-w-xs mb-6 leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
+                <p className="text-gray-600 text-sm max-w-xs mb-6 leading-relaxed text-start">
                   {t('footer.tagline', 'Stay connected wherever you travel. Instant eSIM activation for 150+ countries.')}
                 </p>
                 {/* Social Icons */}
-                <div className="flex gap-1">
+                <div className="flex gap-1 rtl-native-flex">
                   {socialLinks.map((social, index) => (
                     <SocialLink
                       key={index}
@@ -193,39 +187,38 @@ const Footer = () => {
             </div>
 
             {/* Link Columns */}
-            <FooterColumn title={footerSections.product.title} isRTL={isRTL}>
+            <FooterColumn title={footerSections.product.title}>
               {footerSections.product.links.map((link, index) => (
                 <FooterLink
                   key={index}
                   href={link.path}
                   external={link.external}
                   icon={link.icon}
-                  isRTL={isRTL}
                 >
                   {link.name}
                 </FooterLink>
               ))}
             </FooterColumn>
 
-            <FooterColumn title={footerSections.support.title} isRTL={isRTL}>
+            <FooterColumn title={footerSections.support.title}>
               {footerSections.support.links.map((link, index) => (
-                <FooterLink key={index} href={link.path} external={link.external} isRTL={isRTL}>
+                <FooterLink key={index} href={link.path} external={link.external}>
                   {link.name}
                 </FooterLink>
               ))}
             </FooterColumn>
 
-            <FooterColumn title={footerSections.company.title} isRTL={isRTL}>
+            <FooterColumn title={footerSections.company.title}>
               {footerSections.company.links.map((link, index) => (
-                <FooterLink key={index} href={link.path} external={link.external} isRTL={isRTL}>
+                <FooterLink key={index} href={link.path} external={link.external}>
                   {link.name}
                 </FooterLink>
               ))}
             </FooterColumn>
 
-            <FooterColumn title={footerSections.legal.title} isRTL={isRTL}>
+            <FooterColumn title={footerSections.legal.title}>
               {footerSections.legal.links.map((link, index) => (
-                <FooterLink key={index} href={link.path} external={link.external} isRTL={isRTL}>
+                <FooterLink key={index} href={link.path} external={link.external}>
                   {link.name}
                 </FooterLink>
               ))}
@@ -235,7 +228,7 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="border-t border-gray-200 py-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rtl-native-flex">
             <p className="text-gray-500 text-sm">
               &copy; {new Date().getFullYear()} {t('footer.brandName', 'Simnetiq')} &middot; {t('footer.allRightsReserved', 'All rights reserved')}
             </p>

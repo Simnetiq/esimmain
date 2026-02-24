@@ -4,7 +4,7 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { getSupabase } from '@esim/shared/lib/supabase';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
-import { getLanguageDirection, detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
+import { detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
 import { usePathname, useRouter } from 'next/navigation';
 
 // ─── Inline SVG icons (no lucide-react) ───────────────────────────────────
@@ -95,16 +95,16 @@ const showToast = async (type, message) => {
   type === 'success' ? toast.success(message) : toast.error(message);
 };
 
-const SettingsField = ({ icon: Icon, label, value, isRTL, badge, onEdit, editing, editContent }) => (
+const SettingsField = ({ icon: Icon, label, value, badge, onEdit, editing, editContent }) => (
   <div className="space-y-1.5 min-h-[60px]">
-    <label className={`flex items-center gap-1.5 text-xs font-medium tracking-widest uppercase text-gray-500 ${isRTL ? 'flex-row-reverse' : ''}`}>
+    <label className="flex items-center gap-1.5 text-xs font-medium tracking-widest uppercase text-gray-500 rtl-native-flex">
       <Icon className="w-3.5 h-3.5" />
       {label}
     </label>
     {editing ? editContent : (
-      <div className={`flex items-center justify-between p-3 bg-white transition-colors duration-300 ${isRTL ? 'flex-row-reverse' : ''}`}>
+      <div className="flex items-center justify-between p-3 bg-white transition-colors duration-300 rtl-native-flex">
         <span className="text-sm text-gray-900 break-all">{value}</span>
-        <div className={`flex items-center gap-2 flex-shrink-0 ${isRTL ? 'flex-row-reverse' : ''}`}>
+        <div className="flex items-center gap-2 flex-shrink-0 rtl-native-flex">
           {badge}
           {onEdit && (
             <button
@@ -140,8 +140,6 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
       return 'en';
     }
   }, [locale, pathname, i18nLoading]);
-
-  const isRTL = getLanguageDirection(currentLanguage) === 'rtl';
 
   const [editingName, setEditingName] = useState(false);
   const [editingPhone, setEditingPhone] = useState(false);
@@ -270,12 +268,12 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
   }, [deleteConfirmText, currentUser, logout, router, currentLanguage, t]);
 
   const EditInput = ({ value, onChange, onSave, onCancel, type = 'text', placeholder }) => (
-    <div className={`flex gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+    <div className="flex gap-2 rtl-native-flex">
       <input
         type={type}
         value={value}
         onChange={onChange}
-        className={`flex-1 p-3 bg-white text-sm text-gray-900 focus:ring-2 focus:ring-tufts-blue/20 outline-none transition-all duration-300 ${isRTL ? 'text-right' : ''}`}
+        className="flex-1 p-3 bg-white text-sm text-gray-900 focus:ring-2 focus:ring-tufts-blue/20 outline-none transition-all duration-300 text-start"
         placeholder={placeholder}
       />
       <button
@@ -302,7 +300,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
   ].filter(s => s.label);
 
   return (
-    <div dir={isRTL ? 'rtl' : 'ltr'}>
+    <div>
       <div className="mx-auto w-full max-w-9xl">
         <div className="mx-auto w-full max-w-7xl">
           <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl space-y-4">
@@ -310,14 +308,14 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
         {/* ── Personal Information ── */}
         <div className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 p-5">
           <span
-            className={`absolute top-3 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-400/20 select-none pointer-events-none ${isRTL ? 'left-4' : 'right-4'}`}
+            className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-400/20 select-none pointer-events-none"
             aria-hidden="true"
           >
             01
           </span>
 
           <div className="relative">
-            <div className={`flex items-center gap-3 mb-5 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className="flex items-center gap-3 mb-5 rtl-native-flex">
               <div className="w-11 h-11 rounded-lg bg-tufts-blue/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
                 <UserIcon className="w-5 h-5 text-tufts-blue" />
               </div>
@@ -331,7 +329,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
                 icon={MailIcon}
                 label={t('dashboard.emailAddress', 'Email')}
                 value={currentUser.email}
-                isRTL={isRTL}
+
                 badge={
                   <span className="text-[11px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
                     {t('dashboard.verified', 'Verified')}
@@ -343,7 +341,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
                 icon={UserIcon}
                 label={t('dashboard.displayName', 'Name')}
                 value={userProfile?.display_name || currentUser?.user_metadata?.display_name || currentUser?.user_metadata?.full_name || t('dashboard.notSet', 'Not set')}
-                isRTL={isRTL}
+
                 onEdit={() => setEditingName(true)}
                 editing={editingName}
                 editContent={
@@ -361,7 +359,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
                 icon={PhoneIcon}
                 label={t('dashboard.phoneNumber', 'Phone')}
                 value={userProfile?.phone || t('dashboard.notSet', 'Not set')}
-                isRTL={isRTL}
+
                 onEdit={() => setEditingPhone(true)}
                 editing={editingPhone}
                 editContent={
@@ -384,7 +382,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
                     ? new Date(userProfile.created_at).toLocaleDateString()
                     : t('dashboard.unknown', 'Unknown')
                 }
-                isRTL={isRTL}
+
               />
             </div>
           </div>
@@ -394,25 +392,25 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
         {(isGoogleUser || isAppleUser) && (
           <div className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 p-5">
             <span
-              className={`absolute top-3 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-400/20 select-none pointer-events-none ${isRTL ? 'left-4' : 'right-4'}`}
+              className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-400/20 select-none pointer-events-none"
               aria-hidden="true"
             >
               02
             </span>
 
             <div className="relative">
-              <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className="flex items-center gap-3 rtl-native-flex">
                 <div className="w-11 h-11 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
                   {isGoogleUser ? <GoogleIcon /> : <AppleIcon />}
                 </div>
                 <div className="min-w-0">
-                  <p className={`text-xs font-medium tracking-widest uppercase text-tufts-blue ${isRTL ? 'text-right' : ''}`}>
+                  <p className="text-xs font-medium tracking-widest uppercase text-tufts-blue text-start">
                     {isGoogleUser
                       ? t('dashboard.googleAccount', 'Signed in with Google')
                       : t('dashboard.appleAccount', 'Signed in with Apple')
                     }
                   </p>
-                  <p className={`text-sm text-gray-500 leading-relaxed mt-1 ${isRTL ? 'text-right' : ''}`}>
+                  <p className="text-sm text-gray-500 leading-relaxed mt-1 text-start">
                     {isGoogleUser
                       ? t('dashboard.googleAccountInfo', 'Your password is managed by Google. Visit your Google Account to change it.')
                       : t('dashboard.appleAccountInfo', 'Your password is managed by Apple. Visit your Apple ID settings to change it.')
@@ -427,14 +425,14 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
         {/* ── Newsletter ── */}
         <div className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 p-5">
           <span
-            className={`absolute top-3 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-400/20 select-none pointer-events-none ${isRTL ? 'left-4' : 'right-4'}`}
+            className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-400/20 select-none pointer-events-none"
             aria-hidden="true"
           >
             {isGoogleUser || isAppleUser ? '03' : '02'}
           </span>
 
           <div className="relative">
-            <div className={`flex items-center gap-3 mb-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className="flex items-center gap-3 mb-2 rtl-native-flex">
               <div className="w-11 h-11 rounded-lg bg-tufts-blue/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
                 {isSubscribedToNewsletter
                   ? <BellIcon className="w-5 h-5 text-tufts-blue" />
@@ -445,7 +443,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
                 {t('settings.newsletterPreferences', 'Newsletter')}
               </h3>
             </div>
-            <p className={`text-sm text-gray-500 leading-relaxed mt-2 mb-4 ${isRTL ? 'text-right' : ''}`}>
+            <p className="text-sm text-gray-500 leading-relaxed mt-2 mb-4 text-start">
               {isSubscribedToNewsletter
                 ? t('settings.currentlySubscribed', 'You are currently subscribed to our newsletter and promotional emails.')
                 : t('settings.currentlyUnsubscribed', 'You are not subscribed to our newsletter.')
@@ -478,14 +476,14 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
         {/* ── Danger Zone ── */}
         <div className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 p-5">
           <span
-            className={`absolute top-3 text-[5rem] lg:text-[6rem] font-semibold leading-none text-red-400/15 select-none pointer-events-none ${isRTL ? 'left-4' : 'right-4'}`}
+            className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-red-400/15 select-none pointer-events-none"
             aria-hidden="true"
           >
             {isGoogleUser || isAppleUser ? '04' : '03'}
           </span>
 
           <div className="relative">
-            <div className={`flex items-center gap-3 mb-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className="flex items-center gap-3 mb-2 rtl-native-flex">
               <div className="w-11 h-11 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
                 <AlertTriangleIcon className="w-5 h-5 text-red-500" />
               </div>
@@ -493,7 +491,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
                 {t('settings.deleteAccount', 'Delete Account')}
               </h3>
             </div>
-            <p className={`text-sm text-gray-500 leading-relaxed mt-2 mb-4 ${isRTL ? 'text-right' : ''}`}>
+            <p className="text-sm text-gray-500 leading-relaxed mt-2 mb-4 text-start">
               {t('settings.deleteAccountDescription', 'Permanently delete your account and all associated data. This action cannot be undone.')}
             </p>
             <button
@@ -517,10 +515,9 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
         >
           <div
             className="bg-white max-w-md w-full p-6"
-            dir={isRTL ? 'rtl' : 'ltr'}
             onClick={e => e.stopPropagation()}
           >
-            <div className={`flex items-center gap-3 mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className="flex items-center gap-3 mb-4 rtl-native-flex">
               <div className="w-11 h-11 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0">
                 <AlertTriangleIcon className="w-5 h-5 text-red-600" />
               </div>
@@ -531,12 +528,12 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
               </div>
             </div>
 
-            <p className={`text-sm text-gray-500 leading-relaxed mb-5 ${isRTL ? 'text-right' : ''}`}>
+            <p className="text-sm text-gray-500 leading-relaxed mb-5 text-start">
               {t('settings.deleteWarning', 'This will permanently delete your account, all your eSIMs, order history, and personal data. This action cannot be undone.')}
             </p>
 
             <div className="mb-5">
-              <label className={`block text-xs font-medium tracking-widest uppercase text-gray-500 mb-1.5 ${isRTL ? 'text-right' : ''}`}>
+              <label className="block text-xs font-medium tracking-widest uppercase text-gray-500 mb-1.5 text-start">
                 {t('settings.typeDeleteToConfirm', 'Type DELETE to confirm')}
               </label>
               <input
@@ -544,12 +541,12 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
                 value={deleteConfirmText}
                 onChange={(e) => setDeleteConfirmText(e.target.value)}
                 placeholder="DELETE"
-                className={`w-full px-4 py-3 bg-gray-50 text-sm focus:ring-2 focus:ring-red-200 outline-none transition-all duration-300 ${isRTL ? 'text-right' : ''}`}
+                className="w-full px-4 py-3 bg-gray-50 text-sm focus:ring-2 focus:ring-red-200 outline-none transition-all duration-300 text-start"
               />
               <div className="h-5" />
             </div>
 
-            <div className={`flex gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className="flex gap-3 rtl-native-flex">
               <button
                 onClick={() => { setShowDeleteModal(false); setDeleteConfirmText(''); }}
                 className="flex-1 py-3 text-sm font-medium text-gray-700 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors duration-300"

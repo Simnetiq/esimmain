@@ -107,7 +107,7 @@ const CountriesGrid = ({
   if (countries.length === 0) {
     return (
       <div className="text-center py-12" dir={direction} lang={detectedLanguage}>
-        <p className={`text-gray-500 text-sm lg:text-base ${isRTL ? 'text-right' : 'text-center'}`}>
+        <p className="text-gray-500 text-sm lg:text-base text-center">
           {searchTerm
             ? t('plans.noCountriesFound', 'No countries found matching your search')
             : t('plans.noCountriesAvailable', 'No countries available yet')
@@ -153,10 +153,10 @@ const CountriesGrid = ({
             // Home page: "Show More" redirects to plans page
             <button
               onClick={onShowMoreClick}
-              className="btn-secondary px-8 py-3 font-semibold rounded-full transition-all duration-300 hover:scale-105 inline-flex items-center gap-2"
+              className="btn-secondary px-8 py-3 font-semibold rounded-full transition-all duration-300 hover:scale-105 inline-flex items-center gap-2 rtl-native-flex"
             >
               {t('plans.showMore', 'Show More')}
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4 rtl:-scale-x-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
             </button>

@@ -4,7 +4,19 @@
 [dir="rtl"] {
   direction: rtl;
   /* Font family for RTL languages */
-  font-family: var(--font-heebo), var(--font-ibm-plex-arabic), var(--font-rubik), system-ui, sans-serif;
+  font-family: var(--font-open-sans), var(--font-ibm-plex-arabic), system-ui, sans-serif;
+}
+
+/* Arabic-specific — prioritize IBM Plex Sans Arabic */
+[dir="rtl"][lang="ar"],
+[dir="rtl"][lang="ar"] body {
+  font-family: var(--font-ibm-plex-arabic), var(--font-open-sans), system-ui, sans-serif;
+}
+
+/* Hebrew-specific — prioritize Open Sans */
+[dir="rtl"][lang="he"],
+[dir="rtl"][lang="he"] body {
+  font-family: var(--font-open-sans), system-ui, sans-serif;
 }
 
 /* Text alignment - RTL inherits right alignment */
@@ -92,14 +104,25 @@
 [dir="rtl"] .rounded-l-xl { border-radius: 0 0.75rem 0.75rem 0; }
 [dir="rtl"] .rounded-r-xl { border-radius: 0.75rem 0 0 0.75rem; }
 
-/* Navbar - keep LTR layout, only apply RTL fonts */
+/* Navbar — keep LTR layout, only apply RTL fonts and text direction */
 [dir="rtl"] .navbar-header {
   direction: ltr;
 }
+[dir="rtl"] .navbar-header .flex:not(.flex-col),
+[dir="rtl"] .navbar-header .inline-flex {
+  flex-direction: row;
+}
+[dir="rtl"] .navbar-header .justify-start {
+  justify-content: flex-start;
+}
+[dir="rtl"] .navbar-header .justify-end {
+  justify-content: flex-end;
+}
 [dir="rtl"] .navbar-header a,
 [dir="rtl"] .navbar-header button,
-[dir="rtl"] .navbar-header span {
-  font-family: var(--font-heebo), var(--font-ibm-plex-arabic), var(--font-rubik), system-ui, sans-serif;
+[dir="rtl"] .navbar-header span,
+[dir="rtl"] .navbar-header p {
+  font-family: var(--font-open-sans), var(--font-ibm-plex-arabic), system-ui, sans-serif;
 }
 
 /* Prose (blog) RTL */
@@ -135,4 +158,10 @@
 /* Flex containers that should stay centered */
 [dir="rtl"] .flex.items-center.justify-center {
   flex-direction: row;
+}
+
+/* Opt-in class: restore native flex-direction: row so dir="rtl" handles mirroring.
+   Use on containers where the global row-reverse override causes double-reversal. */
+[dir="rtl"] .rtl-native-flex {
+  flex-direction: row !important;
 }

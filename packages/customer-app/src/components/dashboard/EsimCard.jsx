@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
-import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
+import { detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
 import { mapPackageCountryData, mapPlanDetails, getCachedCountryImage, setCachedCountryImage } from '@esim/shared/utils/esimFieldMapper';
 import { useCountryNames } from '@esim/shared/hooks/useCountriesSupabase';
@@ -153,9 +153,6 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
     }
   }, [locale, pathname, i18nLoading]);
 
-  const direction = getLanguageDirection(detectedLanguage);
-  const isRTL = direction === 'rtl';
-
   // Format data usage
   const formatDataUsage = (remaining, total, isUnlimited) => {
     if (isUnlimited) return { text: t('dashboard.unlimited', 'Unlimited'), percentage: 0, remainingPercentage: 100 };
@@ -248,7 +245,6 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
   const mappedPlanDetails = mapPlanDetails(rawPlanDetails);
   const planDetails = { ...rawPlanDetails, ...mappedPlanDetails };
   const dataDisplay = planDetails.data || `${planDetails.dataAmountMb || 0} MB`;
-  const validityDisplay = planDetails.validity || null;
 
   const fullName = localizedCountryName || fallbackName;
 
@@ -267,7 +263,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
     >
       {/* Faded data watermark */}
       <span
-        className={`absolute top-4 hidden sm:block text-[5rem] lg:text-[6rem] font-semibold leading-none text-eerie-black/[0.04] select-none pointer-events-none ${isRTL ? 'left-4' : 'right-4'}`}
+        className="absolute top-4 end-4 hidden sm:block text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-200 select-none pointer-events-none"
         aria-hidden="true"
       >
         {watermarkText}
@@ -277,7 +273,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
       <div className="relative p-4 md:p-5">
 
         {/* Header Section */}
-        <div className={`flex items-center gap-3 mb-4 ${isRTL ? 'flex-row-reverse' : ''}`} dir={direction}>
+        <div className="flex items-center gap-3 mb-4 rtl-native-flex">
           <div className="w-12 h-12 bg-gray-100 flex items-center justify-center rounded-full overflow-hidden flex-shrink-0 relative">
             {countryImage ? (
               <>
@@ -310,31 +306,19 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          {/* Data Usage */}
-          <dl className={`flex flex-col ${isRTL ? 'items-end' : 'items-start'}`}>
-            <dt className={`text-gray-500 text-xs font-normal mb-1 flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <WifiIcon className="w-3.5 h-3.5" />
-              {t('dashboard.dataRemaining', 'Data Remaining')}
-            </dt>
-            {loadingUsage ? (
-              <dd className="h-6 w-16 bg-gray-200 rounded animate-pulse"></dd>
-            ) : (
-              <dd className={`text-base font-semibold ${isExpired ? 'text-gray-500' : 'text-eerie-black'}`}>
-                {usage ? usage.text : dataDisplay}
-                {usage && <span className="text-gray-400 font-normal text-sm"> / {usage.totalText}</span>}
-              </dd>
-            )}
-          </dl>
-
-          {/* Validity — days only */}
-          <dl className={`flex flex-col justify-end ${isRTL ? 'items-start' : 'items-end'}`}>
-            <dd className={`text-base font-semibold text-eerie-black flex items-center gap-1.5 mt-auto ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <ClockIcon className="w-3.5 h-3.5 text-gray-400" />
-              {validityDisplay ? `${validityDisplay} ${t('dashboard.days', 'days')}` : '—'}
-            </dd>
-          </dl>
+        {/* Data Remaining */}
+        <div className="mb-4">
+          <p className="text-gray-500 text-xs font-normal mb-1 flex items-center gap-1 rtl-native-flex">
+            <WifiIcon className="w-3.5 h-3.5" />
+            {t('dashboard.dataRemaining', 'Data Remaining')}
+          </p>
+          {loadingUsage ? (
+            <div className="h-6 w-20 bg-gray-200 rounded animate-pulse"></div>
+          ) : (
+            <p className={`text-base font-semibold ${isExpired ? 'text-gray-500' : 'text-gray-700'}`}>
+              {usage ? `${usage.text} / ${usage.totalText}` : dataDisplay}
+            </p>
+          )}
         </div>
 
 
@@ -348,15 +332,15 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
           if (!hasVoice && !hasSms) return null;
 
           return (
-            <div className={`flex flex-wrap gap-2 mb-4 ${isRTL ? 'justify-end' : 'justify-start'}`}>
+            <div className="flex flex-wrap gap-2 mb-4 justify-start rtl-native-flex">
               {hasVoice && voiceMinutes > 0 && (
-                <span className={`inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs font-medium px-2 py-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs font-medium px-2 py-1">
                   <PhoneIcon className="w-3 h-3" />
                   {voiceMinutes} {t('dashboard.min', 'min')}
                 </span>
               )}
               {hasSms && smsCount > 0 && (
-                <span className={`inline-flex items-center gap-1 bg-purple-50 text-purple-700 text-xs font-medium px-2 py-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <span className="inline-flex items-center gap-1 bg-purple-50 text-purple-700 text-xs font-medium px-2 py-1">
                   <MessageSquareIcon className="w-3 h-3" />
                   {smsCount} SMS
                 </span>
@@ -367,7 +351,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
 
         {/* Operator Branding - from Supabase */}
         {planMetadata?.operatorName && (
-          <div className={`flex items-center gap-2 mb-4 p-2 bg-gray-100/50 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
+          <div className="flex items-center gap-2 mb-4 p-2 bg-gray-100/50 rtl-native-flex">
             {planMetadata.operatorLogo ? (
               <Image
                 src={planMetadata.operatorLogo}
@@ -398,13 +382,13 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
         )}
 
         {/* Footer — Price + Status */}
-        <div className={`flex items-center justify-between pt-4 border-t border-gray-100/60 ${isRTL ? 'flex-row-reverse' : ''}`}>
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100/60 rtl-native-flex">
           <div>
             <span className="text-xs text-gray-500">{t('dashboard.price', 'Price')}</span>
             <p className="text-lg font-bold text-eerie-black">{formatPrice(order.amount || 0)}</p>
           </div>
-          <span className={`inline-flex items-center ${statusInfo.bgColor} border ${statusInfo.borderColor} ${statusInfo.textColor} text-xs font-medium px-2 py-1 rounded-lg ${isRTL ? 'flex-row-reverse' : ''}`}>
-            <StatusIcon className={`w-3.5 h-3.5 ${isRTL ? 'ms-1' : 'me-1'}`} />
+          <span className={`inline-flex items-center ${statusInfo.bgColor} border ${statusInfo.borderColor} ${statusInfo.textColor} text-xs font-medium px-2 py-1 rounded-lg`}>
+            <StatusIcon className="w-3.5 h-3.5 me-1" />
             {statusInfo.label}
           </span>
         </div>
@@ -418,8 +402,8 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
           className={`relative w-full mt-4 flex items-center justify-center py-3 bg-eerie-black text-white text-sm font-medium rounded-full transition-colors duration-300 hover:bg-gray-800`}
         >
           <span>{t('dashboard.viewDetails', 'View Details')}</span>
-          <span className={`absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white flex items-center justify-center ${isRTL ? 'left-3' : 'right-3'}`}>
-            <ArrowUpRightIcon className="w-3.5 h-3.5 text-eerie-black" />
+          <span className="absolute top-1/2 -translate-y-1/2 end-3 w-6 h-6 rounded-full bg-white flex items-center justify-center">
+            <ArrowUpRightIcon className="w-3.5 h-3.5 text-eerie-black rtl:-scale-x-100" />
           </span>
         </button>
 

@@ -372,9 +372,7 @@ const BlogPost = ({ slug }) => {
                 )}
 
                 {/* App Download CTA */}
-                <BlogAppDownload 
-                  language={detectedLanguage}
-                  isRTL={isRTL}
+                <BlogAppDownload
                   location="blog_post"
                   context={{ page: 'blog_post', blog_title: post.title, blog_id: post.id, blog_category: post.category }}
                 />

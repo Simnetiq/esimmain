@@ -47,11 +47,11 @@ function DownloadButton({ platform, variant, size, source, className = '' }) {
     });
   };
 
-  // Match ExploreStoreCTA sizing: asymmetric padding, circle flush on right
+  // Match ExploreStoreCTA sizing: asymmetric padding, circle flush on end side
   const sizeConfig = {
-    sm: { outer: 'pl-5 pr-1 py-1 text-sm', circle: 'w-8 h-8', icon: 'w-4 h-4' },
-    md: { outer: 'pl-6 pr-1.5 py-1.5 text-base', circle: 'w-9 h-9', icon: 'w-5 h-5' },
-    lg: { outer: 'pl-10 pr-2 py-2 text-lg', circle: 'w-11 h-11', icon: 'w-6 h-6' },
+    sm: { outer: 'ps-5 pe-1 py-1 text-sm', circle: 'w-8 h-8', icon: 'w-4 h-4' },
+    md: { outer: 'ps-6 pe-1.5 py-1.5 text-base', circle: 'w-9 h-9', icon: 'w-5 h-5' },
+    lg: { outer: 'ps-10 pe-2 py-2 text-lg', circle: 'w-11 h-11', icon: 'w-6 h-6' },
   };
 
   const config = sizeConfig[size];
@@ -76,14 +76,14 @@ function DownloadButton({ platform, variant, size, source, className = '' }) {
       onClick={handleClick}
       className={`
         inline-flex items-center rounded-full font-semibold
-        transition-all duration-200
+        transition-all duration-200 rtl-native-flex
         ${config.outer}
         ${variantClasses[variant]}
         ${className}
       `}
     >
       <span className="flex-1 text-center">{label}</span>
-      <span className={`ml-3 flex-shrink-0 inline-flex items-center justify-center rounded-full ${circleClasses[variant]} ${config.circle}`}>
+      <span className={`ms-3 flex-shrink-0 inline-flex items-center justify-center rounded-full rtl-native-flex ${circleClasses[variant]} ${config.circle}`}>
         <Icon className={config.icon} />
       </span>
     </a>
@@ -131,7 +131,7 @@ export default function PlatformDownloadCTA({
 
   // Before detection or on desktop, show both buttons (both reserve space during null)
   return (
-    <div className={`flex flex-row items-center justify-center gap-3 ${className} ${fadeClass}`}>
+    <div className={`flex flex-row items-center justify-center gap-3 rtl-native-flex ${className} ${fadeClass}`}>
       <DownloadButton
         platform="ios"
         variant={variant}

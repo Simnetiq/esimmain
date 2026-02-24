@@ -60,18 +60,18 @@ const FlexiblePlanCard = ({ plan, t, onClick, isRTL = false }) => {
         >
             {/* Price — big watermark on the right */}
             <span
-                className={`absolute top-3 text-[3rem] sm:text-[3.5rem] font-semibold leading-none text-gray-700 select-none pointer-events-none ${isRTL ? 'left-3' : 'right-3'}`}
+                className="absolute top-3 end-3 text-[3rem] sm:text-[3.5rem] font-semibold leading-none text-gray-700 select-none pointer-events-none"
                 aria-hidden="true"
             >
                 ${plan.price}
             </span>
 
             <div>
-                <h4 className={`font-semibold text-lg text-eerie-black ${isRTL ? 'text-right' : 'text-left'}`}>
+                <h4 className="font-semibold text-lg text-eerie-black text-start">
                     {dataAmount}
                 </h4>
                 {validity && (
-                    <p className={`text-xs font-medium tracking-widest uppercase text-tufts-blue mt-1 mb-3 ${isRTL ? 'text-right' : 'text-left'}`}>
+                    <p className="text-xs font-medium tracking-widest uppercase text-tufts-blue mt-1 mb-3 text-start">
                         {validity}
                     </p>
                 )}
@@ -109,13 +109,13 @@ const FlexiblePlanCard = ({ plan, t, onClick, isRTL = false }) => {
                     )}
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between rtl-native-flex">
                     {countryCount > 0 ? (
-                        <p className={`text-xs text-tufts-blue/80 font-medium truncate ${isRTL ? 'text-right pl-4' : 'text-left pr-4'}`}>
+                        <p className="text-xs text-tufts-blue/80 font-medium truncate text-start pe-4">
                             {t('deals.covers', 'Covers')} {countryCount} {countryCount === 1 ? t('deals.country', 'country') : t('deals.countries', 'countries')}
                         </p>
                     ) : <span />}
-                    <div className={`w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0 group-hover:bg-eerie-black group-hover:text-white transition-colors duration-300 ${isRTL ? 'rotate-180' : ''}`}>
+                    <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0 group-hover:bg-eerie-black group-hover:text-white transition-colors duration-300 rtl:rotate-180">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
@@ -438,8 +438,7 @@ const EsimPlans = ({ isHomePage = false }) => {
                         placeholder={t('plans.searchPlaceholder', 'Search eSIM plans...')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className={`input-field w-full py-2.5 sm:py-3 resize-none ${isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4'}`}
-                        style={{ textAlign: isRTL ? 'right' : 'left' }}
+                        className="input-field w-full py-2.5 sm:py-3 resize-none ps-10 pe-4 text-start"
                     />
                 </div>
             </div>
@@ -471,20 +470,20 @@ const EsimPlans = ({ isHomePage = false }) => {
                         {/* Regional Plans */}
                         {regionalPlans.length > 0 && (
                             <div className="mb-6">
-                                <div className={`flex items-center justify-between mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                                <div className="flex items-center justify-between mb-3 rtl-native-flex">
                                     <h3 className="text-lg font-bold text-eerie-black">
                                         {t('plans.regionalPlans', 'Regional Plans')}
                                     </h3>
                                     {allRegionalPlans.length > 4 && (
                                         <button
                                             onClick={handleShowAllRegionalPlans}
-                                            className={`text-sm font-medium text-tufts-blue hover:text-blue-700 transition-colors flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}
+                                            className="text-sm font-medium text-tufts-blue hover:text-blue-700 transition-colors flex items-center gap-1 rtl-native-flex"
                                         >
                                             {t('plans.showAll', 'Show All')}
                                             <span className="text-xs bg-tufts-blue/10 text-tufts-blue px-1.5 py-0.5 rounded-full">
                                                 {allRegionalPlans.length}
                                             </span>
-                                            <svg className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg className="w-4 h-4 rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                             </svg>
                                         </button>
@@ -506,7 +505,7 @@ const EsimPlans = ({ isHomePage = false }) => {
 
                         {/* Countries Grid */}
                         <div>
-                            <div className={`flex items-center justify-between mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                            <div className="flex items-center justify-between mb-3 rtl-native-flex">
                                 <h3 className="text-lg font-bold text-eerie-black">
                                     {t('plans.countries', 'Countries')}
                                 </h3>

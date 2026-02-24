@@ -142,9 +142,9 @@ const PlanCard = ({ plan, badge, isSelected, onSelect }) => {
 
   return (
     <button
-      className={`w-full text-left p-4 border transition-all duration-150 ${
+      className={`w-full text-start p-4 border transition-all duration-150 ${
         isSelected
-          ? 'border-tufts-blue bg-tufts-blue/5 border-l-4'
+          ? 'border-tufts-blue bg-tufts-blue/5 border-s-4'
           : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50/50'
       }`}
       onClick={onSelect}
@@ -196,7 +196,7 @@ const PlanCard = ({ plan, badge, isSelected, onSelect }) => {
           )}
         </div>
 
-        <div className="flex-shrink-0 text-right">
+        <div className="flex-shrink-0 text-end">
           <span className="text-lg font-bold text-eerie-black">{formatPrice(originalPrice)}</span>
           {currency !== 'USD' && <p className="text-xs text-gray-400">{currency}</p>}
         </div>
@@ -219,7 +219,7 @@ const PlanTableRow = ({ plan, badge, isSelected, onSelect, regionColor }) => {
       onClick={onSelect}
     >
       {/* Radio */}
-      <td className={`pl-5 py-4 w-12 ${isSelected ? 'border-l-4 border-l-tufts-blue' : 'border-l-4 border-l-transparent'}`}>
+      <td className={`ps-5 py-4 w-12 ${isSelected ? 'border-s-4 border-s-tufts-blue' : 'border-s-4 border-s-transparent'}`}>
         <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
           isSelected ? 'border-tufts-blue bg-tufts-blue' : 'border-gray-300'
         }`}>
@@ -227,15 +227,15 @@ const PlanTableRow = ({ plan, badge, isSelected, onSelect, regionColor }) => {
         </div>
       </td>
       {/* Data */}
-      <td className="py-4 pr-4">
+      <td className="py-4 pe-4">
         <span className={`text-base font-bold ${isSelected ? 'text-tufts-blue' : 'text-eerie-black'}`}>{dataDisplay}</span>
       </td>
       {/* Days */}
-      <td className="py-4 pr-4">
+      <td className="py-4 pe-4">
         <span className={`text-sm ${isSelected ? 'text-gray-700 font-medium' : 'text-gray-600'}`}>{validityDays > 0 ? `${validityDays} days` : '—'}</span>
       </td>
       {/* Operator */}
-      <td className="py-4 pr-4">
+      <td className="py-4 pe-4">
         <div
           className="inline-flex items-center gap-2 px-2.5 py-1.5"
           style={regionColor ? { background: `linear-gradient(135deg, ${regionColor}25, ${regionColor}08)` } : undefined}
@@ -247,12 +247,12 @@ const PlanTableRow = ({ plan, badge, isSelected, onSelect, regionColor }) => {
           )}
           <span className="text-sm text-gray-600 truncate max-w-[140px]">{operatorName || '—'}</span>
           {(isRegional || isGlobal) && coveredCountryCount > 0 && (
-            <span className="text-xs text-tufts-blue whitespace-nowrap ml-1">{coveredCountryCount} {t('deals.countries', 'countries')}</span>
+            <span className="text-xs text-tufts-blue whitespace-nowrap ms-1">{coveredCountryCount} {t('deals.countries', 'countries')}</span>
           )}
         </div>
       </td>
       {/* Badge */}
-      <td className="py-4 pr-4">
+      <td className="py-4 pe-4">
         {currentBadge && (
           <span className={`${currentBadge.bg} ${currentBadge.text} text-xs font-semibold px-2.5 py-1 rounded-full inline-block w-fit`}>
             {currentBadge.label}
@@ -260,9 +260,9 @@ const PlanTableRow = ({ plan, badge, isSelected, onSelect, regionColor }) => {
         )}
       </td>
       {/* Price */}
-      <td className="py-4 pr-5 text-right">
+      <td className="py-4 pe-5 text-end">
         <span className={`text-lg font-bold ${isSelected ? 'text-tufts-blue' : 'text-eerie-black'}`}>{formatPrice(originalPrice)}</span>
-        {currency !== 'USD' && <span className="text-xs text-gray-400 ml-1">{currency}</span>}
+        {currency !== 'USD' && <span className="text-xs text-gray-400 ms-1">{currency}</span>}
       </td>
     </tr>
   );
@@ -829,23 +829,23 @@ const PlanSelectionBottomSheet = ({
                     <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
                       {t('planSelection.dataOnlyPlans', 'Data Only')}
                     </h4>
-                    <span className="text-xs text-gray-400 ml-auto">{dataOnlyPlans.length} {t('planSelection.plans', 'plans')}</span>
+                    <span className="text-xs text-gray-400 ms-auto">{dataOnlyPlans.length} {t('planSelection.plans', 'plans')}</span>
                   </div>
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-gray-200">
-                        <th className="pl-5 py-3 w-12" />
-                        <th className="py-3 pr-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-600" onClick={() => setSortBy('data')}>
+                        <th className="ps-5 py-3 w-12" />
+                        <th className="py-3 pe-4 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-600" onClick={() => setSortBy('data')}>
                           {t('planSort.dataLabel', 'Data')} {sortBy === 'data' && '↓'}
                         </th>
-                        <th className="py-3 pr-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-600" onClick={() => setSortBy('days')}>
+                        <th className="py-3 pe-4 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-600" onClick={() => setSortBy('days')}>
                           {t('planSort.daysLabel', 'Days')} {sortBy === 'days' && '↓'}
                         </th>
-                        <th className="py-3 pr-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        <th className="py-3 pe-4 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider">
                           {t('planSort.operatorLabel', 'Operator')}
                         </th>
-                        <th className="py-3 pr-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider" />
-                        <th className="py-3 pr-5 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-600" onClick={() => setSortBy('price')}>
+                        <th className="py-3 pe-4 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider" />
+                        <th className="py-3 pe-5 text-end text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-600" onClick={() => setSortBy('price')}>
                           {t('planSort.priceLabel', 'Price')} {sortBy === 'price' && '↑'}
                         </th>
                       </tr>
@@ -867,17 +867,17 @@ const PlanSelectionBottomSheet = ({
                     <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
                       {t('planSelection.plansWithCallsSms', 'With Calls & SMS')}
                     </h4>
-                    <span className="text-xs text-gray-400 ml-auto">{plansWithFeatures.length} {t('planSelection.plans', 'plans')}</span>
+                    <span className="text-xs text-gray-400 ms-auto">{plansWithFeatures.length} {t('planSelection.plans', 'plans')}</span>
                   </div>
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-gray-200">
-                        <th className="pl-5 py-3 w-12" />
-                        <th className="py-3 pr-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('planSort.dataLabel', 'Data')}</th>
-                        <th className="py-3 pr-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('planSort.daysLabel', 'Days')}</th>
-                        <th className="py-3 pr-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('planSort.operatorLabel', 'Operator')}</th>
-                        <th className="py-3 pr-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider" />
-                        <th className="py-3 pr-5 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('planSort.priceLabel', 'Price')}</th>
+                        <th className="ps-5 py-3 w-12" />
+                        <th className="py-3 pe-4 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('planSort.dataLabel', 'Data')}</th>
+                        <th className="py-3 pe-4 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('planSort.daysLabel', 'Days')}</th>
+                        <th className="py-3 pe-4 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('planSort.operatorLabel', 'Operator')}</th>
+                        <th className="py-3 pe-4 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider" />
+                        <th className="py-3 pe-5 text-end text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('planSort.priceLabel', 'Price')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -902,8 +902,8 @@ const PlanSelectionBottomSheet = ({
                     <span className="block text-center">
                       {t('planSelection.continue', 'Continue')} · {formatPrice(parsePrice(selectedPlan.price))}
                     </span>
-                    <span className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white flex items-center justify-center">
-                      <svg className="w-3 h-3 text-eerie-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <span className="absolute end-4 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white flex items-center justify-center">
+                      <svg className="w-3 h-3 text-eerie-black rtl:-scale-x-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M7 17L17 7M17 7H7M17 7V17" />
                       </svg>
                     </span>
@@ -971,7 +971,7 @@ const PlanSelectionBottomSheet = ({
                         return (
                           <button
                             key={`${days}-${country.id}`}
-                            className="group w-full relative bg-gray-50 hover:bg-white rounded-lg transition-all duration-300 text-left overflow-hidden"
+                            className="group w-full relative bg-gray-50 hover:bg-white rounded-lg transition-all duration-300 text-start overflow-hidden"
                             onClick={() => {
                               // Navigate to plan or country
                             }}

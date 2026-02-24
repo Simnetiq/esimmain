@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
-import { getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { appStoreLinks } from '@esim/shared/utils/appStoreLinks';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
 
@@ -23,24 +22,9 @@ const ChevronUpIcon = ({ className }) => (
 
 
 export default function ActivationSection() {
-  const { t, locale, isLoading: i18nLoading } = useI18n();
+  const { t } = useI18n();
   const [openFaq, setOpenFaq] = useState(null);
 
-  // Language detection with fallback
-  const detectedLanguage = useMemo(() => {
-    if (i18nLoading) {
-      if (typeof window !== 'undefined') {
-        const savedLanguage = localStorage.getItem('Simnetiq-language');
-        if (savedLanguage) return savedLanguage;
-      }
-      return 'en';
-    }
-    return locale || 'en';
-  }, [locale, i18nLoading]);
-
-  const direction = getLanguageDirection(detectedLanguage);
-  const isRTL = direction === 'rtl';
-  
   // Track iOS download
   const handleIOSDownload = () => {
     trackCustomFacebookEvent('DownloadIOSApp', {
@@ -106,14 +90,14 @@ export default function ActivationSection() {
   };
 
   return (
-    <div className="bg-white flex flex-col overflow-hidden" id="how-it-works" dir={direction} lang={detectedLanguage}>
+    <div className="bg-white flex flex-col overflow-hidden" id="how-it-works">
       <div className="relative flex-1 flex flex-col">
         {/* Simnetiq App Download — FeaturesSection style */}
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
             <div className="px-4 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
               <div className="relative bg-gray-50 overflow-hidden animate-fade-in-up">
-                <div className={`flex flex-col md:flex-row ${isRTL ? 'md:flex-row-reverse' : ''}`}>
+                <div className="flex flex-col md:flex-row rtl-native-flex">
                   {/* Image — left half on desktop, full width on mobile */}
                   <div className="relative h-56 sm:h-64 md:h-auto md:w-1/2 overflow-hidden">
                     <Image
@@ -129,12 +113,12 @@ export default function ActivationSection() {
                   {/* Content — right half */}
                   <div className="relative flex-1 p-6 lg:p-10 flex flex-col justify-end">
                     {/* Large decorative watermark */}
-                    <span className={`absolute top-4 text-[5rem] md:text-[7rem] lg:text-[9rem] font-semibold leading-none text-gray-500/10 select-none pointer-events-none ${isRTL ? 'left-4 lg:left-8' : 'right-4 lg:right-8'}`} aria-hidden="true">
+                    <span className="absolute top-4 end-4 lg:end-8 text-[5rem] md:text-[7rem] lg:text-[9rem] font-semibold leading-none text-gray-500/10 select-none pointer-events-none" aria-hidden="true">
                       eSIM
                     </span>
 
                     <div className="relative">
-                      <div className={`flex items-center gap-3 mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                      <div className="flex items-center gap-3 mb-3 rtl-native-flex">
                         <img
                           src="/images/logo_icon/ioslogo.png"
                           alt="Simnetiq"
@@ -143,30 +127,30 @@ export default function ActivationSection() {
                           className="w-12 h-12 rounded-[12px] shadow"
                         />
                         <div>
-                          <p className={`text-xs font-medium tracking-widest uppercase text-tufts-blue mb-1 ${isRTL ? 'text-right' : 'text-left'}`}>
+                          <p className="text-xs font-medium tracking-widest uppercase text-tufts-blue mb-1 text-start">
                             {t('activation.appBadge', 'DOWNLOAD THE APP')}
                           </p>
-                          <h3 className={`text-xl lg:text-2xl font-semibold text-eerie-black tracking-tight ${isRTL ? 'text-right' : 'text-left'}`}>
+                          <h3 className="text-xl lg:text-2xl font-semibold text-eerie-black tracking-tight text-start">
                             {t('activation.appTitle', 'Stay connected wherever you travel')}
                           </h3>
                         </div>
                       </div>
 
-                      <p className={`text-gray-500 text-sm sm:text-base leading-relaxed max-w-md mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+                      <p className="text-gray-500 text-sm sm:text-base leading-relaxed max-w-md mb-4 text-start">
                         {t('activation.appDescription', 'Get instant eSIM data plans for 200+ countries. No physical SIM needed, activate in minutes.')}
                       </p>
 
                       {/* Download Buttons */}
-                      <div className={`flex flex-col sm:flex-row gap-3 ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
+                      <div className="flex flex-col sm:flex-row gap-3 rtl-native-flex">
                         <a
                           href={appStoreLinks.ios}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={handleIOSDownload}
-                          className="inline-flex items-center rounded-full bg-gray-900 pl-5 pr-1 py-1 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-gray-800 hover:scale-[1.02] w-full sm:w-auto"
+                          className="inline-flex items-center rounded-full bg-gray-900 ps-5 pe-1 py-1 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-gray-800 hover:scale-[1.02] w-full sm:w-auto rtl-native-flex"
                         >
                           <span className="flex-1 text-center">{t('activation.appStore', 'App Store')}</span>
-                          <span className="ml-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-white/20 w-8 h-8">
+                          <span className="ms-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-white/20 w-8 h-8">
                             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <line x1="21" y1="17" x2="18" y2="17"/><line x1="20" y1="21" x2="14.29" y2="10.72"/><line x1="12" y1="6.6" x2="10" y2="3"/><line x1="14" y1="3" x2="4" y2="21"/><line x1="13" y1="17" x2="3" y2="17"/>
                             </svg>
@@ -177,10 +161,10 @@ export default function ActivationSection() {
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={handleAndroidDownload}
-                          className="inline-flex items-center rounded-full bg-white pl-5 pr-1 py-1 text-sm font-semibold text-gray-900 ring-1 ring-gray-200 shadow-sm transition-all duration-150 hover:bg-gray-50 hover:scale-[1.02] w-full sm:w-auto"
+                          className="inline-flex items-center rounded-full bg-white ps-5 pe-1 py-1 text-sm font-semibold text-gray-900 ring-1 ring-gray-200 shadow-sm transition-all duration-150 hover:bg-gray-50 hover:scale-[1.02] w-full sm:w-auto rtl-native-flex"
                         >
                           <span className="flex-1 text-center">{t('activation.googlePlay', 'Google Play')}</span>
-                          <span className="ml-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-gray-100 w-8 h-8">
+                          <span className="ms-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-gray-100 w-8 h-8">
                             <svg className="w-4 h-4 text-gray-900" viewBox="0 0 24 24" fill="currentColor">
                               <path fillRule="evenodd" clipRule="evenodd" d="M2 3.65629C2 2.15127 3.59967 1.18549 4.93149 1.88645L20.7844 10.2301C22.2091 10.9799 22.2091 13.0199 20.7844 13.7698L4.9315 22.1134C3.59968 22.8144 2 21.8486 2 20.3436V3.65629ZM19.8529 11.9999L16.2682 10.1132L14.2243 11.9999L16.2682 13.8866L19.8529 11.9999ZM14.3903 14.875L12.75 13.3608L6.75782 18.8921L14.3903 14.875ZM12.75 10.639L14.3903 9.12488L6.75782 5.10777L12.75 10.639ZM4 5.28391L11.2757 11.9999L4 18.7159V5.28391Z"/>
                             </svg>
@@ -200,7 +184,7 @@ export default function ActivationSection() {
           <div className="mx-auto w-full max-w-7xl mt-6">
             <div className="px-4 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
               <div className="relative bg-gray-50 overflow-hidden animate-fade-in-up">
-                <div className={`flex flex-col md:flex-row ${isRTL ? 'md:flex-row-reverse' : ''}`}>
+                <div className="flex flex-col md:flex-row rtl-native-flex">
                   {/* Image — left half on desktop, full width on mobile */}
                   <div className="relative h-56 sm:h-64 md:h-auto md:w-1/2 overflow-hidden">
                     <Image
@@ -216,49 +200,49 @@ export default function ActivationSection() {
                   {/* Content — right half */}
                   <div className="relative flex-1 p-6 lg:p-10 flex flex-col justify-end">
                     {/* Large decorative watermark */}
-                    <span className={`absolute top-4 text-[5rem] md:text-[7rem] lg:text-[9rem] font-semibold leading-none text-gray-500/10 select-none pointer-events-none ${isRTL ? 'left-4 lg:left-8' : 'right-4 lg:right-8'}`} aria-hidden="true">
+                    <span className="absolute top-4 end-4 lg:end-8 text-[5rem] md:text-[7rem] lg:text-[9rem] font-semibold leading-none text-gray-500/10 select-none pointer-events-none" aria-hidden="true">
                       VPN
                     </span>
 
                     <div className="relative">
-                      <div className={`flex items-center gap-3 mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                      <div className="flex items-center gap-3 mb-3 rtl-native-flex">
                         <img
                           src="/images/doppler-icon.jpg"
                           alt="Doppler VPN"
                           width={48}
                           height={48}
-                          className="w-12 h-12 rounded-[12px] shadow "
+                          className="w-12 h-12 rounded-[12px] shadow"
                         />
                         <div>
-                          <p className={`text-xs font-medium tracking-widest uppercase text-tufts-blue mb-1 ${isRTL ? 'text-right' : 'text-left'}`}>
+                          <p className="text-xs font-medium tracking-widest uppercase text-tufts-blue mb-1 text-start">
                             {t('activation.doppler.badge', 'By Simnetiq')}
                           </p>
-                          <h3 className={`text-xl lg:text-2xl font-semibold text-eerie-black tracking-tight ${isRTL ? 'text-right' : 'text-left'}`}>
+                          <h3 className="text-xl lg:text-2xl font-semibold text-eerie-black tracking-tight text-start">
                             {t('activation.doppler.title', 'Doppler VPN')}
                           </h3>
                         </div>
                       </div>
 
-                      <p className={`text-gray-500 text-sm sm:text-base leading-relaxed max-w-md mb-3 ${isRTL ? 'text-right' : 'text-left'}`}>
+                      <p className="text-gray-500 text-sm sm:text-base leading-relaxed max-w-md mb-3 text-start">
                         {t('activation.doppler.description', 'Fast, no-logs VPN powered by WireGuard on mobile and advanced VLESS via Telegram bot. All major platforms, up to 10 devices.')}
                       </p>
 
-                      <div className={`inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                      <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 mb-4 rtl-native-flex">
                         <span className="text-xs font-semibold text-emerald-700">
                           {t('activation.doppler.promo', 'Launch offer: use code LAUNCH20 for 20% off')}
                         </span>
                       </div>
 
                       {/* CTA Buttons */}
-                      <div className={`flex flex-col sm:flex-row gap-3 ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
+                      <div className="flex flex-col sm:flex-row gap-3 rtl-native-flex">
                         <a
                           href="https://apps.apple.com/at/app/doppler-vpn-fast-secure/id6757091773"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center rounded-full bg-gray-900 pl-5 pr-1 py-1 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-gray-800 hover:scale-[1.02] w-full sm:w-auto"
+                          className="inline-flex items-center rounded-full bg-gray-900 ps-5 pe-1 py-1 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-gray-800 hover:scale-[1.02] w-full sm:w-auto rtl-native-flex"
                         >
                           <span className="flex-1 text-center">{t('activation.doppler.appStore', 'App Store')}</span>
-                          <span className="ml-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-white/20 w-8 h-8">
+                          <span className="ms-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-white/20 w-8 h-8">
                             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <line x1="21" y1="17" x2="18" y2="17"/><line x1="20" y1="21" x2="14.29" y2="10.72"/><line x1="12" y1="6.6" x2="10" y2="3"/><line x1="14" y1="3" x2="4" y2="21"/><line x1="13" y1="17" x2="3" y2="17"/>
                             </svg>
@@ -268,11 +252,11 @@ export default function ActivationSection() {
                           href="https://dopplervpn.org/"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center rounded-full bg-white pl-5 pr-1 py-1 text-sm font-semibold text-gray-900 ring-1 ring-gray-200 shadow-sm transition-all duration-150 hover:bg-gray-50 hover:scale-[1.02] w-full sm:w-auto"
+                          className="inline-flex items-center rounded-full bg-white ps-5 pe-1 py-1 text-sm font-semibold text-gray-900 ring-1 ring-gray-200 shadow-sm transition-all duration-150 hover:bg-gray-50 hover:scale-[1.02] w-full sm:w-auto rtl-native-flex"
                         >
                           <span className="flex-1 text-center">{t('activation.doppler.learnMore', 'Learn More')}</span>
-                          <span className="ml-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-gray-100 w-8 h-8">
-                            <svg className="w-3.5 h-3.5 text-gray-900" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <span className="ms-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-gray-100 w-8 h-8">
+                            <svg className="w-3.5 h-3.5 text-gray-900 rtl:-scale-x-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <path d="M7 17 17 7"/><path d="M7 7h10v10"/>
                             </svg>
                           </span>
@@ -290,10 +274,10 @@ export default function ActivationSection() {
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
             <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              <p className={`text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 mb-4 animate-fade-in-up ${isRTL ? 'text-right' : 'text-left'}`}>
+              <p className="text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 mb-4 animate-fade-in-up text-start">
                 {t('faq.title', 'Frequently Asked Questions')}
               </p>
-              <h2 className={`text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-eerie-black max-w-5xl animate-fade-in-up animation-delay-100 ${isRTL ? 'text-right' : 'text-left'}`}>
+              <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-eerie-black max-w-5xl animate-fade-in-up animation-delay-100 text-start">
                 {t('faq.subtitle', 'Everything you need to know about eSIM')}
               </h2>
             </div>
@@ -315,10 +299,10 @@ export default function ActivationSection() {
                     >
                       <button
                         onClick={() => toggleFaq(index)}
-                        className={`w-full p-5 lg:p-6 flex items-start justify-between gap-4 ${isRTL ? 'text-right' : 'text-left'}`}
+                        className="w-full p-5 lg:p-6 flex items-start justify-between gap-4 text-start rtl-native-flex"
                         aria-expanded={isOpen}
                       >
-                        <span className={`font-medium text-eerie-black text-sm lg:text-base leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
+                        <span className="font-medium text-eerie-black text-sm lg:text-base leading-relaxed text-start">
                           {faq.question}
                         </span>
                         {isOpen ? (
@@ -335,7 +319,7 @@ export default function ActivationSection() {
                         }`}
                       >
                         <div className="px-5 pb-5 lg:px-6 lg:pb-6">
-                          <p className={`text-gray-600 text-sm leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
+                          <p className="text-gray-600 text-sm leading-relaxed text-start">
                             {faq.answer}
                           </p>
                         </div>

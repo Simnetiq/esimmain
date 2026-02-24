@@ -3,7 +3,7 @@
 import React, { useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
-import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
+import { detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
 import { PlatformDownloadCTA, ExploreStoreCTA } from '../cta';
 
 // Inline SVG icons to avoid lucide-react bundle overhead
@@ -81,9 +81,6 @@ export default function HeroSection() {
     }
   }, [locale, ssrSafeLanguage, i18nLoading]);
 
-  // Use pathname-based language for direction to prevent CLS on hydration.
-  const direction = getLanguageDirection(ssrSafeLanguage);
-
   // Apply IBM Plex Sans Italic for "easiest way" only in EN and DE
   const useIbmPlexSansItalic = detectedLanguage === 'en' || detectedLanguage === 'de';
   const highlightClassName = useIbmPlexSansItalic
@@ -103,7 +100,7 @@ export default function HeroSection() {
   const subtitleText = t('hero.subtitle', 'Activate your eSIM in minutes and stay connected in 200+ destinations worldwide.');
 
   return (
-    <div className="hero-section relative min-h-screen flex flex-col bg-white" dir={direction} lang={detectedLanguage}>
+    <div className="hero-section relative min-h-screen flex flex-col bg-white" lang={detectedLanguage}>
       {/* SVG dot grid with routes — zero JS, zero TBT impact */}
       <div className="absolute inset-0 flex items-center justify-center overflow-hidden" aria-hidden="true" style={{ maskImage: 'radial-gradient(ellipse 60% 55% at 50% 50%, black 40%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse 60% 55% at 50% 50%, black 40%, transparent 100%)' }}>
         <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
@@ -166,7 +163,7 @@ export default function HeroSection() {
                 {subtitleText}
               </p>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 lg:mb-12 w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 lg:mb-12 w-full sm:w-auto rtl-native-flex">
                 <ExploreStoreCTA
                   variant="dark"
                   size="md"
@@ -181,10 +178,10 @@ export default function HeroSection() {
                 />
               </div>
 
-              <div className="flex flex-wrap items-center gap-4 sm:gap-8 text-xs sm:text-sm text-gray-500 justify-center min-h-[24px] sm:min-h-[28px]">
+              <div className="flex flex-wrap items-center gap-4 sm:gap-8 text-xs sm:text-sm text-gray-500 justify-center min-h-[24px] sm:min-h-[28px] rtl-native-flex">
                 {trustIndicators.map(({ Icon, label, key }, index) => (
                   <React.Fragment key={key}>
-                    <div className="flex items-center gap-1.5 sm:gap-2 text-gray-600 sm:text-eerie-black">
+                    <div className="flex items-center gap-1.5 sm:gap-2 text-gray-600 sm:text-eerie-black rtl-native-flex">
                       <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 sm:text-eerie-black" />
                       <span>{label}</span>
                     </div>

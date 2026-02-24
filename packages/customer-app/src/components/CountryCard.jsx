@@ -77,7 +77,7 @@ const CountryCard = ({
     >
       {/* Country code watermark */}
       <span
-        className={`absolute top-3 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-300/10 select-none pointer-events-none ${isRTL ? 'left-4' : 'right-4'}`}
+        className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-300/10 select-none pointer-events-none"
         aria-hidden="true"
       >
         {countryCode}
@@ -85,7 +85,7 @@ const CountryCard = ({
 
       <div className="relative p-4">
         {/* Country image + name */}
-        <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+        <div className="flex items-center gap-3 rtl-native-flex">
           <div className="flex-shrink-0 w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-300">
             {(country.imageUrl || country.image?.url) ? (
               <Image
@@ -101,38 +101,32 @@ const CountryCard = ({
               <span className="text-xl">{country.flagEmoji || '🌍'}</span>
             )}
           </div>
-          <div className={`flex-1 min-w-0 ${isRTL ? 'text-right' : 'text-left'}`}>
+          <div className="flex-1 min-w-0">
             <h3 className="text-sm sm:text-base font-semibold text-eerie-black truncate leading-tight">
               {displayName}
             </h3>
-            <div className={`flex items-center gap-1.5 mt-0.5 ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <p className="text-xs text-gray-500">
-                {planCount > 0
-                  ? `${planCount} ${planCount === 1 ? t('plans.plan', 'plan') : t('plans.plans', 'plans')}`
-                  : t('plans.noPlansAvailable', 'No plans')
-                }
-              </p>
-              {(hasPlansWithSms || hasPlansWithVoice) && (
-                <div className={`hidden sm:flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                  {hasPlansWithVoice && (
-                    <span className="text-teal-600" title={t('plan.callsAvailable', 'Plans with calls available')}>
-                      <PhoneIcon className="w-3 h-3" />
-                    </span>
-                  )}
-                  {hasPlansWithSms && (
-                    <span className="text-purple-600" title={t('plan.smsAvailable', 'Plans with SMS available')}>
-                      <MessageIcon className="w-3 h-3" />
-                    </span>
-                  )}
-                </div>
+            <p className="text-xs text-gray-500 mt-0.5">
+              {planCount > 0
+                ? `${planCount} ${planCount === 1 ? t('plans.plan', 'plan') : t('plans.plans', 'plans')}`
+                : t('plans.noPlansAvailable', 'No plans')
+              }
+              {hasPlansWithVoice && (
+                <span className="hidden sm:inline text-teal-600 ms-1.5" title={t('plan.callsAvailable', 'Plans with calls available')}>
+                  <PhoneIcon className="w-3 h-3 inline" />
+                </span>
               )}
-            </div>
+              {hasPlansWithSms && (
+                <span className="hidden sm:inline text-purple-600 ms-1" title={t('plan.smsAvailable', 'Plans with SMS available')}>
+                  <MessageIcon className="w-3 h-3 inline" />
+                </span>
+              )}
+            </p>
           </div>
         </div>
 
         {/* Most Popular badge — below the flag row */}
         {isPromoted && (
-          <div className={`mt-2 ${isRTL ? 'text-right' : 'text-left'}`}>
+          <div className="mt-2 text-start">
             <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold px-1.5 py-0.5">
               {t('plans.topChoice', 'Most Popular')}
             </span>
@@ -143,9 +137,9 @@ const CountryCard = ({
         {!isPromoted && <div className="mt-2" />}
 
         {/* Price + arrow */}
-        <div className={`flex items-center justify-between pt-3 border-t border-gray-100/60 ${isRTL ? 'flex-row-reverse' : ''}`}>
+        <div className="flex items-center justify-between pt-3 border-t border-gray-100/60 rtl-native-flex">
           {minPrice ? (
-            <div className={`flex items-baseline gap-1.5 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className="flex items-baseline gap-1.5 rtl-native-flex">
               <span className="text-xs text-gray-500">{t('plans.from', 'From')}</span>
               <span className="text-base font-bold text-eerie-black">
                 {formatPrice(minPrice)}
@@ -155,7 +149,7 @@ const CountryCard = ({
             <span className="text-xs text-gray-400">{t('plans.priceNotAvailable', 'Price N/A')}</span>
           )}
           <span className="w-7 h-7 rounded-full bg-eerie-black flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-            <ArrowUpRightIcon className="w-3.5 h-3.5 text-white" />
+            <ArrowUpRightIcon className="w-3.5 h-3.5 text-white rtl:-scale-x-100" />
           </span>
         </div>
       </div>

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { createContactRequest } from '@esim/shared/services/contactService';
-import { getLanguageDirection, detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
+import { detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import BlogAppDownload from './BlogAppDownload';
@@ -80,22 +80,22 @@ const BookOpenIcon = ({ className }) => (
 );
 
 // FAQ Item Component
-const FAQItem = ({ question, answer, isOpen, onToggle, isRTL, steps }) => (
+const FAQItem = ({ question, answer, isOpen, onToggle, steps }) => (
   <div className="border-b border-gray-100 last:border-b-0">
     <button
       onClick={onToggle}
-      className={`w-full px-5 py-4 flex items-center justify-between gap-4 hover:bg-gray-50/50 transition-colors duration-150 ease-out ${isRTL ? 'flex-row-reverse text-right' : 'text-left'}`}
+      className="w-full px-5 py-4 flex items-center justify-between gap-4 hover:bg-gray-50/50 transition-colors duration-150 ease-out text-start rtl-native-flex"
     >
       <span className="font-medium text-gray-900 text-sm sm:text-base">{question}</span>
       <ChevronDownIcon className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
     </button>
     {isOpen && (
-      <div className={`px-5 pb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+      <div className="px-5 pb-4 text-start">
         <p className="text-gray-500 leading-relaxed text-sm mb-3">{answer}</p>
         {steps && steps.length > 0 && (
           <div className="mt-3 space-y-2.5">
             {steps.map((step, idx) => (
-              <div key={idx} className={`flex gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div key={idx} className="flex gap-3 rtl-native-flex">
                 <span className="flex-shrink-0 w-7 h-7 rounded-full bg-tufts-blue/10 text-tufts-blue flex items-center justify-center text-xs font-semibold mt-0.5">
                   {idx + 1}
                 </span>
@@ -113,20 +113,20 @@ const FAQItem = ({ question, answer, isOpen, onToggle, isRTL, steps }) => (
 const FAQ_NUMBERS = ['01', '02', '03', '04'];
 
 // FAQ Category Component
-const FAQCategory = ({ icon: Icon, title, faqs, openFaq, onToggle, categoryIndex, isRTL }) => (
+const FAQCategory = ({ icon: Icon, title, faqs, openFaq, onToggle, categoryIndex }) => (
   <div className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500">
     <span
-      className={`absolute top-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-eerie-black/[0.04] select-none pointer-events-none ${isRTL ? 'left-4' : 'right-4'}`}
+      className="absolute top-4 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-eerie-black/[0.04] select-none pointer-events-none"
       aria-hidden="true"
     >
       {FAQ_NUMBERS[categoryIndex]}
     </span>
 
-    <div className={`relative p-5 flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+    <div className="relative p-5 flex items-center gap-3 rtl-native-flex">
       <div className="w-11 h-11 rounded-lg bg-tufts-blue/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
         <Icon className="w-5 h-5 text-tufts-blue" />
       </div>
-      <div className={isRTL ? 'text-right' : ''}>
+      <div>
         <p className="text-xs font-medium tracking-widest uppercase text-tufts-blue mb-0.5">
           {FAQ_NUMBERS[categoryIndex]}
         </p>
@@ -143,7 +143,6 @@ const FAQCategory = ({ icon: Icon, title, faqs, openFaq, onToggle, categoryIndex
           steps={faq.steps}
           isOpen={openFaq === `${categoryIndex}-${faqIndex}`}
           onToggle={() => onToggle(categoryIndex, faqIndex)}
-          isRTL={isRTL}
         />
       ))}
     </div>
@@ -168,7 +167,6 @@ const Contact = () => {
     return detectLanguageFromPath(pathname) || 'en';
   }, [locale, pathname]);
 
-  const isRTL = mounted ? getLanguageDirection(currentLanguage) === 'rtl' : false;
   const guideHref = currentLanguage === 'en' ? '/help/install-esim' : `/${currentLanguage}/help/install-esim`;
 
   const [formData, setFormData] = useState({
@@ -218,7 +216,7 @@ const Contact = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData, t]);
+  }, [formData, t, requestType]);
 
   const toggleFaq = useCallback((categoryIndex, faqIndex) => {
     const key = `${categoryIndex}-${faqIndex}`;
@@ -363,19 +361,19 @@ const Contact = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-white">
 
       {/* Page Header */}
       <div className="mx-auto w-full max-w-9xl">
         <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
           <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-            <p className={`text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+            <p className="text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 mb-4 text-start">
               {t('contact.title', 'Help Center')}
             </p>
-            <h1 className={`text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-eerie-black ${isRTL ? 'text-right' : 'text-left'}`}>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-eerie-black text-start">
               {t('contact.subtitle', "We're here to help with all your needs")}
             </h1>
-            <p className={`mt-2 text-gray-500 text-sm leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
+            <p className="mt-2 text-gray-500 text-sm leading-relaxed text-start">
               {t('contact.description', 'Find answers to common questions or send us a message. Our support team typically responds within a few hours.')}
             </p>
           </div>
@@ -395,13 +393,13 @@ const Contact = () => {
                   <div className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 p-5 sm:p-6">
 
                     <div className="relative mb-6">
-                      <div className={`w-11 h-11 rounded-lg bg-tufts-blue/10 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 ${isRTL ? 'ml-auto' : ''}`}>
+                      <div className="w-11 h-11 rounded-lg bg-tufts-blue/10 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
                         <SendIcon className="w-5 h-5 text-tufts-blue" />
                       </div>
-                      <p className={`text-xs font-medium tracking-widest uppercase text-tufts-blue mb-2 ${isRTL ? 'text-right' : 'text-left'}`}>
+                      <p className="text-xs font-medium tracking-widest uppercase text-tufts-blue mb-2 text-start">
                         {t('contact.tagGetInTouch', 'GET IN TOUCH')}
                       </p>
-                      <h2 className={`text-lg lg:text-xl font-semibold text-eerie-black mb-2 ${isRTL ? 'text-right' : 'text-left'}`}>
+                      <h2 className="text-lg lg:text-xl font-semibold text-eerie-black mb-2 text-start">
                         {t('contact.sendMessage', 'Send us a Message')}
                       </h2>
                     </div>
@@ -416,7 +414,7 @@ const Contact = () => {
                       >
                         {t('contact.generalInquiry', 'General Inquiry')}
                         {requestType === 'contact' && (
-                          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-tufts-blue" />
+                          <div className="absolute bottom-0 inset-x-0 h-0.5 bg-tufts-blue" />
                         )}
                       </button>
                       <button
@@ -428,18 +426,18 @@ const Contact = () => {
                       >
                         {t('contact.deletionRequest', 'Delete Account')}
                         {requestType === 'deletion_request' && (
-                          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-tufts-blue" />
+                          <div className="absolute bottom-0 inset-x-0 h-0.5 bg-tufts-blue" />
                         )}
                       </button>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                       <div>
-                        <label htmlFor="name" className={`block text-sm font-medium text-gray-700 mb-2 ${isRTL ? 'text-right' : ''}`}>
+                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2 text-start">
                           {t('contact.fullName', 'Full Name')}
                         </label>
                         <div className="relative">
-                          <UserIcon className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isRTL ? 'right-3' : 'left-3'}`} />
+                          <UserIcon className="absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 start-3" />
                           <input
                             type="text"
                             id="name"
@@ -447,36 +445,35 @@ const Contact = () => {
                             value={formData.name}
                             onChange={handleInputChange}
                             required
-                            className={`w-full px-10 py-3 border border-gray-200 rounded-lg bg-white focus:ring-2 focus:ring-tufts-blue/20 focus:border-tufts-blue transition-colors ${isRTL ? 'text-right' : ''}`}
+                            className="w-full px-10 py-3 border border-gray-200 rounded-lg bg-white focus:ring-2 focus:ring-tufts-blue/20 focus:border-tufts-blue transition-colors text-start"
                             placeholder={t('contact.fullNamePlaceholder', 'Enter your name')}
-                            dir={isRTL ? 'rtl' : 'ltr'}
                           />
                         </div>
                       </div>
 
                       <div>
-                        <label htmlFor="email" className={`block text-sm font-medium text-gray-700 mb-2 ${isRTL ? 'text-right' : ''}`}>
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2 text-start">
                           {t('contact.emailAddress', 'Email Address')}
                         </label>
                         <div className="relative">
-                          <MailIcon className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isRTL ? 'right-3' : 'left-3'}`} />
+                          <MailIcon className="absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 start-3" />
                           <input
                             type="email"
                             id="email"
                             name="email"
+                            dir="ltr"
                             value={formData.email}
                             onChange={handleInputChange}
                             required
-                            className={`w-full px-10 py-3 border border-gray-200 rounded-lg bg-white focus:ring-2 focus:ring-tufts-blue/20 focus:border-tufts-blue transition-colors ${isRTL ? 'text-right' : ''}`}
+                            className="w-full px-10 py-3 border border-gray-200 rounded-lg bg-white focus:ring-2 focus:ring-tufts-blue/20 focus:border-tufts-blue transition-colors text-start"
                             placeholder={t('contact.emailPlaceholder', 'your@email.com')}
-                            dir={isRTL ? 'rtl' : 'ltr'}
                           />
                         </div>
                       </div>
 
                       {requestType === 'contact' ? (
                         <div>
-                          <label htmlFor="message" className={`block text-sm font-medium text-gray-700 mb-2 ${isRTL ? 'text-right' : ''}`}>
+                          <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2 text-start">
                             {t('contact.message', 'Message')}
                           </label>
                           <textarea
@@ -486,9 +483,8 @@ const Contact = () => {
                             onChange={handleInputChange}
                             required
                             rows={4}
-                            className={`w-full px-4 py-3 border border-gray-200 rounded-lg bg-white focus:ring-2 focus:ring-tufts-blue/20 focus:border-tufts-blue transition-colors resize-none ${isRTL ? 'text-right' : ''}`}
+                            className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-white focus:ring-2 focus:ring-tufts-blue/20 focus:border-tufts-blue transition-colors resize-none text-start"
                             placeholder={t('contact.messagePlaceholder', 'How can we help you?')}
-                            dir={isRTL ? 'rtl' : 'ltr'}
                           />
                         </div>
                       ) : (
@@ -501,7 +497,7 @@ const Contact = () => {
                               {t('contact.deletionAgreement', "I hereby request the deletion of my account and all associated data. I understand this action is irreversible and will result in the permanent loss of my purchase history, active eSIMs, and account settings.")}
                             </p>
                           </div>
-                          <div className="flex items-start gap-3">
+                          <div className="flex items-start gap-3 rtl-native-flex">
                             <div className="flex items-center h-5">
                               <input
                                 id="agreementAccepted"
@@ -523,7 +519,7 @@ const Contact = () => {
                       <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full py-3.5 px-6 bg-eerie-black text-white rounded-full font-medium flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full py-3.5 px-6 bg-eerie-black text-white rounded-full font-medium flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed rtl-native-flex"
                       >
                         {isSubmitting ? (
                           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
@@ -537,12 +533,12 @@ const Contact = () => {
                     </form>
 
                     <div className="mt-6 pt-6 border-t border-gray-100">
-                      <p className={`text-sm text-gray-500 ${isRTL ? 'text-right' : ''}`}>
+                      <p className="text-sm text-gray-500 text-start">
                         {t('contact.quickResponse', 'Or email us directly at')}
                       </p>
                       <a
                         href="mailto:support@simnetiq.net"
-                        className={`text-tufts-blue font-medium hover:underline ${isRTL ? 'block text-right' : ''}`}
+                        className="text-tufts-blue font-medium hover:underline block text-start"
                       >
                         support@simnetiq.net
                       </a>
@@ -559,11 +555,11 @@ const Contact = () => {
                   href={guideHref}
                   className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 block p-5"
                 >
-                  <div className={`flex items-center gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <div className="flex items-center gap-4 rtl-native-flex">
                     <div className="w-11 h-11 rounded-lg bg-tufts-blue/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
                       <BookOpenIcon className="w-5 h-5 text-tufts-blue" />
                     </div>
-                    <div className={`flex-1 min-w-0 ${isRTL ? 'text-right' : ''}`}>
+                    <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium tracking-widest uppercase text-tufts-blue mb-1">
                         {t('contact.guideCard.tag', 'INSTALLATION GUIDE')}
                       </p>
@@ -574,7 +570,7 @@ const Contact = () => {
                         {t('contact.guideCard.description', 'Step-by-step instructions for iPhone, Android, and manual installation')}
                       </p>
                     </div>
-                    <ArrowRightIcon className={`w-5 h-5 text-tufts-blue flex-shrink-0 group-hover:translate-x-0.5 transition-transform duration-150 ${isRTL ? 'rotate-180 group-hover:-translate-x-0.5' : ''}`} />
+                    <ArrowRightIcon className="w-5 h-5 text-tufts-blue flex-shrink-0 rtl:-scale-x-100" />
                   </div>
                 </Link>
 
@@ -588,7 +584,6 @@ const Contact = () => {
                     openFaq={openFaq}
                     onToggle={toggleFaq}
                     categoryIndex={categoryIndex}
-                    isRTL={isRTL}
                   />
                 ))}
               </div>
@@ -603,8 +598,6 @@ const Contact = () => {
         <div className="mx-auto w-full max-w-7xl">
           <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
             <BlogAppDownload
-              language={currentLanguage}
-              isRTL={isRTL}
               location="contact_page"
               context={{ page: 'contact' }}
             />

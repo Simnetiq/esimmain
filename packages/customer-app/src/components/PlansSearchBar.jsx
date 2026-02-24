@@ -91,7 +91,7 @@ const PlansSearchBar = ({ searchTerm, onSearchChange, onCountrySelect }) => {
   return (
     <div className="flex flex-col md:flex-row gap-3 lg:gap-4 mb-6 lg:mb-8 max-w-4xl mx-auto">
       <div className="flex-1 relative">
-        <Search className="absolute left-4 top-4 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 z-10" />
+        <Search className="absolute start-4 top-4 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 z-10" />
         <input
           ref={inputRef}
           type="text"
@@ -103,12 +103,12 @@ const PlansSearchBar = ({ searchTerm, onSearchChange, onCountrySelect }) => {
               setShowDropdown(true);
             }
           }}
-          className="w-full pl-10 pr-10 py-2 lg:py-3 border-0 shadow-lg rounded-full border-4 border-gray-200/40 focus:ring-2 focus:ring-blue-200/20 focus:border-transparent"
+          className="w-full ps-10 pe-10 py-2 lg:py-3 border-0 shadow-lg rounded-full border-4 border-gray-200/40 focus:ring-2 focus:ring-blue-200/20 focus:border-transparent"
         />
         {searchTerm && (
           <button
             onClick={handleClearSearch}
-            className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 z-10"
+            className="absolute end-4 top-4 text-gray-400 hover:text-gray-600 z-10"
             aria-label="Clear search"
           >
             <X className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -119,7 +119,7 @@ const PlansSearchBar = ({ searchTerm, onSearchChange, onCountrySelect }) => {
         {canShowDropdown && (
           <div
             ref={dropdownRef}
-            className="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-2xl max-h-80 overflow-y-auto z-[100]"
+            className="absolute inset-x-0 top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-2xl max-h-80 overflow-y-auto z-[100]"
             style={{ 
               boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)' 
             }}
@@ -129,7 +129,7 @@ const PlansSearchBar = ({ searchTerm, onSearchChange, onCountrySelect }) => {
                 key={country.code}
                 type="button"
                 onClick={() => handleCountryClick(country)}
-                className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left border-b border-gray-100 last:border-b-0 first:rounded-t-lg last:rounded-b-lg"
+                className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-start border-b border-gray-100 last:border-b-0 first:rounded-t-lg last:rounded-b-lg"
               >
                 {/* Country Image - 4:3 aspect ratio */}
                 <div className="flex-shrink-0 w-12 aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg flex items-center justify-center border border-gray-200 overflow-hidden">
@@ -154,7 +154,7 @@ const PlansSearchBar = ({ searchTerm, onSearchChange, onCountrySelect }) => {
                   <div className="text-xs text-gray-500">
                     {country.code}
                     {country.minPrice && (
-                      <span className="ml-2">
+                      <span className="ms-2">
                         • From ${country.minPrice}
                       </span>
                     )}
