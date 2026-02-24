@@ -1,12 +1,10 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import LPAQRCodeDisplay from './LPAQRCodeDisplay';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { getLanguageDirection } from '@esim/shared/utils/languageUtils';
-import { BACKDROP, CENTER_MODAL } from '../../lib/animation-constants';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
 import {
   getQrCodeValue,
@@ -410,9 +408,9 @@ const QRCodeModal = ({
     }
   };
 
-  const isVisible = show && selectedOrder && orderData;
+  if (!show || !selectedOrder || !orderData) return null;
 
-  const { planDetails, qrCodeString, appleInstallUrl, iccid, matchingId } = orderData || {};
+  const { planDetails, qrCodeString, appleInstallUrl, iccid, matchingId } = orderData;
   const statusConfig = usageData?.status ? getStatusConfig(usageData.status) : null;
 
   // Remaining percentage for the circular-style indicator
@@ -420,19 +418,8 @@ const QRCodeModal = ({
     ? Math.round((usageData.remaining / usageData.total) * 100) : null;
 
   return (
-    <AnimatePresence>
-      {isVisible && (
-    <>
-    <motion.div
-      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
-      {...BACKDROP}
-      onClick={onClose}
-    />
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none" dir={direction}>
-      <motion.div
-        className="w-full max-w-lg max-h-[90vh] bg-white flex flex-col overflow-hidden pointer-events-auto"
-        {...CENTER_MODAL}
-      >
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fade-in" dir={direction} onClick={onClose}>
+      <div className="w-full max-w-lg max-h-[90vh] bg-white flex flex-col overflow-hidden animate-scale-in" onClick={(e) => e.stopPropagation()}>
 
         {/* ── Header ── */}
         <div className="flex-shrink-0 border-b border-gray-100 p-5">
@@ -996,11 +983,8 @@ const QRCodeModal = ({
             </div>
           </div>
         )}
-      </motion.div>
+      </div>
     </div>
-    </>
-      )}
-    </AnimatePresence>
   );
 };
 

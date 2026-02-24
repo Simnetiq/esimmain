@@ -225,6 +225,16 @@
     animation: fadeInDown 0.4s ease-out both;
   }
   
+  /* Modal scale-in animation */
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease-out both;
+  }
+
   /* Animation delays for staggered effects */
   .animation-delay-100 { animation-delay: 100ms; }
   .animation-delay-200 { animation-delay: 200ms; }

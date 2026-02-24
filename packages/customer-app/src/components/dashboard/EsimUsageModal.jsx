@@ -1,8 +1,6 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { Wifi, Phone, MessageSquare, Clock, Signal, X, AlertCircle, CheckCircle } from 'lucide-react';
-import { BACKDROP, CENTER_MODAL } from '../../lib/animation-constants';
 
 const EsimUsageModal = ({ esimUsage, onClose }) => {
   const { t } = useI18n();
@@ -97,23 +95,14 @@ const EsimUsageModal = ({ esimUsage, onClose }) => {
     }
   };
 
+  if (!esimUsage) return null;
+
   const statusInfo = getStatusInfo(esimUsage.status);
   const StatusIcon = statusInfo.icon;
 
   return (
-    <AnimatePresence>
-      {esimUsage && (
-    <>
-    <motion.div
-      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
-      {...BACKDROP}
-      onClick={onClose}
-    />
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-      <motion.div
-        className="w-full max-w-md max-h-[90vh] overflow-hidden bg-white rounded-lg shadow-xl pointer-events-auto"
-        {...CENTER_MODAL}
-      >
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in" onClick={onClose}>
+      <div className="w-full max-w-md max-h-[90vh] overflow-hidden bg-white rounded-lg shadow-xl animate-scale-in" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="bg-gradient-to-r from-tufts-blue to-blue-600 px-6 py-4">
           <div className="flex items-center justify-between">
@@ -252,11 +241,8 @@ const EsimUsageModal = ({ esimUsage, onClose }) => {
             {t('common.close', 'Close')}
           </button>
         </div>
-      </motion.div>
+      </div>
     </div>
-    </>
-      )}
-    </AnimatePresence>
   );
 };
 

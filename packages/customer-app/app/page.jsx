@@ -6,22 +6,22 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
-import { HeroSection } from '../src/components/sections';
+import HeroSection from '../src/components/sections/HeroSection';
 
-// Lazy load non-critical sections
-const PlansSection = dynamic(() => import('../src/components/sections').then(mod => ({ default: mod.PlansSection })), {
+// Lazy load non-critical sections — direct file imports for proper code splitting
+const PlansSection = dynamic(() => import('../src/components/sections/PlansSection'), {
   loading: () => <div className="h-96 bg-white animate-pulse" />,
 });
 
-const FeaturesSection = dynamic(() => import('../src/components/sections').then(mod => ({ default: mod.FeaturesSection })), {
+const FeaturesSection = dynamic(() => import('../src/components/sections/FeaturesSection'), {
   loading: () => <div className="h-96 bg-gray-50 animate-pulse" />,
 });
 
-const ActivationSection = dynamic(() => import('../src/components/sections').then(mod => ({ default: mod.ActivationSection })), {
+const ActivationSection = dynamic(() => import('../src/components/sections/ActivationSection'), {
   loading: () => <div className="h-96 bg-gray-50 animate-pulse" />,
 });
 
-const TravelBlogsSection = dynamic(() => import('../src/components/sections').then(mod => ({ default: mod.TravelBlogsSection })), {
+const TravelBlogsSection = dynamic(() => import('../src/components/sections/TravelBlogsSection'), {
   loading: () => <div className="h-96 bg-white animate-pulse" />,
 });
 
