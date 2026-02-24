@@ -1,10 +1,6 @@
+'use client';
+
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import {
-  QrCode, Smartphone, Clock, Wifi, Phone, MessageSquare,
-  Copy, Check, ChevronDown, ChevronUp, X, ExternalLink,
-  AlertCircle, Trash2, BookOpen, Globe,
-  Plus, ArrowLeft, RefreshCw
-} from 'lucide-react';
 import Link from 'next/link';
 import LPAQRCodeDisplay from './LPAQRCodeDisplay';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
@@ -23,6 +19,128 @@ import { useCountryNames } from '@esim/shared/hooks/useCountriesSupabase';
 import { getSupabase } from '@esim/shared/lib/supabase';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
+
+// ─── Inline SVG icons (no lucide-react) ───────────────────────────────────
+
+const QrCodeIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/>
+  </svg>
+);
+
+const SmartphoneIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/>
+  </svg>
+);
+
+const ClockIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+  </svg>
+);
+
+const WifiIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/><path d="M5 12.859a10 10 0 0 1 14 0"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/>
+  </svg>
+);
+
+const PhoneIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.62 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+  </svg>
+);
+
+const MessageSquareIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+);
+
+const CopyIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+  </svg>
+);
+
+const CheckIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 6 9 17l-5-5"/>
+  </svg>
+);
+
+const ChevronDownIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m6 9 6 6 6-6"/>
+  </svg>
+);
+
+const ChevronUpIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m18 15-6-6-6 6"/>
+  </svg>
+);
+
+const XIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+  </svg>
+);
+
+const ExternalLinkIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+  </svg>
+);
+
+const AlertCircleIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>
+  </svg>
+);
+
+const Trash2Icon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/>
+  </svg>
+);
+
+const BookOpenIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+  </svg>
+);
+
+const GlobeIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>
+  </svg>
+);
+
+const PlusIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M5 12h14"/><path d="M12 5v14"/>
+  </svg>
+);
+
+const ArrowLeftIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
+  </svg>
+);
+
+const RefreshCwIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>
+  </svg>
+);
+
+const ArrowUpRightIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M7 7h10v10"/><path d="M7 17 17 7"/>
+  </svg>
+);
 
 const QRCodeModal = ({
   show,
@@ -141,10 +259,10 @@ const QRCodeModal = ({
     }
   }, [show, selectedOrder]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Reset collapsible sections when modal opens with new order
+  // Reset collapsible sections when modal opens with new order — QR auto-opens
   useEffect(() => {
     if (show) {
-      setShowQrSection(false);
+      setShowQrSection(true);
       setShowDetails(false);
       setShowInstructions(false);
       setShowTopupPackages(false);
@@ -300,14 +418,14 @@ const QRCodeModal = ({
     ? Math.round((usageData.remaining / usageData.total) * 100) : null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" dir={direction}>
-      <div className="w-full max-w-lg max-h-[90vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" dir={direction}>
+      <div className="w-full max-w-lg max-h-[90vh] bg-white flex flex-col overflow-hidden">
 
         {/* ── Header ── */}
-        <div className="flex-shrink-0 border-b border-gray-200 p-5">
+        <div className="flex-shrink-0 border-b border-gray-100 p-5">
           <div className={`flex items-start justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
             <div className={`flex items-center gap-3 min-w-0 ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <div className="w-12 h-12 bg-gray-100 border border-gray-200 flex items-center justify-center rounded-full overflow-hidden flex-shrink-0">
+              <div className="w-12 h-12 bg-gray-100 flex items-center justify-center rounded-full overflow-hidden flex-shrink-0">
                 {countryImage ? (
                   <Image
                     src={countryImage}
@@ -320,11 +438,11 @@ const QRCodeModal = ({
                 ) : getFlagEmoji(countryCode) ? (
                   <span className="text-2xl leading-none">{getFlagEmoji(countryCode)}</span>
                 ) : (
-                  <Globe className="w-6 h-6 text-gray-500" />
+                  <GlobeIcon className="w-6 h-6 text-gray-500" />
                 )}
               </div>
               <div className="min-w-0">
-                <h3 className="text-lg font-semibold text-gray-900 leading-tight truncate">
+                <h3 className="text-lg font-semibold text-eerie-black leading-tight truncate">
                   {localizedCountryName || selectedOrder.planName || t('dashboard.esim', 'eSIM')}
                 </h3>
                 <div className={`flex items-center gap-2 mt-0.5 ${isRTL ? 'flex-row-reverse' : ''}`}>
@@ -342,9 +460,9 @@ const QRCodeModal = ({
             </div>
             <button
               onClick={onClose}
-              className={`p-1.5 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0 ${isRTL ? 'ml-0 mr-auto' : ''}`}
+              className={`p-1.5 hover:bg-gray-100 transition-colors flex-shrink-0 ${isRTL ? 'ml-0 mr-auto' : ''}`}
             >
-              <X className="w-5 h-5 text-gray-500" />
+              <XIcon className="w-5 h-5 text-gray-500" />
             </button>
           </div>
         </div>
@@ -358,11 +476,11 @@ const QRCodeModal = ({
               <div className={`flex items-center gap-3 mb-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                 <button
                   onClick={() => { setShowTopupPackages(false); setTopupError(null); }}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-gray-100 transition-colors"
                 >
-                  <ArrowLeft className={`w-5 h-5 text-gray-600 ${isRTL ? 'rotate-180' : ''}`} />
+                  <ArrowLeftIcon className={`w-5 h-5 text-gray-600 ${isRTL ? 'rotate-180' : ''}`} />
                 </button>
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-semibold text-eerie-black">
                   {t('dashboard.selectTopup', 'Select Top-Up Package')}
                 </h3>
               </div>
@@ -370,7 +488,7 @@ const QRCodeModal = ({
               {loadingTopups && (
                 <div className="space-y-3 animate-pulse">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="p-4 rounded-xl border-2 border-gray-100">
+                    <div key={i} className="p-4 bg-gray-50">
                       <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
                         <div>
                           <div className="h-5 w-16 bg-gray-200 rounded mb-1.5" />
@@ -384,16 +502,16 @@ const QRCodeModal = ({
               )}
               {topupError && (
                 <div className="text-center py-8">
-                  <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-3" />
+                  <AlertCircleIcon className="w-10 h-10 text-red-400 mx-auto mb-3" />
                   <p className="text-red-600">{topupError}</p>
-                  <button onClick={handleTopUpClick} className="mt-3 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
+                  <button onClick={handleTopUpClick} className="mt-3 px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
                     {t('common.retry', 'Retry')}
                   </button>
                 </div>
               )}
               {!loadingTopups && !topupError && topupPackages.length === 0 && (
                 <div className="text-center py-8">
-                  <AlertCircle className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+                  <AlertCircleIcon className="w-10 h-10 text-gray-300 mx-auto mb-3" />
                   <p className="text-gray-500">{t('dashboard.noTopups', 'No top-up packages available for this eSIM')}</p>
                 </div>
               )}
@@ -402,13 +520,13 @@ const QRCodeModal = ({
                   key={pkg.id}
                   onClick={() => handleTopupPurchase(pkg)}
                   disabled={processingTopup !== null}
-                  className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                    processingTopup === pkg.id ? 'border-tufts-blue bg-blue-50' : 'border-gray-200 hover:border-tufts-blue hover:bg-gray-50'
+                  className={`w-full text-left p-4 transition-all border-l-2 ${
+                    processingTopup === pkg.id ? 'border-l-tufts-blue bg-blue-50' : 'border-l-transparent bg-gray-50 hover:border-l-tufts-blue hover:bg-white'
                   } ${isRTL ? 'text-right' : ''} disabled:opacity-60`}
                 >
                   <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
                     <div>
-                      <p className="font-semibold text-gray-900">{pkg.dataDisplay}</p>
+                      <p className="font-semibold text-eerie-black">{pkg.dataDisplay}</p>
                       <p className="text-sm text-gray-500">{pkg.validityDays} {t('dashboard.days', 'days')}</p>
                     </div>
                     <div className={isRTL ? 'text-left' : 'text-right'}>
@@ -429,7 +547,7 @@ const QRCodeModal = ({
               {loadingEsimUsage && !usageData && (
                 <div className="space-y-3 animate-pulse">
                   {/* Data usage skeleton */}
-                  <div className="bg-gray-50 rounded-xl p-4">
+                  <div className="bg-gray-50 p-4">
                     <div className={`flex items-center justify-between mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                       <div className={`flex items-center gap-2.5 ${isRTL ? 'flex-row-reverse' : ''}`}>
                         <div className="w-9 h-9 bg-gray-200 rounded-lg" />
@@ -454,11 +572,11 @@ const QRCodeModal = ({
               {usageData && (
                 <div className="space-y-3">
                   {/* Data usage — prominent card */}
-                  <div className="bg-gray-50 rounded-xl p-4">
+                  <div className="bg-gray-50 p-4">
                     <div className={`flex items-center justify-between mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                       <div className={`flex items-center gap-2.5 ${isRTL ? 'flex-row-reverse' : ''}`}>
                         <div className="w-9 h-9 bg-tufts-blue/10 rounded-lg flex items-center justify-center">
-                          <Wifi className="w-4.5 h-4.5 text-tufts-blue" />
+                          <WifiIcon className="w-[18px] h-[18px] text-tufts-blue" />
                         </div>
                         <span className="text-sm font-medium text-gray-700">{t('dashboard.dataUsage', 'Data Usage')}</span>
                       </div>
@@ -466,7 +584,7 @@ const QRCodeModal = ({
                         <span className="text-sm font-bold text-tufts-blue">{t('dashboard.unlimited', 'Unlimited')}</span>
                       ) : (
                         <div className={isRTL ? 'text-left' : 'text-right'}>
-                          <span className="text-lg font-bold text-gray-900">{formatData(usageData.remaining)}</span>
+                          <span className="text-lg font-bold text-eerie-black">{formatData(usageData.remaining)}</span>
                           <span className="text-sm text-gray-400 font-normal"> / {formatData(usageData.total)}</span>
                         </div>
                       )}
@@ -496,12 +614,12 @@ const QRCodeModal = ({
                   {(usageData.hasVoice || usageData.hasText) && (
                     <div className={`grid gap-3 ${usageData.hasVoice && usageData.hasText ? 'grid-cols-2' : 'grid-cols-1'}`}>
                       {usageData.hasVoice && (
-                        <div className="bg-emerald-50 rounded-xl p-3 border border-emerald-100">
+                        <div className="bg-emerald-50 p-3">
                           <div className={`flex items-center gap-2 mb-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                            <Phone className="w-4 h-4 text-emerald-600" />
+                            <PhoneIcon className="w-4 h-4 text-emerald-600" />
                             <span className="text-xs font-medium text-emerald-700">{t('dashboard.voiceUsage', 'Voice')}</span>
                           </div>
-                          <p className="text-sm font-bold text-gray-900">
+                          <p className="text-sm font-bold text-eerie-black">
                             {usageData.remainingVoice} <span className="font-normal text-gray-400">/ {usageData.totalVoice} {t('dashboard.min', 'min')}</span>
                           </p>
                           {usageData.totalVoice > 0 && (
@@ -512,12 +630,12 @@ const QRCodeModal = ({
                         </div>
                       )}
                       {usageData.hasText && (
-                        <div className="bg-purple-50 rounded-xl p-3 border border-purple-100">
+                        <div className="bg-purple-50 p-3">
                           <div className={`flex items-center gap-2 mb-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                            <MessageSquare className="w-4 h-4 text-purple-600" />
+                            <MessageSquareIcon className="w-4 h-4 text-purple-600" />
                             <span className="text-xs font-medium text-purple-700">{t('dashboard.smsUsage', 'SMS')}</span>
                           </div>
-                          <p className="text-sm font-bold text-gray-900">
+                          <p className="text-sm font-bold text-eerie-black">
                             {usageData.remainingText} <span className="font-normal text-gray-400">/ {usageData.totalText} SMS</span>
                           </p>
                           {usageData.totalText > 0 && (
@@ -533,7 +651,7 @@ const QRCodeModal = ({
                   {/* Expiry info */}
                   {usageData.expiredAt && (
                     <div className={`flex items-center gap-2 px-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                      <Clock className="w-3.5 h-3.5 text-gray-400" />
+                      <ClockIcon className="w-3.5 h-3.5 text-gray-400" />
                       <span className="text-xs text-gray-400">
                         {usageData.status?.toUpperCase() === 'EXPIRED'
                           ? t('dashboard.expiredOn', 'Expired on {{date}}', { date: formatDate(usageData.expiredAt) })
@@ -549,7 +667,7 @@ const QRCodeModal = ({
                     disabled={loadingEsimUsage}
                     className={`flex items-center gap-1.5 text-xs text-gray-400 hover:text-tufts-blue transition-colors disabled:opacity-50 ${isRTL ? 'flex-row-reverse' : ''}`}
                   >
-                    <RefreshCw className={`w-3 h-3 ${loadingEsimUsage ? 'animate-spin' : ''}`} />
+                    <RefreshCwIcon className={`w-3 h-3 ${loadingEsimUsage ? 'animate-spin' : ''}`} />
                     {t('dashboard.refreshUsage', 'Refresh usage')}
                   </button>
                 </div>
@@ -558,21 +676,21 @@ const QRCodeModal = ({
               {/* Usage not available and not loading — show plan stats as fallback */}
               {!usageData && !loadingEsimUsage && (
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-gray-50 rounded-xl p-3">
+                  <div className="bg-gray-50 p-3">
                     <div className={`flex items-center gap-2 mb-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                      <Wifi className="w-4 h-4 text-tufts-blue" />
+                      <WifiIcon className="w-4 h-4 text-tufts-blue" />
                       <span className="text-xs text-gray-500">{t('dashboard.data', 'Data')}</span>
                     </div>
-                    <p className="text-sm font-semibold text-gray-900">
+                    <p className="text-sm font-semibold text-eerie-black">
                       {planDetails.data || `${planDetails.dataAmountMb || 0} MB`}
                     </p>
                   </div>
-                  <div className={`bg-gray-50 rounded-xl p-3 ${isRTL ? 'text-start' : 'text-end'}`}>
+                  <div className={`bg-gray-50 p-3 ${isRTL ? 'text-start' : 'text-end'}`}>
                     <div className={`flex items-center gap-2 mb-1 ${isRTL ? 'flex-row-reverse justify-start' : 'justify-end'}`}>
-                      <Clock className="w-4 h-4 text-emerald-500" />
+                      <ClockIcon className="w-4 h-4 text-emerald-500" />
                       <span className="text-xs text-gray-500">{t('dashboard.validity', 'Validity')}</span>
                     </div>
-                    <p className="text-sm font-semibold text-gray-900">
+                    <p className="text-sm font-semibold text-eerie-black">
                       {planDetails.validity ? `${planDetails.validity} ${t('dashboard.days', 'days')}` : '—'}
                     </p>
                   </div>
@@ -581,7 +699,7 @@ const QRCodeModal = ({
                       <button
                         onClick={onCheckEsimUsage}
                         disabled={loadingEsimUsage || !iccid}
-                        className="w-full py-2.5 text-sm font-medium text-tufts-blue bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors disabled:opacity-50"
+                        className="w-full py-2.5 text-sm font-medium text-tufts-blue bg-blue-50 hover:bg-blue-100 transition-colors disabled:opacity-50"
                       >
                         {t('dashboard.loadUsage', 'Load Usage Data')}
                       </button>
@@ -591,33 +709,35 @@ const QRCodeModal = ({
               )}
 
               {/* ── Section 2: QR Code (collapsible) ── */}
-              <div className="border border-gray-200 rounded-xl overflow-hidden">
+              <div className="bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500">
                 <button
                   type="button"
                   onClick={() => setShowQrSection(!showQrSection)}
-                  className={`w-full flex items-center justify-between p-4 bg-white hover:bg-gray-50 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
+                  className={`w-full flex items-center justify-between p-4 hover:bg-white/40 transition-colors duration-150 ease-out ${isRTL ? 'flex-row-reverse' : ''}`}
                 >
                   <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                    <QrCode className="w-5 h-5 text-tufts-blue" />
-                    <span className="font-medium text-gray-900">{t('dashboard.qrCode', 'QR Code & Installation')}</span>
+                    <div className="w-11 h-11 rounded-lg bg-tufts-blue/10 flex items-center justify-center flex-shrink-0">
+                      <QrCodeIcon className="w-5 h-5 text-tufts-blue" />
+                    </div>
+                    <span className="text-lg font-semibold text-eerie-black">{t('dashboard.qrCode', 'QR Code & Installation')}</span>
                   </div>
-                  {showQrSection ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+                  {showQrSection ? <ChevronUpIcon className="w-5 h-5 text-gray-400" /> : <ChevronDownIcon className="w-5 h-5 text-gray-400" />}
                 </button>
 
                 {showQrSection && (
-                  <div className="border-t border-gray-200 p-4 space-y-4">
+                  <div className="border-t border-gray-100 p-4 space-y-4">
                     {/* QR Code Display */}
                     <div className="flex justify-center">
                       {qrCodeString ? (
-                        <div className="bg-white p-3 rounded-xl border-2 border-gray-100 shadow-sm">
+                        <div className="bg-white p-3 border border-gray-100">
                           <div className="w-40 h-40">
                             <LPAQRCodeDisplay lpaData={qrCodeString} />
                           </div>
                         </div>
                       ) : (
-                        <div className="w-40 h-40 bg-gray-50 rounded-xl flex items-center justify-center border-2 border-dashed border-gray-200">
+                        <div className="w-40 h-40 bg-gray-50 flex items-center justify-center border-2 border-dashed border-gray-200">
                           <div className="text-center">
-                            <QrCode className="w-8 h-8 text-gray-300 mx-auto mb-1" />
+                            <QrCodeIcon className="w-8 h-8 text-gray-300 mx-auto mb-1" />
                             <p className="text-xs text-gray-400">{t('dashboard.noQrCode', 'No QR Code')}</p>
                           </div>
                         </div>
@@ -634,35 +754,35 @@ const QRCodeModal = ({
                           href={appleInstallUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors"
+                          className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-eerie-black text-white text-sm font-medium rounded-full hover:bg-gray-800 transition-colors"
                         >
-                          <Smartphone className="w-4 h-4" />
+                          <SmartphoneIcon className="w-4 h-4" />
                           {t('dashboard.installOnApple', 'Install on iPhone')}
                         </a>
                       )}
                       {qrCodeString && (
                         <button
                           onClick={() => copyToClipboard(qrCodeString, 'lpa')}
-                          className={`${appleInstallUrl ? '' : 'flex-1'} flex items-center justify-center gap-2 py-2.5 px-4 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors`}
+                          className={`${appleInstallUrl ? '' : 'flex-1'} flex items-center justify-center gap-2 py-2.5 px-4 bg-gray-100 text-gray-700 text-sm font-medium rounded-full hover:bg-gray-200 transition-colors`}
                         >
-                          {copiedField === 'lpa' ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+                          {copiedField === 'lpa' ? <CheckIcon className="w-4 h-4 text-emerald-500" /> : <CopyIcon className="w-4 h-4" />}
                           {copiedField === 'lpa' ? t('common.copied', 'Copied!') : t('dashboard.copyActivationCode', 'Copy Code')}
                         </button>
                       )}
                     </div>
 
                     {/* Installation Instructions — translated */}
-                    <div className="border border-gray-100 rounded-lg overflow-hidden">
+                    <div className="border-t border-gray-100 overflow-hidden">
                       <button
                         type="button"
                         onClick={() => setShowInstructions(!showInstructions)}
-                        className={`w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
+                        className={`w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-white/40 transition-colors duration-150 ease-out ${isRTL ? 'flex-row-reverse' : ''}`}
                       >
                         <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                          <BookOpen className="w-4 h-4 text-gray-500" />
+                          <BookOpenIcon className="w-4 h-4 text-gray-500" />
                           <span className="text-sm font-medium text-gray-700">{t('dashboard.installStepsTitle', 'How to install your eSIM')}</span>
                         </div>
-                        {showInstructions ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+                        {showInstructions ? <ChevronUpIcon className="w-4 h-4 text-gray-400" /> : <ChevronDownIcon className="w-4 h-4 text-gray-400" />}
                       </button>
                       {showInstructions && (
                         <div className="p-3 border-t border-gray-100 space-y-3">
@@ -671,8 +791,8 @@ const QRCodeModal = ({
                             <button
                               type="button"
                               onClick={() => setInstallTab('ios')}
-                              className={`flex-1 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                                installTab === 'ios' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                              className={`flex-1 py-1.5 text-sm font-medium transition-colors ${
+                                installTab === 'ios' ? 'bg-eerie-black text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                               }`}
                             >
                               {t('dashboard.iosTab', 'iPhone')}
@@ -680,8 +800,8 @@ const QRCodeModal = ({
                             <button
                               type="button"
                               onClick={() => setInstallTab('android')}
-                              className={`flex-1 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                                installTab === 'android' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                              className={`flex-1 py-1.5 text-sm font-medium transition-colors ${
+                                installTab === 'android' ? 'bg-eerie-black text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                               }`}
                             >
                               {t('dashboard.androidTab', 'Android')}
@@ -711,41 +831,43 @@ const QRCodeModal = ({
                     {/* Full Installation Guide Link */}
                     <Link
                       href="/help/install-esim"
-                      className={`flex items-center justify-between p-3 bg-tufts-blue/5 border border-tufts-blue/15 rounded-lg hover:bg-tufts-blue/10 transition-colors text-sm ${isRTL ? 'flex-row-reverse' : ''}`}
+                      className={`flex items-center justify-between p-3 bg-tufts-blue/5 hover:bg-tufts-blue/10 transition-colors duration-150 ease-out text-sm ${isRTL ? 'flex-row-reverse' : ''}`}
                     >
                       <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                        <BookOpen className="w-4 h-4 text-tufts-blue" />
+                        <BookOpenIcon className="w-4 h-4 text-tufts-blue" />
                         <span className="font-medium text-tufts-blue">{t('dashboard.viewGuide', 'View Installation Guide')}</span>
                       </div>
-                      <ExternalLink className="w-4 h-4 text-tufts-blue/60" />
+                      <ExternalLinkIcon className="w-4 h-4 text-tufts-blue/60" />
                     </Link>
                   </div>
                 )}
               </div>
 
               {/* ── Section 3: Details (collapsible) ── */}
-              <div className="border border-gray-200 rounded-xl overflow-hidden">
+              <div className="bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500">
                 <button
                   type="button"
                   onClick={() => setShowDetails(!showDetails)}
-                  className={`w-full flex items-center justify-between p-4 bg-white hover:bg-gray-50 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
+                  className={`w-full flex items-center justify-between p-4 hover:bg-white/40 transition-colors duration-150 ease-out ${isRTL ? 'flex-row-reverse' : ''}`}
                 >
                   <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                    <Globe className="w-5 h-5 text-gray-500" />
-                    <span className="font-medium text-gray-900">{t('dashboard.details', 'eSIM Details')}</span>
+                    <div className="w-11 h-11 rounded-lg bg-tufts-blue/10 flex items-center justify-center flex-shrink-0">
+                      <GlobeIcon className="w-5 h-5 text-tufts-blue" />
+                    </div>
+                    <span className="text-lg font-semibold text-eerie-black">{t('dashboard.details', 'eSIM Details')}</span>
                   </div>
-                  {showDetails ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+                  {showDetails ? <ChevronUpIcon className="w-5 h-5 text-gray-400" /> : <ChevronDownIcon className="w-5 h-5 text-gray-400" />}
                 </button>
 
                 {showDetails && (
-                  <div className="border-t border-gray-200 p-4 space-y-3">
+                  <div className="border-t border-gray-100 p-4 space-y-3">
                     {/* Operator branding */}
                     {planMetadata?.operatorName && (
-                      <div className={`flex items-center gap-3 p-3 bg-gray-50 rounded-lg ${isRTL ? 'flex-row-reverse text-right' : ''}`}>
+                      <div className={`flex items-center gap-3 p-3 bg-gray-100 ${isRTL ? 'flex-row-reverse text-right' : ''}`}>
                         {planMetadata.operatorLogo ? (
-                          <Image src={planMetadata.operatorLogo} alt={planMetadata.operatorName} width={32} height={28} className="h-7 w-auto object-contain rounded flex-shrink-0" unoptimized />
+                          <Image src={planMetadata.operatorLogo} alt={planMetadata.operatorName} width={32} height={28} className="h-7 w-auto object-contain flex-shrink-0" unoptimized />
                         ) : (
-                          <div className="h-7 w-7 flex items-center justify-center bg-gray-200 rounded text-gray-600 text-xs font-bold flex-shrink-0">
+                          <div className="h-7 w-7 flex items-center justify-center bg-gray-200 text-gray-600 text-xs font-bold flex-shrink-0">
                             {planMetadata.operatorName.charAt(0).toUpperCase()}
                           </div>
                         )}
@@ -779,11 +901,11 @@ const QRCodeModal = ({
                       <div>
                         <div className={`flex items-center justify-between mb-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
                           <span className="text-xs text-gray-400">{t('dashboard.activationCode', 'Activation Code (LPA)')}</span>
-                          <button onClick={() => copyToClipboard(qrCodeString, 'lpa2')} className="p-1 hover:bg-gray-100 rounded transition-colors">
-                            {copiedField === 'lpa2' ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5 text-gray-400" />}
+                          <button onClick={() => copyToClipboard(qrCodeString, 'lpa2')} className="p-1 hover:bg-gray-100 transition-colors">
+                            {copiedField === 'lpa2' ? <CheckIcon className="w-3.5 h-3.5 text-emerald-500" /> : <CopyIcon className="w-3.5 h-3.5 text-gray-400" />}
                           </button>
                         </div>
-                        <p className={`text-[11px] font-mono text-gray-500 break-all bg-gray-50 p-2 rounded border border-gray-100 ${isRTL ? 'text-right' : 'text-left'}`}>
+                        <p className={`text-[11px] font-mono text-gray-500 break-all bg-gray-100 p-2 ${isRTL ? 'text-right' : 'text-left'}`}>
                           {qrCodeString}
                         </p>
                       </div>
@@ -793,11 +915,11 @@ const QRCodeModal = ({
                     <div className="grid grid-cols-2 gap-2 pt-1">
                       <div>
                         <span className="text-xs text-gray-400">{t('dashboard.orderDate', 'Order Date')}</span>
-                        <p className="text-sm font-medium text-gray-900">{formatDate(selectedOrder.createdAt)}</p>
+                        <p className="text-sm font-medium text-eerie-black">{formatDate(selectedOrder.createdAt)}</p>
                       </div>
                       <div className={isRTL ? 'text-left' : 'text-right'}>
                         <span className="text-xs text-gray-400">{t('dashboard.price', 'Price')}</span>
-                        <p className="text-sm font-medium text-gray-900">{formatPrice(selectedOrder.amount || 0)}</p>
+                        <p className="text-sm font-medium text-eerie-black">{formatPrice(selectedOrder.amount || 0)}</p>
                       </div>
                       <div>
                         <span className="text-xs text-gray-400">{t('dashboard.orderId', 'Order ID')}</span>
@@ -805,7 +927,7 @@ const QRCodeModal = ({
                       </div>
                       <div className={isRTL ? 'text-left' : 'text-right'}>
                         <span className="text-xs text-gray-400">{t('dashboard.validity', 'Validity')}</span>
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="text-sm font-medium text-eerie-black">
                           {planDetails.validity ? `${planDetails.validity} ${t('dashboard.days', 'days')}` : '—'}
                         </p>
                       </div>
@@ -814,7 +936,7 @@ const QRCodeModal = ({
                     {/* Coverage info */}
                     {planMetadata?.isRegional && planMetadata.coveredCountryCount > 0 && (
                       <div className={`flex items-center gap-2 text-xs text-gray-500 pt-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                        <Globe className="w-3.5 h-3.5" />
+                        <GlobeIcon className="w-3.5 h-3.5" />
                         <span>
                           {planMetadata.coveredCountryCount} {planMetadata.coveredCountryCount === 1
                             ? t('dashboard.country', 'country')
@@ -831,39 +953,31 @@ const QRCodeModal = ({
 
         {/* ── Footer Actions ── */}
         {!showTopupPackages && (
-          <div className="flex-shrink-0 border-t border-gray-200 p-4 bg-gray-50">
+          <div className="flex-shrink-0 border-t border-gray-100 p-4 bg-gray-50">
             <div className={`flex gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
-              {/* Top Up — only for completed eSIMs */}
+              {/* Top Up — rounded black with arrow */}
               {iccid && (selectedOrder?.status === 'completed' || selectedOrder?.status === 'active') && (
                 <button
                   type="button"
                   onClick={handleTopUpClick}
-                  className="flex items-center justify-center gap-2 py-3 px-4 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600 transition-colors"
+                  className="relative flex-1 flex items-center justify-center py-3 bg-eerie-black text-white font-medium rounded-full hover:bg-gray-800 transition-colors"
                 >
-                  <Plus className="w-5 h-5" />
                   <span>{t('dashboard.topUp', 'Top Up')}</span>
+                  <span className={`absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white flex items-center justify-center ${isRTL ? 'left-3' : 'right-3'}`}>
+                    <PlusIcon className="w-3.5 h-3.5 text-eerie-black" />
+                  </span>
                 </button>
               )}
-
-              {/* Toggle QR section shortcut */}
-              <button
-                type="button"
-                onClick={() => setShowQrSection(!showQrSection)}
-                className="flex-1 flex items-center justify-center gap-2 py-3 bg-tufts-blue text-white rounded-xl font-medium hover:bg-tufts-blue/90 transition-colors"
-              >
-                <QrCode className="w-5 h-5" />
-                <span>{showQrSection ? t('dashboard.hideQrCode', 'Hide QR Code') : t('dashboard.showQrCode', 'Show QR Code')}</span>
-              </button>
 
               {/* Delete */}
               {onDeleteOrder && (
                 <button
                   type="button"
                   onClick={handleDelete}
-                  className="p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors"
-                  title={t('dashboard.deleteEsim', 'Delete eSIM')}
+                  className="p-3 bg-red-50 text-red-600 rounded-full hover:bg-red-100 transition-colors"
+                  aria-label={t('dashboard.deleteEsim', 'Delete eSIM')}
                 >
-                  <Trash2 className="w-5 h-5" />
+                  <Trash2Icon className="w-5 h-5" />
                 </button>
               )}
             </div>
@@ -879,12 +993,12 @@ const DetailRow = ({ label, value, mono, onCopy, copied, isRTL }) => (
   <div className={`flex items-center justify-between py-1.5 ${isRTL ? 'flex-row-reverse' : ''}`}>
     <span className="text-xs text-gray-400">{label}</span>
     <div className={`flex items-center gap-1.5 ${isRTL ? 'flex-row-reverse' : ''}`}>
-      <span className={`text-sm text-gray-900 ${mono ? 'font-mono' : 'font-medium'} truncate max-w-[180px]`}>
+      <span className={`text-sm text-eerie-black ${mono ? 'font-mono' : 'font-medium'} truncate max-w-[180px]`}>
         {value || '—'}
       </span>
       {onCopy && value && (
-        <button onClick={onCopy} className="p-1 hover:bg-gray-100 rounded transition-colors flex-shrink-0">
-          {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5 text-gray-400" />}
+        <button onClick={onCopy} className="p-1 hover:bg-gray-100 transition-colors flex-shrink-0">
+          {copied ? <CheckIcon className="w-3.5 h-3.5 text-emerald-500" /> : <CopyIcon className="w-3.5 h-3.5 text-gray-400" />}
         </button>
       )}
     </div>

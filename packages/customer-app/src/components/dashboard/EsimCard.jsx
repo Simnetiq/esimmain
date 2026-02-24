@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
-import { Globe, Wifi, Phone, MessageSquare, Clock, ArrowRight, TrendingUp, TrendingDown } from 'lucide-react';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
@@ -11,13 +10,62 @@ import { useCountryNames } from '@esim/shared/hooks/useCountriesSupabase';
 import { getSupabase } from '@esim/shared/lib/supabase';
 import Image from 'next/image';
 
+// ─── Inline SVG icons (no lucide-react) ───────────────────────────────────
+
+const GlobeIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>
+  </svg>
+);
+
+const WifiIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/><path d="M5 12.859a10 10 0 0 1 14 0"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/>
+  </svg>
+);
+
+const PhoneIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.9a16 16 0 0 0 6.29 6.29l.94-.93a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 17z"/>
+  </svg>
+);
+
+const MessageSquareIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+);
+
+const ClockIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+  </svg>
+);
+
+const ArrowUpRightIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M7 7h10v10"/><path d="M7 17 17 7"/>
+  </svg>
+);
+
+const TrendingUpIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
+  </svg>
+);
+
+const TrendingDownIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/>
+  </svg>
+);
+
 const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, planMetadataLoading }) => {
   const pathname = usePathname();
   const { t, locale, isLoading: i18nLoading } = useI18n();
   const [mounted, setMounted] = useState(false);
   const [countryImage, setCountryImage] = useState(null);
 
-  // Get localized country names from Supabase
   const { getLocalizedName } = useCountryNames(locale || 'en');
 
   useEffect(() => {
@@ -144,7 +192,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
         textColor: 'text-gray-600',
         borderColor: 'border-gray-200',
         label: t('dashboard.status.expired', 'Expired'),
-        icon: TrendingDown
+        icon: TrendingDownIcon
       };
     }
 
@@ -156,7 +204,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
           textColor: 'text-emerald-700',
           borderColor: 'border-emerald-200',
           label: t('dashboard.status.active', 'Active'),
-          icon: TrendingUp
+          icon: TrendingUpIcon
         };
       case 'pending':
         return {
@@ -164,7 +212,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
           textColor: 'text-amber-700',
           borderColor: 'border-amber-200',
           label: t('dashboard.status.pending', 'Pending'),
-          icon: Clock
+          icon: ClockIcon
         };
       default:
         return {
@@ -172,7 +220,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
           textColor: 'text-gray-600',
           borderColor: 'border-gray-200',
           label: status || t('dashboard.unknown', 'Unknown'),
-          icon: Clock
+          icon: ClockIcon
         };
     }
   };
@@ -200,198 +248,169 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
 
   const fullName = localizedCountryName || fallbackName;
 
+  // Watermark: use live total data if available, else plan data display
+  const watermarkText = usage
+    ? `${usage.total}${usage.unit}`
+    : dataDisplay.replace(/\s/g, '');
+
   return (
     <div
-      className={`w-full bg-white border rounded-xl shadow-sm p-4 md:p-5 cursor-pointer transition-all duration-200 hover:shadow-md hover:border-gray-300 ${
+      className={`group relative w-full bg-gray-50 overflow-hidden cursor-pointer transition-all duration-500 hover:bg-white ${
         isExpired ? 'opacity-75 hover:opacity-100' : ''
       }`}
       onClick={() => onViewQRCode(order)}
       lang={detectedLanguage}
     >
-      {/* Header Section */}
-      <div className="flex justify-between pb-4 mb-4 border-b border-gray-100" dir={direction}>
-        {/* In RTL: Status badge first (appears on right), then country info (appears on left) */}
-        {isRTL ? (
-          <>
-            {/* Status Badge - renders first, appears on RIGHT in RTL due to justify-between + dir=rtl */}
-            <div>
-              <span className={`inline-flex items-center flex-row-reverse ${statusInfo.bgColor} border ${statusInfo.borderColor} ${statusInfo.textColor} text-xs font-medium px-2 py-1 rounded-lg`}>
-                <StatusIcon className="w-3.5 h-3.5 ms-1" />
-                {statusInfo.label}
-              </span>
-            </div>
-            {/* Country Info - renders second, appears on LEFT in RTL */}
-            {/* In RTL: text first, then image (so image appears on LEFT of text visually) */}
-            <div className="flex items-center gap-3">
-              <div>
-                <h5 className="text-lg font-semibold text-gray-900 leading-tight">
-                  {fullName || t('dashboard.unknownRegion', 'Unknown')}
-                </h5>
-                <p className="text-sm text-gray-500 truncate max-w-[180px]">
-                  {order.planName || t('dashboard.unknownPlan', 'Unknown Plan')}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-gray-100 border border-gray-200 flex items-center justify-center rounded-full overflow-hidden flex-shrink-0">
-                {countryImage ? (
-                  <Image
-                    src={countryImage}
-                    alt={fullName}
-                    width={48}
-                    height={48}
-                    className="w-full h-full object-cover"
-                    unoptimized
-                  />
-                ) : (
-                  <Globe className="w-6 h-6 text-gray-500" />
-                )}
-              </div>
-            </div>
-          </>
-        ) : (
-          <>
-            {/* Country Info - renders first, appears on LEFT in LTR */}
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gray-100 border border-gray-200 flex items-center justify-center rounded-full overflow-hidden flex-shrink-0">
-                {countryImage ? (
-                  <Image
-                    src={countryImage}
-                    alt={fullName}
-                    width={48}
-                    height={48}
-                    className="w-full h-full object-cover"
-                    unoptimized
-                  />
-                ) : (
-                  <Globe className="w-6 h-6 text-gray-500" />
-                )}
-              </div>
-              <div>
-                <h5 className="text-lg font-semibold text-gray-900 leading-tight">
-                  {fullName || t('dashboard.unknownRegion', 'Unknown')}
-                </h5>
-                <p className="text-sm text-gray-500 truncate max-w-[180px]">
-                  {order.planName || t('dashboard.unknownPlan', 'Unknown Plan')}
-                </p>
-              </div>
-            </div>
-            {/* Status Badge - renders second, appears on RIGHT in LTR */}
-            <div>
-              <span className={`inline-flex items-center ${statusInfo.bgColor} border ${statusInfo.borderColor} ${statusInfo.textColor} text-xs font-medium px-2 py-1 rounded-lg`}>
-                <StatusIcon className="w-3.5 h-3.5 me-1" />
-                {statusInfo.label}
-              </span>
-            </div>
-          </>
-        )}
-      </div>
+      {/* Faded data watermark */}
+      <span
+        className={`absolute top-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-eerie-black/[0.04] select-none pointer-events-none ${isRTL ? 'left-4' : 'right-4'}`}
+        aria-hidden="true"
+      >
+        {watermarkText}
+      </span>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        {/* Data Usage */}
-        <dl className={`flex flex-col ${isRTL ? 'items-end' : 'items-start'}`}>
-          <dt className={`text-gray-500 text-xs font-normal mb-1 flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
-            <Wifi className="w-3.5 h-3.5" />
-            {t('dashboard.dataRemaining', 'Data Remaining')}
-          </dt>
-          {loadingUsage ? (
-            <dd className="h-6 w-16 bg-gray-200 rounded animate-pulse"></dd>
-          ) : (
-            <dd className={`text-base font-semibold ${isExpired ? 'text-gray-500' : 'text-gray-900'}`}>
-              {usage ? usage.text : dataDisplay}
-              {usage && <span className="text-gray-400 font-normal text-sm"> / {usage.totalText}</span>}
-            </dd>
-          )}
-        </dl>
+      {/* Content sits above watermark */}
+      <div className="relative p-4 md:p-5">
 
-        {/* Validity */}
-        <dl className={`flex flex-col ${isRTL ? 'items-start' : 'items-end'}`}>
-          <dt className={`text-gray-500 text-xs font-normal mb-1 flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
-            <Clock className="w-3.5 h-3.5" />
-            {t('dashboard.validity', 'Validity')}
-          </dt>
-          <dd className="text-base font-semibold text-gray-900">
-            {validityDisplay ? `${validityDisplay} ${t('dashboard.days', 'days')}` : '—'}
-          </dd>
-        </dl>
-      </div>
-
-
-      {/* Features Tags (only if present) */}
-      {(() => {
-        const hasVoice = planMetadata?.hasVoice || planDetails.voice > 0;
-        const hasSms = planMetadata?.hasSms || planDetails.sms > 0;
-        const voiceMinutes = planMetadata?.voice || planDetails.voice || 0;
-        const smsCount = planMetadata?.sms || planDetails.sms || 0;
-
-        if (!hasVoice && !hasSms) return null;
-
-        return (
-          <div className={`flex flex-wrap gap-2 mb-4 ${isRTL ? 'justify-end' : 'justify-start'}`}>
-            {hasVoice && voiceMinutes > 0 && (
-              <span className={`inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs font-medium px-2 py-1 rounded ${isRTL ? 'flex-row-reverse' : ''}`}>
-                <Phone className="w-3 h-3" />
-                {voiceMinutes} {t('dashboard.min', 'min')}
-              </span>
-            )}
-            {hasSms && smsCount > 0 && (
-              <span className={`inline-flex items-center gap-1 bg-purple-50 text-purple-700 text-xs font-medium px-2 py-1 rounded ${isRTL ? 'flex-row-reverse' : ''}`}>
-                <MessageSquare className="w-3 h-3" />
-                {smsCount} SMS
-              </span>
+        {/* Header Section */}
+        <div className={`flex items-center gap-3 mb-4 ${isRTL ? 'flex-row-reverse' : ''}`} dir={direction}>
+          <div className="w-12 h-12 bg-gray-100 flex items-center justify-center rounded-full overflow-hidden flex-shrink-0">
+            {countryImage ? (
+              <Image
+                src={countryImage}
+                alt={fullName}
+                width={48}
+                height={48}
+                className="w-full h-full object-cover"
+                unoptimized
+              />
+            ) : (
+              <GlobeIcon className="w-6 h-6 text-gray-500" />
             )}
           </div>
-        );
-      })()}
+          <div>
+            <h5 className="text-lg font-semibold text-eerie-black leading-tight">
+              {fullName || t('dashboard.unknownRegion', 'Unknown')}
+            </h5>
+            <p className="text-sm text-gray-500 truncate max-w-[180px]">
+              {order.planName || t('dashboard.unknownPlan', 'Unknown Plan')}
+            </p>
+          </div>
+        </div>
 
-      {/* Operator Branding - from Supabase */}
-      {planMetadata?.operatorName && (
-        <div className={`flex items-center gap-2 mb-4 p-2 bg-gray-50 rounded-lg ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
-          {planMetadata.operatorLogo ? (
-            <Image
-              src={planMetadata.operatorLogo}
-              alt={planMetadata.operatorName}
-              width={24}
-              height={24}
-              className="h-6 w-auto object-contain"
-              unoptimized
-            />
-          ) : null}
-          <span className="text-xs text-gray-500">
-            {t('dashboard.poweredBy', 'Powered by')}{' '}
-            <span
-              className="font-medium"
-              style={{
-                background: planMetadata.operatorGradientStart && planMetadata.operatorGradientEnd
-                  ? `linear-gradient(135deg, ${planMetadata.operatorGradientStart}, ${planMetadata.operatorGradientEnd})`
-                  : 'linear-gradient(135deg, #3B82F6, #1D4ED8)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
-              }}
-            >
-              {planMetadata.operatorName}
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          {/* Data Usage */}
+          <dl className={`flex flex-col ${isRTL ? 'items-end' : 'items-start'}`}>
+            <dt className={`text-gray-500 text-xs font-normal mb-1 flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <WifiIcon className="w-3.5 h-3.5" />
+              {t('dashboard.dataRemaining', 'Data Remaining')}
+            </dt>
+            {loadingUsage ? (
+              <dd className="h-6 w-16 bg-gray-200 rounded animate-pulse"></dd>
+            ) : (
+              <dd className={`text-base font-semibold ${isExpired ? 'text-gray-500' : 'text-eerie-black'}`}>
+                {usage ? usage.text : dataDisplay}
+                {usage && <span className="text-gray-400 font-normal text-sm"> / {usage.totalText}</span>}
+              </dd>
+            )}
+          </dl>
+
+          {/* Validity — days only */}
+          <dl className={`flex flex-col justify-end ${isRTL ? 'items-start' : 'items-end'}`}>
+            <dd className={`text-base font-semibold text-eerie-black flex items-center gap-1.5 mt-auto ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <ClockIcon className="w-3.5 h-3.5 text-gray-400" />
+              {validityDisplay ? `${validityDisplay} ${t('dashboard.days', 'days')}` : '—'}
+            </dd>
+          </dl>
+        </div>
+
+
+        {/* Features Tags (only if present) */}
+        {(() => {
+          const hasVoice = planMetadata?.hasVoice || planDetails.voice > 0;
+          const hasSms = planMetadata?.hasSms || planDetails.sms > 0;
+          const voiceMinutes = planMetadata?.voice || planDetails.voice || 0;
+          const smsCount = planMetadata?.sms || planDetails.sms || 0;
+
+          if (!hasVoice && !hasSms) return null;
+
+          return (
+            <div className={`flex flex-wrap gap-2 mb-4 ${isRTL ? 'justify-end' : 'justify-start'}`}>
+              {hasVoice && voiceMinutes > 0 && (
+                <span className={`inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs font-medium px-2 py-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <PhoneIcon className="w-3 h-3" />
+                  {voiceMinutes} {t('dashboard.min', 'min')}
+                </span>
+              )}
+              {hasSms && smsCount > 0 && (
+                <span className={`inline-flex items-center gap-1 bg-purple-50 text-purple-700 text-xs font-medium px-2 py-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <MessageSquareIcon className="w-3 h-3" />
+                  {smsCount} SMS
+                </span>
+              )}
+            </div>
+          );
+        })()}
+
+        {/* Operator Branding - from Supabase */}
+        {planMetadata?.operatorName && (
+          <div className={`flex items-center gap-2 mb-4 p-2 bg-gray-100/50 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
+            {planMetadata.operatorLogo ? (
+              <Image
+                src={planMetadata.operatorLogo}
+                alt={planMetadata.operatorName}
+                width={24}
+                height={24}
+                className="h-6 w-auto object-contain"
+                unoptimized
+              />
+            ) : null}
+            <span className="text-xs text-gray-500">
+              {t('dashboard.poweredBy', 'Powered by')}{' '}
+              <span
+                className="font-medium"
+                style={{
+                  background: planMetadata.operatorGradientStart && planMetadata.operatorGradientEnd
+                    ? `linear-gradient(135deg, ${planMetadata.operatorGradientStart}, ${planMetadata.operatorGradientEnd})`
+                    : 'linear-gradient(135deg, #3B82F6, #1D4ED8)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}
+              >
+                {planMetadata.operatorName}
+              </span>
             </span>
+          </div>
+        )}
+
+        {/* Footer — Price + Status */}
+        <div className={`flex items-center justify-between pt-4 border-t border-gray-100/60 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <div>
+            <span className="text-xs text-gray-500">{t('dashboard.price', 'Price')}</span>
+            <p className="text-lg font-bold text-eerie-black">{formatPrice(order.amount || 0)}</p>
+          </div>
+          <span className={`inline-flex items-center ${statusInfo.bgColor} border ${statusInfo.borderColor} ${statusInfo.textColor} text-xs font-medium px-2 py-1 rounded-lg ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <StatusIcon className={`w-3.5 h-3.5 ${isRTL ? 'ms-1' : 'me-1'}`} />
+            {statusInfo.label}
           </span>
         </div>
-      )}
 
-      {/* Footer */}
-      <div className={`flex items-center justify-between pt-4 border-t border-gray-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
-        <div>
-          <span className="text-xs text-gray-500">{t('dashboard.price', 'Price')}</span>
-          <p className="text-lg font-bold text-gray-900">{formatPrice(order.amount || 0)}</p>
-        </div>
-
+        {/* View Details CTA — text centered, arrow pinned end */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             onViewQRCode(order);
           }}
-          className={`inline-flex items-center text-tufts-blue bg-transparent border border-transparent hover:bg-gray-50 font-medium rounded-lg text-sm px-3 py-2 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
+          className={`relative w-full mt-4 flex items-center justify-center py-3 bg-eerie-black text-white text-sm font-medium rounded-full transition-colors duration-300 hover:bg-gray-800`}
         >
-          {t('dashboard.viewDetails', 'View Details')}
-          <ArrowRight className={`w-4 h-4 ${isRTL ? 'me-1.5 rotate-180' : 'ms-1.5'}`} />
+          <span>{t('dashboard.viewDetails', 'View Details')}</span>
+          <span className={`absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white flex items-center justify-center ${isRTL ? 'left-3' : 'right-3'}`}>
+            <ArrowUpRightIcon className="w-3.5 h-3.5 text-eerie-black" />
+          </span>
         </button>
+
       </div>
     </div>
   );

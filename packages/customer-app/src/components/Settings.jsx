@@ -3,7 +3,19 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, LogOut } from 'lucide-react';
+// ─── Inline SVG icons (no lucide-react) ───────────────────────────────────
+
+const ArrowLeftIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
+  </svg>
+);
+
+const LogOutIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>
+  </svg>
+);
 import { getSupabase } from '@esim/shared/lib/supabase';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
@@ -126,16 +138,20 @@ const Settings = () => {
     <div className="min-h-screen relative" dir={isRTL ? 'rtl' : 'ltr'}>
       <BackgroundDecor />
 
-      <div className="relative transition-opacity duration-150 ease-out opacity-100">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 pt-6">
-          {/* Back Link */}
-          <Link
-            href={getLocalizedUrl('/dashboard')}
-            className={`inline-flex items-center gap-2 text-gray-600 hover:text-tufts-blue text-sm font-medium transition-colors duration-150 ease-out mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}
-          >
-            <ArrowLeft className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
-            {t('settings.backToDashboard', 'Back to Dashboard')}
-          </Link>
+      <div className="relative transition-opacity duration-300 opacity-100">
+        <div className="mx-auto w-full max-w-9xl">
+          <div className="mx-auto w-full max-w-7xl">
+            <div className="px-4 pt-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
+              {/* Back Link */}
+              <Link
+                href={getLocalizedUrl('/dashboard')}
+                className={`inline-flex items-center gap-2 text-gray-500 hover:text-tufts-blue text-sm font-medium transition-colors duration-300 mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}
+              >
+                <ArrowLeftIcon className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
+                {t('settings.backToDashboard', 'Back to Dashboard')}
+              </Link>
+            </div>
+          </div>
         </div>
 
         {/* Account Settings */}
@@ -146,29 +162,44 @@ const Settings = () => {
         />
 
         {/* Sign Out Section */}
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 pb-8">
-          <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-5">
-            <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <div className={isRTL ? 'text-right' : ''}>
-                <h3 className="text-sm font-semibold text-gray-900">
-                  {t('settings.signOut', 'Sign Out')}
-                </h3>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  {t('settings.signOutDescription', 'Sign out of your account on this device.')}
-                </p>
+        <div className="mx-auto w-full max-w-9xl">
+          <div className="mx-auto w-full max-w-7xl">
+            <div className="px-4 pb-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
+              <div className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 p-5">
+                <span
+                  className={`absolute top-3 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-400/20 select-none pointer-events-none ${isRTL ? 'left-4' : 'right-4'}`}
+                  aria-hidden="true"
+                >
+                  {/* Dynamic step number based on whether social provider section exists */}
+                  05
+                </span>
+
+                <div className="relative">
+                  <div className={`flex items-center gap-3 mb-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div className="w-11 h-11 rounded-lg bg-tufts-blue/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                      <LogOutIcon className="w-5 h-5 text-tufts-blue" />
+                    </div>
+                    <h3 className="text-xs font-medium tracking-widest uppercase text-tufts-blue">
+                      {t('settings.signOut', 'Sign Out')}
+                    </h3>
+                  </div>
+                  <p className={`text-sm text-gray-500 leading-relaxed mt-2 mb-4 ${isRTL ? 'text-right' : ''}`}>
+                    {t('settings.signOutDescription', 'Sign out of your account on this device.')}
+                  </p>
+                  <button
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                    className={`inline-flex items-center gap-2 px-5 py-2.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-full hover:bg-gray-200 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${isRTL ? 'flex-row-reverse' : ''}`}
+                  >
+                    {isLoggingOut ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-400 border-t-transparent" />
+                    ) : (
+                      <LogOutIcon className="w-4 h-4" />
+                    )}
+                    {isLoggingOut ? t('settings.signingOut', 'Signing out...') : t('settings.signOutButton', 'Sign Out')}
+                  </button>
+                </div>
               </div>
-              <button
-                onClick={handleLogout}
-                disabled={isLoggingOut}
-                className={`inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-50 transition-colors duration-150 ease-out disabled:opacity-50 disabled:cursor-not-allowed ${isRTL ? 'flex-row-reverse' : ''}`}
-              >
-                {isLoggingOut ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400" />
-                ) : (
-                  <LogOut className="w-4 h-4" />
-                )}
-                {isLoggingOut ? t('settings.signingOut', 'Signing out...') : t('settings.signOutButton', 'Sign Out')}
-              </button>
             </div>
           </div>
         </div>

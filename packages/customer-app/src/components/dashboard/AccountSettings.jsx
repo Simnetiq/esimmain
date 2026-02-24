@@ -1,20 +1,79 @@
 'use client';
 
 import React, { useState, useCallback, useMemo } from 'react';
-import {
-  Mail, User, Phone, Pencil, X, Calendar,
-  Bell, BellOff, Trash2, AlertTriangle, Check
-} from 'lucide-react';
 import { getSupabase } from '@esim/shared/lib/supabase';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { getLanguageDirection, detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
 import { usePathname, useRouter } from 'next/navigation';
 
-const showToast = async (type, message) => {
-  const toast = (await import('react-hot-toast')).default;
-  type === 'success' ? toast.success(message) : toast.error(message);
-};
+// ─── Inline SVG icons (no lucide-react) ───────────────────────────────────
+
+const MailIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+  </svg>
+);
+
+const UserIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+  </svg>
+);
+
+const PhoneIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+  </svg>
+);
+
+const PencilIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/>
+  </svg>
+);
+
+const XIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+  </svg>
+);
+
+const CalendarIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>
+  </svg>
+);
+
+const BellIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+  </svg>
+);
+
+const BellOffIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M8.7 3A6 6 0 0 1 18 8a21.3 21.3 0 0 0 .6 5"/><path d="M17 17H3s3-2 3-9a4.67 4.67 0 0 1 .3-1.7"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><line x1="2" x2="22" y1="2" y2="22"/>
+  </svg>
+);
+
+const Trash2Icon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/>
+  </svg>
+);
+
+const AlertTriangleIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>
+  </svg>
+);
+
+const CheckIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 6 9 17l-5-5"/>
+  </svg>
+);
 
 const GoogleIcon = () => (
   <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -31,23 +90,28 @@ const AppleIcon = () => (
   </svg>
 );
 
+const showToast = async (type, message) => {
+  const toast = (await import('react-hot-toast')).default;
+  type === 'success' ? toast.success(message) : toast.error(message);
+};
+
 const SettingsField = ({ icon: Icon, label, value, isRTL, badge, onEdit, editing, editContent }) => (
   <div className="space-y-1.5 min-h-[60px]">
-    <label className={`flex items-center gap-1.5 text-xs font-medium text-gray-500 ${isRTL ? 'flex-row-reverse' : ''}`}>
+    <label className={`flex items-center gap-1.5 text-xs font-medium tracking-widest uppercase text-gray-500 ${isRTL ? 'flex-row-reverse' : ''}`}>
       <Icon className="w-3.5 h-3.5" />
       {label}
     </label>
     {editing ? editContent : (
-      <div className={`flex items-center justify-between p-3 bg-gray-50/80 border border-gray-200 rounded-xl transition-colors duration-150 ease-out ${isRTL ? 'flex-row-reverse' : ''}`}>
+      <div className={`flex items-center justify-between p-3 bg-white transition-colors duration-300 ${isRTL ? 'flex-row-reverse' : ''}`}>
         <span className="text-sm text-gray-900 break-all">{value}</span>
         <div className={`flex items-center gap-2 flex-shrink-0 ${isRTL ? 'flex-row-reverse' : ''}`}>
           {badge}
           {onEdit && (
             <button
               onClick={onEdit}
-              className="p-1.5 text-gray-400 hover:text-tufts-blue hover:bg-tufts-blue/10 rounded-lg transition-colors duration-150 ease-out"
+              className="p-1.5 text-gray-400 hover:text-tufts-blue hover:bg-tufts-blue/10 rounded-lg transition-colors duration-300"
             >
-              <Pencil className="w-3.5 h-3.5" />
+              <PencilIcon className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
@@ -211,155 +275,197 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
         type={type}
         value={value}
         onChange={onChange}
-        className={`flex-1 p-3 border border-gray-200 rounded-xl text-sm text-gray-900 focus:ring-2 focus:ring-tufts-blue/20 focus:border-tufts-blue outline-none transition-all duration-150 ease-out ${isRTL ? 'text-right' : ''}`}
+        className={`flex-1 p-3 bg-white text-sm text-gray-900 focus:ring-2 focus:ring-tufts-blue/20 outline-none transition-all duration-300 ${isRTL ? 'text-right' : ''}`}
         placeholder={placeholder}
       />
       <button
         onClick={onSave}
         disabled={isUpdating}
-        className="p-3 bg-tufts-blue text-white rounded-xl hover:bg-tufts-blue/90 transition-colors duration-150 ease-out disabled:opacity-50 disabled:cursor-not-allowed"
+        className="p-3 bg-eerie-black text-white rounded-full hover:bg-gray-800 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {isUpdating ? <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" /> : <Check className="w-4 h-4" />}
+        {isUpdating ? <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" /> : <CheckIcon className="w-4 h-4" />}
       </button>
       <button
         onClick={onCancel}
-        className="p-3 bg-gray-100 text-gray-500 rounded-xl hover:bg-gray-200 transition-colors duration-150 ease-out"
+        className="p-3 bg-gray-100 text-gray-500 rounded-full hover:bg-gray-200 transition-colors duration-300"
       >
-        <X className="w-4 h-4" />
+        <XIcon className="w-4 h-4" />
       </button>
     </div>
   );
 
+  const sections = [
+    { step: '01', label: t('dashboard.personalInformation', 'Personal Information') },
+    { step: '02', label: isGoogleUser || isAppleUser ? t('dashboard.signInProvider', 'Sign-in Provider') : null },
+    { step: isGoogleUser || isAppleUser ? '03' : '02', label: t('settings.newsletterPreferences', 'Newsletter') },
+    { step: isGoogleUser || isAppleUser ? '04' : '03', label: t('settings.deleteAccount', 'Delete Account') },
+  ].filter(s => s.label);
+
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 space-y-5">
+      <div className="mx-auto w-full max-w-9xl">
+        <div className="mx-auto w-full max-w-7xl">
+          <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl space-y-4">
 
         {/* ── Personal Information ── */}
-        <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-5">
-          <h3 className={`text-sm font-semibold text-gray-900 mb-4 ${isRTL ? 'text-right' : ''}`}>
-            {t('dashboard.personalInformation', 'Personal Information')}
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <SettingsField
-              icon={Mail}
-              label={t('dashboard.emailAddress', 'Email')}
-              value={currentUser.email}
-              isRTL={isRTL}
-              badge={
-                <span className="text-[11px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-                  {t('dashboard.verified', 'Verified')}
-                </span>
-              }
-            />
+        <div className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 p-5">
+          <span
+            className={`absolute top-3 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-400/20 select-none pointer-events-none ${isRTL ? 'left-4' : 'right-4'}`}
+            aria-hidden="true"
+          >
+            01
+          </span>
 
-            <SettingsField
-              icon={User}
-              label={t('dashboard.displayName', 'Name')}
-              value={userProfile?.display_name || currentUser?.user_metadata?.display_name || currentUser?.user_metadata?.full_name || t('dashboard.notSet', 'Not set')}
-              isRTL={isRTL}
-              onEdit={() => setEditingName(true)}
-              editing={editingName}
-              editContent={
-                <EditInput
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  onSave={handleUpdateName}
-                  onCancel={cancelNameEdit}
-                  placeholder={t('dashboard.enterYourName', 'Enter your name')}
-                />
-              }
-            />
+          <div className="relative">
+            <div className={`flex items-center gap-3 mb-5 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className="w-11 h-11 rounded-lg bg-tufts-blue/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                <UserIcon className="w-5 h-5 text-tufts-blue" />
+              </div>
+              <h3 className="text-xs font-medium tracking-widest uppercase text-tufts-blue">
+                {t('dashboard.personalInformation', 'Personal Information')}
+              </h3>
+            </div>
 
-            <SettingsField
-              icon={Phone}
-              label={t('dashboard.phoneNumber', 'Phone')}
-              value={userProfile?.phone || t('dashboard.notSet', 'Not set')}
-              isRTL={isRTL}
-              onEdit={() => setEditingPhone(true)}
-              editing={editingPhone}
-              editContent={
-                <EditInput
-                  type="tel"
-                  value={newPhone}
-                  onChange={(e) => setNewPhone(e.target.value)}
-                  onSave={handleUpdatePhone}
-                  onCancel={cancelPhoneEdit}
-                  placeholder={t('dashboard.enterYourPhone', 'Enter your phone number')}
-                />
-              }
-            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <SettingsField
+                icon={MailIcon}
+                label={t('dashboard.emailAddress', 'Email')}
+                value={currentUser.email}
+                isRTL={isRTL}
+                badge={
+                  <span className="text-[11px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                    {t('dashboard.verified', 'Verified')}
+                  </span>
+                }
+              />
 
-            <SettingsField
-              icon={Calendar}
-              label={t('dashboard.accountCreated', 'Member since')}
-              value={
-                userProfile?.created_at
-                  ? new Date(userProfile.created_at).toLocaleDateString()
-                  : t('dashboard.unknown', 'Unknown')
-              }
-              isRTL={isRTL}
-            />
+              <SettingsField
+                icon={UserIcon}
+                label={t('dashboard.displayName', 'Name')}
+                value={userProfile?.display_name || currentUser?.user_metadata?.display_name || currentUser?.user_metadata?.full_name || t('dashboard.notSet', 'Not set')}
+                isRTL={isRTL}
+                onEdit={() => setEditingName(true)}
+                editing={editingName}
+                editContent={
+                  <EditInput
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    onSave={handleUpdateName}
+                    onCancel={cancelNameEdit}
+                    placeholder={t('dashboard.enterYourName', 'Enter your name')}
+                  />
+                }
+              />
+
+              <SettingsField
+                icon={PhoneIcon}
+                label={t('dashboard.phoneNumber', 'Phone')}
+                value={userProfile?.phone || t('dashboard.notSet', 'Not set')}
+                isRTL={isRTL}
+                onEdit={() => setEditingPhone(true)}
+                editing={editingPhone}
+                editContent={
+                  <EditInput
+                    type="tel"
+                    value={newPhone}
+                    onChange={(e) => setNewPhone(e.target.value)}
+                    onSave={handleUpdatePhone}
+                    onCancel={cancelPhoneEdit}
+                    placeholder={t('dashboard.enterYourPhone', 'Enter your phone number')}
+                  />
+                }
+              />
+
+              <SettingsField
+                icon={CalendarIcon}
+                label={t('dashboard.accountCreated', 'Member since')}
+                value={
+                  userProfile?.created_at
+                    ? new Date(userProfile.created_at).toLocaleDateString()
+                    : t('dashboard.unknown', 'Unknown')
+                }
+                isRTL={isRTL}
+              />
+            </div>
           </div>
         </div>
 
         {/* ── Social Provider ── */}
         {(isGoogleUser || isAppleUser) && (
-          <div className={`flex items-center gap-3 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
-            <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0">
-              {isGoogleUser ? <GoogleIcon /> : <AppleIcon />}
-            </div>
-            <div className="min-w-0">
-              <p className={`text-sm font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
-                {isGoogleUser
-                  ? t('dashboard.googleAccount', 'Signed in with Google')
-                  : t('dashboard.appleAccount', 'Signed in with Apple')
-                }
-              </p>
-              <p className={`text-xs text-gray-500 mt-0.5 ${isRTL ? 'text-right' : ''}`}>
-                {isGoogleUser
-                  ? t('dashboard.googleAccountInfo', 'Your password is managed by Google. Visit your Google Account to change it.')
-                  : t('dashboard.appleAccountInfo', 'Your password is managed by Apple. Visit your Apple ID settings to change it.')
-                }
-              </p>
+          <div className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 p-5">
+            <span
+              className={`absolute top-3 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-400/20 select-none pointer-events-none ${isRTL ? 'left-4' : 'right-4'}`}
+              aria-hidden="true"
+            >
+              02
+            </span>
+
+            <div className="relative">
+              <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className="w-11 h-11 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                  {isGoogleUser ? <GoogleIcon /> : <AppleIcon />}
+                </div>
+                <div className="min-w-0">
+                  <p className={`text-xs font-medium tracking-widest uppercase text-tufts-blue ${isRTL ? 'text-right' : ''}`}>
+                    {isGoogleUser
+                      ? t('dashboard.googleAccount', 'Signed in with Google')
+                      : t('dashboard.appleAccount', 'Signed in with Apple')
+                    }
+                  </p>
+                  <p className={`text-sm text-gray-500 leading-relaxed mt-1 ${isRTL ? 'text-right' : ''}`}>
+                    {isGoogleUser
+                      ? t('dashboard.googleAccountInfo', 'Your password is managed by Google. Visit your Google Account to change it.')
+                      : t('dashboard.appleAccountInfo', 'Your password is managed by Apple. Visit your Apple ID settings to change it.')
+                    }
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         )}
 
         {/* ── Newsletter ── */}
-        <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-5">
-          <div className={`flex items-start justify-between gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
-            <div className="min-w-0">
-              <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+        <div className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 p-5">
+          <span
+            className={`absolute top-3 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-400/20 select-none pointer-events-none ${isRTL ? 'left-4' : 'right-4'}`}
+            aria-hidden="true"
+          >
+            {isGoogleUser || isAppleUser ? '03' : '02'}
+          </span>
+
+          <div className="relative">
+            <div className={`flex items-center gap-3 mb-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className="w-11 h-11 rounded-lg bg-tufts-blue/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
                 {isSubscribedToNewsletter
-                  ? <Bell className="w-4 h-4 text-tufts-blue flex-shrink-0" />
-                  : <BellOff className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  ? <BellIcon className="w-5 h-5 text-tufts-blue" />
+                  : <BellOffIcon className="w-5 h-5 text-gray-400" />
                 }
-                <h3 className="text-sm font-semibold text-gray-900">
-                  {t('settings.newsletterPreferences', 'Newsletter')}
-                </h3>
               </div>
-              <p className={`text-xs text-gray-500 mt-1 ${isRTL ? 'text-right' : ''}`}>
-                {isSubscribedToNewsletter
-                  ? t('settings.currentlySubscribed', 'You are currently subscribed to our newsletter and promotional emails.')
-                  : t('settings.currentlyUnsubscribed', 'You are not subscribed to our newsletter.')
-                }
-              </p>
+              <h3 className="text-xs font-medium tracking-widest uppercase text-tufts-blue">
+                {t('settings.newsletterPreferences', 'Newsletter')}
+              </h3>
             </div>
+            <p className={`text-sm text-gray-500 leading-relaxed mt-2 mb-4 ${isRTL ? 'text-right' : ''}`}>
+              {isSubscribedToNewsletter
+                ? t('settings.currentlySubscribed', 'You are currently subscribed to our newsletter and promotional emails.')
+                : t('settings.currentlyUnsubscribed', 'You are not subscribed to our newsletter.')
+              }
+            </p>
             <button
               onClick={handleNewsletterToggle}
               disabled={isUnsubscribing}
-              className={`flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-xl transition-colors duration-150 ease-out disabled:opacity-50 disabled:cursor-not-allowed ${
+              className={`inline-flex items-center gap-1.5 px-5 py-2.5 text-sm font-medium rounded-full transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
                 isSubscribedToNewsletter
-                  ? 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100'
-                  : 'bg-tufts-blue text-white hover:bg-tufts-blue/90'
+                  ? 'bg-amber-50 text-amber-700 hover:bg-amber-100'
+                  : 'bg-eerie-black text-white hover:bg-gray-800'
               }`}
             >
               {isUnsubscribing ? (
                 <div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-current border-t-transparent" />
               ) : isSubscribedToNewsletter ? (
-                <BellOff className="w-3.5 h-3.5" />
+                <BellOffIcon className="w-3.5 h-3.5" />
               ) : (
-                <Bell className="w-3.5 h-3.5" />
+                <BellIcon className="w-3.5 h-3.5" />
               )}
               {isSubscribedToNewsletter
                 ? t('settings.unsubscribe', 'Unsubscribe')
@@ -370,58 +476,67 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
         </div>
 
         {/* ── Danger Zone ── */}
-        <div className="bg-white/80 backdrop-blur-sm border border-red-200 rounded-xl p-5">
-          <div className={`flex items-start justify-between gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
-            <div className="min-w-0">
-              <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
-                <h3 className="text-sm font-semibold text-gray-900">
-                  {t('settings.deleteAccount', 'Delete Account')}
-                </h3>
+        <div className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 p-5">
+          <span
+            className={`absolute top-3 text-[5rem] lg:text-[6rem] font-semibold leading-none text-red-400/15 select-none pointer-events-none ${isRTL ? 'left-4' : 'right-4'}`}
+            aria-hidden="true"
+          >
+            {isGoogleUser || isAppleUser ? '04' : '03'}
+          </span>
+
+          <div className="relative">
+            <div className={`flex items-center gap-3 mb-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className="w-11 h-11 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                <AlertTriangleIcon className="w-5 h-5 text-red-500" />
               </div>
-              <p className={`text-xs text-gray-500 mt-1 ${isRTL ? 'text-right' : ''}`}>
-                {t('settings.deleteAccountDescription', 'Permanently delete your account and all associated data. This action cannot be undone.')}
-              </p>
+              <h3 className="text-xs font-medium tracking-widest uppercase text-red-500">
+                {t('settings.deleteAccount', 'Delete Account')}
+              </h3>
             </div>
+            <p className={`text-sm text-gray-500 leading-relaxed mt-2 mb-4 ${isRTL ? 'text-right' : ''}`}>
+              {t('settings.deleteAccountDescription', 'Permanently delete your account and all associated data. This action cannot be undone.')}
+            </p>
             <button
               onClick={() => setShowDeleteModal(true)}
-              className="flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-colors duration-150 ease-out"
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 text-sm font-medium text-red-600 bg-red-50 rounded-full hover:bg-red-100 transition-colors duration-300"
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              <Trash2Icon className="w-3.5 h-3.5" />
               {t('settings.deleteMyAccount', 'Delete')}
             </button>
           </div>
+        </div>
+      </div>
         </div>
       </div>
 
       {/* ── Delete Confirmation Modal ── */}
       {showDeleteModal && (
         <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-opacity duration-150 ease-out"
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 transition-opacity duration-300"
           onClick={() => setShowDeleteModal(false)}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6"
+            className="bg-white max-w-md w-full p-6"
             dir={isRTL ? 'rtl' : 'ltr'}
             onClick={e => e.stopPropagation()}
           >
             <div className={`flex items-center gap-3 mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <div className="w-11 h-11 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                <AlertTriangle className="w-5 h-5 text-red-600" />
+              <div className="w-11 h-11 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0">
+                <AlertTriangleIcon className="w-5 h-5 text-red-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-semibold text-eerie-black">
                   {t('settings.confirmDeleteAccount', 'Delete Account?')}
                 </h3>
               </div>
             </div>
 
-            <p className={`text-sm text-gray-500 mb-5 ${isRTL ? 'text-right' : ''}`}>
+            <p className={`text-sm text-gray-500 leading-relaxed mb-5 ${isRTL ? 'text-right' : ''}`}>
               {t('settings.deleteWarning', 'This will permanently delete your account, all your eSIMs, order history, and personal data. This action cannot be undone.')}
             </p>
 
             <div className="mb-5">
-              <label className={`block text-xs font-medium text-gray-500 mb-1.5 ${isRTL ? 'text-right' : ''}`}>
+              <label className={`block text-xs font-medium tracking-widest uppercase text-gray-500 mb-1.5 ${isRTL ? 'text-right' : ''}`}>
                 {t('settings.typeDeleteToConfirm', 'Type DELETE to confirm')}
               </label>
               <input
@@ -429,28 +544,27 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
                 value={deleteConfirmText}
                 onChange={(e) => setDeleteConfirmText(e.target.value)}
                 placeholder="DELETE"
-                className={`w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-red-200 focus:border-red-400 outline-none transition-all duration-150 ease-out ${isRTL ? 'text-right' : ''}`}
+                className={`w-full px-4 py-3 bg-gray-50 text-sm focus:ring-2 focus:ring-red-200 outline-none transition-all duration-300 ${isRTL ? 'text-right' : ''}`}
               />
-              {/* Reserved height for error state — prevents layout jump */}
               <div className="h-5" />
             </div>
 
             <div className={`flex gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
               <button
                 onClick={() => { setShowDeleteModal(false); setDeleteConfirmText(''); }}
-                className="flex-1 py-3 text-sm font-medium text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors duration-150 ease-out"
+                className="flex-1 py-3 text-sm font-medium text-gray-700 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors duration-300"
               >
                 {t('common.cancel', 'Cancel')}
               </button>
               <button
                 onClick={handleDeleteAccount}
                 disabled={isDeleting || deleteConfirmText !== 'DELETE'}
-                className="flex-1 py-3 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors duration-150 ease-out disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 py-3 text-sm font-medium text-white bg-red-600 rounded-full hover:bg-red-700 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isDeleting ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
                 ) : (
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2Icon className="w-4 h-4" />
                 )}
                 {t('settings.deleteForever', 'Delete Forever')}
               </button>

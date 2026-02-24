@@ -102,41 +102,55 @@ export const BlogGridSkeleton = ({ count = 6 }) => (
 export const FormFieldSkeleton = () => (
   <div className="space-y-1.5">
     <TextLine width="w-16" className="h-3" />
-    <Block className="h-12 rounded-xl" />
+    <Block className="h-12 rounded-none" />
   </div>
 );
 
-/** Account settings skeleton — profile card with fields */
+/** Settings card skeleton — flat bg-gray-50 card with icon pill and watermark */
+const SettingsCardSkeleton = ({ children }) => (
+  <div className="relative bg-gray-50 overflow-hidden p-5">
+    <div className="absolute top-3 right-4 w-16 h-20 bg-gray-100/50 rounded animate-pulse" />
+    <div className="relative">
+      <div className="flex items-center gap-3 mb-4">
+        <Block className="w-11 h-11 rounded-lg" />
+        <TextLine width="w-32" className="h-3" />
+      </div>
+      {children}
+    </div>
+  </div>
+);
+
+/** Account settings skeleton — flat cards matching design system */
 export const AccountSettingsSkeleton = () => (
-  <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 space-y-5">
-    {/* Personal Info card */}
-    <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4">
-      <Heading width="w-40" />
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <FormFieldSkeleton />
-        <FormFieldSkeleton />
-        <FormFieldSkeleton />
-        <FormFieldSkeleton />
-      </div>
-    </div>
+  <div className="mx-auto w-full max-w-9xl">
+    <div className="mx-auto w-full max-w-7xl">
+      <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl space-y-4">
+        {/* Personal Info card */}
+        <SettingsCardSkeleton>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <FormFieldSkeleton />
+            <FormFieldSkeleton />
+            <FormFieldSkeleton />
+            <FormFieldSkeleton />
+          </div>
+        </SettingsCardSkeleton>
 
-    {/* Provider card */}
-    <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl p-4">
-      <Block className="w-10 h-10 rounded-xl" />
-      <div className="space-y-1.5 flex-1">
-        <TextLine width="w-40" />
-        <TextLine width="w-64" className="h-3" />
-      </div>
-    </div>
-
-    {/* Newsletter card */}
-    <div className="bg-white border border-gray-200 rounded-xl p-5">
-      <div className="flex items-start justify-between gap-4">
-        <div className="space-y-1.5 flex-1">
-          <Heading width="w-28" />
+        {/* Provider card */}
+        <SettingsCardSkeleton>
           <TextLine width="w-64" className="h-3" />
-        </div>
-        <Block className="w-28 h-9 rounded-xl flex-shrink-0" />
+        </SettingsCardSkeleton>
+
+        {/* Newsletter card */}
+        <SettingsCardSkeleton>
+          <TextLine width="w-64" className="h-3 mb-4" />
+          <Block className="w-28 h-9 rounded-full" />
+        </SettingsCardSkeleton>
+
+        {/* Danger zone card */}
+        <SettingsCardSkeleton>
+          <TextLine width="w-72" className="h-3 mb-4" />
+          <Block className="w-20 h-9 rounded-full" />
+        </SettingsCardSkeleton>
       </div>
     </div>
   </div>
