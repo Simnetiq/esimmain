@@ -14,6 +14,7 @@ import CurrencyToggle from './CurrencyToggle';
 import { detectLanguageFromPath, getLocalizedBlogListUrl, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
 import { getPlatformAppStoreLink } from '@esim/shared/utils/appStoreLinks';
+import PlatformDownloadCTA from './cta/PlatformDownloadCTA';
 // Inline SVG icons to avoid lucide-react bundle overhead on every page
 const ChevronDown = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -210,7 +211,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
 
   return (
     <header
-      className={`navbar-header fixed bg-white/30 backdrop-blur-xl w-full left-0 right-0 justify-center border-b border-gray-200/70 top-0 transition-transform duration-300 ${
+      className={`navbar-header fixed bg-white/30 backdrop-blur-md w-full left-0 right-0 justify-center top-0 transition-transform duration-300 ${
         isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}
       style={{ zIndex: 9999 }}
@@ -437,7 +438,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
       {isMenuOpen && mounted && createPortal(
         <div className="lg:hidden" style={{ zIndex: 99999, position: 'fixed', inset: 0 }} dir={direction} lang={currentLanguage}>
           <div 
-            className="fixed inset-0 w-full h-full overflow-y-auto bg-white/80 backdrop-blur-xl" 
+            className="fixed inset-0 w-full h-full overflow-y-auto bg-white/80 backdrop-blur-md" 
             style={{ zIndex: 99999 }}
           >
             {/* Header with logo and close button */}
@@ -467,152 +468,119 @@ const Navbar = ({ hideLanguageSelector = false }) => {
             {/* Centered menu items */}
             <div className="flex flex-col justify-center min-h-[60vh]">
               <div className="space-y-2">
-                {/* User info - only show when logged in */}
-                {currentUser && (
-                  <>
-                    <div className={`flex items-center justify-center gap-4 py-4 px-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                      <div className="w-14 h-14 rounded-full bg-tufts-blue text-white text-lg font-semibold flex items-center justify-center flex-shrink-0">
-                        {getUserInitials()}
-                      </div>
-                      <div className={isRTL ? 'text-right' : 'text-left'}>
-                        <p className="text-base font-medium text-eerie-black">
-                          {currentUser.displayName || t('navbar.user', 'User')}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {currentUser.email}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="border-t border-gray-200 my-4 mx-8" />
-                  </>
-                )}
-                
-                {/* Store */}
-                <Link
-                  href={getLocalizedUrl("/esim-plans")}
-                  className="flex items-center justify-center text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {t('navbar.store', 'Store')}
-                </Link>
-                
-                {/* My eSIMs - only show when logged in */}
-                {currentUser && (
-                  <Link
-                    href={getLocalizedUrl("/dashboard")}
-                    className="flex items-center justify-center text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {t('navbar.myEsims', 'My eSIMs')}
-                  </Link>
-                )}
-                
-                {/* Divider */}
-                <div className="border-t border-gray-200 my-4 mx-8" />
-                
-                {/* More section items */}
-                <Link
-                  href={getLocalizedBlogListUrl(currentLanguage)}
-                  className="flex items-center justify-center text-base sm:text-lg font-semibold text-gray-600 hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {t('navbar.blog', 'Blog')}
-                </Link>
-                
-                <Link
-                  href={getLocalizedUrl('/contact')}
-                  className="flex items-center justify-center text-base sm:text-lg font-semibold text-gray-600 hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {t('navbar.contactUs', 'Contact Us')}
-                </Link>
-                
-                {/* Divider */}
-                <div className="border-t border-gray-200 my-4 mx-8" />
-                
-                {/* Download App - with specific links for authenticated users */}
+                {/* Authenticated menu */}
                 {currentUser ? (
                   <>
-                    <span className="flex items-center justify-center text-xs text-gray-400 uppercase tracking-wider py-2">
-                      {t('navbar.getTheApp', 'Get the App')}
-                    </span>
-                    <a
-                      href="https://apps.apple.com/gb/app/simnetiq-global-esim/id6755963262"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4 `}
-                      onClick={() => {
-                        handleDownloadApp();
-                        setIsMenuOpen(false);
-                      }}
-                    >
-                      <Smartphone className="w-5 h-5" />
-                      {t('navbar.iosApp', 'iOS App')}
-                    </a>
-                    <a
-                      href="https://play.google.com/store/apps/details?id=com.simnetiq.storeAndroid&hl=en"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4 `}
-                      onClick={() => {
-                        handleDownloadApp();
-                        setIsMenuOpen(false);
-                      }}
-                    >
-                      <Smartphone className="w-5 h-5" />
-                      {t('navbar.androidApp', 'Android App')}
-                    </a>
-                  </>
-                ) : (
-                  <a
-                    href={getPlatformAppStoreLink()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => {
-                      handleDownloadApp();
-                      setIsMenuOpen(false);
-                    }}
-                    className="flex items-center justify-center text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4"
-                  >
-                    {t('navbar.downloadApp', 'Download App')}
-                  </a>
-                )}
-                
-                {/* Divider before auth section */}
-                <div className="border-t border-gray-200 my-4 mx-8" />
-                
-                {/* Auth/Settings section */}
-                {currentUser ? (
-                  <>
+                    {/* Name only — bigger, centered */}
+                    <p className="text-xl font-bold text-eerie-black text-center py-4">
+                      {currentUser.displayName || t('navbar.user', 'User')}
+                    </p>
+
+                    <div className="border-t border-gray-200 my-2 mx-8" />
+
+                    {/* Edit Profile */}
                     <Link
                       href={getLocalizedUrl('/settings')}
-                      className={`flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4 `}
+                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      <SettingsIcon className="w-5 h-5" />
-                      {t('navbar.settings', 'Settings')}
+                      {t('navbar.editProfile', 'Edit Profile')}
                     </Link>
-                    
+
+                    {/* My eSIMs */}
+                    <Link
+                      href={getLocalizedUrl('/dashboard')}
+                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {t('navbar.myEsims', 'My eSIMs')}
+                    </Link>
+
+                    {/* Store */}
+                    <Link
+                      href={getLocalizedUrl('/esim-plans')}
+                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {t('navbar.store', 'Store')}
+                    </Link>
+
+                    <div className="border-t border-gray-200 my-2 mx-8" />
+
+                    {/* Download App — device-aware */}
+                    <div className="flex justify-center py-3 px-4">
+                      <PlatformDownloadCTA variant="secondary" size="sm" source="mobile_menu" />
+                    </div>
+
+                    <div className="border-t border-gray-200 my-2 mx-8" />
+
+                    {/* Support */}
                     <Link
                       href={getLocalizedUrl('/contact')}
-                      className={`flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4 `}
+                      className="flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <Headphones className="w-5 h-5" />
                       {t('navbar.support', 'Support')}
                     </Link>
-                    
-                    <button
-                      onClick={handleLogout}
-                      disabled={isLoggingOut}
-                      className={`flex items-center justify-center gap-2 w-full text-base sm:text-lg font-semibold text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-all duration-200 py-3 px-4 disabled:opacity-50 `}
-                    >
-                      <LogOut className="w-5 h-5" />
-                      {isLoggingOut ? t('navbar.loggingOut', 'Logging out...') : t('navbar.logout', 'Log out')}
-                    </button>
+
+                    {/* Log Out — rounded outlined button */}
+                    <div className="flex justify-center pt-4 pb-2 px-8">
+                      <button
+                        onClick={handleLogout}
+                        disabled={isLoggingOut}
+                        className="w-full py-3 text-base font-semibold text-red-600 border border-red-200 rounded-full hover:bg-red-50 transition-colors disabled:opacity-50"
+                      >
+                        {isLoggingOut ? t('navbar.loggingOut', 'Logging out...') : t('navbar.logout', 'Log out')}
+                      </button>
+                    </div>
                   </>
                 ) : (
                   <>
+                    {/* Non-authenticated menu — unchanged */}
+                    <Link
+                      href={getLocalizedUrl("/esim-plans")}
+                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {t('navbar.store', 'Store')}
+                    </Link>
+
+                    <div className="border-t border-gray-200 my-4 mx-8" />
+
+                    <Link
+                      href={getLocalizedBlogListUrl(currentLanguage)}
+                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-gray-600 hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {t('navbar.blog', 'Blog')}
+                    </Link>
+
+                    <Link
+                      href={getLocalizedUrl('/contact')}
+                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-gray-600 hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {t('navbar.contactUs', 'Contact Us')}
+                    </Link>
+
+                    <div className="border-t border-gray-200 my-4 mx-8" />
+
+                    <a
+                      href={getPlatformAppStoreLink()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => {
+                        handleDownloadApp();
+                        setIsMenuOpen(false);
+                      }}
+                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4"
+                    >
+                      {t('navbar.downloadApp', 'Download App')}
+                    </a>
+
+                    <div className="border-t border-gray-200 my-4 mx-8" />
+
                     <Link
                       href={getLocalizedUrl('/login')}
                       className="flex items-center justify-center text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4"
@@ -620,7 +588,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                     >
                       {t('navbar.login', 'Login')}
                     </Link>
-                    
+
                     <Link
                       href={getLocalizedUrl('/register')}
                       className="flex items-center justify-center text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4"

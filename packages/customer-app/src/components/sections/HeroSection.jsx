@@ -41,7 +41,7 @@ function DeferredBackground({ isMobile }) {
     if (hasIdleCallback) {
       timer = window.requestIdleCallback(() => setShouldRender(true), { timeout: 2000 });
     } else {
-      timer = setTimeout(() => setShouldRender(true), 100);
+      timer = setTimeout(() => setShouldRender(true), 3000);
     }
 
     return () => {

@@ -267,7 +267,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
     >
       {/* Faded data watermark */}
       <span
-        className={`absolute top-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-eerie-black/[0.04] select-none pointer-events-none ${isRTL ? 'left-4' : 'right-4'}`}
+        className={`absolute top-4 hidden sm:block text-[5rem] lg:text-[6rem] font-semibold leading-none text-eerie-black/[0.04] select-none pointer-events-none ${isRTL ? 'left-4' : 'right-4'}`}
         aria-hidden="true"
       >
         {watermarkText}

@@ -35,22 +35,13 @@ export default function HomePage() {
   const currentLanguage = locale || detectLanguageFromPath(pathname) || 'en';
   const isRTL = getLanguageDirection(currentLanguage) === 'rtl';
 
-  // Redirect authenticated users to dashboard
+  // Redirect authenticated users to dashboard (non-blocking — don't gate content)
   useEffect(() => {
     if (!authLoading && currentUser) {
       const dashboardUrl = currentLanguage === 'en' ? '/dashboard' : `/${currentLanguage}/dashboard`;
-      router.push(dashboardUrl);
+      router.replace(dashboardUrl);
     }
   }, [authLoading, currentUser, currentLanguage, router]);
-
-  // Show nothing while checking auth or redirecting
-  if (authLoading || currentUser) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-tufts-blue"></div>
-      </div>
-    );
-  }
 
   return (
     <>
