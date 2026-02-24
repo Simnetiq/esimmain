@@ -23,7 +23,8 @@
     "iosApp": "App iOS",
     "androidApp": "App Android",
     "userMenu": "Menu utilisateur",
-    "user": "Utilisateur"
+    "user": "Utilisateur",
+    "about": "About"
   },
   "hero": {
     "announcement": "Maintenant disponible dans plus de 200 pays dans le monde.",
@@ -41,7 +42,6 @@
     "downloadAppAndroid": "Télécharger l'app Android",
     "exploreStore": "Explorer la boutique eSIM",
     "Online": "Toujours connecté",
-    "with": "êtes avec Simnetiq",
     "description": "eSIM mondial pour les voyageurs, les nomades numériques et les randonneurs. Pas de frais de roaming, pas de SIM physique nécessaire.",
     "downloadApp": "Télécharger l'application",
     "exploreTariffs": "Explorer les tarifs",
@@ -52,7 +52,7 @@
       "japan": "🇯🇵 Japon",
       "spain": "🇪🇸 Espagne",
       "china": "🇨🇳 Chine",
-        "brazil": "🇧🇷 Brésil",
+      "brazil": "🇧🇷 Brésil",
       "india": "🇮🇳 Inde",
       "uk": "🇬🇧 Royaume-Uni",
       "germany": "🇩🇪 Allemagne",
@@ -65,7 +65,6 @@
   "features": {
     "title": "Connectez-vous globalement",
     "subtitle": "Solution eSIM parfaite pour randonneurs, voyageurs et nomades numériques dans le monde entier",
-    "get35Off": "Obtenez 35% DE RÉDUCTION",
     "globalCoverage": {
       "tag": "COUVERTURE MONDIALE",
       "title": "Couverture mondiale",
@@ -101,17 +100,7 @@
       "description": "Bientôt à court ? Rechargez votre eSIM instantanément depuis l'application — pas besoin d'acheter un nouveau forfait ou de réinstaller."
     }
   },
-  "QRCodeModal": {
-    "esimQrCode": "eSIM QR Code",
-    "qrCodeImageFromAiralo": "QR Code Image from Airalo",
-    "realQrCodeFromAiralo": "Real QR Code from Airalo (Add Cellular Plan)",
-    "qrData": "QR Data: {{data}}...",
-    "directAppleInstallationLink": "Direct Apple Installation Link",
-    "appleEsimInstallation": "Apple eSIM Installation",
-    "qrCodeBeingGenerated": "QR code is being generated...",
-    "clickGenerateQrCodeToTryAgain": "Click \"Generate QR Code\" to try again",
-    "actions": "Actions"
-  },
+  "QRCodeModal": {},
   "activation": {
     "appTitle": "Restez connecté où que vous voyagiez",
     "appDescription": "Obtenez des forfaits eSIM instantanés pour plus de 200 pays. Pas de SIM physique, activation en minutes.",
@@ -154,7 +143,6 @@
     }
   },
   "footer": {
-    "logoAlt": "Logo Simnetiq",
     "brandName": "Simnetiq",
     "companyDescription": "Simnetiq - Votre partenaire de confiance pour les solutions eSIM mondiales. Activation instantanée, couverture mondiale et connectivité sécurisée pour les voyageurs et les entreprises.",
     "quickLinks": "Liens rapides",
@@ -166,7 +154,20 @@
     "termsOfService": "Conditions d'utilisation",
     "cookiePolicy": "Politique des cookies",
     "contactInfoNotAvailable": "Informations de contact non disponibles",
-    "allRightsReserved": "Tous droits réservés"
+    "allRightsReserved": "Tous droits réservés",
+    "tagline": "Stay connected wherever you travel. Instant eSIM activation for 200+ countries.",
+    "product": "PRODUCT",
+    "esimPlans": "eSIM Plans",
+    "appStore": "iOS App",
+    "googlePlay": "Android App",
+    "support": "SUPPORT",
+    "contact": "Contact Us",
+    "faq": "FAQ",
+    "company": "COMPANY",
+    "about": "About",
+    "simnetiq": "Simnetiq",
+    "dopplerVpn": "Doppler VPN",
+    "legal": "LEGAL"
   },
   "search": {
     "destinationPlaceholder": "Recherchez votre destination (ex: France, Allemagne, États-Unis)",
@@ -338,7 +339,8 @@
       "title": "Paiement rapide",
       "subtitle": "Choisissez comment vous souhaitez continuer",
       "disclaimer": "En continuant, vous confirmez avoir au moins 18 ans et acceptez nos Conditions d'utilisation."
-    }
+    },
+    "loggedIn": "Logged in successfully"
   },
   "contact": {
     "title": "Entrer en contact",
@@ -553,7 +555,6 @@
     "activeEsims": "eSIMs actives",
     "totalSpent": "Total dépensé",
     "browseEsims": "Parcourir les eSIMs",
-    "uses": "Utilisations",
     "yourPerformance": "Vos performances",
     "totalEarnings": "Gains totaux",
     "tapToJoinAffiliate": "Appuyez pour rejoindre le programme d'affiliation",
@@ -707,7 +708,9 @@
     "title": "Oups ! Page non trouvée",
     "goBack": "Retour",
     "needHelp": "Besoin d'aide ?",
-    "contactSupport": "Contactez notre équipe de support"
+    "contactSupport": "Contactez notre équipe de support",
+    "description": "The page you are looking for doesn't exist or has been moved. Let's get you back on track.",
+    "goHome": "Go Home"
   },
   "deals": {
     "unlimitedBadge": "Illimité",
@@ -841,7 +844,27 @@
     "globalCoverage": "Couverture mondiale",
     "globalCoverageDesc": "Restez connecté où que vous alliez",
     "metaDescription": "Acheter {planName} eSIM pour {country}. Activation instantanée, paiement sécurisé, couverture mondiale. À partir de ${price}. Parfait pour les voyageurs et nomades digitaux.",
-    "metaTitle": "Acheter {planName} eSIM - {country} | Paiement Sécurisé"
+    "metaTitle": "Acheter {planName} eSIM - {country} | Paiement Sécurisé",
+    "for": "for",
+    "implicitTerms": "By clicking \"Proceed to Payment\" you agree to the",
+    "loginToContinue": "Log in to Continue",
+    "loginDesc": "Sign in with Google or Apple",
+    "verifyingAccount": "Verifying your account...",
+    "poweredBy": "Powered by",
+    "voiceCalls": "Voice Calls",
+    "minutes": "min",
+    "sms": "SMS Messages",
+    "coverageIn": "Coverage in",
+    "country": "country",
+    "countries": "countries",
+    "tapToView": "Tap to view all countries",
+    "fairUsage": "Fair Usage Policy",
+    "promoPlaceholder": "Promo code",
+    "applyPromo": "Apply",
+    "promoAppliedPct": "{{pct}}% off applied",
+    "promoAppliedAmt": "${{amt}} off applied",
+    "promoInvalid": "Invalid or expired promo code",
+    "promoError": "Could not validate promo code"
   },
   "stripeCheckout": {
     "title": "Paiement sécurisé par carte",
@@ -906,7 +929,12 @@
     "androidStep4": "Activez les données mobiles et l'itinérance des données pour votre eSIM",
     "downloadIOS": "Télécharger sur iOS",
     "downloadAndroid": "Télécharger sur Android",
-    "generatingQR": "Génération du code QR..."
+    "generatingQR": "Génération du code QR...",
+    "instructionStep1": "Open your device's Settings app",
+    "instructionStep2": "Go to Cellular or Mobile Data settings",
+    "instructionStep3": "Tap \"Add Cellular Plan\" or \"Add eSIM\"",
+    "instructionStep4": "Scan the QR code above with your device",
+    "instructionStep5": "Follow the on-screen instructions to complete activation"
   },
   "blogApp": {
     "appTitle": "Restez connecté où que vous voyagiez",

@@ -23,7 +23,8 @@
     "iosApp": "אפליקציית iOS",
     "androidApp": "אפליקציית Android",
     "userMenu": "תפריט משתמש",
-    "user": "משתמש"
+    "user": "משתמש",
+    "about": "About"
   },
   "hero": {
     "announcement": "כעת זמין ביותר מ-200 מדינות ברחבי העולם.",
@@ -64,7 +65,6 @@
   "features": {
     "title": "התחבר גלובלית",
     "subtitle": "כל מה שאתה צריך לחיבור גלובלי",
-    "get35Off": "קבל 35% הנחה",
     "globalCoverage": {
       "tag": "כיסוי גלובלי",
       "title": "כיסוי גלובלי",
@@ -87,7 +87,7 @@
       "title": "תאימות מכשירים",
       "description": "עובד עם כל הסמארטפונים והטאבלטים המודרניים התומכים בטכנולוגיית eSIM.",
       "esimCompatible": "תואם eSIM",
-      "operatingSystem": "Android 12+, iOS 15+"   
+      "operatingSystem": "Android 12+, iOS 15+"
     },
     "easySetup": {
       "title": "הגדרה פשוטה",
@@ -122,8 +122,6 @@
     "downloadForAndroid": "הורד אפליקציית Android",
     "appLinksSoon": "קישורי חנות האפליקציות יהיו זמינים בקרוב.",
     "loadingAppLinks": "טוען קישורי אפליקציות...",
-    "earnWithReferrals": "רוצה להרוויח כסף? הצטרף לתוכנית השותפים שלנו וקבל תשלום עבור כל הפניה.",
-    "learnMore": "למד עוד",
     "activationProcess": "תהליך הפעלה",
     "followSteps": "עקוב אחר השלבים הפשוטים הבאים כדי להפעיל את ה-eSIM שלך",
     "step1": {
@@ -206,7 +204,7 @@
     "seeAllPlans": "צפה בכל התוכניות",
     "plan": "תוכנית",
     "plans": "תוכניות",
-    "from": "", 
+    "from": "",
     "priceNotAvailable": "מחיר לא זמין",
     "regionalPlans": "תוכניות אזוריות",
     "topChoice": " פופולרי",
@@ -222,17 +220,7 @@
     "minutes": "דק׳",
     "fairUsage": "שימוש הוגן"
   },
-  "QRCodeModal": {
-    "esimQrCode": "eSIM QR Code",
-    "qrCodeImageFromAiralo": "QR Code Image from Airalo",
-    "realQrCodeFromAiralo": "Real QR Code from Airalo (Add Cellular Plan)",
-    "qrData": "QR Data: {{data}}...",
-    "directAppleInstallationLink": "Direct Apple Installation Link",
-    "appleEsimInstallation": "Apple eSIM Installation",
-    "qrCodeBeingGenerated": "QR code is being generated...",
-    "clickGenerateQrCodeToTryAgain": "Click \"Generate QR Code\" to try again",
-    "actions": "Actions"
-  },
+  "QRCodeModal": {},
   "discount": {
     "get35Off": "קבל 35% הנחה",
     "copied": "קוד הנחה OCTOBER35 הועתק! 35% הנחה על הרכישה שלך!",
@@ -345,16 +333,15 @@
       "and": "ו",
       "privacyPolicy": "מדיניות הפרטיות שלנו"
     },
-    "register": {
-      "title": "צור את החשבון שלך"
-    },
+    "register": {},
     "welcomeMessage": "ברוכים הבאים ל-Simnetiq - פתרון ה-eSIM הגלובלי שלכם",
     "trustedByThousands": "מועדף על ידי אלפי מטיילים ברחבי העולם",
     "modal": {
       "title": "תשלום מהיר",
       "subtitle": "בחר כיצד ברצונך להמשיך",
       "disclaimer": "בהמשך, אתה מאשר שאתה בן 18 לפחות ומסכים לתנאי השירות שלנו."
-    }
+    },
+    "loggedIn": "Logged in successfully"
   },
   "contact": {
     "title": "צור קשר",
@@ -571,7 +558,6 @@
     "browseEsims": "עיין ב-eSIMs",
     "yourPerformance": "הביצועים שלך",
     "totalEarnings": "סך הכנסות",
-    "uses": "שימושים",
     "tapToJoinAffiliate": "הקש כדי להצטרף לתוכנית השותפים",
     "qrCode": "קוד QR",
     "details": "פרטים",
@@ -723,7 +709,9 @@
     "title": "אופס! הדף לא נמצא",
     "goBack": "חזור אחורה",
     "needHelp": "צריך עזרה?",
-    "contactSupport": "צור קשר עם צוות התמיכה שלנו"
+    "contactSupport": "צור קשר עם צוות התמיכה שלנו",
+    "description": "The page you are looking for doesn't exist or has been moved. Let's get you back on track.",
+    "goHome": "Go Home"
   },
   "deals": {
     "unlimitedBadge": "ללא הגבלה",
@@ -857,7 +845,27 @@
     "buyNow": "קנה עכשיו",
     "pageTitle": "תשלום מאובטח - קנה eSIM",
     "metaDescription": "קנה {planName} eSIM עבור {country}. הפעלה מיידית, תשלום מאובטח, כיסוי גלובלי. החל מ-${price}. מושלם לנוסעים ונוודים דיגיטליים.",
-    "metaTitle": "קנה {planName} eSIM - {country} | תשלום מאובטח"
+    "metaTitle": "קנה {planName} eSIM - {country} | תשלום מאובטח",
+    "for": "for",
+    "implicitTerms": "By clicking \"Proceed to Payment\" you agree to the",
+    "loginToContinue": "Log in to Continue",
+    "loginDesc": "Sign in with Google or Apple",
+    "verifyingAccount": "Verifying your account...",
+    "poweredBy": "Powered by",
+    "voiceCalls": "Voice Calls",
+    "minutes": "min",
+    "sms": "SMS Messages",
+    "coverageIn": "Coverage in",
+    "country": "country",
+    "countries": "countries",
+    "tapToView": "Tap to view all countries",
+    "fairUsage": "Fair Usage Policy",
+    "promoPlaceholder": "Promo code",
+    "applyPromo": "Apply",
+    "promoAppliedPct": "{{pct}}% off applied",
+    "promoAppliedAmt": "${{amt}} off applied",
+    "promoInvalid": "Invalid or expired promo code",
+    "promoError": "Could not validate promo code"
   },
   "stripeCheckout": {
     "title": "תשלום מאובטח בכרטיס",
@@ -922,7 +930,12 @@
     "androidStep4": "הפעל נתונים ניידים ונדידת נתונים עבור ה-eSIM שלך",
     "downloadIOS": "הורד ב-iOS",
     "downloadAndroid": "הורד ב-Android",
-    "generatingQR": "יוצר קוד QR..."
+    "generatingQR": "יוצר קוד QR...",
+    "instructionStep1": "Open your device's Settings app",
+    "instructionStep2": "Go to Cellular or Mobile Data settings",
+    "instructionStep3": "Tap \"Add Cellular Plan\" or \"Add eSIM\"",
+    "instructionStep4": "Scan the QR code above with your device",
+    "instructionStep5": "Follow the on-screen instructions to complete activation"
   },
   "blogApp": {
     "appTitle": "הישאר מחובר לאן שתיסע",

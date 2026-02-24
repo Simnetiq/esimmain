@@ -1,13 +1,10 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useMemo, lazy, Suspense } from 'react';
+import React, { useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { PlatformDownloadCTA, ExploreStoreCTA } from '../cta';
-
-// Lazy load Antigravity - only after LCP to not block initial render
-const Antigravity = lazy(() => import('../animations/Antigravity'));
 
 // Inline SVG icons to avoid lucide-react bundle overhead
 const GlobeIcon = ({ className }) => (
@@ -28,78 +25,42 @@ const ShieldIcon = ({ className }) => (
   </svg>
 );
 
-// Deferred background component - loads after LCP, pauses when off-screen
-function DeferredBackground({ isMobile }) {
-  const [shouldRender, setShouldRender] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
-  const containerRef = useRef(null);
+// 16x20 dot grid with routes — pure SVG, zero TBT
+const COLS = 16;
+const ROWS = 20;
+const PADDING = 8; // % padding from edges
+const dotX = (col) => PADDING + (col / (COLS - 1)) * (100 - PADDING * 2);
+const dotY = (row) => PADDING + (row / (ROWS - 1)) * (100 - PADDING * 2);
 
-  // Pause animation when hero section scrolls off-screen
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsVisible(entry.isIntersecting),
-      { threshold: 0 }
-    );
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, [shouldRender]);
-
-  useEffect(() => {
-    // Defer background animation until after LCP (use requestIdleCallback or setTimeout)
-    // Note: requestIdleCallback is not supported on Safari/iOS, so we need to check window
-    const hasIdleCallback = typeof window !== 'undefined' && 'requestIdleCallback' in window;
-
-    let timer;
-    if (hasIdleCallback) {
-      timer = window.requestIdleCallback(() => setShouldRender(true), { timeout: 2000 });
-    } else {
-      timer = setTimeout(() => setShouldRender(true), 3000);
-    }
-
-    return () => {
-      if (hasIdleCallback && typeof timer === 'number') {
-        window.cancelIdleCallback(timer);
-      } else {
-        clearTimeout(timer);
-      }
-    };
-  }, []);
-
-  if (!shouldRender) return <div ref={containerRef} className="w-full h-full" />;
-
-  return (
-    <div ref={containerRef} className="w-full h-full">
-      <Suspense fallback={null}>
-        <Antigravity
-          color="#4975D4"
-          autoAnimate={true}
-          count={isMobile ? 100 : 200}
-          magnetRadius={isMobile ? 5 : 7}
-          ringRadius={isMobile ? 6 : 8}
-          waveSpeed={0.3}
-          waveAmplitude={1.2}
-          particleSize={isMobile ? 0.7 : 1.0}
-          lerpSpeed={0.04}
-          particleVariance={1}
-          paused={!isVisible}
-        />
-      </Suspense>
-    </div>
-  );
-}
+// Pre-computed routes connecting dots (col, row pairs) — travel paths
+const ROUTES = [
+  // Long diagonal sweep top-left to center
+  [[1, 1], [2, 2], [3, 2], [4, 3], [5, 4], [6, 4]],
+  // Gentle mid-left arc
+  [[2, 8], [3, 8], [4, 9], [5, 9], [6, 10]],
+  // Right descending staircase
+  [[11, 2], [12, 3], [12, 4], [13, 5], [13, 6], [14, 7]],
+  // Bottom-left L-shape
+  [[1, 14], [2, 14], [3, 15], [4, 16], [5, 16], [6, 16]],
+  // Short top-right connector
+  [[12, 1], [13, 1], [14, 2]],
+  // Bottom-right ascending
+  [[10, 18], [11, 17], [12, 17], [13, 16], [14, 15]],
+  // Left vertical drop
+  [[1, 5], [1, 6], [2, 7], [2, 8], [1, 9]],
+  // Center triangle
+  [[7, 5], [8, 6], [9, 5], [7, 5]],
+  // Wide bottom sweep
+  [[3, 11], [4, 11], [5, 12], [6, 12], [6, 14], [7, 13], [8, 13], [9, 12], [8, 11]],
+  // Small top-center
+  [[6, 1], [7, 2], [8, 2], [9, 1]],
+  // Right side short vertical
+  [[14, 10], [14, 11], [13, 12], [13, 13]],
+];
 
 export default function HeroSection() {
   const pathname = usePathname();
   const { locale, t, isLoading: i18nLoading } = useI18n();
-  const [mounted, setMounted] = useState(false);
-  const [isMobile, setIsMobile] = useState(true); // Default to mobile (no animations) for SSR
-
-  useEffect(() => {
-    setMounted(true);
-    // Detect mobile devices - used to reduce animation complexity
-    setIsMobile(window.innerWidth < 768);
-  }, []);
 
   // SSR-safe language: always use pathname-based detection to avoid
   // hydration mismatch from localStorage reads
@@ -108,7 +69,6 @@ export default function HeroSection() {
   const detectedLanguage = useMemo(() => {
     try {
       if (i18nLoading) {
-        // On client, prefer localStorage; on server, fall back to pathname
         if (typeof window !== 'undefined') {
           const savedLanguage = localStorage.getItem('Simnetiq-language');
           if (savedLanguage) return savedLanguage;
@@ -122,24 +82,21 @@ export default function HeroSection() {
   }, [locale, ssrSafeLanguage, i18nLoading]);
 
   // Use pathname-based language for direction to prevent CLS on hydration.
-  // The dir attribute must match between server and client first render.
   const direction = getLanguageDirection(ssrSafeLanguage);
 
-  // Apply IBM Plex Sans Italic for "anywhere" only in EN and DE
+  // Apply IBM Plex Sans Italic for "easiest way" only in EN and DE
   const useIbmPlexSansItalic = detectedLanguage === 'en' || detectedLanguage === 'de';
   const highlightClassName = useIbmPlexSansItalic
     ? 'inline italic text-tufts-blue font-ibm-plex-sans'
     : 'inline italic text-tufts-blue';
 
-  // Trust indicators data - using inline SVG icons
+  // Trust indicators data
   const trustIndicators = [
     { Icon: GlobeIcon, label: t('hero.countries', '200+ Countries'), key: 'countries' },
     { Icon: ZapIcon, label: t('hero.instantActivation', 'Instant Activation'), key: 'activation' },
     { Icon: ShieldIcon, label: t('hero.securePayment', 'Secure Payment'), key: 'secure' },
   ];
 
-  // Get translated text - headline split into parts for styling
-  // Use fallbacks immediately for LCP - don't wait for translations
   const headlinePart1 = t('hero.headlinePart1', 'The ');
   const headlineHighlight = t('hero.headlineHighlight', 'easiest way');
   const headlinePart2 = t('hero.headlinePart2', 'to get data anywhere in the world');
@@ -147,40 +104,75 @@ export default function HeroSection() {
 
   return (
     <div className="hero-section relative min-h-screen flex flex-col bg-white" dir={direction} lang={detectedLanguage}>
-      {/* Antigravity Background Animation - deferred to after LCP */}
-      <div className="absolute inset-0 opacity-20" aria-hidden="true">
-        {mounted && <DeferredBackground isMobile={isMobile} />}
+      {/* SVG dot grid with routes — zero JS, zero TBT impact */}
+      <div className="absolute inset-0 flex items-center justify-center overflow-hidden" aria-hidden="true" style={{ maskImage: 'radial-gradient(ellipse 60% 55% at 50% 50%, black 40%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse 60% 55% at 50% 50%, black 40%, transparent 100%)' }}>
+        <svg className="max-w-9xl w-full aspect-square" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+          {/* Route lines */}
+          {ROUTES.map((route, ri) => (
+            <polyline
+              key={`r${ri}`}
+              points={route.map(([c, r]) => `${dotX(c)},${dotY(r)}`).join(' ')}
+              fill="none"
+              stroke="#1F1F1F"
+              strokeWidth="0.05"
+              opacity="0.1"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="hero-route"
+              style={{ animationDelay: `${ri * -3}s` }}
+            />
+          ))}
+          {/* Grid dots */}
+          {Array.from({ length: COLS * ROWS }, (_, i) => {
+            const col = i % COLS;
+            const row = Math.floor(i / COLS);
+            return (
+              <circle
+                key={i}
+                cx={dotX(col)}
+                cy={dotY(row)}
+                r="0.1"
+                fill="#1F1F1F"
+                opacity="0.18"
+              />
+            );
+          })}
+          {/* Highlighted dots on routes */}
+          {ROUTES.flat().map(([c, r], i) => (
+            <circle
+              key={`rd${i}`}
+              cx={dotX(c)}
+              cy={dotY(r)}
+              r="0.1"
+              fill="#1F1F1F"
+              opacity="0.1"
+            />
+          ))}
+        </svg>
       </div>
 
-      <div className="relative flex-1 flex flex-col pointer-events-none">
-        {/* Main Content - pointer-events-none to allow mouse to reach canvas */}
+      <div className="relative flex-1 flex flex-col">
         <div className="relative flex-1 flex flex-col items-center justify-center px-4 py-20 lg:py-24">
           <div className="mx-auto w-full max-w-7xl">
             <div className="px-4 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl text-center">
 
-              {/* Headline - ALWAYS render immediately for LCP, animations are purely decorative */}
               <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-8xl font-bold tracking-tight text-eerie-black mb-6 lg:mb-8 leading-[1.1]">
                 <span className="inline">{headlinePart1}</span>{' '}
                 <span className={highlightClassName}>{headlineHighlight}</span>{' '}
                 <span className="inline">{headlinePart2}</span>
               </h1>
 
-              {/* Subtitle - render immediately */}
               <p className="text-sm sm:text-lg lg:text-xl xl:text-2xl text-gray-600 mb-10 lg:mb-12 max-w-2xl lg:max-w-3xl mx-auto leading-relaxed">
                 {subtitleText}
               </p>
 
-              {/* CTA Buttons - Explore Store is PRIMARY */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 lg:mb-12 pointer-events-auto w-full sm:w-auto">
-                {/* Primary CTA - Explore eSIM Store */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 lg:mb-12 w-full sm:w-auto">
                 <ExploreStoreCTA
                   variant="dark"
                   size="md"
                   source="hero_primary_cta"
                   className="w-full sm:w-auto"
                 />
-
-                {/* Secondary CTAs - Download App (iOS + Android on desktop, single on mobile) */}
                 <PlatformDownloadCTA
                   variant="secondary"
                   size="md"
@@ -189,7 +181,6 @@ export default function HeroSection() {
                 />
               </div>
 
-              {/* Trust Indicators - stable min-h prevents bottom-line shift */}
               <div className="flex flex-wrap items-center gap-4 sm:gap-8 text-xs sm:text-sm text-gray-500 justify-center min-h-[24px] sm:min-h-[28px]">
                 {trustIndicators.map(({ Icon, label, key }, index) => (
                   <React.Fragment key={key}>
@@ -197,7 +188,6 @@ export default function HeroSection() {
                       <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 sm:text-eerie-black" />
                       <span>{label}</span>
                     </div>
-                    {/* Vertical separator between items - hidden on mobile */}
                     {index < trustIndicators.length - 1 && (
                       <div className="hidden sm:block w-px h-4 bg-gray-300" />
                     )}

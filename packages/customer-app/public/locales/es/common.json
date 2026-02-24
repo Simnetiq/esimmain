@@ -23,7 +23,8 @@
     "iosApp": "App iOS",
     "androidApp": "App Android",
     "userMenu": "Menú de usuario",
-    "user": "Usuario"
+    "user": "Usuario",
+    "about": "About"
   },
   "hero": {
     "announcement": "Ahora disponible en más de 200 países en todo el mundo.",
@@ -41,7 +42,6 @@
     "downloadAppAndroid": "Descargar app Android",
     "exploreStore": "Explorar tienda eSIM",
     "Online": "Siempre conectado",
-    "with": "estés con Simnetiq",
     "description": "eSIM global para viajeros, nómadas digitales y mochileros. Sin cargos de roaming, sin SIM física necesaria.",
     "downloadApp": "Descargar aplicación",
     "exploreTariffs": "Explorar tarifas",
@@ -52,8 +52,8 @@
       "japan": "🇯🇵 Japón",
       "spain": "🇪🇸 España",
       "china": "🇨🇳 China",
-        "brazil": "🇧🇷 Brasil",
-        "india": "🇮🇳 India",
+      "brazil": "🇧🇷 Brasil",
+      "india": "🇮🇳 India",
       "uk": "🇬🇧 Reino Unido",
       "germany": "🇩🇪 Alemania",
       "portugal": "🇵🇹 Portugal",
@@ -65,7 +65,6 @@
   "features": {
     "title": "Conéctate globalmente",
     "subtitle": "Todo lo que necesitas para la conectividad global",
-    "get35Off": "Obtén 35% DE DESCUENTO",
     "globalCoverage": {
       "tag": "COBERTURA GLOBAL",
       "title": "Cobertura global",
@@ -153,7 +152,21 @@
     "termsOfService": "Términos de servicio",
     "cookiePolicy": "Política de cookies",
     "contactInfoNotAvailable": "Información de contacto no disponible",
-    "allRightsReserved": "Todos los derechos reservados"
+    "allRightsReserved": "Todos los derechos reservados",
+    "brandName": "Simnetiq",
+    "tagline": "Stay connected wherever you travel. Instant eSIM activation for 200+ countries.",
+    "product": "PRODUCT",
+    "esimPlans": "eSIM Plans",
+    "appStore": "iOS App",
+    "googlePlay": "Android App",
+    "support": "SUPPORT",
+    "contact": "Contact Us",
+    "faq": "FAQ",
+    "company": "COMPANY",
+    "about": "About",
+    "simnetiq": "Simnetiq",
+    "dopplerVpn": "Doppler VPN",
+    "legal": "LEGAL"
   },
   "search": {
     "destinationPlaceholder": "Busca tu destino (ej: Francia, Alemania, Estados Unidos)",
@@ -319,44 +332,17 @@
       "and": "y",
       "privacyPolicy": "Política de Privacidad"
     },
-    "register": {
-      "title": "Crea tu cuenta",
-      "subtitle": "O",
-      "signInExisting": "inicia sesión en tu cuenta existente",
-      "fullNameLabel": "Nombre completo",
-      "fullNamePlaceholder": "Ingresa tu nombre completo",
-      "emailLabel": "Dirección de correo electrónico",
-      "emailPlaceholder": "Ingresa tu correo electrónico",
-      "passwordLabel": "Contraseña",
-      "passwordPlaceholder": "Ingresa tu contraseña",
-      "createAccountButton": "Crear cuenta",
-      "fillAllFields": "Por favor completa todos los campos",
-      "passwordTooShort": "La contraseña debe tener al menos 6 caracteres",
-      "accountCreated": "¡Cuenta creada! Por favor revisa tu correo electrónico para el código de verificación.",
-      "registrationFailed": "Error al enviar el código de verificación"
-    },
+    "register": {},
     "welcomeMessage": "Bienvenido a Simnetiq - Tu solución eSIM global",
     "trustedByThousands": "Confiado por miles de viajeros en todo el mundo",
     "modal": {
       "title": "Pago rápido",
       "subtitle": "Elige cómo deseas continuar",
       "disclaimer": "Al continuar, verificas que tienes al menos 18 años y aceptas nuestros Términos de Servicio."
-    }
+    },
+    "loggedIn": "Logged in successfully"
   },
-  "accountSettings": {
-    "accountSettings": "Configuración de cuenta",
-    "email": "Dirección de correo electrónico",
-    "phone": "Número de teléfono",
-    "name": "Nombre",
-    "saveChanges": "Guardar cambios",
-    "cancel": "Cancelar",
-    "updateSuccess": "¡Cambios guardados exitosamente!",
-    "updateFailed": "Error al guardar los cambios",
-    "password": "Contraseña",
-    "passwordPlaceholder": "Ingresa tu contraseña",
-    "passwordConfirm": "Confirmar contraseña",
-    "passwordConfirmPlaceholder": "Ingresa tu contraseña nuevamente"
-  },
+  "accountSettings": {},
   "contact": {
     "title": "Ponte en contacto",
     "subtitle": "Estamos aquí para ayudarte con todas tus necesidades de eSIM",
@@ -561,7 +547,6 @@
     "checkUsageAndStatus": "Verificar Uso y Estado",
     "openInAppleEsim": "Abrir en Apple eSIM",
     "downloadQrCode": "Descargar Código QR",
-    "uses": "Usos",
     "roles": {
       "customer": "Cliente",
       "admin": "Administrador",
@@ -724,7 +709,9 @@
     "title": "¡Ups! Página no encontrada",
     "goBack": "Volver",
     "needHelp": "¿Necesitas ayuda?",
-    "contactSupport": "Contacta a nuestro equipo de soporte"
+    "contactSupport": "Contacta a nuestro equipo de soporte",
+    "description": "The page you are looking for doesn't exist or has been moved. Let's get you back on track.",
+    "goHome": "Go Home"
   },
   "deals": {
     "unlimitedBadge": "Ilimitado",
@@ -858,7 +845,27 @@
     "globalCoverage": "Cobertura global",
     "globalCoverageDesc": "Mantente conectado dondequiera que vayas",
     "metaDescription": "Comprar {planName} eSIM para {country}. Activación instantánea, pago seguro, cobertura global. Desde ${price}. Perfecto para viajeros y nómadas digitales.",
-    "metaTitle": "Comprar {planName} eSIM - {country} | Pago Seguro"
+    "metaTitle": "Comprar {planName} eSIM - {country} | Pago Seguro",
+    "for": "for",
+    "implicitTerms": "By clicking \"Proceed to Payment\" you agree to the",
+    "loginToContinue": "Log in to Continue",
+    "loginDesc": "Sign in with Google or Apple",
+    "verifyingAccount": "Verifying your account...",
+    "poweredBy": "Powered by",
+    "voiceCalls": "Voice Calls",
+    "minutes": "min",
+    "sms": "SMS Messages",
+    "coverageIn": "Coverage in",
+    "country": "country",
+    "countries": "countries",
+    "tapToView": "Tap to view all countries",
+    "fairUsage": "Fair Usage Policy",
+    "promoPlaceholder": "Promo code",
+    "applyPromo": "Apply",
+    "promoAppliedPct": "{{pct}}% off applied",
+    "promoAppliedAmt": "${{amt}} off applied",
+    "promoInvalid": "Invalid or expired promo code",
+    "promoError": "Could not validate promo code"
   },
   "stripeCheckout": {
     "title": "Pago seguro con tarjeta",
@@ -923,7 +930,12 @@
     "androidStep4": "Activa los datos móviles y el roaming de datos para tu eSIM",
     "downloadIOS": "Descargar en iOS",
     "downloadAndroid": "Descargar en Android",
-    "generatingQR": "Generando código QR..."
+    "generatingQR": "Generando código QR...",
+    "instructionStep1": "Open your device's Settings app",
+    "instructionStep2": "Go to Cellular or Mobile Data settings",
+    "instructionStep3": "Tap \"Add Cellular Plan\" or \"Add eSIM\"",
+    "instructionStep4": "Scan the QR code above with your device",
+    "instructionStep5": "Follow the on-screen instructions to complete activation"
   },
   "blogApp": {
     "appTitle": "Mantente conectado dondequiera que viajes",

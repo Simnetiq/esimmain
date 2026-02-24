@@ -44,7 +44,6 @@
     "exploreStore": "Explore eSIM Store",
     "description": "Global eSIM for travelers, digital nomads, and backpackers. No roaming fees, no physical SIM cards needed.",
     "exploreTariffs": "Explore Tariffs",
-    "exploreBlog": "Explore Blog",
     "popularCountries": {
       "france": "🇫🇷 France",
       "usa": "🇺🇸 USA",
@@ -60,12 +59,12 @@
       "greece": "🇬🇷 Greece",
       "turkey": "🇹🇷 Turkey",
       "uae": "🇦🇪 UAE"
-    }
+    },
+    "downloadApp": "Download App"
   },
   "features": {
     "title": "Connect globally",
     "subtitle": "Perfect eSIM solution for backpackers, travelers, and digital nomads worldwide",
-    "get35Off": "Get 35% OFF",
     "globalCoverage": {
       "tag": "GLOBAL COVERAGE",
       "title": "Global Coverage",
@@ -119,7 +118,6 @@
     "showLess": "Show Less",
     "showMore": "Show More",
     "seeAllPlans": "See All Plans",
-    "allRegions": "All Regions",
     "plan": "plan",
     "plans": "plans",
     "from": "From",
@@ -129,7 +127,8 @@
     "bestValue": "Best Value",
     "mins": "mins",
     "available": "available",
-    "days": "Days"
+    "days": "Days",
+    "topChoice": "Top Choice"
   },
   "discount": {
     "get35Off": "Get 35% OFF",
@@ -158,8 +157,6 @@
     "downloadForAndroid": "Download Android app",
     "appLinksSoon": "App store links will be available soon.",
     "loadingAppLinks": "Loading app links...",
-    "earnWithReferrals": "Want to earn money? Join our affiliate program and get paid for every referral.",
-    "learnMore": "Learn more",
     "activationProcess": "Activation Process",
     "followSteps": "Follow these simple steps to activate your eSIM",
     "step1": {
@@ -180,7 +177,6 @@
     }
   },
   "footer": {
-    "logoAlt": "Simnetiq Logo",
     "brandName": "Simnetiq",
     "tagline": "Stay connected wherever you travel. Instant eSIM activation for 200+ countries.",
     "companyDescription": "Simnetiq - Your trusted partner for global eSIM solutions. Perfect for backpackers, travelers, and digital nomads. Compare Airalo vs Simnetiq vs eSIMo. Instant activation, worldwide coverage, and secure connectivity for travelers and businesses worldwide.",
@@ -298,17 +294,7 @@
     "sharePost": "Share",
     "copyLink": "Copy Link",
     "linkCopied": "Link copied to clipboard!",
-    "defaultReadTime": "5 min read",
-    "pagination": {
-      "previous": "Previous",
-      "next": "Next"
-    },
-    "downloadApp": {
-      "title": "Get the Simnetiq App",
-      "description": "Download our app to easily manage your eSIMs, top up data, and stay connected wherever you go.",
-      "availableOn": "Download on the",
-      "getItOn": "GET IT ON"
-    },
+    "pagination": {},
     "newsletter": {
       "title": "Stay Updated with eSIM News",
       "description": "Get the latest eSIM insights, travel tips, and technology updates delivered to your inbox",
@@ -341,41 +327,7 @@
       "and": "and",
       "privacyPolicy": "Privacy Policy"
     },
-    "register": {
-      "title": "Create your account",
-      "subtitle": "Or",
-      "signInExisting": "sign in to your existing account",
-      "fullNameLabel": "Full Name",
-      "fullNamePlaceholder": "Enter your full name",
-      "emailLabel": "Email address",
-      "emailPlaceholder": "Enter your email",
-      "passwordLabel": "Password",
-      "passwordPlaceholder": "Enter your password",
-      "createAccountButton": "Create Account",
-      "fillAllFields": "Please fill in all fields",
-      "passwordTooShort": "Password must be at least 6 characters",
-      "accountCreated": "Account created! Please check your email for verification code.",
-      "registrationFailed": "Failed to send verification code",
-      "passwordNotStrong": "Please meet all password requirements",
-      "acceptTerms": "Please accept the Terms of Service and Privacy Policy",
-      "recaptchaNotReady": "reCAPTCHA not ready. Please try again.",
-      "passwordStrength": "Password Strength",
-      "minLength": "At least 8 characters",
-      "hasUpperCase": "One uppercase letter",
-      "hasLowerCase": "One lowercase letter",
-      "hasNumber": "One number",
-      "hasSpecialChar": "One special character (!@#$%^&*)",
-      "acceptTermsText": "I agree to the",
-      "termsOfService": "Terms of Service",
-      "and": "and",
-      "privacyPolicy": "Privacy Policy",
-      "emailSent": "Verification code sent to your email!",
-      "checkConsole": "Check console for verification code (email service unavailable)",
-      "orContinueWith": "Or continue with",
-      "signInWithGoogle": "Sign in with Google",
-      "googleSignInSuccessful": "Signed in with Google successfully!",
-      "googleSignInFailed": "Failed to sign in with Google"
-    },
+    "register": {},
     "welcomeMessage": "Welcome to Simnetiq - Your global eSIM solution",
     "trustedByThousands": "Trusted by thousands of travelers worldwide",
     "loggedIn": "Logged in successfully",
@@ -486,17 +438,7 @@
       "shareEsimAnswer": "eSIMs are tied to the device they're installed on and cannot be transferred. If you need to use your data on a different device, you'll need to purchase a new eSIM for that device."
     }
   },
-  "QRCodeModal": {
-    "esimQrCode": "eSIM QR Code",
-    "qrCodeImageFromAiralo": "QR Code Image from Airalo",
-    "realQrCodeFromAiralo": "Real QR Code from Airalo (Add Cellular Plan)",
-    "qrData": "QR Data: {{data}}...",
-    "directAppleInstallationLink": "Direct Apple Installation Link",
-    "appleEsimInstallation": "Apple eSIM Installation",
-    "qrCodeBeingGenerated": "QR code is being generated...",
-    "clickGenerateQrCodeToTryAgain": "Click \"Generate QR Code\" to try again",
-    "actions": "Actions"
-  },
+  "QRCodeModal": {},
   "dashboard": {
     "title": "Dashboard",
     "loadingDashboard": "Loading dashboard...",
@@ -600,7 +542,6 @@
     "checkUsageAndStatus": "Check Usage & Status",
     "openInAppleEsim": "Open in Apple eSIM",
     "downloadQrCode": "Download QR Code",
-    "uses": "Uses",
     "roles": {
       "customer": "Customer",
       "admin": "Admin",
@@ -737,14 +678,22 @@
     "chooseYourPlan": "Choose Your Plan",
     "loadingPlans": "Loading available plans...",
     "pleaseWait": "Please wait while we fetch the best options for you",
-      "availablePlans": "Available Plans ",
+    "availablePlans": "Available Plans ",
     "sortedByCheapest": "Sorted by cheapest first",
     "dayPlans": "{{days}} Day{{plural}} Plans",
     "countriesAvailable": "{{count}} countr{{plural}} available",
     "plansCount": "{{count}} plans",
     "noPlansAvailable": "No Plans Available",
     "couldNotFind": "We couldn't find any plans for your current selection",
-    "tryAdjusting": "Try adjusting your filters or selecting a different country"
+    "tryAdjusting": "Try adjusting your filters or selecting a different country",
+    "days": "days",
+    "dataOnlyPlans": "Data Only Plans",
+    "plansWithCallsSms": "Plans with Calls & SMS",
+    "selectPlan": "Select Plan",
+    "continue": "Continue",
+    "selectPlanToContinue": "Select a plan to continue",
+    "globalPlans": "Global Plans",
+    "regionalPlansFor": "Regional Plans for"
   },
   "notFound": {
     "title": "Page Not Found",
@@ -770,7 +719,10 @@
     "discoverGlobal": "Discover Global",
     "covers": "Covers",
     "exploreAll": "Explore All",
-    "noGlobalPlans": "Global plans coming soon"
+    "noGlobalPlans": "Global plans coming soon",
+    "country": "Country",
+    "bestValue": "Best Value",
+    "unlimitedData": "Unlimited Data"
   },
   "common": {
     "close": "Close",
@@ -1141,5 +1093,16 @@
     "ctaTitle": "Ready to go global?",
     "ctaDesc": "Get your eSIM in minutes. Works on any unlocked device.",
     "ctaButton": "Browse Plans"
+  },
+  "plan": {
+    "callsAvailable": "Calls Available",
+    "smsAvailable": "SMS Available",
+    "minutes": "minutes",
+    "fairUsage": "Fair Usage Policy"
+  },
+  "planSort": {
+    "price": "Price",
+    "data": "Data",
+    "days": "Days"
   }
 }

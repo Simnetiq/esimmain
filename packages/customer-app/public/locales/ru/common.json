@@ -23,7 +23,8 @@
     "iosApp": "iOS приложение",
     "androidApp": "Android приложение",
     "userMenu": "Меню пользователя",
-    "user": "Пользователь"
+    "user": "Пользователь",
+    "about": "About"
   },
   "hero": {
     "announcement": "Доступно в более чем 200 странах",
@@ -41,7 +42,6 @@
     "downloadAppIOS": "Скачать iOS приложение",
     "downloadAppAndroid": "Скачать Android приложение",
     "exploreStore": "Перейти в магазин eSIM",
-    "with": "были с Simnetiq",
     "description": "Глобальный eSIM для путешественников, цифровых кочевников и мотыльков. Без роуминга, без физических SIM-карт.",
     "downloadApp": "Скачать приложение",
     "exploreTariffs": "Посмотреть тарифы",
@@ -62,21 +62,10 @@
       "uae": "🇦🇪 ОАЭ"
     }
   },
-  "QRCodeModal": {
-    "esimQrCode": "eSIM QR Code",
-    "qrCodeImageFromAiralo": "QR Code Image from Airalo",
-    "realQrCodeFromAiralo": "Real QR Code from Airalo (Add Cellular Plan)",
-    "qrData": "QR Data: {{data}}...",
-    "directAppleInstallationLink": "Direct Apple Installation Link",
-    "appleEsimInstallation": "Apple eSIM Installation",
-    "qrCodeBeingGenerated": "QR code is being generated...",
-    "clickGenerateQrCodeToTryAgain": "Click \"Generate QR Code\" to try again",
-    "actions": "Actions"
-  },
+  "QRCodeModal": {},
   "features": {
     "title": "Подключайтесь глобально",
     "subtitle": "Все, что вам нужно для глобального подключения",
-    "get35Off": "Получите скидку 35%",
     "globalCoverage": {
       "tag": "ГЛОБАЛЬНОЕ ПОКРЫТИЕ",
       "title": "Глобальное покрытие",
@@ -154,7 +143,6 @@
     }
   },
   "footer": {
-    "logoAlt": "Логотип Simnetiq",
     "brandName": "Simnetiq",
     "tagline": "Оставайтесь на связи, куда бы вы ни путешествовали. Мгновенная активация eSIM в более чем 200 странах.",
     "companyDescription": "Simnetiq - ваш надежный партнер для глобальных решений eSIM. Мгновенная активация, всемирное покрытие и безопасное подключение для путешественников и бизнеса.",
@@ -558,7 +546,6 @@
     "checkUsageAndStatus": "Проверить использование и статус",
     "openInAppleEsim": "Открыть в Apple eSIM",
     "downloadQrCode": "Скачать QR-код",
-    "uses": "Использования",
     "roles": {
       "customer": "Клиент",
       "admin": "Администратор",
@@ -721,7 +708,9 @@
     "title": "Упс! Страница не найдена",
     "goBack": "Назад",
     "needHelp": "Нужна помощь?",
-    "contactSupport": "Свяжитесь с нашей службой поддержки"
+    "contactSupport": "Свяжитесь с нашей службой поддержки",
+    "description": "The page you are looking for doesn't exist or has been moved. Let's get you back on track.",
+    "goHome": "Go Home"
   },
   "deals": {
     "unlimitedBadge": "Безлимитный",
@@ -869,7 +858,13 @@
     "tapToView": "Нажмите для просмотра всех стран",
     "fairUsage": "Политика честного использования",
     "metaDescription": "Купить {planName} eSIM для {country}. Мгновенная активация, безопасная оплата, глобальное покрытие. От ${price}. Идеально для путешественников и цифровых кочевников.",
-    "metaTitle": "Купить {planName} eSIM - {country} | Безопасный чекаут"
+    "metaTitle": "Купить {planName} eSIM - {country} | Безопасный чекаут",
+    "promoPlaceholder": "Promo code",
+    "applyPromo": "Apply",
+    "promoAppliedPct": "{{pct}}% off applied",
+    "promoAppliedAmt": "${{amt}} off applied",
+    "promoInvalid": "Invalid or expired promo code",
+    "promoError": "Could not validate promo code"
   },
   "stripeCheckout": {
     "title": "Безопасная оплата картой",
@@ -934,7 +929,12 @@
     "androidStep4": "Включите мобильные данные и роуминг данных для вашей eSIM",
     "downloadIOS": "Скачать на iOS",
     "downloadAndroid": "Скачать на Android",
-    "generatingQR": "Генерация QR-кода..."
+    "generatingQR": "Генерация QR-кода...",
+    "instructionStep1": "Open your device's Settings app",
+    "instructionStep2": "Go to Cellular or Mobile Data settings",
+    "instructionStep3": "Tap \"Add Cellular Plan\" or \"Add eSIM\"",
+    "instructionStep4": "Scan the QR code above with your device",
+    "instructionStep5": "Follow the on-screen instructions to complete activation"
   },
   "blogApp": {
     "appTitle": "Оставайтесь на связи, куда бы вы ни путешествовали",

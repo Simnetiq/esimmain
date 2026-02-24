@@ -240,4 +240,16 @@
   .animation-delay-300 { animation-delay: 300ms; }
   .animation-delay-400 { animation-delay: 400ms; }
   .animation-delay-500 { animation-delay: 500ms; }
+
+  /* Hero route pulse animation — pure CSS, zero TBT */
+  @keyframes heroRoutePulse {
+    0%, 100% { opacity: 0.06; }
+    50% { opacity: 0.18; }
+  }
+  .hero-route {
+    animation: heroRoutePulse 8s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-route { animation: none; }
+  }
 }

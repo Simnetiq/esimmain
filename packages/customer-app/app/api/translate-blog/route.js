@@ -1,7 +1,41 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 
+function isAuthorized(request) {
+  // Allow calls with BLOG_API_KEY (external/n8n)
+  const apiKey = process.env.BLOG_API_KEY;
+  const auth = request.headers.get('authorization');
+  if (apiKey && auth?.startsWith('Bearer ') && auth.slice(7) === apiKey) {
+    return true;
+  }
+
+  // Allow calls with internal header (from admin app on same origin)
+  const internalKey = request.headers.get('x-internal-key');
+  if (internalKey && internalKey === process.env.BLOG_API_KEY) {
+    return true;
+  }
+
+  // Allow calls from same origin (Referer check for admin panel)
+  const referer = request.headers.get('referer') || '';
+  const allowedOrigins = [
+    process.env.NEXT_PUBLIC_BASE_URL,
+    'https://www.simnetiq.store',
+    'https://admin.simnetiq.store',
+    'http://localhost:3000',
+    'http://localhost:3001',
+  ].filter(Boolean);
+
+  return allowedOrigins.some((origin) => referer.startsWith(origin));
+}
+
 export async function POST(request) {
+  if (!isAuthorized(request)) {
+    return NextResponse.json(
+      { success: false, error: 'Unauthorized' },
+      { status: 401 }
+    );
+  }
+
   try {
     const { title, content, targetLanguage } = await request.json();
 
@@ -16,18 +50,18 @@ export async function POST(request) {
     const supabase = getSupabaseAdmin();
     const { data: configData, error: configError } = await supabase
       .from('app_config')
-      .select('*')
-      .eq('id', 'openai')
+      .select('value')
+      .eq('key', 'openai')
       .single();
-    
-    if (configError || !configData?.api_key) {
+
+    if (configError || !configData?.value?.api_key) {
       return NextResponse.json(
         { success: false, error: 'OpenAI API key not configured' },
         { status: 400 }
       );
     }
 
-    const openaiApiKey = configData.api_key;
+    const openaiApiKey = configData.value.api_key;
 
     const languageNames = {
       'en': 'English',
