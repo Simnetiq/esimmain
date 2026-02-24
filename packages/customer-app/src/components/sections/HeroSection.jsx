@@ -140,9 +140,9 @@ export default function HeroSection() {
 
   // Get translated text - headline split into parts for styling
   // Use fallbacks immediately for LCP - don't wait for translations
-  const headlinePart1 = t('hero.headlinePart1', 'The easiest way to get mobile data');
-  const headlineHighlight = t('hero.headlineHighlight', 'anywhere');
-  const headlinePart2 = t('hero.headlinePart2', 'in the world');
+  const headlinePart1 = t('hero.headlinePart1', 'The ');
+  const headlineHighlight = t('hero.headlineHighlight', 'easiest way');
+  const headlinePart2 = t('hero.headlinePart2', 'to get data anywhere in the world');
   const subtitleText = t('hero.subtitle', 'Activate your eSIM in minutes and stay connected in 200+ destinations worldwide.');
 
   return (
@@ -166,7 +166,7 @@ export default function HeroSection() {
               </h1>
 
               {/* Subtitle - render immediately */}
-              <p className="text-base sm:text-lg lg:text-xl xl:text-2xl text-gray-600 mb-10 lg:mb-12 max-w-2xl lg:max-w-3xl mx-auto leading-relaxed">
+              <p className="text-sm sm:text-lg lg:text-xl xl:text-2xl text-gray-600 mb-10 lg:mb-12 max-w-2xl lg:max-w-3xl mx-auto leading-relaxed">
                 {subtitleText}
               </p>
 
