@@ -4,6 +4,10 @@
     {
       "path": "/api/sync-airalo-v2",
       "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/exchange-rates",
+      "schedule": "0 * * * *"
     }
   ],
   "headers": [

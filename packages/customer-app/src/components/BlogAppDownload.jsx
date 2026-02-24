@@ -81,39 +81,30 @@ const BlogAppDownload = ({
     <div className={`mt-16 space-y-6 ${className}`} dir={direction} lang={detectedLanguage}>
       {/* App Download CTA Section */}
       <div className="relative isolate overflow-hidden">
-        {/* Blurry gradient background from #5374CD to white */}
+        {/* Background image + dark gradient overlay */}
         <div className="absolute inset-0 -z-10">
-          {/* Base gradient */}
-          <div 
-            className="absolute inset-0"
-            style={{
-              background: 'linear-gradient(135deg, #5374CD 0%, #7B93DB 30%, #A8B8E8 50%, #D4DCF4 70%, #F0F3FA 85%, #FFFFFF 100%)'
-            }}
-          />
-          {/* Blur overlay for softer effect */}
-          <div 
-            className="absolute inset-0 backdrop-blur-3xl"
-            style={{
-              background: 'radial-gradient(ellipse at 30% 20%, rgba(83, 116, 205, 0.4) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(255, 255, 255, 0.8) 0%, transparent 50%)'
-            }}
-          />
-          {/* Optional: Background image overlay */}
           <Image
-            src="/images/blog-cta-bg.jpg"
+            src="/images/blog.avif"
             alt=""
             fill
-            className="object-cover opacity-10 mix-blend-overlay"
+            className="object-cover"
             sizes="100vw"
             priority={false}
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.75) 0%, rgba(30, 41, 59, 0.6) 50%, rgba(15, 23, 42, 0.8) 100%)'
+            }}
           />
         </div>
 
         <div className="px-6 py-16 md:px-12 md:py-20">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-2xl font-semibold tracking-tight text-balance text-gray-900 md:text-3xl lg:text-4xl">
+            <h2 className="text-2xl font-semibold tracking-tight text-balance text-white md:text-3xl lg:text-4xl">
               {t('blogApp.appTitle', 'Stay connected wherever you travel')}
             </h2>
-            <p className="mx-auto mt-4 max-w-xl text-base font-normal text-pretty text-gray-700 md:text-lg">
+            <p className="mx-auto mt-4 max-w-xl text-base font-normal text-pretty text-gray-200 md:text-lg">
               {t('blogApp.appDescription', 'Get instant eSIM data plans for 200+ countries. No physical SIM needed, activate in minutes.')}
             </p>
             <div className={`mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row ${currentIsRTL ? 'sm:flex-row-reverse' : ''}`}>

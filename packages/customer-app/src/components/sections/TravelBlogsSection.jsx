@@ -107,12 +107,6 @@ export default function TravelBlogsSection() {
   const [travelBlogs, setTravelBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // Grid pattern style
-  const gridPatternStyle = {
-    backgroundSize: '10px 10px',
-    backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-  };
-
   useEffect(() => {
     loadTravelBlogs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -147,18 +141,6 @@ export default function TravelBlogsSection() {
   return (
     <div className="bg-white flex flex-col overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="relative flex-1 flex flex-col">
-        {/* Grid Pattern - Left Side */}
-        <div 
-          className="hidden xl:block absolute left-0 top-0 bottom-0 w-32"
-          style={gridPatternStyle}
-        />
-
-        {/* Grid Pattern - Right Side */}
-        <div 
-          className="hidden xl:block absolute right-0 top-0 bottom-0 w-32"
-          style={gridPatternStyle}
-        />
-
         {/* Section Header */}
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">

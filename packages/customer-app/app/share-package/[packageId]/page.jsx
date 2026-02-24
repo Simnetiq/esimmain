@@ -24,12 +24,6 @@ import {
   ActivationInstructions
 } from './components';
 
-const gridPatternStyle = {
-  backgroundSize: '10px 10px',
-  backgroundAttachment: 'fixed',
-  backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-};
-
 const SharePackagePage = () => {
   const router = useRouter();
   const { currentUser } = useAuth();
@@ -364,8 +358,6 @@ const SharePackagePage = () => {
     return (
       <div className="bg-white min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="relative isolate">
-          <div className="hidden xl:block absolute left-0 top-0 bottom-0 w-32 pointer-events-none" style={gridPatternStyle} />
-          <div className="hidden xl:block absolute right-0 top-0 bottom-0 w-32 pointer-events-none" style={gridPatternStyle} />
           <div className="mx-auto w-full max-w-9xl">
             {/* Header skeleton */}
             <div className="mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl w-full px-4 pt-10 lg:pt-20">
@@ -475,10 +467,6 @@ const SharePackagePage = () => {
         {/* Decorative Lines */}
         <div className="hidden sm:block absolute top-0 left-0 right-0 h-px bg-gray-200"></div>
         <div className="hidden sm:block absolute bottom-0 left-0 right-0 h-px bg-gray-200"></div>
-
-        {/* Grid Patterns */}
-        <div className="hidden xl:block absolute left-0 top-0 bottom-0 w-32 pointer-events-none" style={gridPatternStyle} />
-        <div className="hidden xl:block absolute right-0 top-0 bottom-0 w-32 pointer-events-none" style={gridPatternStyle} />
 
         <div className="mx-auto w-full max-w-9xl">
           {/* Package Header */}

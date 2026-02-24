@@ -99,12 +99,6 @@ const SocialLink = memo(({ href, icon: Icon, label, external = true }) => (
 ));
 SocialLink.displayName = 'SocialLink';
 
-// Grid pattern style
-const gridPatternStyle = {
-  backgroundSize: '10px 10px',
-  backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-};
-
 const Footer = () => {
   const pathname = usePathname();
   const { t, locale } = useI18n();
@@ -171,18 +165,6 @@ const Footer = () => {
       dir={direction} 
       lang={locale}
     >
-        {/* Grid Pattern - Left Side */}
-        <div 
-        className="hidden xl:block absolute left-0 top-0 bottom-0 w-32 z-0"
-        style={gridPatternStyle}
-      />
-
-        {/* Grid Pattern - Right Side */}
-        <div 
-        className="hidden xl:block absolute right-0 top-0 bottom-0 w-32 z-0"
-        style={gridPatternStyle}
-      />
-
       {/* Top Border */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gray-200" />
 

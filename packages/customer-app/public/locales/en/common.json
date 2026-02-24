@@ -29,9 +29,9 @@
     "announcement": "Now available in 200+ countries worldwide.",
     "countriesAvailable": "Now available in 200+ countries",
     "stayConnected": "The easiest way to get mobile data anywhere in the world",
-    "headlinePart1": "The easiest way to get mobile data",
-    "headlineHighlight": "anywhere",
-    "headlinePart2": "in the world",
+    "headlinePart1": "The ",
+    "headlineHighlight": "easiest way",
+    "headlinePart2": "to get data anywhere in the world",
     "subtitle": "Activate your eSIM in minutes and stay connected in 200+ destinations worldwide.",
     "Online": "Always Online",
     "countries": "200+ Countries",
@@ -90,6 +90,11 @@
       "title": "Easy Setup",
       "description": "Simple QR activation. Scan a QR code, follow the steps, and you're connected. It takes less than 2 minutes.",
       "readyInSeconds": "✓ Ready in seconds"
+    },
+    "topUp": {
+      "tag": "TOP UP ANYTIME",
+      "title": "Need more data?",
+      "description": "Running low? Top up your eSIM instantly from the app — no need to buy a new plan or reinstall."
     }
   },
   "plans": {
@@ -1097,5 +1102,35 @@
     "benefit4": "Keep your main number active while using data abroad",
     "benefit5": "24/7 customer support",
     "regionalPlans": "{{region}} Regional Plans"
+  },
+  "about": {
+    "sectionLabel": "About Us",
+    "heroTitle": "Connectivity freedom for everyone",
+    "missionLabel": "Our Mission",
+    "missionTitle": "Bridging the world through seamless connectivity",
+    "missionDesc1": "We believe connectivity is a fundamental right. Whether you're a backpacker, expat, or digital nomad — you deserve fast, affordable internet without the friction of physical SIM cards or surprise roaming charges.",
+    "missionDesc2": "Simnetiq was built to make staying connected abroad as simple as scanning a QR code. No contracts, no stores, no hassle — just instant data wherever you land.",
+    "statCountries": "Countries",
+    "statSupport": "Support",
+    "statMinutes": "Min activation",
+    "statDigital": "Digital",
+    "valuesLabel": "Why Choose Us",
+    "valuesTitle": "Built from the ground up for travelers",
+    "value1Title": "Global Connectivity",
+    "value1Desc": "Instant eSIMs for 200+ countries. Travel without borders, stay connected everywhere.",
+    "value2Title": "Instant Activation",
+    "value2Desc": "Your eSIM is ready in seconds. No physical SIM, no waiting, no roaming fees.",
+    "value3Title": "Secure & Reliable",
+    "value3Desc": "Enterprise-grade encryption and fraud protection for every transaction.",
+    "value4Title": "Built for Travelers",
+    "value4Desc": "Designed for digital nomads, frequent flyers, and everyone in between.",
+    "storyLabel": "Our Story",
+    "storyTitle": "From frustration to innovation",
+    "storyPara1": "Simnetiq started with a simple problem: getting connected abroad shouldn't be this hard. Between hunting for local SIM shops, dealing with language barriers, and paying outrageous roaming fees — we knew there had to be a better way.",
+    "storyPara2": "Today, Simnetiq serves travelers in over 200 countries with instant digital eSIMs. Purchase online, scan a QR code, and you're connected — all before you even leave the airport.",
+    "storyPara3": "We're a small team of travelers and technologists who believe the best connectivity is the kind you don't have to think about. No contracts, no stores, no friction.",
+    "ctaTitle": "Ready to go global?",
+    "ctaDesc": "Get your eSIM in minutes. Works on any unlocked device.",
+    "ctaButton": "Browse Plans"
   }
 }

@@ -399,6 +399,7 @@ const EsimPlans = ({ isHomePage = false }) => {
 
     return (
         <div className={`min-h-screen bg-white transition-opacity duration-150 ${isMounted ? 'opacity-100' : 'opacity-0'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+
             {/* Header */}
             <div className="w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-8 sm:mt-12 lg:mt-20">
                 <p className="font-mono text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 rtl:font-bold rtl:tracking-tight">

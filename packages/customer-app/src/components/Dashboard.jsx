@@ -32,19 +32,9 @@ const ReferralBottomSheet = dynamic(() => import('./ReferralBottomSheet'), {
   loading: () => null
 });
 
-// Grid pattern style for skeleton
-const gridPatternStyle = {
-  backgroundSize: '10px 10px',
-  backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-};
-
 // Dashboard Skeleton Component - matches exact DashboardHeader + RecentOrders dimensions
 const DashboardSkeleton = () => (
   <div className="min-h-screen bg-white flex flex-col relative overflow-hidden">
-    {/* Grid Pattern */}
-    <div className="hidden xl:block absolute left-0 top-0 bottom-0 w-32 pointer-events-none" style={gridPatternStyle} />
-    <div className="hidden xl:block absolute right-0 top-0 bottom-0 w-32 pointer-events-none" style={gridPatternStyle} />
-
     <div className="relative isolate flex-1 flex flex-col">
       {/* Horizontal Lines */}
       <div className="hidden sm:block absolute top-0 left-0 right-0 h-px bg-gray-200/70" />
@@ -1164,18 +1154,6 @@ const Dashboard = () => {
         {/* Horizontal Lines */}
         <div className="hidden sm:block absolute top-0 left-0 right-0 h-px bg-gray-200/70"></div>
         <div className="hidden sm:block absolute bottom-0 left-0 right-0 h-px bg-gray-200/70"></div>
-
-        {/* Grid Pattern - Left Side */}
-        <div
-          className="hidden xl:block absolute left-0 top-0 bottom-0 w-32 pointer-events-none"
-          style={gridPatternStyle}
-        ></div>
-
-        {/* Grid Pattern - Right Side */}
-        <div
-          className="hidden xl:block absolute right-0 top-0 bottom-0 w-32 pointer-events-none"
-          style={gridPatternStyle}
-        ></div>
 
         {/* Header Section */}
         <DashboardHeader

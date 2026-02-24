@@ -28,12 +28,6 @@ const ShieldIcon = ({ className }) => (
   </svg>
 );
 
-// Grid pattern style (matching FeaturesSection)
-const gridPatternStyle = {
-  backgroundSize: '10px 10px',
-  backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-};
-
 // Deferred background component - loads after LCP
 function DeferredBackground({ isMobile }) {
   const [shouldRender, setShouldRender] = useState(false);
@@ -143,12 +137,6 @@ export default function HeroSection() {
       </div>
 
       <div className="relative flex-1 flex flex-col pointer-events-none">
-        {/* Grid Pattern - Left Side */}
-        <div className="hidden xl:block absolute left-0 top-0 bottom-0 w-32" style={gridPatternStyle} />
-
-        {/* Grid Pattern - Right Side */}
-        <div className="hidden xl:block absolute right-0 top-0 bottom-0 w-32" style={gridPatternStyle} />
-
         {/* Main Content - pointer-events-none to allow mouse to reach canvas */}
         <div className="relative flex-1 flex flex-col items-center justify-center px-4 py-20 lg:py-24">
           <div className="mx-auto w-full max-w-7xl">

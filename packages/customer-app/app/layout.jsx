@@ -225,9 +225,24 @@ export default function RootLayout({ children }) {
             <Suspense fallback={null}>
               <Analytics />
             </Suspense>
-            <div className="bg-white min-h-screen overflow-x-hidden max-w-full">
+            <div className="bg-white min-h-screen overflow-x-hidden max-w-full relative">
+              {/* Grid Pattern Rails — single source, continuous across all pages */}
+              <div
+                className="hidden xl:block absolute left-0 top-0 bottom-0 w-32 z-50 pointer-events-none"
+                style={{
+                  backgroundSize: '10px 10px',
+                  backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
+                }}
+              />
+              <div
+                className="hidden xl:block absolute right-0 top-0 bottom-0 w-32 z-50 pointer-events-none"
+                style={{
+                  backgroundSize: '10px 10px',
+                  backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
+                }}
+              />
               <ConditionalNavbar />
-              <main className="pt-12 overflow-x-hidden">  
+              <main className="pt-12 overflow-x-hidden">
                 {children}
               </main>
               <ConditionalFooter/>

@@ -10,6 +10,7 @@ import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { useRegionsSupabase as useRegions } from '@esim/shared/hooks/useRegionsSupabase';
 import LanguageSelector from './LanguageSelector';
+import CurrencyToggle from './CurrencyToggle';
 import { detectLanguageFromPath, getLocalizedBlogListUrl, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
 import { getPlatformAppStoreLink } from '@esim/shared/utils/appStoreLinks';
@@ -237,6 +238,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
         </div>
         
         <div className={`flex lg:hidden items-center ${isRTL ? 'justify-start gap-x-2' : 'justify-end gap-x-2'}`}>
+          {process.env.NEXT_PUBLIC_ENABLE_CURRENCY_TOGGLE === 'true' && <CurrencyToggle />}
           {!hideLanguageSelector && <LanguageSelector />}
           {/* User Avatar for mobile - only show when logged in */}
           {currentUser && (
@@ -335,7 +337,8 @@ const Navbar = ({ hideLanguageSelector = false }) => {
           )}
 
           {!hideLanguageSelector && <LanguageSelector />}
-          
+          {process.env.NEXT_PUBLIC_ENABLE_CURRENCY_TOGGLE === 'true' && <CurrencyToggle />}
+
           {/* User Avatar Dropdown - only show when logged in */}
           {currentUser && (
             <div className="relative" ref={userDropdownRef}>

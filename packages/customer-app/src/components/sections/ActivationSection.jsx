@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Image from 'next/image';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { appStoreLinks } from '@esim/shared/utils/appStoreLinks';
@@ -50,12 +51,6 @@ export default function ActivationSection() {
   const direction = getLanguageDirection(detectedLanguage);
   const isRTL = direction === 'rtl';
   
-  // Grid pattern style
-  const gridPatternStyle = {
-    backgroundSize: '10px 10px',
-    backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-  };
-
   // Track iOS download
   const handleIOSDownload = () => {
     trackCustomFacebookEvent('DownloadIOSApp', {
@@ -123,37 +118,27 @@ export default function ActivationSection() {
   return (
     <div className="bg-white flex flex-col overflow-hidden" id="how-it-works" dir={direction} lang={detectedLanguage}>
       <div className="relative flex-1 flex flex-col">
-        {/* Grid Pattern - Left Side */}
-        <div 
-          className="hidden xl:block absolute left-0 top-0 bottom-0 w-32"
-          style={gridPatternStyle}
-        />
-
-        {/* Grid Pattern - Right Side */}
-        <div 
-          className="hidden xl:block absolute right-0 top-0 bottom-0 w-32"
-          style={gridPatternStyle}
-        />
-
         {/* App Download CTA - BlogAppDownload style */}
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
             <div className="px-4 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
               
-              {/* App Download Card with gradient background */}
-              <div className="relative isolate overflow-hidden  animate-fade-in-up">
-                {/* Blurry gradient background */}
+              {/* App Download Card with background image */}
+              <div className="relative isolate overflow-hidden animate-fade-in-up">
+                {/* Background image + dark gradient overlay */}
                 <div className="absolute inset-0 -z-10">
-                  <div 
-                    className="absolute inset-0"
-                    style={{
-                      background: 'linear-gradient(135deg, #5374CD 0%, #7B93DB 30%, #A8B8E8 50%,rgb(204, 215, 239) 85%, #FFFFFF 100%)'
-                    }}
+                  <Image
+                    src="/images/blog.avif"
+                    alt=""
+                    fill
+                    className="object-cover"
+                    sizes="100vw"
+                    priority={false}
                   />
-                  <div 
+                  <div
                     className="absolute inset-0"
                     style={{
-                      background: 'radial-gradient(ellipse at 30% 20%, rgba(83, 116, 205, 0.4) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(255, 255, 255, 0.8) 0%, transparent 50%)'
+                      background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.75) 0%, rgba(30, 41, 59, 0.6) 50%, rgba(15, 23, 42, 0.8) 100%)'
                     }}
                   />
                 </div>
@@ -163,7 +148,7 @@ export default function ActivationSection() {
                     <h2 className="text-2xl font-semibold tracking-tight text-white  md:text-3xl lg:text-4xl animate-fade-in-up animation-delay-100 drop-shadow-[0_2px_16px_rgba(225, 225, 225, 0.22)]">
                       {t('activation.appTitle', 'Stay connected wherever you travel')}
                     </h2>
-                    <p className="mx-auto mt-4 max-w-xl text-base font-normal text-pretty text-gray-700 md:text-lg animate-fade-in-up animation-delay-200">
+                    <p className="mx-auto mt-4 max-w-xl text-base font-normal text-pretty text-gray-200 md:text-lg animate-fade-in-up animation-delay-200">
                       {t('activation.appDescription', 'Get instant eSIM data plans for 200+ countries. No physical SIM needed, activate in minutes.')}
                     </p>
                     

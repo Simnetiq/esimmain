@@ -24,12 +24,12 @@ const LanguageSelector = () => {
 
   const languages = [
     { code: 'en', name: getNativeLanguageName('en'), flag: getLanguageFlag('en'), route: '/' },
-    { code: 'he', name: getNativeLanguageName('he'), flag: getLanguageFlag('he'), route: '/he' },
+    { code: 'es', name: getNativeLanguageName('es'), flag: getLanguageFlag('es'), route: '/es' },
     { code: 'ru', name: getNativeLanguageName('ru'), flag: getLanguageFlag('ru'), route: '/ru' },
-    { code: 'ar', name: getNativeLanguageName('ar'), flag: getLanguageFlag('ar'), route: '/ar' },
     { code: 'de', name: getNativeLanguageName('de'), flag: getLanguageFlag('de'), route: '/de' },
     { code: 'fr', name: getNativeLanguageName('fr'), flag: getLanguageFlag('fr'), route: '/fr' },
-    { code: 'es', name: getNativeLanguageName('es'), flag: getLanguageFlag('es'), route: '/es' }
+    { code: 'he', name: getNativeLanguageName('he'), flag: getLanguageFlag('he'), route: '/he' },
+    { code: 'ar', name: getNativeLanguageName('ar'), flag: getLanguageFlag('ar'), route: '/ar' },
   ];
 
   // Determine current language from context or pathname (no localStorage during render to avoid hydration mismatch)

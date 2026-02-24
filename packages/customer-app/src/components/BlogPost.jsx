@@ -54,12 +54,6 @@ const CopyIcon = ({ className }) => (
   </svg>
 );
 
-// Grid pattern style
-const gridPatternStyle = {
-  backgroundSize: '10px 10px',
-  backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-};
-
 // Lazy load toast
 const showToast = async (message) => {
   const toast = (await import('react-hot-toast')).default;
@@ -285,9 +279,6 @@ const BlogPost = ({ slug }) => {
       <div className="bg-white min-h-screen flex flex-col" dir={direction} lang={detectedLanguage}>
         <div className="relative isolate flex-1 flex flex-col">
           {/* Grid Patterns */}
-          <div className="hidden xl:block absolute left-0 top-0 bottom-0 w-32 pointer-events-none" style={gridPatternStyle} />
-          <div className="hidden xl:block absolute right-0 top-0 bottom-0 w-32 pointer-events-none" style={gridPatternStyle} />
-
           {/* Header Section */}
           <div className="mx-auto w-full max-w-9xl">
             <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-6">
