@@ -66,17 +66,20 @@
     "subtitle": "Perfect eSIM solution for backpackers, travelers, and digital nomads worldwide",
     "get35Off": "Get 35% OFF",
     "globalCoverage": {
+      "tag": "GLOBAL COVERAGE",
       "title": "Global Coverage",
       "description": "Stay connected in 200+ countries with our extensive eSIM network coverage worldwide. Perfect for backpackers exploring multiple destinations and digital nomads working remotely.",
       "countries": "200+ Countries",
       "worldwide": "Worldwide Coverage"
     },
     "instantActivation": {
+      "tag": "INSTANT ACTIVATION",
       "title": "Instant Activation",
       "description": "Get connected immediately with our QR code activation. No waiting, no delays. Perfect for travelers who need instant internet access upon arrival.",
       "readyInSeconds": "✓ Ready in seconds"
     },
     "securePayment": {
+      "tag": "SECURE PAYMENT",
       "title": "Secure Payment",
       "description": "256-bit SSL encryption and multiple payment options for your security. Trusted by thousands of travelers and digital nomads worldwide."
     },

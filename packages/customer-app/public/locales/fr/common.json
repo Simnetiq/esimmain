@@ -67,17 +67,20 @@
     "subtitle": "Solution eSIM parfaite pour randonneurs, voyageurs et nomades numériques dans le monde entier",
     "get35Off": "Obtenez 35% DE RÉDUCTION",
     "globalCoverage": {
+      "tag": "COUVERTURE MONDIALE",
       "title": "Couverture mondiale",
       "description": "Restez connecté dans plus de 200 pays avec notre vaste couverture réseau eSIM dans le monde entier. Parfait pour les randonneurs explorant plusieurs destinations et les nomades numériques travaillant à distance.",
       "countries": "200+ pays",
       "worldwide": "Couverture mondiale"
     },
     "instantActivation": {
+      "tag": "ACTIVATION INSTANTANÉE",
       "title": "Activation instantanée",
       "description": "Connectez-vous immédiatement avec notre activation de code QR. Pas d'attente, pas de délais. Parfait pour les voyageurs qui ont besoin d'un accès Internet instantané à l'arrivée.",
       "readyInSeconds": "✓ Prêt en quelques secondes"
     },
     "securePayment": {
+      "tag": "PAIEMENT SÉCURISÉ",
       "title": "Paiement sécurisé",
       "description": "Chiffrement SSL 256 bits et plusieurs options de paiement pour votre sécurité. Fait confiance par des milliers de voyageurs et nomades numériques dans le monde entier."
     },
@@ -91,6 +94,11 @@
       "title": "Configuration facile",
       "description": "Configuration facile. Scannez un code QR, suivez les étapes, et vous êtes connecté. Cela prend moins de 2 minutes.",
       "readyInSeconds": "✓ Prêt en quelques secondes"
+    },
+    "topUp": {
+      "tag": "RECHARGEMENT À TOUT MOMENT",
+      "title": "Besoin de plus de données ?",
+      "description": "Bientôt à court ? Rechargez votre eSIM instantanément depuis l'application — pas besoin d'acheter un nouveau forfait ou de réinstaller."
     }
   },
   "QRCodeModal": {
@@ -1033,5 +1041,35 @@
     "benefit4": "Gardez votre numéro principal actif tout en utilisant les données à l'étranger",
     "benefit5": "Support client 24/7",
     "regionalPlans": "Forfaits régionaux {{region}}"
+  },
+  "about": {
+    "sectionLabel": "À propos",
+    "heroTitle": "La liberté de connexion pour tous",
+    "missionLabel": "Notre mission",
+    "missionTitle": "Relier le monde grâce à une connectivité sans faille",
+    "missionDesc1": "Nous croyons que la connectivité est un droit fondamental. Que vous soyez routard, expatrié ou nomade numérique — vous méritez un internet rapide et abordable sans la contrainte des cartes SIM physiques ou des frais de roaming inattendus.",
+    "missionDesc2": "Simnetiq a été conçu pour rendre la connexion à l'étranger aussi simple que scanner un code QR. Pas de contrats, pas de boutiques, pas de tracas — juste des données instantanées où que vous atterrissiez.",
+    "statCountries": "Pays",
+    "statSupport": "Support",
+    "statMinutes": "Min. activation",
+    "statDigital": "Numérique",
+    "valuesLabel": "Pourquoi nous choisir",
+    "valuesTitle": "Conçu de A à Z pour les voyageurs",
+    "value1Title": "Connectivité mondiale",
+    "value1Desc": "eSIMs instantanées pour plus de 200 pays. Voyagez sans frontières, restez connecté partout.",
+    "value2Title": "Activation instantanée",
+    "value2Desc": "Votre eSIM est prête en quelques secondes. Pas de SIM physique, pas d'attente, pas de frais de roaming.",
+    "value3Title": "Sécurisé et fiable",
+    "value3Desc": "Chiffrement de niveau entreprise et protection contre la fraude pour chaque transaction.",
+    "value4Title": "Conçu pour les voyageurs",
+    "value4Desc": "Pensé pour les nomades numériques, les voyageurs fréquents et tous les autres.",
+    "storyLabel": "Notre histoire",
+    "storyTitle": "De la frustration à l'innovation",
+    "storyPara1": "Simnetiq est né d'un problème simple : se connecter à l'étranger ne devrait pas être aussi compliqué. Entre la recherche de boutiques SIM locales, les barrières linguistiques et les tarifs de roaming exorbitants — nous savions qu'il devait y avoir une meilleure solution.",
+    "storyPara2": "Aujourd'hui, Simnetiq sert les voyageurs dans plus de 200 pays avec des eSIMs numériques instantanées. Achetez en ligne, scannez un code QR et vous êtes connecté — le tout avant même de quitter l'aéroport.",
+    "storyPara3": "Nous sommes une petite équipe de voyageurs et de technologues qui croient que la meilleure connectivité est celle à laquelle vous n'avez pas à penser. Pas de contrats, pas de boutiques, pas de friction.",
+    "ctaTitle": "Prêt à passer au global ?",
+    "ctaDesc": "Obtenez votre eSIM en quelques minutes. Fonctionne sur tout appareil déverrouillé.",
+    "ctaButton": "Voir les forfaits"
   }
 }

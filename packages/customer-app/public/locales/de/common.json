@@ -67,17 +67,20 @@
     "subtitle": "Perfekte eSIM-Lösung für Rucksacktouristen, Reisende und digitale Nomaden weltweit",
     "get35Off": "35% Rabatt erhalten",
     "globalCoverage": {
+      "tag": "GLOBALE ABDECKUNG",
       "title": "Globale Abdeckung",
       "description": "Bleiben Sie in über 200 Ländern mit unserer umfangreichen eSIM-Netzwerkabdeckung weltweit verbunden. Perfekt für Rucksacktouristen, die mehrere Ziele erkunden, und digitale Nomaden, die remote arbeiten.",
       "countries": "200+ Länder",
       "worldwide": "Weltweite Abdeckung"
     },
     "instantActivation": {
+      "tag": "SOFORTIGE AKTIVIERUNG",
       "title": "Sofortige Aktivierung",
       "description": "Verbinden Sie sich sofort mit unserer QR-Code-Aktivierung. Kein Warten, keine Verzögerungen. Perfekt für Reisende, die sofortigen Internetzugang bei der Ankunft benötigen.",
       "readyInSeconds": "✓ In Sekunden bereit"
     },
     "securePayment": {
+      "tag": "SICHERE ZAHLUNG",
       "title": "Sichere Zahlung",
       "description": "256-Bit SSL-Verschlüsselung und mehrere Zahlungsoptionen für Ihre Sicherheit. Vertraut von Tausenden von Reisenden und digitalen Nomaden weltweit."
     },
@@ -91,6 +94,11 @@
       "title": "Einfache Einrichtung",
       "description": "Einfache Einrichtung. Scanne einen QR-Code, folge den Schritten und du bist verbunden. Das dauert weniger als 2 Minuten.",
       "readyInSeconds": "✓ Bereit in Sekunden"
+    },
+    "topUp": {
+      "tag": "JEDERZEIT AUFLADEN",
+      "title": "Mehr Daten benötigt?",
+      "description": "Datenvolumen knapp? Laden Sie Ihre eSIM sofort über die App auf — kein neuer Tarif oder Neuinstallation nötig."
     }
   },
   "activation": {
@@ -1061,5 +1069,35 @@
     "benefit4": "Behalten Sie Ihre Hauptnummer, während Sie Daten im Ausland nutzen",
     "benefit5": "Kundensupport rund um die Uhr",
     "regionalPlans": "{{region}} Regionaltarife"
+  },
+  "about": {
+    "sectionLabel": "Über uns",
+    "heroTitle": "Verbindungsfreiheit für alle",
+    "missionLabel": "Unsere Mission",
+    "missionTitle": "Die Welt durch nahtlose Konnektivität verbinden",
+    "missionDesc1": "Wir glauben, dass Konnektivität ein grundlegendes Recht ist. Ob Backpacker, Expat oder digitaler Nomade — Sie verdienen schnelles, erschwingliches Internet ohne den Aufwand physischer SIM-Karten oder überraschende Roaming-Gebühren.",
+    "missionDesc2": "Simnetiq wurde entwickelt, damit die Verbindung im Ausland so einfach ist wie das Scannen eines QR-Codes. Keine Verträge, keine Geschäfte, kein Aufwand — einfach sofortige Daten, wo auch immer Sie landen.",
+    "statCountries": "Länder",
+    "statSupport": "Support",
+    "statMinutes": "Min. Aktivierung",
+    "statDigital": "Digital",
+    "valuesLabel": "Warum wir",
+    "valuesTitle": "Von Grund auf für Reisende entwickelt",
+    "value1Title": "Globale Konnektivität",
+    "value1Desc": "Sofortige eSIMs für über 200 Länder. Reisen Sie ohne Grenzen, bleiben Sie überall verbunden.",
+    "value2Title": "Sofortige Aktivierung",
+    "value2Desc": "Ihre eSIM ist in Sekunden bereit. Keine physische SIM, kein Warten, keine Roaming-Gebühren.",
+    "value3Title": "Sicher und zuverlässig",
+    "value3Desc": "Verschlüsselung auf Unternehmensebene und Betrugsschutz für jede Transaktion.",
+    "value4Title": "Für Reisende gemacht",
+    "value4Desc": "Entwickelt für digitale Nomaden, Vielflieger und alle dazwischen.",
+    "storyLabel": "Unsere Geschichte",
+    "storyTitle": "Von Frustration zu Innovation",
+    "storyPara1": "Simnetiq begann mit einem einfachen Problem: Sich im Ausland zu verbinden sollte nicht so schwer sein. Zwischen der Suche nach lokalen SIM-Geschäften, Sprachbarrieren und horrenden Roaming-Gebühren — wir wussten, dass es einen besseren Weg geben muss.",
+    "storyPara2": "Heute bedient Simnetiq Reisende in über 200 Ländern mit sofortigen digitalen eSIMs. Online kaufen, QR-Code scannen und verbunden sein — alles noch bevor Sie den Flughafen verlassen.",
+    "storyPara3": "Wir sind ein kleines Team von Reisenden und Technologen, die glauben, dass die beste Konnektivität die ist, über die man nicht nachdenken muss. Keine Verträge, keine Geschäfte, keine Reibung.",
+    "ctaTitle": "Bereit, global zu werden?",
+    "ctaDesc": "Erhalten Sie Ihre eSIM in Minuten. Funktioniert mit jedem entsperrten Gerät.",
+    "ctaButton": "Tarife ansehen"
   }
 }

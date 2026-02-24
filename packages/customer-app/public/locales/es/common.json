@@ -67,28 +67,20 @@
     "subtitle": "Todo lo que necesitas para la conectividad global",
     "get35Off": "Obtén 35% DE DESCUENTO",
     "globalCoverage": {
+      "tag": "COBERTURA GLOBAL",
       "title": "Cobertura global",
       "description": "Mantente conectado en más de 200 países con nuestra extensa cobertura de red eSIM en todo el mundo.",
       "countries": "200+ países",
       "worldwide": "Cobertura mundial"
     },
-    "QRCodeModal": {
-      "esimQrCode": "eSIM QR Code",
-      "qrCodeImageFromAiralo": "QR Code Image from Airalo",
-      "realQrCodeFromAiralo": "Real QR Code from Airalo (Add Cellular Plan)",
-      "qrData": "QR Data: {{data}}...",
-      "directAppleInstallationLink": "Direct Apple Installation Link",
-      "appleEsimInstallation": "Apple eSIM Installation",
-      "qrCodeBeingGenerated": "QR code is being generated...",
-      "clickGenerateQrCodeToTryAgain": "Click \"Generate QR Code\" to try again",
-      "actions": "Actions"
-    },
     "instantActivation": {
+      "tag": "ACTIVACIÓN INSTANTÁNEA",
       "title": "Activación instantánea",
       "description": "Conéctate inmediatamente con nuestra activación de código QR. Sin esperas, sin retrasos.",
       "readyInSeconds": "✓ Listo en segundos"
     },
     "securePayment": {
+      "tag": "PAGO SEGURO",
       "title": "Pago seguro",
       "description": "Cifrado SSL de 256 bits y múltiples opciones de pago para tu seguridad."
     },
@@ -97,6 +89,16 @@
       "description": "Funciona con todos los smartphones y tablets modernos que soportan tecnología eSIM.",
       "esimCompatible": "Compatible con eSIM",
       "operatingSystem": "Android 12+, iOS 15+"
+    },
+    "easySetup": {
+      "title": "Configuración fácil",
+      "description": "Escanea un código QR, sigue los pasos y estarás conectado. Tarda menos de 2 minutos.",
+      "readyInSeconds": "✓ Listo en segundos"
+    },
+    "topUp": {
+      "tag": "RECARGA EN CUALQUIER MOMENTO",
+      "title": "¿Necesitas más datos?",
+      "description": "¿Se te acaban? Recarga tu eSIM al instante desde la app — sin necesidad de comprar un nuevo plan ni reinstalar."
     }
   },
   "activation": {
@@ -1056,5 +1058,35 @@
     "benefit4": "Mantén tu número principal activo mientras usas datos en el extranjero",
     "benefit5": "Soporte al cliente 24/7",
     "regionalPlans": "Planes regionales de {{region}}"
+  },
+  "about": {
+    "sectionLabel": "Sobre nosotros",
+    "heroTitle": "Libertad de conexión para todos",
+    "missionLabel": "Nuestra misión",
+    "missionTitle": "Conectando el mundo a través de una conectividad sin fisuras",
+    "missionDesc1": "Creemos que la conectividad es un derecho fundamental. Ya seas mochilero, expatriado o nómada digital — mereces internet rápido y asequible sin la complicación de las SIM físicas o cargos de roaming inesperados.",
+    "missionDesc2": "Simnetiq fue creado para que estar conectado en el extranjero sea tan simple como escanear un código QR. Sin contratos, sin tiendas, sin complicaciones — solo datos instantáneos donde aterrices.",
+    "statCountries": "Países",
+    "statSupport": "Soporte",
+    "statMinutes": "Min. activación",
+    "statDigital": "Digital",
+    "valuesLabel": "Por qué elegirnos",
+    "valuesTitle": "Diseñado desde cero para viajeros",
+    "value1Title": "Conectividad global",
+    "value1Desc": "eSIMs instantáneas para más de 200 países. Viaja sin fronteras, mantente conectado en todas partes.",
+    "value2Title": "Activación instantánea",
+    "value2Desc": "Tu eSIM lista en segundos. Sin SIM física, sin esperas, sin cargos de roaming.",
+    "value3Title": "Seguro y fiable",
+    "value3Desc": "Cifrado de nivel empresarial y protección contra fraude en cada transacción.",
+    "value4Title": "Hecho para viajeros",
+    "value4Desc": "Diseñado para nómadas digitales, viajeros frecuentes y todos los demás.",
+    "storyLabel": "Nuestra historia",
+    "storyTitle": "De la frustración a la innovación",
+    "storyPara1": "Simnetiq comenzó con un problema simple: conectarse en el extranjero no debería ser tan difícil. Entre buscar tiendas de SIM locales, las barreras del idioma y los precios escandalosos del roaming — sabíamos que tenía que haber una mejor manera.",
+    "storyPara2": "Hoy, Simnetiq sirve a viajeros en más de 200 países con eSIMs digitales instantáneas. Compra en línea, escanea un código QR y estás conectado — todo antes de salir del aeropuerto.",
+    "storyPara3": "Somos un equipo pequeño de viajeros y tecnólogos que creen que la mejor conectividad es aquella en la que no tienes que pensar. Sin contratos, sin tiendas, sin complicaciones.",
+    "ctaTitle": "¿Listo para ser global?",
+    "ctaDesc": "Obtén tu eSIM en minutos. Funciona en cualquier dispositivo desbloqueado.",
+    "ctaButton": "Ver planes"
   }
 }
