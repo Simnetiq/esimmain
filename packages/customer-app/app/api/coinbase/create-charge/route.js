@@ -8,7 +8,7 @@ import {
 } from '@esim/shared/services/fraudDetectionService';
 
 const COINBASE_API_URL = 'https://api.commerce.coinbase.com';
-const COINBASE_API_KEY = process.env.COINBASE_COMMERCE_API_KEY || process.env.NEXT_PUBLIC_COINBASE_COMMERCE_API_KEY;
+const COINBASE_API_KEY = process.env.COINBASE_COMMERCE_API_KEY;
 
 const SECURITY_CONFIG = {
   MAX_PRICE_TOLERANCE: 0.01,

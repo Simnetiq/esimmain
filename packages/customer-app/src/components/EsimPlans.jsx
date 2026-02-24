@@ -141,6 +141,7 @@ const EsimPlans = ({ isHomePage = false }) => {
 
     // State
     const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
     const [selectedRegion, setSelectedRegion] = useState('global');
     const [regionalPlans, setRegionalPlans] = useState([]);
 
@@ -167,6 +168,12 @@ const EsimPlans = ({ isHomePage = false }) => {
         setIsMounted(true);
     }, []);
 
+    // Debounce search to avoid filtering on every keystroke
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedSearchTerm(searchTerm), 250);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
     // Special "Discover Global" entry for global/discover searches
     const discoverGlobalEntry = useMemo(() => ({
         id: 'discover-global',
@@ -192,9 +199,9 @@ const EsimPlans = ({ isHomePage = false }) => {
         const countriesWithPlans = countries.filter(c => (c.planCount || 0) > 0);
         let filtered = countriesWithPlans;
 
-        if (searchTerm) {
+        if (debouncedSearchTerm) {
             // Search mode - filter by search term (still only showing countries with plans)
-            const term = searchTerm.toLowerCase();
+            const term = debouncedSearchTerm.toLowerCase();
             filtered = countriesWithPlans.filter(c =>
                 (c.name && c.name.toLowerCase().includes(term)) ||
                 (c.displayName && c.displayName.toLowerCase().includes(term)) ||
@@ -258,7 +265,7 @@ const EsimPlans = ({ isHomePage = false }) => {
 
         // Don't limit here - CountriesGrid handles pagination with "Load More"
         return filtered;
-    }, [countries, searchTerm, selectedRegion, discoverGlobalEntry, promotedCountries]);
+    }, [countries, debouncedSearchTerm, selectedRegion, discoverGlobalEntry, promotedCountries]);
 
 
     // Sync URL params
@@ -267,8 +274,10 @@ const EsimPlans = ({ isHomePage = false }) => {
         if (search) setSearchTerm(search);
     }, [searchParams]);
 
-    // Fetch Regional Plans from Supabase
+    // Fetch Regional Plans from Supabase (with cancellation to prevent race conditions)
     useEffect(() => {
+        let cancelled = false;
+
         const loadRegionalPlans = async () => {
             if (!selectedRegion || selectedRegion === 'all' || selectedRegion === 'popular') {
                 setRegionalPlans([]);
@@ -278,9 +287,11 @@ const EsimPlans = ({ isHomePage = false }) => {
 
             try {
                 const plans = await fetchRegionalPlans(selectedRegion);
-                setAllRegionalPlans(plans); // Store all plans for "Show All" button
-                setRegionalPlans(plans.slice(0, 4)); // Display only top 4
+                if (cancelled) return;
+                setAllRegionalPlans(plans);
+                setRegionalPlans(plans.slice(0, 4));
             } catch (error) {
+                if (cancelled) return;
                 console.error('Error fetching regional plans from Supabase:', error);
                 setRegionalPlans([]);
                 setAllRegionalPlans([]);
@@ -288,6 +299,7 @@ const EsimPlans = ({ isHomePage = false }) => {
         };
 
         if (isMounted && selectedRegion) loadRegionalPlans();
+        return () => { cancelled = true; };
     }, [selectedRegion, isMounted]);
 
     // Handlers - Load plans from Supabase
@@ -427,11 +439,11 @@ const EsimPlans = ({ isHomePage = false }) => {
 
             {/* Main Content */}
             <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-12">
-                {searchTerm ? (
+                {debouncedSearchTerm ? (
                     <CountriesGrid
                         countries={filteredCountries}
                         isPlansPage={isPlansPage}
-                        searchTerm={searchTerm}
+                        searchTerm={debouncedSearchTerm}
                         onCountrySelect={handleCountrySelect}
                         isLoading={countriesLoading}
                         selectedRegion={selectedRegion}

@@ -33,11 +33,13 @@ class ConfigService {
     try {
       const config = await this._getConfigValue('stripe');
       if (config?.mode) return config.mode;
-      const savedMode = localStorage.getItem('esim_stripe_mode');
-      return savedMode || 'test';
+      if (typeof window !== 'undefined') {
+        const savedMode = localStorage.getItem('esim_stripe_mode');
+        if (savedMode) return savedMode;
+      }
+      return process.env.STRIPE_MODE || 'test';
     } catch (error) {
-      const savedMode = localStorage.getItem('esim_stripe_mode');
-      return savedMode || 'test';
+      return process.env.STRIPE_MODE || 'test';
     }
   }
 
@@ -45,16 +47,24 @@ class ConfigService {
     try {
       const config = await this._getConfigValue('environment');
       if (config?.mode) return config.mode;
-      const savedEnv = localStorage.getItem('esim_environment');
-      return savedEnv || 'test';
+      if (typeof window !== 'undefined') {
+        const savedEnv = localStorage.getItem('esim_environment');
+        if (savedEnv) return savedEnv;
+      }
+      return process.env.AIRALO_MODE || 'test';
     } catch (error) {
-      const savedEnv = localStorage.getItem('esim_environment');
-      return savedEnv || 'test';
+      return process.env.AIRALO_MODE || 'test';
     }
   }
 
   async getAiraloConfig() {
     try {
+      const envKey = process.env.AIRALO_CLIENT_SECRET;
+      const envMode = process.env.AIRALO_MODE || 'sandbox';
+      const envBaseUrl = process.env.AIRALO_BASE_URL || 'https://partners-api.airalo.com/v2';
+      if (envKey) {
+        return { apiKey: envKey, environment: envMode, baseUrl: envBaseUrl };
+      }
       const config = await this._getConfigValue('airalo');
       if (config?.api_key) {
         return {
@@ -62,11 +72,6 @@ class ConfigService {
           environment: config.environment || 'sandbox',
           baseUrl: 'https://partners-api.airalo.com/v2'
         };
-      }
-      const savedKey = localStorage.getItem('airalo_api_key');
-      const savedEnv = localStorage.getItem('airalo_environment') || 'test';
-      if (savedKey) {
-        return { apiKey: savedKey, environment: savedEnv, baseUrl: 'https://partners-api.airalo.com/v2' };
       }
       return { apiKey: null, environment: 'sandbox', baseUrl: 'https://sandbox-partners-api.airalo.com/v2' };
     } catch (error) {
@@ -94,29 +99,17 @@ class ConfigService {
   }
 
   async getStripeSecretKey(mode = 'test') {
-    try {
-      if (mode === 'live' || mode === 'production') {
-        const envKey = process.env.STRIPE_SECRET_KEY_LIVE || process.env.STRIPE_SECRET_KEY;
-        if (envKey) return envKey;
-      } else {
-        const envKey = process.env.STRIPE_SECRET_KEY_TEST || process.env.STRIPE_SECRET_KEY;
-        if (envKey) return envKey;
-      }
-
-      const config = await this._getConfigValue('stripe');
-      if (config) {
-        if (mode === 'live' || mode === 'production') {
-          const liveKey = config.liveSecretKey || config.live_secret_key;
-          if (liveKey) return liveKey;
-        } else {
-          const testKey = config.testSecretKey || config.test_secret_key;
-          if (testKey) return testKey;
-        }
-      }
-      throw new Error('Stripe secret key not configured');
-    } catch (error) {
-      throw error;
+    if (typeof window !== 'undefined') {
+      throw new Error('getStripeSecretKey must only be called on the server');
     }
+    if (mode === 'live' || mode === 'production') {
+      const envKey = process.env.STRIPE_SECRET_KEY_LIVE || process.env.STRIPE_SECRET_KEY;
+      if (envKey) return envKey;
+    } else {
+      const envKey = process.env.STRIPE_SECRET_KEY_TEST || process.env.STRIPE_SECRET_KEY;
+      if (envKey) return envKey;
+    }
+    throw new Error('Stripe secret key not configured in environment variables');
   }
 
   async logExpiredStripeKey(keyType = 'unknown', error = null) {

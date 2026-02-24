@@ -8,7 +8,7 @@ const COINBASE_API_URL = 'https://api.commerce.coinbase.com';
 
 class CoinbasePaymentService {
   constructor() {
-    this.apiKey = process.env.NEXT_PUBLIC_COINBASE_COMMERCE_API_KEY || process.env.COINBASE_COMMERCE_API_KEY;
+    this.apiKey = process.env.COINBASE_COMMERCE_API_KEY;
     this.webhookSecret = process.env.COINBASE_COMMERCE_WEBHOOK_SECRET;
   }
 

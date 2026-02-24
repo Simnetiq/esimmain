@@ -101,24 +101,35 @@ const fetchCountriesFromSupabase = async (locale = 'en') => {
   console.log('[fetchCountriesFromSupabase] Starting fetch...');
   const supabase = getSupabase();
 
-  // Fetch countries with translations, joined with regions to check is_active
-  const { data, error } = await supabase
-    .from('countries')
-    .select(`
-      *,
-      country_translations (
-        language_code,
-        name,
-        description
-      ),
-      region:regions!countries_region_id_fkey (
-        id,
-        is_active
-      )
-    `)
-    .eq('is_active', true)
-    .order('is_popular', { ascending: false })
-    .order('name', { ascending: true });
+  // Fetch countries and plan stats in parallel (independent queries)
+  const [countriesResult, planStatsResult] = await Promise.all([
+    supabase
+      .from('countries')
+      .select(`
+        *,
+        country_translations (
+          language_code,
+          name,
+          description
+        ),
+        region:regions!countries_region_id_fkey (
+          id,
+          is_active
+        )
+      `)
+      .eq('is_active', true)
+      .order('is_popular', { ascending: false })
+      .order('name', { ascending: true }),
+    supabase
+      .from('dataplans')
+      .select('country_id, country_iso, price')
+      .eq('status', 'active')
+      .eq('is_enabled', true)
+      .neq('plan_type', 'global')
+  ]);
+
+  const { data, error } = countriesResult;
+  const { data: planStats } = planStatsResult;
 
   if (error) {
     console.error('[fetchCountriesFromSupabase] Error:', error);
@@ -126,15 +137,6 @@ const fetchCountriesFromSupabase = async (locale = 'en') => {
   }
 
   console.log('[fetchCountriesFromSupabase] Received', data?.length, 'countries from Supabase');
-
-  // Fetch plan stats (plan count and min price per country)
-  // This ensures we always have fresh stats even if admin hasn't run recalculate
-  const { data: planStats } = await supabase
-    .from('dataplans')
-    .select('country_id, country_iso, price')
-    .eq('status', 'active')
-    .eq('is_enabled', true)
-    .neq('plan_type', 'global');
 
   // Build stats map by country - index by multiple keys for better matching
   const statsMap = new Map();

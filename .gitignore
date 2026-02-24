@@ -17,6 +17,7 @@ dist/
 .env.test.local
 .env.production.local
 .env.*
+server/env.production
 
 # Service account keys and sensitive files
 **/serviceAccountKey.json

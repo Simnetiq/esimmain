@@ -128,27 +128,25 @@ const Navbar = ({ hideLanguageSelector = false }) => {
     });
   };
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const lastScrollYRef = useRef(0);
   const [mounted, setMounted] = useState(false);
 
   // Handle scroll behavior with throttling for performance
   useEffect(() => {
     let ticking = false;
-    let lastKnownScrollY = lastScrollY;
 
     const controlNavbar = () => {
       const currentScrollY = window.scrollY;
-      
+
       // Show navbar when at top or scrolling up
-      if (currentScrollY < 10 || currentScrollY < lastKnownScrollY) {
+      if (currentScrollY < 10 || currentScrollY < lastScrollYRef.current) {
         setIsVisible(true);
       } else {
         // Hide navbar when scrolling down
         setIsVisible(false);
       }
-      
-      lastKnownScrollY = currentScrollY;
-      setLastScrollY(currentScrollY);
+
+      lastScrollYRef.current = currentScrollY;
       ticking = false;
     };
 
@@ -159,11 +157,9 @@ const Navbar = ({ hideLanguageSelector = false }) => {
       }
     };
 
-    if (typeof window !== 'undefined') {
-      window.addEventListener('scroll', onScroll, { passive: true });
-      return () => window.removeEventListener('scroll', onScroll);
-    }
-  }, [lastScrollY]);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   // Set mounted state
   useEffect(() => {

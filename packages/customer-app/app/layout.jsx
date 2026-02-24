@@ -144,21 +144,17 @@ export default function RootLayout({ children }) {
   return (
     <html suppressHydrationWarning>
       <head>
-        {/* Preconnect to Google Fonts for faster loading */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        
         {/* Preload critical translation file with high priority */}
-        <link 
-          rel="preload" 
-          href="/locales/en/common.json" 
-          as="fetch" 
+        <link
+          rel="preload"
+          href="/locales/en/common.json"
+          as="fetch"
           type="application/json"
           crossOrigin="anonymous"
         />
-        
-        {/* Preconnect to Airalo CDN for country flag images */}
-        <link rel="preconnect" href="https://cdn.airalo.com" />
+
+        {/* DNS prefetch for non-critical third-party domains */}
+        <link rel="dns-prefetch" href="https://cdn.airalo.com" />
 
         {/* Preconnect to Supabase for faster auth/db initialization */}
         {process.env.NEXT_PUBLIC_SUPABASE_URL && (
@@ -169,26 +165,13 @@ export default function RootLayout({ children }) {
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
         
-        {/* Scroll to top on page load/refresh */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('scrollRestoration' in history) {
-                history.scrollRestoration = 'manual';
-              }
-              window.addEventListener('beforeunload', function() {
-                window.scrollTo(0, 0);
-              });
-            `,
-          }}
-        />
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/images/logo_icon/favicon.png" type="image/png" />
         <link rel="apple-touch-icon" href="/images/logo_icon/ioslogo.png" />
         
-        {/* Stripe.js preconnect for faster loading when needed */}
-        <link rel="preconnect" href="https://js.stripe.com" />
+        {/* Stripe.js - only dns-prefetch since it's not needed on every page */}
+        <link rel="dns-prefetch" href="https://js.stripe.com" />
         
         <meta name="theme-color" content="#468BE6" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
