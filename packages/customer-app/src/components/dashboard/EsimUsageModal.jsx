@@ -1,12 +1,12 @@
 import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { Wifi, Phone, MessageSquare, Clock, Signal, X, AlertCircle, CheckCircle } from 'lucide-react';
+import { BACKDROP, CENTER_MODAL } from '../../lib/animation-constants';
 
 const EsimUsageModal = ({ esimUsage, onClose }) => {
   const { t } = useI18n();
   
-  if (!esimUsage) return null;
-
   // Calculate usage percentages with safety checks - clamp between 0 and 100
   const getUsagePercentage = (used, total) => {
     if (!total || total === 0 || isNaN(used) || isNaN(total)) return 0;
@@ -101,8 +101,19 @@ const EsimUsageModal = ({ esimUsage, onClose }) => {
   const StatusIcon = statusInfo.icon;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="w-full max-w-md max-h-[90vh] overflow-hidden bg-white rounded-lg shadow-xl">
+    <AnimatePresence>
+      {esimUsage && (
+    <>
+    <motion.div
+      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+      {...BACKDROP}
+      onClick={onClose}
+    />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+      <motion.div
+        className="w-full max-w-md max-h-[90vh] overflow-hidden bg-white rounded-lg shadow-xl pointer-events-auto"
+        {...CENTER_MODAL}
+      >
         {/* Header */}
         <div className="bg-gradient-to-r from-tufts-blue to-blue-600 px-6 py-4">
           <div className="flex items-center justify-between">
@@ -241,8 +252,11 @@ const EsimUsageModal = ({ esimUsage, onClose }) => {
             {t('common.close', 'Close')}
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
+    </>
+      )}
+    </AnimatePresence>
   );
 };
 

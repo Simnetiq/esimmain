@@ -1,9 +1,14 @@
 import React from 'react';
-import { Globe } from 'lucide-react';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { getLanguageDirection, detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
 import { usePathname } from 'next/navigation';
 import EsimCard from './EsimCard';
+
+const GlobeIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>
+  </svg>
+);
 
 // Usage data is preloaded when dashboard loads (up to 10 eSIMs)
 // Additional usage data can be loaded on-demand when user opens the QRCodeModal
@@ -42,7 +47,7 @@ const RecentOrders = ({ orders, loading, onViewQRCode, usageCache = {}, loadingU
               </div>
             ) : orders.length === 0 ? (
               <div className="text-center py-12">
-                <Globe className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <GlobeIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                 <p className="text-gray-500 text-lg">{t('dashboard.noOrders', 'No orders yet')}</p>
               </div>
             ) : (

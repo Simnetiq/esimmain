@@ -81,17 +81,23 @@ const CountriesGrid = ({
 
   if (isLoading && countries.length === 0) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" dir={direction} lang={detectedLanguage}>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4" dir={direction} lang={detectedLanguage}>
         {[...Array(8)].map((_, i) => (
-          <div key={i} className="bg-gray-50 rounded-lg p-4 animate-pulse">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-16 sm:w-20 aspect-[4/3] bg-gray-200 rounded-lg" />
-              <div className="flex-1">
-                <div className="h-5 bg-gray-200 rounded w-3/4 mb-2" />
-                <div className="h-4 bg-gray-200 rounded w-1/2" />
+          <div key={i} className="relative bg-gray-50 overflow-hidden p-4 animate-pulse">
+            <span className="absolute top-2 right-3 text-[3.5rem] sm:text-[4.5rem] font-semibold leading-none text-gray-200/40 select-none" aria-hidden="true">--</span>
+            <div className="relative">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 bg-gray-200 rounded-full flex-shrink-0" />
+                <div className="flex-1">
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-1.5" />
+                  <div className="h-3 bg-gray-200 rounded w-1/2" />
+                </div>
+              </div>
+              <div className="flex items-center justify-between pt-3 border-t border-gray-100/60">
+                <div className="h-5 bg-gray-200 rounded w-16" />
+                <div className="w-7 h-7 bg-gray-200 rounded-full" />
               </div>
             </div>
-            <div className="h-6 bg-gray-200 rounded w-1/3 mt-auto" />
           </div>
         ))}
       </div>

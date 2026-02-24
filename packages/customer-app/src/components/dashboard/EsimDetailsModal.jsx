@@ -1,8 +1,10 @@
 import React, { useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { Info, QrCode, Package, User, X, Copy, ExternalLink, CheckCircle } from 'lucide-react';
+import { BACKDROP, CENTER_MODAL } from '../../lib/animation-constants';
 import toast from 'react-hot-toast';
 
 const EsimDetailsModal = ({ esimDetails, onClose }) => {
@@ -15,8 +17,6 @@ const EsimDetailsModal = ({ esimDetails, onClose }) => {
   }, [locale]);
   const isRTL = direction === 'rtl';
 
-  if (!esimDetails) return null;
-
   const copyToClipboard = (text, label) => {
     navigator.clipboard.writeText(text).then(() => {
       toast.success(t('common.copied', '{{label}} copied!', { label }));
@@ -26,8 +26,19 @@ const EsimDetailsModal = ({ esimDetails, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" dir={direction}>
-      <div className="w-full max-w-2xl max-h-[90vh] overflow-hidden bg-white rounded-lg shadow-xl">
+    <AnimatePresence>
+      {esimDetails && (
+    <>
+    <motion.div
+      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+      {...BACKDROP}
+      onClick={onClose}
+    />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none" dir={direction}>
+      <motion.div
+        className="w-full max-w-2xl max-h-[90vh] overflow-hidden bg-white rounded-lg shadow-xl pointer-events-auto"
+        {...CENTER_MODAL}
+      >
         {/* Header */}
         <div className={`bg-gradient-to-r ${isRTL ? 'from-teal-500 to-emerald-500' : 'from-emerald-500 to-teal-500'} px-6 py-4`}>
           <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
@@ -240,8 +251,11 @@ const EsimDetailsModal = ({ esimDetails, onClose }) => {
             {t('common.close', 'Close')}
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
+    </>
+      )}
+    </AnimatePresence>
   );
 };
 

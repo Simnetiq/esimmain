@@ -53,7 +53,7 @@ const LPAQRCodeDisplay = ({ lpaData }) => {
     return (
       <div className="text-center">
         <div className="w-full h-full flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tufts-blue"></div>
         </div>
         <p className="text-sm text-gray-600 mt-2">{t('dashboard.generatingQrCode', 'Generating QR Code...')}</p>
       </div>

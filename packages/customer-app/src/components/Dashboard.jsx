@@ -32,7 +32,7 @@ const ReferralBottomSheet = dynamic(() => import('./ReferralBottomSheet'), {
   loading: () => null
 });
 
-// Dashboard Skeleton Component - matches exact DashboardHeader + RecentOrders dimensions
+// Dashboard Skeleton Component - matches exact DashboardHeader + RecentOrders layout
 const DashboardSkeleton = () => (
   <div className="min-h-screen bg-white flex flex-col relative overflow-hidden">
     <div className="relative isolate flex-1 flex flex-col">
@@ -40,74 +40,56 @@ const DashboardSkeleton = () => (
       <div className="hidden sm:block absolute top-0 left-0 right-0 h-px bg-gray-200/70" />
       <div className="hidden sm:block absolute bottom-0 left-0 right-0 h-px bg-gray-200/70" />
 
-      {/* Header Section Skeleton - matches DashboardHeader dimensions exactly */}
+      {/* Header Section Skeleton — matches DashboardHeader */}
       <div className="bg-white">
         <div className="mx-auto w-full max-w-9xl">
-          <div className="mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl w-full lg:mt-20 mt-10">
-            <div className="px-4 pt-6 lg:pt-0 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              {/* Subtitle skeleton — matches font-mono text-sm/text-base uppercase tracking-widest */}
-              <div className="h-5 sm:h-5 w-96 max-w-full bg-gray-200 rounded animate-pulse" />
+          <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
+            <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
+              {/* Subtitle — matches text-sm/text-base tracking-widest uppercase */}
+              <div className="h-4 sm:h-5 w-80 max-w-full bg-gray-200 rounded animate-pulse mb-4" />
+              {/* Title — matches text-xl sm:text-2xl lg:text-3xl xl:text-4xl */}
+              <div className="h-7 sm:h-8 lg:h-10 xl:h-12 w-96 max-w-full bg-gray-200 rounded animate-pulse" />
+            </div>
+          </div>
+        </div>
+        <div className="w-full h-px bg-gray-100" />
+      </div>
 
-              {/* Title skeleton — matches text-xl sm:text-2xl lg:text-3xl xl:text-4xl + line-height */}
-              <div className="h-7 sm:h-8 lg:h-10 xl:h-12 w-96 max-w-full bg-gray-200 rounded animate-pulse my-4" />
+      {/* Stats + Actions Skeleton — matches DashboardHeader grid */}
+      <div className="bg-white">
+        <div className="mx-auto w-full max-w-9xl">
+          <div className="mx-auto w-full max-w-7xl">
+            <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
 
-              {/* Divider */}
-              <div className="w-full h-px bg-gray-200 my-4" />
-
-              {/* Stats Line skeleton */}
-              <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-                {/* Stat 1 - Total Orders */}
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-gray-200 rounded animate-pulse" />
-                  <div>
-                    <div className="h-3.5 w-20 bg-gray-200 rounded animate-pulse mb-1" />
-                    <div className="h-4 w-8 bg-gray-200 rounded animate-pulse" />
+              {/* Stats Cards — 3-col grid matching real layout */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="relative bg-gray-50 overflow-hidden p-5">
+                    <span className="absolute top-3 right-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-400/10 select-none pointer-events-none" aria-hidden="true">--</span>
+                    <div className="relative">
+                      <div className="w-11 h-11 rounded-lg bg-gray-200 animate-pulse mb-4" />
+                      <div className="h-3 w-24 bg-gray-200 rounded animate-pulse" />
+                    </div>
                   </div>
-                </div>
-
-                <div className="w-px h-8 bg-gray-200 hidden sm:block" />
-
-                {/* Stat 2 - Active eSIMs */}
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-gray-200 rounded animate-pulse" />
-                  <div>
-                    <div className="h-3.5 w-20 bg-gray-200 rounded animate-pulse mb-1" />
-                    <div className="h-4 w-8 bg-gray-200 rounded animate-pulse" />
-                  </div>
-                </div>
-
-                <div className="w-px h-8 bg-gray-200 hidden sm:block" />
-
-                {/* Stat 3 - Total Spent */}
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-gray-200 rounded animate-pulse" />
-                  <div>
-                    <div className="h-3.5 w-20 bg-gray-200 rounded animate-pulse mb-1" />
-                    <div className="h-4 w-14 bg-gray-200 rounded animate-pulse" />
-                  </div>
-                </div>
+                ))}
               </div>
 
-              {/* Quick Actions skeleton — matches px-4 py-2.5 text-sm + icon + text width */}
-              <div className="mt-6">
-                <div className="flex flex-wrap gap-3">
-                  <div className="h-10 w-40 bg-gray-200 rounded-lg animate-pulse" />
-                  <div className="h-10 w-44 bg-gray-100 rounded-lg animate-pulse" />
-                </div>
+              {/* Quick Actions */}
+              <div className="flex flex-wrap gap-3">
+                <div className="h-12 w-40 bg-gray-200 rounded-full animate-pulse" />
+                <div className="h-12 w-44 bg-gray-100 rounded-full animate-pulse" />
               </div>
             </div>
           </div>
         </div>
-        {/* Full width gray line */}
-        <div className="w-full h-px bg-gray-100 mt-6" />
       </div>
 
-      {/* Recent Orders Section Skeleton - matches RecentOrders dimensions */}
+      {/* Recent Orders Section Skeleton — spinner only */}
       <div className="bg-white flex-1">
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl">
             <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              {/* Section title skeleton — matches text-xl sm:text-2xl font-semibold */}
+              {/* Section title */}
               <div className="h-7 sm:h-8 w-44 bg-gray-200 rounded animate-pulse mb-6" />
 
               {/* Loading indicator */}

@@ -65,6 +65,8 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
   const { t, locale, isLoading: i18nLoading } = useI18n();
   const [mounted, setMounted] = useState(false);
   const [countryImage, setCountryImage] = useState(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageFetchDone, setImageFetchDone] = useState(false);
 
   const { getLocalizedName } = useCountryNames(locale || 'en');
 
@@ -124,8 +126,10 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
 
         if (imageUrl) setCachedCountryImage(cacheKey, imageUrl);
         setCountryImage(imageUrl || null);
+        setImageFetchDone(true);
       } catch (error) {
         console.error('Error fetching country image:', error);
+        setImageFetchDone(true);
       }
     };
 
@@ -274,16 +278,24 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
 
         {/* Header Section */}
         <div className={`flex items-center gap-3 mb-4 ${isRTL ? 'flex-row-reverse' : ''}`} dir={direction}>
-          <div className="w-12 h-12 bg-gray-100 flex items-center justify-center rounded-full overflow-hidden flex-shrink-0">
+          <div className="w-12 h-12 bg-gray-100 flex items-center justify-center rounded-full overflow-hidden flex-shrink-0 relative">
             {countryImage ? (
-              <Image
-                src={countryImage}
-                alt={fullName}
-                width={48}
-                height={48}
-                className="w-full h-full object-cover"
-                unoptimized
-              />
+              <>
+                {!imageLoaded && (
+                  <div className="absolute inset-0 bg-gray-200 rounded-full animate-pulse" />
+                )}
+                <Image
+                  src={countryImage}
+                  alt={fullName}
+                  width={48}
+                  height={48}
+                  className={`w-full h-full object-cover transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                  unoptimized
+                  onLoad={() => setImageLoaded(true)}
+                />
+              </>
+            ) : !imageFetchDone ? (
+              <div className="absolute inset-0 bg-gray-200 rounded-full animate-pulse" />
             ) : (
               <GlobeIcon className="w-6 h-6 text-gray-500" />
             )}
