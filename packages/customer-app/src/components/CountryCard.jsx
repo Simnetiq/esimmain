@@ -77,7 +77,7 @@ const CountryCard = ({
     >
       {/* Country code watermark */}
       <span
-        className={`absolute top-3 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-500/10 select-none pointer-events-none ${isRTL ? 'left-4' : 'right-4'}`}
+        className={`absolute top-3 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-300/10 select-none pointer-events-none ${isRTL ? 'left-4' : 'right-4'}`}
         aria-hidden="true"
       >
         {countryCode}

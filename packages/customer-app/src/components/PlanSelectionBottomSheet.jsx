@@ -10,6 +10,7 @@ import { formatPrice, parsePrice } from '@esim/shared/utils/priceUtils';
 import Image from 'next/image';
 import { getSupabase } from '@esim/shared/lib/supabase';
 import { GLOBAL_PLAN_IMAGE_URL } from '@esim/shared';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 
 // Inline SVG icons to avoid lucide-react bundle overhead
@@ -108,20 +109,14 @@ const formatDataDisplay = (plan) => {
   return dataStr || 'Data';
 };
 
-const PlanCard = ({ plan, badge, isSelected, onSelect }) => {
+// Shared plan data extraction
+const usePlanData = (plan, badge) => {
   const { t } = useI18n();
-
   const originalPrice = parsePrice(plan.price);
   const hasSms = planHasSms(plan);
   const hasVoice = planHasVoice(plan);
-
-  // Format data display properly
   const dataDisplay = formatDataDisplay(plan);
-
-  // Get validity days with fallback
   const validityDays = plan.validity || plan.period || plan.duration || 0;
-
-  // Get additional plan metadata
   const operatorName = plan.operatorName || plan.operator_name;
   const operatorLogo = plan.operatorLogo || plan.operator_logo || plan.operator_image_url;
   const fairUsagePolicy = plan.fair_usage_policy || plan.fairUsagePolicy;
@@ -131,130 +126,145 @@ const PlanCard = ({ plan, badge, isSelected, onSelect }) => {
   const isGlobal = isGlobalPlan(plan);
   const currency = plan.currency || 'USD';
 
-  // Badge configurations - simple text badges
   const badgeConfig = {
-    cheapest: {
-      bg: 'bg-green-100',
-      text: 'text-green-700',
-      label: t('deals.bestPrice', 'Best Price')
-    },
-    bestDeal: {
-      bg: 'bg-amber-100',
-      text: 'text-amber-700',
-      label: t('deals.bestValue', 'Best Value')
-    },
-    unlimited: {
-      bg: 'bg-purple-100',
-      text: 'text-purple-700',
-      label: t('deals.unlimitedData', 'Unlimited data')
-    }
+    cheapest: { bg: 'bg-green-50', text: 'text-green-700', label: t('deals.bestPrice', 'Best Price') },
+    bestDeal: { bg: 'bg-amber-50', text: 'text-amber-700', label: t('deals.bestValue', 'Best Value') },
+    unlimited: { bg: 'bg-purple-50', text: 'text-purple-700', label: t('deals.unlimitedData', 'Unlimited data') }
   };
-
   const currentBadge = badge ? badgeConfig[badge] : null;
+
+  return { originalPrice, hasSms, hasVoice, dataDisplay, validityDays, operatorName, operatorLogo, fairUsagePolicy, coveredCountryCount, isRegional, isGlobal, currency, currentBadge, t };
+};
+
+// Mobile: compact card (sharp corners)
+const PlanCard = ({ plan, badge, isSelected, onSelect }) => {
+  const { originalPrice, hasSms, hasVoice, dataDisplay, validityDays, operatorName, operatorLogo, fairUsagePolicy, coveredCountryCount, isRegional, isGlobal, currency, currentBadge, t } = usePlanData(plan, badge);
 
   return (
     <button
-      className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 ${
+      className={`w-full text-left p-4 border transition-all duration-150 ${
         isSelected
-          ? 'border-tufts-blue bg-blue-50/50'
-          : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50'
+          ? 'border-tufts-blue bg-tufts-blue/5 border-l-4'
+          : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50/50'
       }`}
       onClick={onSelect}
     >
-      <div className="flex items-start justify-between gap-3">
-        {/* Left: Radio indicator */}
-        <div className={`w-5 h-5 mt-0.5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
-          isSelected
-            ? 'border-tufts-blue bg-tufts-blue'
-            : 'border-gray-300'
+      <div className="flex items-center gap-3">
+        <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+          isSelected ? 'border-tufts-blue bg-tufts-blue' : 'border-gray-300'
         }`}>
-          {isSelected && <CheckIcon className="w-3 h-3 text-white" />}
+          {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
         </div>
 
-        {/* Center: Plan details */}
         <div className="flex-1 min-w-0">
-          {/* Row 1: Data + Validity + Badge */}
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-base font-semibold text-gray-900">
-              {dataDisplay}
-            </span>
+            <span className="text-base font-bold text-eerie-black">{dataDisplay}</span>
             {validityDays > 0 && (
               <>
                 <span className="text-gray-300">·</span>
-                <span className="text-sm text-gray-500">
-                  {validityDays} {t('planSelection.days', 'days')}
-                </span>
+                <span className="text-sm text-gray-500">{validityDays} {t('planSelection.days', 'days')}</span>
               </>
             )}
-            {/* Badges */}
             {currentBadge && (
-              <span className={`${currentBadge.bg} ${currentBadge.text} text-xs font-medium px-2 py-0.5 rounded`}>
+              <span className={`${currentBadge.bg} ${currentBadge.text} text-xs font-semibold px-2 py-0.5 rounded-full`}>
                 {currentBadge.label}
               </span>
             )}
           </div>
-
-          {/* Row 2: SMS & Voice */}
           {(hasSms || hasVoice) && (
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 mt-0.5">
               {hasVoice && <span>{plan.voice || plan.calls} {t('plan.minutes', 'min')}</span>}
               {hasVoice && hasSms && <span> · </span>}
               {hasSms && <span>{plan.sms} SMS</span>}
             </p>
           )}
-
-          {/* Row 3: Operator + Country Coverage */}
-          {(operatorName || ((isRegional || isGlobal) && coveredCountryCount > 0)) && (
-            <div className="flex items-center gap-2 flex-wrap mt-1">
-              {operatorName && (
-                <div className="flex items-center gap-1">
-                  {operatorLogo && (
-                    <div className="relative w-4 h-4 flex-shrink-0">
-                      <Image
-                        src={operatorLogo}
-                        alt={operatorName}
-                        fill
-                        sizes="16px"
-                        className="rounded object-contain"
-                        quality={75}
-                        loading="lazy"
-                      />
-                    </div>
-                  )}
-                  <span className="text-xs text-gray-400">{operatorName}</span>
+          {operatorName && (
+            <div className="flex items-center gap-1 mt-0.5">
+              {operatorLogo && (
+                <div className="relative w-3.5 h-3.5 flex-shrink-0">
+                  <Image src={operatorLogo} alt={operatorName} fill sizes="14px" className="object-contain" quality={75} loading="lazy" />
                 </div>
               )}
+              <span className="text-xs text-gray-400">{operatorName}</span>
               {(isRegional || isGlobal) && coveredCountryCount > 0 && (
                 <>
-                  {operatorName && <span className="text-gray-300">·</span>}
-                  <span className="inline-flex items-center gap-1 text-xs text-tufts-blue">
-                    <GlobeIcon className="w-3 h-3" />
-                    {coveredCountryCount} {coveredCountryCount === 1 ? t('deals.country', 'country') : t('deals.countries', 'countries')}
-                  </span>
+                  <span className="text-gray-300 mx-0.5">·</span>
+                  <span className="text-xs text-tufts-blue">{coveredCountryCount} {t('deals.countries', 'countries')}</span>
                 </>
               )}
             </div>
           )}
-
-          {/* Row 4: Fair Usage Policy (for unlimited plans) */}
-          {fairUsagePolicy && (
-            <p className="text-xs text-amber-600 mt-1">
-              {t('plan.fairUsage', 'Fair usage')}: {fairUsagePolicy}
-            </p>
-          )}
         </div>
 
-        {/* Right: Price */}
         <div className="flex-shrink-0 text-right">
-          <span className="text-lg font-bold text-gray-900">
-            {formatPrice(originalPrice)}
-          </span>
-          {currency !== 'USD' && (
-            <p className="text-xs text-gray-400">{currency}</p>
-          )}
+          <span className="text-lg font-bold text-eerie-black">{formatPrice(originalPrice)}</span>
+          {currency !== 'USD' && <p className="text-xs text-gray-400">{currency}</p>}
         </div>
       </div>
     </button>
+  );
+};
+
+// Desktop: table row
+const PlanTableRow = ({ plan, badge, isSelected, onSelect, regionColor }) => {
+  const { originalPrice, hasSms, hasVoice, dataDisplay, validityDays, operatorName, operatorLogo, fairUsagePolicy, coveredCountryCount, isRegional, isGlobal, currency, currentBadge, t } = usePlanData(plan, badge);
+
+  return (
+    <tr
+      className={`cursor-pointer transition-all duration-150 ${
+        isSelected
+          ? 'bg-tufts-blue/[0.07] shadow-[inset_0_1px_0_0_rgba(73,117,212,0.15),inset_0_-1px_0_0_rgba(73,117,212,0.15)]'
+          : 'hover:bg-gray-50'
+      }`}
+      onClick={onSelect}
+    >
+      {/* Radio */}
+      <td className={`pl-5 py-4 w-12 ${isSelected ? 'border-l-4 border-l-tufts-blue' : 'border-l-4 border-l-transparent'}`}>
+        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+          isSelected ? 'border-tufts-blue bg-tufts-blue' : 'border-gray-300'
+        }`}>
+          {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
+        </div>
+      </td>
+      {/* Data */}
+      <td className="py-4 pr-4">
+        <span className={`text-base font-bold ${isSelected ? 'text-tufts-blue' : 'text-eerie-black'}`}>{dataDisplay}</span>
+      </td>
+      {/* Days */}
+      <td className="py-4 pr-4">
+        <span className={`text-sm ${isSelected ? 'text-gray-700 font-medium' : 'text-gray-600'}`}>{validityDays > 0 ? `${validityDays} days` : '—'}</span>
+      </td>
+      {/* Operator */}
+      <td className="py-4 pr-4">
+        <div
+          className="inline-flex items-center gap-2 px-2.5 py-1.5"
+          style={regionColor ? { background: `linear-gradient(135deg, ${regionColor}25, ${regionColor}08)` } : undefined}
+        >
+          {operatorLogo && (
+            <div className="relative w-5 h-5 flex-shrink-0">
+              <Image src={operatorLogo} alt={operatorName || ''} fill sizes="20px" className="object-contain" quality={75} loading="lazy" />
+            </div>
+          )}
+          <span className="text-sm text-gray-600 truncate max-w-[140px]">{operatorName || '—'}</span>
+          {(isRegional || isGlobal) && coveredCountryCount > 0 && (
+            <span className="text-xs text-tufts-blue whitespace-nowrap ml-1">{coveredCountryCount} {t('deals.countries', 'countries')}</span>
+          )}
+        </div>
+      </td>
+      {/* Badge */}
+      <td className="py-4 pr-4">
+        {currentBadge && (
+          <span className={`${currentBadge.bg} ${currentBadge.text} text-xs font-semibold px-2.5 py-1 rounded-full inline-block w-fit`}>
+            {currentBadge.label}
+          </span>
+        )}
+      </td>
+      {/* Price */}
+      <td className="py-4 pr-5 text-right">
+        <span className={`text-lg font-bold ${isSelected ? 'text-tufts-blue' : 'text-eerie-black'}`}>{formatPrice(originalPrice)}</span>
+        {currency !== 'USD' && <span className="text-xs text-gray-400 ml-1">{currency}</span>}
+      </td>
+    </tr>
   );
 };
 
@@ -295,6 +305,7 @@ const PlanSelectionBottomSheet = ({
   }, [locale, pathname, i18nLoading]);
 
   const isRTL = getLanguageDirection(currentLanguage) === 'rtl';
+  const isMobile = useIsMobile(768);
 
   // Helper function to generate localized URLs
   const getLocalizedUrl = (path) => {
@@ -702,9 +713,9 @@ const PlanSelectionBottomSheet = ({
       onClose={onClose}
       title={
         countryInfo ? (
-          <div className="flex items-center gap-x-2 my-4">
+          <div className="flex items-center gap-x-3 py-1">
             {/* Country/Global/Regional Image */}
-            <div className="flex-shrink-0 w-10 aspect-[4/3] flex items-center justify-center border border-gray-200 overflow-hidden rounded bg-gray-50">
+            <div className="flex-shrink-0 w-12 aspect-[4/3] flex items-center justify-center border border-gray-200 overflow-hidden rounded bg-gray-50">
               {countryInfo.imageUrl ? (
                 <div className="relative w-full h-full">
                   <Image
@@ -730,7 +741,7 @@ const PlanSelectionBottomSheet = ({
         )
       }
       maxHeight="85vh"
-      variant="center"
+      variant={isMobile ? "bottom" : "center"}
     >
       <div className="p-4 lg:p-6" dir={isRTL ? 'rtl' : 'ltr'}>
 
@@ -739,10 +750,10 @@ const PlanSelectionBottomSheet = ({
           <div className="py-8">
             <div className="grid grid-cols-2 gap-3">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="bg-gray-50 rounded-lg p-4 animate-pulse">
-                  <div className="h-5 bg-gray-200 rounded w-3/4 mb-3" />
-                  <div className="h-4 bg-gray-200 rounded w-1/2 mb-3" />
-                  <div className="h-6 bg-gray-200 rounded w-1/3" />
+                <div key={i} className="bg-gray-50 p-4 animate-pulse">
+                  <div className="h-5 bg-gray-200 w-3/4 mb-3" />
+                  <div className="h-4 bg-gray-200 w-1/2 mb-3" />
+                  <div className="h-6 bg-gray-200 w-1/3" />
                 </div>
               ))}
             </div>
@@ -751,85 +762,152 @@ const PlanSelectionBottomSheet = ({
         ) : availablePlans && availablePlans.length > 0 ? (
           <div className="space-y-4">
             {/* Sort Control */}
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-gray-500">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-sm text-gray-500 flex-shrink-0">
                 {t('planSelection.selectPlan', 'Select a plan')}
               </p>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="text-xs sm:text-sm border-0 bg-gray-100 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-tufts-blue/20"
-              >
-                <option value="price">{t('planSort.price', 'Price ↑')}</option>
-                <option value="data">{t('planSort.data', 'Data ↓')}</option>
-                <option value="days">{t('planSort.days', 'Days ↓')}</option>
-              </select>
+              {/* Mobile: pill segments */}
+              <div className="md:hidden inline-flex bg-gray-100 p-0.5">
+                {[
+                  { value: 'price', label: t('planSort.price', 'Price ↑') },
+                  { value: 'data', label: t('planSort.data', 'Data ↓') },
+                  { value: 'days', label: t('planSort.days', 'Days ↓') },
+                ].map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setSortBy(opt.value)}
+                    className={`px-3 py-1 text-xs font-medium transition-all duration-150 ${
+                      sortBy === opt.value
+                        ? 'bg-white text-tufts-blue'
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Data Only Plans Section */}
-            {dataOnlyPlans.length > 0 && (
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center">
+            {/* ===== MOBILE: Card list ===== */}
+            <div className="md:hidden space-y-4">
+              {dataOnlyPlans.length > 0 && (
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 mb-2">
                     <WifiIcon className="w-4 h-4 text-tufts-blue" />
+                    <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      {t('planSelection.dataOnlyPlans', 'Data Only')}
+                    </h4>
                   </div>
-                  <h4 className="text-sm font-semibold text-gray-700">
-                    {t('planSelection.dataOnlyPlans', 'Data Only')}
-                  </h4>
-                </div>
-                <div className="flex flex-col gap-2">
                   {dataOnlyPlans.map((plan) => (
-                    <PlanCard
-                      key={plan.id}
-                      plan={plan}
-                      badge={plan.badge}
-                      isSelected={selectedPlanId === plan.id}
-                      onSelect={() => setSelectedPlanId(plan.id)}
-                    />
+                    <PlanCard key={plan.id} plan={plan} badge={plan.badge} isSelected={selectedPlanId === plan.id} onSelect={() => setSelectedPlanId(plan.id)} />
                   ))}
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Plans with Calls & SMS Section */}
-            {plansWithFeatures.length > 0 && (
-              <div className="space-y-3">
-                {dataOnlyPlans.length > 0 && (
-                  <div className="w-full h-px bg-gray-200 my-4" />
-                )}
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-green-50 flex items-center justify-center">
+              {plansWithFeatures.length > 0 && (
+                <div className="space-y-1">
+                  {dataOnlyPlans.length > 0 && <div className="w-full h-px bg-gray-200 my-3" />}
+                  <div className="flex items-center gap-2 mb-2">
                     <PhoneCallIcon className="w-4 h-4 text-green-600" />
+                    <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      {t('planSelection.plansWithCallsSms', 'With Calls & SMS')}
+                    </h4>
                   </div>
-                  <h4 className="text-sm font-semibold text-gray-700">
-                    {t('planSelection.plansWithCallsSms', 'With Calls & SMS')}
-                  </h4>
-                </div>
-                <div className="flex flex-col gap-2">
                   {plansWithFeatures.map((plan) => (
-                    <PlanCard
-                      key={plan.id}
-                      plan={plan}
-                      badge={plan.badge}
-                      isSelected={selectedPlanId === plan.id}
-                      onSelect={() => setSelectedPlanId(plan.id)}
-                    />
+                    <PlanCard key={plan.id} plan={plan} badge={plan.badge} isSelected={selectedPlanId === plan.id} onSelect={() => setSelectedPlanId(plan.id)} />
                   ))}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
-            {/* Continue Button - Fixed at bottom */}
+            {/* ===== DESKTOP: Table view ===== */}
+            <div className="hidden md:block">
+              {dataOnlyPlans.length > 0 && (
+                <div className="mb-6">
+                  <div className="flex items-center gap-2 mb-3">
+                    <WifiIcon className="w-4 h-4 text-tufts-blue" />
+                    <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      {t('planSelection.dataOnlyPlans', 'Data Only')}
+                    </h4>
+                    <span className="text-xs text-gray-400 ml-auto">{dataOnlyPlans.length} {t('planSelection.plans', 'plans')}</span>
+                  </div>
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-200">
+                        <th className="pl-5 py-3 w-12" />
+                        <th className="py-3 pr-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-600" onClick={() => setSortBy('data')}>
+                          {t('planSort.dataLabel', 'Data')} {sortBy === 'data' && '↓'}
+                        </th>
+                        <th className="py-3 pr-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-600" onClick={() => setSortBy('days')}>
+                          {t('planSort.daysLabel', 'Days')} {sortBy === 'days' && '↓'}
+                        </th>
+                        <th className="py-3 pr-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                          {t('planSort.operatorLabel', 'Operator')}
+                        </th>
+                        <th className="py-3 pr-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider" />
+                        <th className="py-3 pr-5 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-600" onClick={() => setSortBy('price')}>
+                          {t('planSort.priceLabel', 'Price')} {sortBy === 'price' && '↑'}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {dataOnlyPlans.map((plan) => (
+                        <PlanTableRow key={plan.id} plan={plan} badge={plan.badge} isSelected={selectedPlanId === plan.id} onSelect={() => setSelectedPlanId(plan.id)} regionColor={regionColors[plan.region]} />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {plansWithFeatures.length > 0 && (
+                <div>
+                  {dataOnlyPlans.length > 0 && <div className="w-full h-px bg-gray-200 my-4" />}
+                  <div className="flex items-center gap-2 mb-3">
+                    <PhoneCallIcon className="w-4 h-4 text-green-600" />
+                    <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      {t('planSelection.plansWithCallsSms', 'With Calls & SMS')}
+                    </h4>
+                    <span className="text-xs text-gray-400 ml-auto">{plansWithFeatures.length} {t('planSelection.plans', 'plans')}</span>
+                  </div>
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-200">
+                        <th className="pl-5 py-3 w-12" />
+                        <th className="py-3 pr-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('planSort.dataLabel', 'Data')}</th>
+                        <th className="py-3 pr-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('planSort.daysLabel', 'Days')}</th>
+                        <th className="py-3 pr-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('planSort.operatorLabel', 'Operator')}</th>
+                        <th className="py-3 pr-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider" />
+                        <th className="py-3 pr-5 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('planSort.priceLabel', 'Price')}</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {plansWithFeatures.map((plan) => (
+                        <PlanTableRow key={plan.id} plan={plan} badge={plan.badge} isSelected={selectedPlanId === plan.id} onSelect={() => setSelectedPlanId(plan.id)} regionColor={regionColors[plan.region]} />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Continue Button — sticky, sharp */}
             <div className="sticky bottom-0 pt-4 pb-2 bg-white border-t border-gray-100 -mx-4 px-4 lg:-mx-6 lg:px-6 mt-6">
               <button
                 onClick={() => selectedPlan && handlePlanSelect(selectedPlan)}
                 disabled={!selectedPlan}
-                className="w-full py-3.5 bg-tufts-blue text-white font-semibold rounded-xl hover:bg-blue-600 transition-colors disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+                className="relative w-full py-3.5 bg-eerie-black text-white text-sm font-semibold rounded-full hover:bg-gray-800 active:scale-[0.99] transition-all duration-150 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
               >
                 {selectedPlan ? (
-                  <span className="flex items-center justify-center gap-2">
-                    {t('planSelection.continue', 'Continue')} · {formatPrice(parsePrice(selectedPlan.price))}
-                  </span>
+                  <>
+                    <span className="block text-center">
+                      {t('planSelection.continue', 'Continue')} · {formatPrice(parsePrice(selectedPlan.price))}
+                    </span>
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white flex items-center justify-center">
+                      <svg className="w-3 h-3 text-eerie-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M7 17L17 7M17 7H7M17 7V17" />
+                      </svg>
+                    </span>
+                  </>
                 ) : (
                   t('planSelection.selectPlanToContinue', 'Select a plan to continue')
                 )}

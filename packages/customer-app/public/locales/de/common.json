@@ -301,6 +301,9 @@
   "auth": {
     "login": {
       "title": "Bei Ihrem Konto anmelden",
+      "signIn": "Anmelden",
+      "or": "oder",
+      "getStarted": "loslegen",
       "quickAccess": "Schneller und sicherer Zugang mit Ihrem Google- oder Apple-Konto",
       "welcome": "Willkommen zurück",
       "signInSuccessful": "Erfolgreich angemeldet!",

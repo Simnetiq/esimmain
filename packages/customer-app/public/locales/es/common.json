@@ -301,6 +301,9 @@
   "auth": {
     "login": {
       "title": "Inicia sesión en tu cuenta",
+      "signIn": "Inicia sesión",
+      "or": "o",
+      "getStarted": "comenzar",
       "quickAccess": "Acceso rápido y seguro con tu cuenta de Google o Apple",
       "welcome": "Bienvenido de nuevo",
       "signInSuccessful": "¡Sesión iniciada correctamente!",

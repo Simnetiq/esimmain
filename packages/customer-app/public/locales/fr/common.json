@@ -314,6 +314,9 @@
   "auth": {
     "login": {
       "title": "Connectez-vous à votre compte",
+      "signIn": "Connectez-vous",
+      "or": "ou",
+      "getStarted": "commencer",
       "quickAccess": "Accès rapide et sécurisé avec votre compte Google ou Apple",
       "welcome": "Bon retour",
       "signInSuccessful": "Connexion réussie !",

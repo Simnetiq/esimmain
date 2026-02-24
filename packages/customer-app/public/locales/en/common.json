@@ -323,6 +323,9 @@
   "auth": {
     "login": {
       "title": "Sign in to your account",
+      "signIn": "Sign in",
+      "or": "or",
+      "getStarted": "get started",
       "quickAccess": "Quick and secure access with your Google or Apple account",
       "welcome": "Welcome Back",
       "signInSuccessful": "Signed in successfully!",

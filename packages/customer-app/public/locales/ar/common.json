@@ -315,6 +315,9 @@
   "auth": {
     "login": {
       "title": "تسجيل الدخول إلى حسابك",
+      "signIn": "سجّل الدخول",
+      "or": "أو",
+      "getStarted": "ابدأ",
       "subtitle": "أو",
       "createAccount": "إنشاء حساب جديد",
       "emailLabel": "عنوان البريد الإلكتروني",

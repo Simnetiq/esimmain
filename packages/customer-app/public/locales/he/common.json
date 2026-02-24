@@ -327,6 +327,9 @@
   "auth": {
     "login": {
       "title": "התחבר לחשבון שלך",
+      "signIn": "התחבר",
+      "or": "או",
+      "getStarted": "התחל",
       "quickAccess": "גישה מהירה ובטוחה עם חשבון Google או Apple",
       "welcome": "ברוך שובך",
       "signInSuccessful": "התחברת בהצלחה!",

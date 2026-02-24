@@ -93,7 +93,7 @@ const BottomSheet = ({
                   damping: 25, 
                   stiffness: 300
                 }}
-                className="w-full max-w-4xl bg-white rounded-xl shadow-2xl max-h-[85vh] flex flex-col pointer-events-auto overflow-hidden"
+                className="w-full max-w-4xl bg-white shadow-2xl max-h-[85vh] flex flex-col pointer-events-auto overflow-hidden"
               >
                 {/* Header */}
                 <div className="px-5 py-4 border-b border-gray-100 flex-shrink-0 bg-gray-50" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -103,7 +103,7 @@ const BottomSheet = ({
                     </h2>
                     <button
                       onClick={onClose}
-                      className="w-9 h-9 flex items-center justify-center text-gray-400 hover:text-gray-600 rounded-full bg-white hover:bg-gray-100 transition-all duration-200 ring-1 ring-black/5"
+                      className="w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:text-eerie-black bg-white hover:bg-gray-100 transition-all duration-200 border border-gray-200"
                     >
                       <X size={18} />
                     </button>
@@ -111,8 +111,8 @@ const BottomSheet = ({
                 </div>
 
                 {/* Content */}
-                <div 
-                  className="overflow-y-auto flex-1 bg-white" 
+                <div
+                  className="overflow-y-auto flex-1 bg-white"
                   dir={isRTL ? 'rtl' : 'ltr'}
                 >
                   {children}
@@ -126,21 +126,21 @@ const BottomSheet = ({
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
-              transition={{ 
-                type: "spring", 
-                damping: 25, 
+              transition={{
+                type: "spring",
+                damping: 25,
                 stiffness: 300
               }}
               drag="y"
               dragConstraints={{ top: 0, bottom: 0 }}
               dragElastic={0.1}
               onDragEnd={handleDragEnd}
-              className="fixed bottom-0 left-0 right-0 z-[9999] bg-white rounded-t-2xl shadow-2xl overflow-hidden"
+              className="fixed bottom-0 left-0 right-0 z-[9999] bg-white shadow-2xl overflow-hidden"
               style={{ maxHeight }}
             >
               {/* Drag Handle */}
               <div className="flex justify-center pt-3 pb-2 bg-gray-50">
-                <div className="w-10 h-1 bg-gray-300 rounded-full" />
+                <div className="w-10 h-1 bg-gray-300" />
               </div>
 
               {/* Header */}
@@ -151,7 +151,7 @@ const BottomSheet = ({
                   </h2>
                   <button
                     onClick={onClose}
-                    className="w-9 h-9 flex items-center justify-center text-gray-400 hover:text-gray-600 rounded-full bg-white hover:bg-gray-100 transition-all duration-200 ring-1 ring-black/5"
+                    className="w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:text-eerie-black bg-white hover:bg-gray-100 transition-all duration-200 border border-gray-200"
                   >
                     <X size={18} />
                   </button>
@@ -159,7 +159,7 @@ const BottomSheet = ({
               </div>
 
               {/* Content */}
-              <div 
+              <div
                 className="overflow-y-auto bg-white" 
                 style={{ maxHeight: `calc(${maxHeight} - 100px)` }}
                 dir={isRTL ? 'rtl' : 'ltr'}

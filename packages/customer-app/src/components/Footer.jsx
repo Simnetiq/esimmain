@@ -1,8 +1,7 @@
 'use client';
 
-import React, { memo, useMemo, useCallback } from 'react';
+import React, { memo, useMemo } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { appStoreLinks } from '@esim/shared/utils/appStoreLinks';
@@ -62,7 +61,7 @@ const FooterLink = memo(({ href, children, external = false, icon: Icon = null, 
   return (
     <Component
       href={href}
-      className={`text-gray-500 hover:text-gray-900 transition-colors duration-200 text-sm py-1 flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}
+      className={`text-gray-600 hover:text-tufts-blue transition-colors duration-200 text-sm py-1 flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}
       {...linkProps}
     >
       {Icon && <Icon />}
@@ -74,11 +73,11 @@ FooterLink.displayName = 'FooterLink';
 
 // Footer column component
 const FooterColumn = memo(({ title, children, isRTL = false }) => (
-  <div className={`flex flex-col gap-3 ${isRTL ? 'items-end' : 'items-start'}`}>
-    <h3 className={`text-xs font-semibold text-gray-900 uppercase tracking-wider ${isRTL ? 'rtl:tracking-tight' : ''}`}>
+  <div className={`flex flex-col gap-4 ${isRTL ? 'items-end' : 'items-start'}`}>
+    <h3 className={`text-xs font-bold text-eerie-black uppercase tracking-wider ${isRTL ? 'rtl:tracking-tight' : ''}`}>
       {title}
     </h3>
-    <div className={`flex flex-col gap-1 ${isRTL ? 'items-end' : 'items-start'}`}>
+    <div className={`flex flex-col gap-2 ${isRTL ? 'items-end' : 'items-start'}`}>
       {children}
     </div>
   </div>
@@ -91,7 +90,7 @@ const SocialLink = memo(({ href, icon: Icon, label, external = true }) => (
     href={href}
     target={external ? '_blank' : undefined}
     rel={external ? 'noopener noreferrer' : undefined}
-    className="w-8 h-8 flex items-center justify-center text-gray-900 hover:text-gray-600 transition-colors duration-200"
+    className="w-9 h-9 flex items-center justify-center text-gray-600 hover:text-tufts-blue hover:scale-110 rounded-full hover:bg-blue-50 transition-all duration-200"
     aria-label={label}
   >
     <Icon />
@@ -100,98 +99,96 @@ const SocialLink = memo(({ href, icon: Icon, label, external = true }) => (
 SocialLink.displayName = 'SocialLink';
 
 const Footer = () => {
-  const pathname = usePathname();
   const { t, locale } = useI18n();
-  
+
   const direction = getLanguageDirection(locale);
   const isRTL = direction === 'rtl';
-  
-  // Memoize page type check
-  const shouldTranslate = useMemo(() => {
-    const languagePrefixes = ['/he', '/ar', '/ru', '/de', '/fr', '/es', '/hebrew', '/arabic', '/russian', '/german', '/french', '/spanish'];
-    return languagePrefixes.some(prefix => pathname === prefix || pathname.startsWith(`${prefix}/`)) || 
-           pathname.startsWith('/blog');
-  }, [pathname]);
 
-  const getText = useCallback((key, englishText) => {
-    return shouldTranslate ? t(key, englishText) : englishText;
-  }, [shouldTranslate, t]);
+  // Localize internal URLs — same pattern as Navbar
+  const getLocalizedUrl = (path) => {
+    if (locale === 'en') return path;
+    return `/${locale}${path}`;
+  };
 
-  // Footer data
+  // Footer data with proper localization
   const footerSections = useMemo(() => ({
     product: {
-      title: getText('footer.product', 'PRODUCT'),
+      title: t('footer.product', 'PRODUCT'),
       links: [
-        { name: getText('footer.esimPlans', 'eSIM Plans'), path: '/esim-plans' },
-        { name: getText('footer.appStore', 'iOS App'), path: appStoreLinks.ios, external: true, icon: AppleIcon },
-        { name: getText('footer.googlePlay', 'Android App'), path: appStoreLinks.android, external: true, icon: AndroidIcon },
+        { name: t('footer.esimPlans', 'eSIM Plans'), path: getLocalizedUrl('/esim-plans') },
+        { name: t('footer.appStore', 'iOS App'), path: appStoreLinks.ios, external: true, icon: AppleIcon },
+        { name: t('footer.googlePlay', 'Android App'), path: appStoreLinks.android, external: true, icon: AndroidIcon },
       ]
     },
     support: {
-      title: getText('footer.support', 'SUPPORT'),
+      title: t('footer.support', 'SUPPORT'),
       links: [
-        { name: getText('footer.contact', 'Contact Us'), path: '/contact' },
-        { name: getText('footer.faq', 'FAQ'), path: '/#faq' },
+        { name: t('footer.contact', 'Contact Us'), path: getLocalizedUrl('/contact') },
+        { name: t('footer.faq', 'FAQ'), path: getLocalizedUrl('/#how-it-works') },
       ]
     },
     company: {
-      title: getText('footer.company', 'COMPANY'),
+      title: t('footer.company', 'COMPANY'),
       links: [
-        { name: getText('footer.about', 'About'), path: '/about' },
-        { name: getText('footer.blog', 'Blog'), path: '/blog' },
-        { name: getText('footer.simnetiq', 'Simnetiq'), path: '/simnetiq' },
-        { name: getText('footer.dopplerVpn', 'Doppler VPN'), path: '/doppler-vpn' },
+        { name: t('footer.about', 'About'), path: getLocalizedUrl('/about') },
+        { name: t('footer.blog', 'Blog'), path: getLocalizedUrl('/blog') },
+        // Cross-promo links — English-only (no locale versions exist)
+        { name: t('footer.simnetiq', 'Simnetiq'), path: '/simnetiq' },
+        { name: t('footer.dopplerVpn', 'Doppler VPN'), path: '/doppler-vpn' },
       ]
     },
     legal: {
-      title: getText('footer.legal', 'LEGAL'),
+      title: t('footer.legal', 'LEGAL'),
+      // Legal pages — English-only (no locale versions exist)
       links: [
-    { name: getText('footer.privacyPolicy', 'Privacy Policy'), path: '/privacy-policy' },
-    { name: getText('footer.termsOfService', 'Terms of Service'), path: '/terms-of-service' },
-    { name: getText('footer.cookiePolicy', 'Cookie Policy'), path: '/cookie-policy' },
+        { name: t('footer.privacyPolicy', 'Privacy Policy'), path: '/privacy-policy' },
+        { name: t('footer.termsOfService', 'Terms of Service'), path: '/terms-of-service' },
+        { name: t('footer.cookiePolicy', 'Cookie Policy'), path: '/cookie-policy' },
       ]
     }
-  }), [getText]);
+  }), [t, locale]);
 
   const socialLinks = [
     { icon: LinkedInIcon, href: 'https://www.linkedin.com/company/109536645', label: 'LinkedIn' },
     { icon: InstagramIcon, href: 'https://www.instagram.com/esim.Simnetiq', label: 'Instagram' },
-    { icon: MailIcon, href: 'mailto:support@Simnetiq.net', label: 'Email' },
+    { icon: MailIcon, href: 'mailto:support@simnetiq.store', label: 'Email' },
   ];
 
   return (
-    <footer 
-      className="relative bg-white overflow-hidden" 
-      dir={direction} 
+    <footer
+      className="relative bg-white overflow-hidden"
+      dir={direction}
       lang={locale}
     >
-      {/* Top Border */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gray-200" />
+      {/* Top Border — gradient fade */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 ">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
         {/* Main Footer Content */}
-        <div className="py-12 lg:py-16">
+        <div className="py-16 lg:py-20">
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 lg:gap-12">
-            {/* Brand Column with decorative image */}
-            <div className={`col-span-2 lg:col-span-2 relative flex flex-col ${isRTL ? 'items-end text-right' : 'items-start text-left'}`}>
-              <Link href="/" className="inline-block mb-4">
-                <span className="text-2xl font-bold text-gray-900">
-                  {getText('footer.brandName', 'Simnetiq')}
-                </span>
-              </Link>
-              <p className="text-gray-600 text-sm max-w-xs mb-6 leading-relaxed">
-                {getText('footer.tagline', 'Stay connected wherever you travel. Instant eSIM activation for 150+ countries.')}
-              </p>
-              {/* Social Icons */}
-              <div className="flex gap-1">
-                {socialLinks.map((social, index) => (
-                  <SocialLink
-                    key={index}
-                    href={social.href}
-                    icon={social.icon}
-                    label={social.label}
-                  />
-                ))}
+            {/* Brand Column — gradient card */}
+            <div className={`col-span-2 lg:col-span-2 relative ${isRTL ? 'items-end text-right' : 'items-start text-left'}`}>
+              <div className={`flex flex-col ${isRTL ? 'items-end' : 'items-start'} bg-gradient-to-br from-blue-50 to-white  p-6 -mx-2`}>
+                <Link href={getLocalizedUrl("/")} className="inline-block mb-4 group">
+                  <span className="text-3xl font-bold text-eerie-black group-hover:text-tufts-blue transition-colors">
+                    {t('footer.brandName', 'Simnetiq')}
+                  </span>
+                </Link>
+                <p className={`text-gray-600 text-sm max-w-xs mb-6 leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
+                  {t('footer.tagline', 'Stay connected wherever you travel. Instant eSIM activation for 150+ countries.')}
+                </p>
+                {/* Social Icons */}
+                <div className="flex gap-1">
+                  {socialLinks.map((social, index) => (
+                    <SocialLink
+                      key={index}
+                      href={social.href}
+                      icon={social.icon}
+                      label={social.label}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -212,7 +209,7 @@ const Footer = () => {
 
             <FooterColumn title={footerSections.support.title} isRTL={isRTL}>
               {footerSections.support.links.map((link, index) => (
-                <FooterLink key={index} href={link.path} isRTL={isRTL}>
+                <FooterLink key={index} href={link.path} external={link.external} isRTL={isRTL}>
                   {link.name}
                 </FooterLink>
               ))}
@@ -220,7 +217,7 @@ const Footer = () => {
 
             <FooterColumn title={footerSections.company.title} isRTL={isRTL}>
               {footerSections.company.links.map((link, index) => (
-                <FooterLink key={index} href={link.path} isRTL={isRTL}>
+                <FooterLink key={index} href={link.path} external={link.external} isRTL={isRTL}>
                   {link.name}
                 </FooterLink>
               ))}
@@ -228,7 +225,7 @@ const Footer = () => {
 
             <FooterColumn title={footerSections.legal.title} isRTL={isRTL}>
               {footerSections.legal.links.map((link, index) => (
-                <FooterLink key={index} href={link.path} isRTL={isRTL}>
+                <FooterLink key={index} href={link.path} external={link.external} isRTL={isRTL}>
                   {link.name}
                 </FooterLink>
               ))}
@@ -237,10 +234,10 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-gray-200 py-6">
+        <div className="border-t border-gray-200 py-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-gray-500 text-sm">
-              {getText('footer.brandName', 'Simnetiq')} 2025 © {getText('footer.allRightsReserved', 'All rights reserved')}
+              &copy; {new Date().getFullYear()} {t('footer.brandName', 'Simnetiq')} &middot; {t('footer.allRightsReserved', 'All rights reserved')}
             </p>
           </div>
         </div>

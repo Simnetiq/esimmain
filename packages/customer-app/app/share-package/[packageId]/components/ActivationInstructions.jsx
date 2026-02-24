@@ -1,7 +1,13 @@
 'use client';
 
 import React from 'react';
-import { appStoreLinks } from '@esim/shared/utils/appStoreLinks';
+import Link from 'next/link';
+
+const ArrowRightIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+  </svg>
+);
 
 const ActivationInstructions = ({ isRTL, t }) => {
   return (
@@ -10,150 +16,56 @@ const ActivationInstructions = ({ isRTL, t }) => {
       <div className="mx-auto w-full max-w-9xl">
         <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
           <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-            <p className="text-sm max-w-2xl sm:text-base font-medium tracking-widest uppercase text-gray-500">
+            <p className={`text-sm max-w-2xl sm:text-base font-medium tracking-widest uppercase text-gray-500 ${isRTL ? 'text-right' : 'text-left'}`}>
               {t('sharePackage.howToUse', 'How to Use')}
             </p>
-            <h3 className="mt-4 text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-pretty text-eerie-black max-w-5xl">
+            <h3 className={`mt-4 text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-pretty text-eerie-black max-w-5xl ${isRTL ? 'text-right' : 'text-left'}`}>
               {t('sharePackage.activationSteps', 'Activate Your eSIM in Minutes')}
             </h3>
           </div>
         </div>
-        <div className="w-full h-px bg-gray-100"></div>
+        <div className="w-full h-px bg-gray-100" />
       </div>
 
-      {/* iOS and Android Instructions */}
-      <div className="mx-auto w-full max-w-9xl activation-section">
+      {/* Activation Guide Card */}
+      <div className="mx-auto w-full max-w-9xl">
         <div className="mx-auto w-full max-w-7xl">
           <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-            <div className="grid gap-6 lg:grid-cols-2">
-              {/* iOS Instructions */}
-              <div className="border border-gray-200 p-6">
-                <div className={`flex justify-start items-center gap-3 mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                  <img
-                    src="/images/logo_icon/apple.svg"
-                    alt="iOS"
-                    width="32"
-                    height="32"
-                    className="w-8 h-8"
-                  />
-                  <h4 className="text-xl font-semibold text-eerie-black">
-                    {t('sharePackage.iosInstructions', 'iOS Instructions')}
-                  </h4>
-                </div>
+            <Link
+              href="/help/install-esim"
+              className="group relative block bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500"
+            >
+              <div className="relative p-6 lg:p-10">
+                <div className="relative">
+                  <div className={`w-11 h-11 rounded-lg bg-tufts-blue/10 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 ${isRTL ? 'ml-auto' : ''}`}>
+                    <svg className="w-5 h-5 text-tufts-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/>
+                    </svg>
+                  </div>
 
-                <div className="space-y-4">
-                  <InstructionStep
-                    number={1}
-                    text={t('sharePackage.iosStep1', 'Open Settings → Cellular → Add eSIM')}
-                    isRTL={isRTL}
-                  />
-                  <InstructionStep
-                    number={2}
-                    text={t('sharePackage.iosStep2', 'Scan the QR code you received via email')}
-                    isRTL={isRTL}
-                  />
-                  <InstructionStep
-                    number={3}
-                    text={t('sharePackage.iosStep3', 'Label your eSIM and set it as your default line')}
-                    isRTL={isRTL}
-                  />
-                  <InstructionStep
-                    number={4}
-                    text={t('sharePackage.iosStep4', "Turn on Data Roaming for your eSIM and you're ready!")}
-                    isRTL={isRTL}
-                  />
-                </div>
+                  <p className={`text-xs font-medium tracking-widest uppercase text-tufts-blue mb-2 ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {t('activation.howToActivateTag', 'HOW TO ACTIVATE')}
+                  </p>
+                  <h3 className={`text-xl lg:text-2xl font-semibold text-eerie-black mb-3 tracking-tight ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {t('activation.activateTitle', 'Activate your eSIM in minutes')}
+                  </h3>
+                  <p className={`text-gray-500 text-sm sm:text-base leading-relaxed max-w-lg ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {t('activation.activateDesc', 'Step-by-step guide for iPhone & Android — scan a QR code and get connected instantly.')}
+                  </p>
 
-                <a
-                  href={appStoreLinks.ios}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`mt-6 btn-primary text-white shadow-sm inline-flex items-center w-full justify-center ${isRTL ? 'flex-row-reverse' : ''}`}
-                >
-                  <img
-                    src="/images/logo_icon/apple.svg"
-                    alt="iOS"
-                    width="20"
-                    height="20"
-                    className={isRTL ? 'w-5 h-5 ml-2' : 'w-5 h-5 mr-2'}
-                  />
-                  <span className="text-base">{t('sharePackage.downloadIOS', 'Download on iOS')}</span>
-                </a>
+                  <div className={`mt-5 inline-flex items-center gap-2 text-sm font-medium text-tufts-blue ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <span>{t('activation.viewGuide', 'View install guide')}</span>
+                    <ArrowRightIcon className={`w-4 h-4 group-hover:translate-x-1 transition-transform duration-200 ${isRTL ? 'rotate-180 group-hover:-translate-x-1' : ''}`} />
+                  </div>
+                </div>
               </div>
-
-              {/* Android Instructions */}
-              <div className="border border-gray-200 p-6">
-                <div className={`flex justify-start items-center gap-3 mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                  <img
-                    src="/images/logo_icon/android.svg"
-                    alt="Android"
-                    width="32"
-                    height="32"
-                    className="w-8 h-8"
-                  />
-                  <h4 className="text-xl font-semibold text-eerie-black">
-                    {t('sharePackage.androidInstructions', 'Android Instructions')}
-                  </h4>
-                </div>
-
-                <div className="space-y-4">
-                  <InstructionStep
-                    number={1}
-                    text={t('sharePackage.androidStep1', 'Open Settings → Network & Internet → SIMs → Add SIM')}
-                    isRTL={isRTL}
-                  />
-                  <InstructionStep
-                    number={2}
-                    text={t('sharePackage.androidStep2', 'Select "Download a SIM instead?" and scan QR code')}
-                    isRTL={isRTL}
-                  />
-                  <InstructionStep
-                    number={3}
-                    text={t('sharePackage.androidStep3', 'Name your eSIM and enable it')}
-                    isRTL={isRTL}
-                  />
-                  <InstructionStep
-                    number={4}
-                    text={t('sharePackage.androidStep4', 'Enable Mobile Data and Data Roaming for your eSIM')}
-                    isRTL={isRTL}
-                  />
-                </div>
-
-                <a
-                  href={appStoreLinks.android}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`mt-6 btn-primary text-white shadow-sm inline-flex items-center w-full justify-center ${isRTL ? 'flex-row-reverse' : ''}`}
-                >
-                  <img
-                    src="/images/logo_icon/android.svg"
-                    alt="Android"
-                    width="18"
-                    height="18"
-                    className={isRTL ? 'w-4 h-4 ml-2' : 'w-4 h-4 mr-2'}
-                  />
-                  <span className="text-base">{t('sharePackage.downloadAndroid', 'Download on Android')}</span>
-                </a>
-              </div>
-            </div>
+            </Link>
           </div>
         </div>
-        <div className="w-full h-px bg-gray-100"></div>
+        <div className="w-full h-px bg-gray-100" />
       </div>
     </>
   );
 };
-
-// Helper component for instruction steps
-const InstructionStep = ({ number, text, isRTL }) => (
-  <div className={`flex justify-start gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
-    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-tufts-blue text-white flex items-center justify-center text-sm font-semibold">
-      {number}
-    </div>
-    <div>
-      <p className="text-sm text-cool-black">{text}</p>
-    </div>
-  </div>
-);
 
 export default ActivationInstructions;

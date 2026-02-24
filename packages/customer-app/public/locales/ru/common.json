@@ -327,6 +327,9 @@
   "auth": {
     "login": {
       "title": "Войти в аккаунт",
+      "signIn": "Войти",
+      "or": "или",
+      "getStarted": "начать",
       "quickAccess": "Быстрый и безопасный доступ с вашим аккаунтом Google или Apple",
       "welcome": "Добро пожаловать",
       "signInSuccessful": "Вход выполнен успешно!",

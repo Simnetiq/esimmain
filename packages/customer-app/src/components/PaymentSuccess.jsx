@@ -5,11 +5,11 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { getSupabase } from '@esim/shared/lib/supabase';
-import { QrCode, Download, CheckCircle, AlertCircle, Clock } from 'lucide-react';
+import { QrCode, Download, CheckCircle, AlertCircle, Clock, ArrowRight, Smartphone, BookOpen } from 'lucide-react';
 import QRCodeLib from 'qrcode';
 import Image from 'next/image';
+import Link from 'next/link';
 import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
-import { appStoreLinks } from '@esim/shared/utils/appStoreLinks';
 
 /**
  * PaymentSuccess Component
@@ -321,165 +321,154 @@ const PaymentSuccess = () => {
   // Success state with QR code
   if (orderStatus === 'completed' && qrCodeData) {
     return (
-      <div className="bg-white min-h-screen flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="bg-gray-50 min-h-screen flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="relative isolate flex-1 flex flex-col">
-          {/* Header */}
-          <div className="mx-auto w-full max-w-9xl">
-            <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
-              <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-                <div className="text-center mb-8">
-                  <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-eerie-black mb-2">
-                    {t('paymentSuccess.title', 'Payment Successful!')}
-                  </h1>
-                  <p className="text-cool-black text-lg">
-                    {t('paymentSuccess.subtitle', 'Your eSIM has been activated successfully')}
-                  </p>
-                  {orderInfo && (
-                    <p className="text-sm text-cool-black mt-2">
-                      {t('paymentSuccess.orderId', 'Order ID')}: {orderInfo.orderId}
-                    </p>
+
+          {/* Success Header with gradient */}
+          <div className="bg-gradient-to-b from-emerald-50 via-white to-gray-50 pt-12 pb-8 sm:pt-16 sm:pb-10">
+            <div className="max-w-2xl mx-auto px-4 text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 mb-5">
+                <CheckCircle className="w-8 h-8 text-emerald-600" />
+              </div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 tracking-tight">
+                {t('paymentSuccess.title', 'Payment Successful!')}
+              </h1>
+              <p className="text-gray-500 text-base sm:text-lg">
+                {t('paymentSuccess.subtitle', 'Your eSIM has been activated successfully')}
+              </p>
+              {orderInfo && (
+                <p className="text-xs text-gray-400 mt-3 font-mono">
+                  {t('paymentSuccess.orderId', 'Order ID')}: {orderInfo.orderId}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* QR Code Card */}
+          <div className="max-w-lg mx-auto w-full px-4 -mt-2">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+              {/* QR Code */}
+              <div className="p-6 sm:p-8 flex flex-col items-center">
+                <p className="text-sm text-gray-500 mb-5 text-center">
+                  {t('paymentSuccess.qrCodeDescription', 'Scan this QR code with your device to activate your eSIM')}
+                </p>
+                <div className="bg-white p-3 rounded-xl border-2 border-gray-100 shadow-sm">
+                  {generatedQrCode ? (
+                    <Image
+                      src={generatedQrCode}
+                      alt="eSIM QR Code"
+                      width={300}
+                      height={300}
+                      className="w-56 h-56 sm:w-64 sm:h-64"
+                    />
+                  ) : qrCodeData.qrCodeUrl && !qrCodeData.qrCodeUrl.includes('test.example.com') ? (
+                    <Image
+                      src={qrCodeData.qrCodeUrl}
+                      alt="eSIM QR Code"
+                      width={256}
+                      height={256}
+                      className="w-56 h-56 sm:w-64 sm:h-64"
+                    />
+                  ) : (
+                    <div className="w-56 h-56 sm:w-64 sm:h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+                      <QrCode className="w-16 h-16 text-gray-300" />
+                    </div>
                   )}
                 </div>
               </div>
-            </div>
-            <div className="w-full h-px bg-gray-100"></div>
-          </div>
 
-          {/* QR Code Section */}
-          <div className="mx-auto w-full max-w-9xl">
-            <div className="mx-auto w-full max-w-7xl">
-              <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-                <div className="bg-jordy-blue/10 p-6 rounded-lg">
-                  <div className="text-center mb-6">
-                    <p className="text-cool-black text-base">
-                      {t('paymentSuccess.qrCodeDescription', 'Scan this QR code with your device to activate your eSIM')}
-                    </p>
-                  </div>
-                  
-                  <div className="flex justify-center mb-6">
-                    <div className="bg-white p-4 rounded-lg border-4 border-gray-200">
-                      {generatedQrCode ? (
-                        <Image 
-                          src={generatedQrCode} 
-                          alt="eSIM QR Code" 
-                          width={300}
-                          height={300}
-                          className="w-64 h-64 md:w-72 md:h-72"
-                        />
-                      ) : qrCodeData.qrCodeUrl && !qrCodeData.qrCodeUrl.includes('test.example.com') ? (
-                        <Image 
-                          src={qrCodeData.qrCodeUrl} 
-                          alt="eSIM QR Code" 
-                          width={256}
-                          height={256}
-                          className="w-64 h-64"
-                        />
-                      ) : (
-                        <div className="w-64 h-64 flex items-center justify-center bg-gray-100 rounded">
-                          <QrCode className="w-16 h-16 text-gray-400" />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-                    <button
-                      onClick={() => {
-                        const qrSource = generatedQrCode || qrCodeData.qrCodeUrl;
-                        if (qrSource) {
-                          const link = document.createElement('a');
-                          link.href = qrSource;
-                          link.download = `esim-qr-${orderInfo?.orderId || 'order'}.png`;
-                          link.click();
-                        }
-                      }}
-                      className="inline-flex items-center justify-center px-6 py-3 bg-tufts-blue text-white rounded-md hover:bg-cobalt-blue transition-colors"
-                      disabled={!generatedQrCode && !qrCodeData.qrCodeUrl}
-                    >
-                      <Download className="w-5 h-5 mr-2" />
-                      {t('paymentSuccess.downloadQR', 'Download QR Code')}
-                    </button>
-                    
-                    {currentUser && (
-                      <button
-                        onClick={() => router.push('/dashboard')}
-                        className="inline-flex items-center justify-center px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
-                      >
-                        {t('paymentSuccess.goToDashboard', 'Go to Dashboard')}
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="mt-6 p-4 bg-white rounded-md space-y-2">
-                    {(qrCodeData.lpa || qrCodeData.qrCode) && (
-                      <div className="text-sm text-gray-700">
-                        <strong>{t('paymentSuccess.lpaCode', 'LPA Code')}:</strong>
-                        <p className="mt-1 font-mono text-xs break-all bg-gray-50 p-2 rounded">
-                          {qrCodeData.lpa || qrCodeData.qrCode}
-                        </p>
-                      </div>
-                    )}
-                    {qrCodeData.iccid && (
-                      <p className="text-sm text-gray-700">
-                        <strong>{t('paymentSuccess.iccid', 'ICCID')}:</strong> {qrCodeData.iccid}
+              {/* LPA & ICCID details */}
+              {(qrCodeData.lpa || qrCodeData.qrCode || qrCodeData.iccid) && (
+                <div className="border-t border-gray-100 px-6 py-4 space-y-2">
+                  {(qrCodeData.lpa || qrCodeData.qrCode) && (
+                    <div>
+                      <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">{t('paymentSuccess.lpaCode', 'LPA Code')}</span>
+                      <p className="mt-1 font-mono text-xs text-gray-600 break-all bg-gray-50 p-2 rounded-lg">
+                        {qrCodeData.lpa || qrCodeData.qrCode}
                       </p>
-                    )}
-                  </div>
+                    </div>
+                  )}
+                  {qrCodeData.iccid && (
+                    <div>
+                      <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">{t('paymentSuccess.iccid', 'ICCID')}</span>
+                      <p className="mt-1 font-mono text-xs text-gray-600">{qrCodeData.iccid}</p>
+                    </div>
+                  )}
                 </div>
+              )}
+
+              {/* Action buttons */}
+              <div className="border-t border-gray-100 p-4 flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={() => {
+                    const qrSource = generatedQrCode || qrCodeData.qrCodeUrl;
+                    if (qrSource) {
+                      const link = document.createElement('a');
+                      link.href = qrSource;
+                      link.download = `esim-qr-${orderInfo?.orderId || 'order'}.png`;
+                      link.click();
+                    }
+                  }}
+                  className={`flex-1 inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-tufts-blue text-white text-sm font-medium rounded-xl hover:bg-cobalt-blue transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
+                  disabled={!generatedQrCode && !qrCodeData.qrCodeUrl}
+                >
+                  <Download className="w-4 h-4" />
+                  {t('paymentSuccess.downloadQR', 'Download QR Code')}
+                </button>
+                {currentUser && (
+                  <button
+                    onClick={() => router.push('/dashboard')}
+                    className="flex-1 inline-flex items-center justify-center px-5 py-2.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-200 transition-colors"
+                  >
+                    {t('paymentSuccess.goToDashboard', 'Go to Dashboard')}
+                  </button>
+                )}
               </div>
             </div>
-            <div className="w-full h-px bg-gray-100"></div>
           </div>
 
-          {/* Instructions Section */}
-          <div className="mx-auto w-full max-w-9xl">
-            <div className="mx-auto w-full max-w-7xl lg:mt-10 mt-6">
-              <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-                <h3 className="text-xl sm:text-2xl font-semibold text-eerie-black mb-6">
-                  {t('paymentSuccess.activationInstructions', 'Activation Instructions')}
-                </h3>
-                
-                <div className="grid gap-6 lg:grid-cols-2">
-                  {/* iOS */}
-                  <div className="border border-gray-200 p-6 rounded-lg">
-                    <div className="flex items-center gap-3 mb-4">
-                      <Image src="/images/logo_icon/apple.svg" alt="iOS" width={32} height={32} className="w-8 h-8" />
-                      <h4 className="text-lg font-semibold">iOS</h4>
-                    </div>
-                    <ol className="space-y-2 text-sm text-gray-600">
-                      <li>1. {t('paymentSuccess.iosStep1', 'Settings → Cellular → Add eSIM')}</li>
-                      <li>2. {t('paymentSuccess.iosStep2', 'Scan the QR code')}</li>
-                      <li>3. {t('paymentSuccess.iosStep3', 'Label your eSIM')}</li>
-                      <li>4. {t('paymentSuccess.iosStep4', 'Enable Data Roaming')}</li>
-                    </ol>
-                    <a href={appStoreLinks.ios} target="_blank" rel="noopener noreferrer" 
-                       className="mt-4 inline-block px-4 py-2 bg-tufts-blue text-white rounded-md text-sm">
-                      Download App
-                    </a>
-                  </div>
-                  
-                  {/* Android */}
-                  <div className="border border-gray-200 p-6 rounded-lg">
-                    <div className="flex items-center gap-3 mb-4">
-                      <Image src="/images/logo_icon/android.svg" alt="Android" width={32} height={32} className="w-8 h-8" />
-                      <h4 className="text-lg font-semibold">Android</h4>
-                    </div>
-                    <ol className="space-y-2 text-sm text-gray-600">
-                      <li>1. {t('paymentSuccess.androidStep1', 'Settings → Network → SIMs → Add')}</li>
-                      <li>2. {t('paymentSuccess.androidStep2', 'Scan QR code')}</li>
-                      <li>3. {t('paymentSuccess.androidStep3', 'Name your eSIM')}</li>
-                      <li>4. {t('paymentSuccess.androidStep4', 'Enable Data Roaming')}</li>
-                    </ol>
-                    <a href={appStoreLinks.android} target="_blank" rel="noopener noreferrer"
-                       className="mt-4 inline-block px-4 py-2 bg-tufts-blue text-white rounded-md text-sm">
-                      Download App
-                    </a>
-                  </div>
+          {/* Next Steps — Install Guide CTA */}
+          <div className="max-w-lg mx-auto w-full px-4 mt-5">
+            <Link
+              href="/help/install-esim"
+              className="group block bg-white rounded-2xl shadow-sm border border-gray-200 p-5 sm:p-6 hover:border-tufts-blue/30 hover:shadow-md transition-all duration-200"
+            >
+              <div className={`flex items-start gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-tufts-blue/10 flex items-center justify-center group-hover:bg-tufts-blue/20 transition-colors">
+                  <BookOpen className="w-5 h-5 text-tufts-blue" />
+                </div>
+                <div className={`flex-1 min-w-0 ${isRTL ? 'text-right' : ''}`}>
+                  <h3 className="text-base font-semibold text-gray-900 mb-1">
+                    {t('paymentSuccess.installGuideTitle', 'How to Install Your eSIM')}
+                  </h3>
+                  <p className="text-sm text-gray-500 leading-relaxed">
+                    {t('paymentSuccess.installGuideDescription', 'Step-by-step instructions for iPhone and Android — takes less than 2 minutes.')}
+                  </p>
+                </div>
+                <ArrowRight className={`w-5 h-5 text-gray-300 group-hover:text-tufts-blue group-hover:translate-x-0.5 transition-all flex-shrink-0 mt-3 ${isRTL ? 'rotate-180 group-hover:-translate-x-0.5' : ''}`} />
+              </div>
+            </Link>
+          </div>
+
+          {/* Quick tips */}
+          <div className="max-w-lg mx-auto w-full px-4 mt-5 mb-12">
+            <div className="bg-amber-50 border border-amber-100 rounded-2xl p-5">
+              <div className={`flex items-start gap-3 ${isRTL ? 'flex-row-reverse text-right' : ''}`}>
+                <Smartphone className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-amber-800 mb-2">
+                    {t('paymentSuccess.quickTipsTitle', 'Before you scan')}
+                  </p>
+                  <ul className={`text-sm text-amber-700 space-y-1 ${isRTL ? 'pr-4' : 'pl-4'}`}>
+                    <li className="list-disc">{t('paymentSuccess.tip1', 'Make sure you have a stable WiFi connection')}</li>
+                    <li className="list-disc">{t('paymentSuccess.tip2', 'Turn off any VPN before scanning')}</li>
+                    <li className="list-disc">{t('paymentSuccess.tip3', 'Enable Data Roaming after installation')}</li>
+                  </ul>
                 </div>
               </div>
             </div>
           </div>
+
         </div>
       </div>
     );

@@ -7,7 +7,7 @@
     },
     {
       "path": "/api/exchange-rates",
-      "schedule": "0 * * * *"
+      "schedule": "0 0 * * *"
     }
   ],
   "headers": [
