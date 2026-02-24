@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
  * Defaults to 'desktop' for SSR and non-mobile browsers
  */
 export function usePlatform() {
-  const [platform, setPlatform] = useState('desktop'); // SSR default
+  const [platform, setPlatform] = useState(null); // null until detected
 
   useEffect(() => {
     const ua = navigator.userAgent.toLowerCase();
@@ -16,8 +16,9 @@ export function usePlatform() {
       setPlatform('ios');
     } else if (/android/.test(ua)) {
       setPlatform('android');
+    } else {
+      setPlatform('desktop');
     }
-    // Desktop stays as 'desktop'
   }, []);
 
   return platform;
@@ -28,7 +29,7 @@ export function usePlatform() {
  */
 export function useIsMobile() {
   const platform = usePlatform();
-  return platform === 'ios' || platform === 'android';
+  return platform !== null && (platform === 'ios' || platform === 'android');
 }
 
 /**
@@ -42,7 +43,7 @@ export function usePlatformAppStoreLink() {
     android: 'https://play.google.com/store/apps/details?id=com.simnetiq.storeAndroid&hl=en'
   };
 
-  // Desktop returns iOS by default
+  // Default to iOS link (desktop and pre-detection)
   return platform === 'android' ? links.android : links.ios;
 }
 

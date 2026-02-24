@@ -109,6 +109,12 @@ export default function PlatformDownloadCTA({
 }) {
   const platform = usePlatform();
   const isMobile = platform === 'ios' || platform === 'android';
+  const detected = platform !== null;
+
+  // Reserve space with invisible placeholder, fade in once platform is detected
+  const fadeClass = detected
+    ? 'opacity-100 transition-opacity duration-300'
+    : 'opacity-0';
 
   // On mobile, show only the platform-specific button
   if (isMobile) {
@@ -118,14 +124,14 @@ export default function PlatformDownloadCTA({
         variant={variant}
         size={size}
         source={source}
-        className={className}
+        className={`${className} ${fadeClass}`}
       />
     );
   }
 
-  // On desktop, show both buttons side by side
+  // Before detection or on desktop, show both buttons (both reserve space during null)
   return (
-    <div className={`flex flex-row items-center justify-center gap-3 ${className}`}>
+    <div className={`flex flex-row items-center justify-center gap-3 ${className} ${fadeClass}`}>
       <DownloadButton
         platform="ios"
         variant={variant}

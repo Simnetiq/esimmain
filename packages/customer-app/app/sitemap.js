@@ -114,28 +114,39 @@ export default async function sitemap() {
       console.error('Sitemap: failed to fetch countries', e);
     }
 
-    // --- Blog posts from Supabase (if migrated) or skip ---
-    // Check if blog_posts table exists in this Supabase
+    // --- Blog posts with multi-locale alternates ---
     try {
       const { data: posts } = await supabase
         .from('blog_posts')
-        .select('slug, updated_at, published_at')
+        .select('base_slug, updated_at, published_at, blog_post_translations(language)')
         .eq('status', 'published')
         .order('published_at', { ascending: false });
 
       if (posts) {
         for (const post of posts) {
           const lastmod = post.updated_at || post.published_at || now;
+          const slug = post.base_slug;
+          const availableLangs = (post.blog_post_translations || []).map(t => t.language);
+
+          // Build hreflang alternates based on actual translations
+          const blogAlternates = {};
+          availableLangs.forEach(lang => {
+            blogAlternates[lang] = lang === 'en'
+              ? `${baseUrl}/blog/${slug}`
+              : `${baseUrl}/${lang}/blog/${slug}`;
+          });
+
           countryPages.push({
-            url: `${baseUrl}/blog/${post.slug}`,
+            url: `${baseUrl}/blog/${slug}`,
             lastModified: lastmod,
             changeFrequency: 'weekly',
             priority: 0.7,
+            alternates: { languages: blogAlternates },
           });
         }
       }
     } catch (e) {
-      // blog_posts table may not exist in this Supabase - that's OK
+      // blog_posts table may not exist - that's OK
     }
   }
 

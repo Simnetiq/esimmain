@@ -1,80 +1,61 @@
 import { Suspense } from 'react'
+import { notFound } from 'next/navigation'
 import BlogPost from '../../../src/components/BlogPost'
+import { BlogJsonLd } from '../../../src/components/seo/BlogJsonLd'
 import Loading from '../../../src/components/Loading'
 import blogServiceSupabase from '@esim/shared/services/blogServiceSupabase'
 
-// Supported languages for hreflang
 const SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'ar', 'he', 'ru'];
 
-// Generate hreflang alternates for blog posts
-function generateBlogAlternates(baseUrl, slug, availableLanguages = []) {
-  const alternates = {
-    canonical: `${baseUrl}/blog/${slug}`,
-    languages: {}
-  };
-
-  // Always add x-default and en pointing to English version
-  alternates.languages['x-default'] = `${baseUrl}/blog/${slug}`;
-  alternates.languages['en'] = `${baseUrl}/blog/${slug}`;
-
-  // Add all available translations
-  SUPPORTED_LANGUAGES.forEach(lang => {
-    if (lang !== 'en') {
-      // Only add if translation exists, otherwise still add for discoverability
-      if (availableLanguages.length === 0 || availableLanguages.includes(lang)) {
-        alternates.languages[lang] = `${baseUrl}/${lang}/blog/${slug}`;
-      }
-    }
-  });
-
-  return alternates;
-}
+export const revalidate = 3600; // ISR: revalidate every hour
 
 export async function generateMetadata({ params }) {
   try {
-    // Fetch the actual blog post data
     const post = await blogServiceSupabase.getPostBySlug(params.id);
-    
+
     if (!post) {
       return {
         title: 'Blog Post Not Found | Simnetiq',
         description: 'The blog post you are looking for could not be found.',
+        robots: { index: false },
       }
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.simnetiq.store';
-    const postUrl = `${baseUrl}/blog/${params.id}`;
-    const imageUrl = post.featuredImage ? 
+    const slug = post.baseSlug || params.id;
+    const postUrl = `${baseUrl}/blog/${slug}`;
+    const imageUrl = post.featuredImage ?
       (post.featuredImage.startsWith('http') ? post.featuredImage : `${baseUrl}${post.featuredImage}`) :
       `${baseUrl}/images/og-image.svg`;
 
-    // Get available languages for this post
+    const description = post.excerpt || post.seoDescription || 'Read our latest insights about eSIM technology and global connectivity.';
     const availableLanguages = post.availableLanguages || [];
 
+    // Build hreflang only for languages with actual translations
+    const languages = {};
+    languages['x-default'] = `${baseUrl}/blog/${slug}`;
+    languages['en'] = `${baseUrl}/blog/${slug}`;
+    availableLanguages.forEach(lang => {
+      if (lang !== 'en') {
+        languages[lang] = `${baseUrl}/${lang}/blog/${slug}`;
+      }
+    });
+
     return {
-      title: `${post.title} | Simnetiq Blog`,
-      description: post.excerpt || post.seoDescription || 'Read our latest insights about eSIM technology and global connectivity.',
+      title: `${post.seoTitle || post.title} | Simnetiq Blog`,
+      description,
       keywords: post.seoKeywords?.length > 0 ? post.seoKeywords : ['eSIM', 'travel', 'connectivity', 'blog'],
       authors: [{ name: post.author || 'Simnetiq Team' }],
       creator: post.author || 'Simnetiq',
       publisher: 'Simnetiq',
-      
-      // Open Graph for Facebook, LinkedIn, etc.
       openGraph: {
         type: 'article',
         locale: 'en_US',
         url: postUrl,
-        title: post.title,
-        description: post.excerpt || post.seoDescription || 'Read our latest insights about eSIM technology and global connectivity.',
+        title: post.seoTitle || post.title,
+        description,
         siteName: 'Simnetiq',
-        images: [
-          {
-            url: imageUrl,
-            width: 1200,
-            height: 630,
-            alt: post.title,
-          },
-        ],
+        images: [{ url: imageUrl, width: 1200, height: 630, alt: post.title }],
         article: {
           publishedTime: post.publishedAt?.toISOString(),
           modifiedTime: post.updatedAt?.toISOString(),
@@ -83,21 +64,15 @@ export async function generateMetadata({ params }) {
           tags: post.tags,
         },
       },
-      
-      // Twitter Cards
       twitter: {
         card: 'summary_large_image',
-        title: post.title,
-        description: post.excerpt || post.seoDescription || 'Read our latest insights about eSIM technology and global connectivity.',
+        title: post.seoTitle || post.title,
+        description,
         images: [imageUrl],
         creator: '@Simnetiq',
         site: '@Simnetiq',
       },
-      
-      // Hreflang alternates for multilingual SEO
-      alternates: generateBlogAlternates(baseUrl, params.id, availableLanguages),
-      
-      // Robots
+      alternates: { canonical: postUrl, languages },
       robots: {
         index: true,
         follow: true,
@@ -119,10 +94,25 @@ export async function generateMetadata({ params }) {
   }
 }
 
-export default function BlogPostPage({ params }) {
+export default async function BlogPostPage({ params }) {
+  // Verify the post exists server-side for proper 404
+  let post = null;
+  try {
+    post = await blogServiceSupabase.getPostBySlug(params.id);
+  } catch {
+    // Fall through to notFound
+  }
+
+  if (!post) {
+    notFound();
+  }
+
   return (
-    <Suspense fallback={<Loading />}>
-      <BlogPost slug={params.id} />
-    </Suspense>
+    <>
+      <BlogJsonLd post={post} locale="en" />
+      <Suspense fallback={<Loading />}>
+        <BlogPost slug={params.id} />
+      </Suspense>
+    </>
   )
 }
