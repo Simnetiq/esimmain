@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useRef, useMemo, lazy, Suspense } from 'react';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
@@ -28,9 +28,22 @@ const ShieldIcon = ({ className }) => (
   </svg>
 );
 
-// Deferred background component - loads after LCP
+// Deferred background component - loads after LCP, pauses when off-screen
 function DeferredBackground({ isMobile }) {
   const [shouldRender, setShouldRender] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const containerRef = useRef(null);
+
+  // Pause animation when hero section scrolls off-screen
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [shouldRender]);
 
   useEffect(() => {
     // Defer background animation until after LCP (use requestIdleCallback or setTimeout)
@@ -53,23 +66,26 @@ function DeferredBackground({ isMobile }) {
     };
   }, []);
 
-  if (!shouldRender) return null;
+  if (!shouldRender) return <div ref={containerRef} className="w-full h-full" />;
 
   return (
-    <Suspense fallback={null}>
-      <Antigravity
-        color="#4975D4"
-        autoAnimate={true}
-        count={isMobile ? 100 : 200}
-        magnetRadius={isMobile ? 5 : 7}
-        ringRadius={isMobile ? 6 : 8}
-        waveSpeed={0.3}
-        waveAmplitude={1.2}
-        particleSize={isMobile ? 0.7 : 1.0}
-        lerpSpeed={0.04}
-        particleVariance={1}
-      />
-    </Suspense>
+    <div ref={containerRef} className="w-full h-full">
+      <Suspense fallback={null}>
+        <Antigravity
+          color="#4975D4"
+          autoAnimate={true}
+          count={isMobile ? 100 : 200}
+          magnetRadius={isMobile ? 5 : 7}
+          ringRadius={isMobile ? 6 : 8}
+          waveSpeed={0.3}
+          waveAmplitude={1.2}
+          particleSize={isMobile ? 0.7 : 1.0}
+          lerpSpeed={0.04}
+          particleVariance={1}
+          paused={!isVisible}
+        />
+      </Suspense>
+    </div>
   );
 }
 
@@ -155,12 +171,13 @@ export default function HeroSection() {
               </p>
 
               {/* CTA Buttons - Explore Store is PRIMARY */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 lg:mb-12 pointer-events-auto">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 lg:mb-12 pointer-events-auto w-full sm:w-auto">
                 {/* Primary CTA - Explore eSIM Store */}
                 <ExploreStoreCTA
                   variant="dark"
                   size="md"
                   source="hero_primary_cta"
+                  className="w-full sm:w-auto"
                 />
 
                 {/* Secondary CTAs - Download App (iOS + Android on desktop, single on mobile) */}
@@ -168,6 +185,7 @@ export default function HeroSection() {
                   variant="secondary"
                   size="md"
                   source="hero_secondary_cta"
+                  className="w-full sm:w-auto"
                 />
               </div>
 

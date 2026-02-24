@@ -23,7 +23,8 @@
     "iosApp": "iOS App",
     "androidApp": "Android App",
     "userMenu": "User menu",
-    "user": "User"
+    "user": "User",
+    "about": "About"
   },
   "hero": {
     "announcement": "Now available in 200+ countries worldwide.",
@@ -144,7 +145,7 @@
       "badge": "By Simnetiq",
       "title": "Doppler VPN",
       "description": "Fast, no-logs VPN powered by WireGuard on mobile and advanced VLESS via Telegram bot. All major platforms, up to 10 devices.",
-      "promo": "Launch offer: use code 20 for 20% off",
+      "promo": "Launch offer: use code LAUNCH20 for 20% off",
       "appStore": "Get on App Store",
       "learnMore": "Learn More"
     },
@@ -743,7 +744,9 @@
     "tryAdjusting": "Try adjusting your filters or selecting a different country"
   },
   "notFound": {
-    "title": "Oops! Page Not Found",
+    "title": "Page Not Found",
+    "description": "The page you are looking for doesn't exist or has been moved. Let's get you back on track.",
+    "goHome": "Go Home",
     "goBack": "Go Back",
     "needHelp": "Need help?",
     "contactSupport": "Contact our support team"

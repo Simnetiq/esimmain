@@ -20,17 +20,7 @@ const ChevronUpIcon = ({ className }) => (
   </svg>
 );
 
-const AppleIcon = () => (
-  <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
-  </svg>
-);
 
-const AndroidIcon = () => (
-  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4483-.9993.9993-.9993c.5511 0 .9993.4483.9993.9993.0001.5511-.4482.9997-.9993.9997zm-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4483.9993.9993 0 .5511-.4483.9997-.9993.9997zm11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.2439 13.8533 7.8508 12 7.8508s-3.5902.3931-5.1367 1.0989L4.841 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3435-4.1021-2.6892-7.5743-6.1185-9.4396z"/>
-  </svg>
-);
 
 export default function ActivationSection() {
   const { t, locale, isLoading: i18nLoading } = useI18n();
@@ -118,132 +108,176 @@ export default function ActivationSection() {
   return (
     <div className="bg-white flex flex-col overflow-hidden" id="how-it-works" dir={direction} lang={detectedLanguage}>
       <div className="relative flex-1 flex flex-col">
-        {/* App Download CTA - BlogAppDownload style */}
+        {/* Simnetiq App Download — FeaturesSection style */}
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
             <div className="px-4 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              
-              {/* App Download Card with background image */}
-              <div className="relative isolate overflow-hidden animate-fade-in-up">
-                {/* Background image + dark gradient overlay */}
-                <div className="absolute inset-0 -z-10">
-                  <Image
-                    src="/images/blog.avif"
-                    alt=""
-                    fill
-                    className="object-cover"
-                    sizes="100vw"
-                    priority={false}
-                  />
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.75) 0%, rgba(30, 41, 59, 0.6) 50%, rgba(15, 23, 42, 0.8) 100%)'
-                    }}
-                  />
-                </div>
+              <div className="relative bg-gray-50 overflow-hidden animate-fade-in-up">
+                <div className={`flex flex-col md:flex-row ${isRTL ? 'md:flex-row-reverse' : ''}`}>
+                  {/* Image — left half on desktop, full width on mobile */}
+                  <div className="relative h-56 sm:h-64 md:h-auto md:w-1/2 overflow-hidden">
+                    <Image
+                      src="/images/blog.avif"
+                      alt="Simnetiq eSIM"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      priority={false}
+                    />
+                  </div>
 
-                <div className="px-6 py-16 md:px-12 md:py-20">
-                  <div className="mx-auto max-w-2xl text-center">
-                    <h2 className="text-2xl font-semibold tracking-tight text-white  md:text-3xl lg:text-4xl animate-fade-in-up animation-delay-100 drop-shadow-[0_2px_16px_rgba(225, 225, 225, 0.22)]">
-                      {t('activation.appTitle', 'Stay connected wherever you travel')}
-                    </h2>
-                    <p className="mx-auto mt-4 max-w-xl text-base font-normal text-pretty text-gray-200 md:text-lg animate-fade-in-up animation-delay-200">
-                      {t('activation.appDescription', 'Get instant eSIM data plans for 200+ countries. No physical SIM needed, activate in minutes.')}
-                    </p>
-                    
-                    {/* Download Buttons */}
-                    <div className={`mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row animate-fade-in-up animation-delay-300 ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
-                      {/* iOS Download */}
-                      <a
-                        href={appStoreLinks.ios}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={handleIOSDownload}
-                        className={`group inline-flex items-center gap-3 rounded-full bg-gray-900 px-6 py-3 text-sm font-medium text-white shadow-lg transition-all duration-200 hover:bg-gray-800 hover:scale-105 `}
-                      >
-                        <AppleIcon />
-                        <span className="text-base">{t('activation.appStore', 'App Store')}</span>
-                      </a>
+                  {/* Content — right half */}
+                  <div className="relative flex-1 p-6 lg:p-10 flex flex-col justify-end">
+                    {/* Large decorative watermark */}
+                    <span className={`absolute top-4 text-[5rem] md:text-[7rem] lg:text-[9rem] font-semibold leading-none text-gray-500/10 select-none pointer-events-none ${isRTL ? 'left-4 lg:left-8' : 'right-4 lg:right-8'}`} aria-hidden="true">
+                      eSIM
+                    </span>
 
-                      {/* Android Download */}
-                      <a
-                        href={appStoreLinks.android}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={handleAndroidDownload}
-                        className={`group inline-flex items-center gap-3 rounded-full bg-white px-6 py-3 text-sm font-medium text-gray-900 ring-1 ring-gray-200 shadow-sm transition-all duration-200 hover:bg-gray-50 hover:scale-105 `}
-                      >
-                        <AndroidIcon />
-                        <span className="text-base">{t('activation.googlePlay', 'Google Play')}</span>
-                      </a>
+                    <div className="relative">
+                      <div className={`flex items-center gap-3 mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <img
+                          src="/images/logo_icon/ioslogo.png"
+                          alt="Simnetiq"
+                          width={48}
+                          height={48}
+                          className="w-12 h-12 rounded-[12px] shadow"
+                        />
+                        <div>
+                          <p className={`text-xs font-medium tracking-widest uppercase text-tufts-blue mb-1 ${isRTL ? 'text-right' : 'text-left'}`}>
+                            {t('activation.appBadge', 'DOWNLOAD THE APP')}
+                          </p>
+                          <h3 className={`text-xl lg:text-2xl font-semibold text-eerie-black tracking-tight ${isRTL ? 'text-right' : 'text-left'}`}>
+                            {t('activation.appTitle', 'Stay connected wherever you travel')}
+                          </h3>
+                        </div>
+                      </div>
+
+                      <p className={`text-gray-500 text-sm sm:text-base leading-relaxed max-w-md mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+                        {t('activation.appDescription', 'Get instant eSIM data plans for 200+ countries. No physical SIM needed, activate in minutes.')}
+                      </p>
+
+                      {/* Download Buttons */}
+                      <div className={`flex flex-col sm:flex-row gap-3 ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
+                        <a
+                          href={appStoreLinks.ios}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={handleIOSDownload}
+                          className="inline-flex items-center rounded-full bg-gray-900 pl-5 pr-1 py-1 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-gray-800 hover:scale-[1.02] w-full sm:w-auto"
+                        >
+                          <span className="flex-1 text-center">{t('activation.appStore', 'App Store')}</span>
+                          <span className="ml-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-white/20 w-8 h-8">
+                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <line x1="21" y1="17" x2="18" y2="17"/><line x1="20" y1="21" x2="14.29" y2="10.72"/><line x1="12" y1="6.6" x2="10" y2="3"/><line x1="14" y1="3" x2="4" y2="21"/><line x1="13" y1="17" x2="3" y2="17"/>
+                            </svg>
+                          </span>
+                        </a>
+                        <a
+                          href={appStoreLinks.android}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={handleAndroidDownload}
+                          className="inline-flex items-center rounded-full bg-white pl-5 pr-1 py-1 text-sm font-semibold text-gray-900 ring-1 ring-gray-200 shadow-sm transition-all duration-150 hover:bg-gray-50 hover:scale-[1.02] w-full sm:w-auto"
+                        >
+                          <span className="flex-1 text-center">{t('activation.googlePlay', 'Google Play')}</span>
+                          <span className="ml-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-gray-100 w-8 h-8">
+                            <svg className="w-4 h-4 text-gray-900" viewBox="0 0 24 24" fill="currentColor">
+                              <path fillRule="evenodd" clipRule="evenodd" d="M2 3.65629C2 2.15127 3.59967 1.18549 4.93149 1.88645L20.7844 10.2301C22.2091 10.9799 22.2091 13.0199 20.7844 13.7698L4.9315 22.1134C3.59968 22.8144 2 21.8486 2 20.3436V3.65629ZM19.8529 11.9999L16.2682 10.1132L14.2243 11.9999L16.2682 13.8866L19.8529 11.9999ZM14.3903 14.875L12.75 13.3608L6.75782 18.8921L14.3903 14.875ZM12.75 10.639L14.3903 9.12488L6.75782 5.10777L12.75 10.639ZM4 5.28391L11.2757 11.9999L4 18.7159V5.28391Z"/>
+                            </svg>
+                          </span>
+                        </a>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
 
-        {/* Doppler VPN Promo */}
+        {/* Doppler VPN Promo — FeaturesSection style */}
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl mt-6">
             <div className="px-4 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              <div className="relative overflow-hidden rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm animate-fade-in-up">
-                <div className="px-6 py-8 md:px-10 md:py-10">
-                  <div className={`flex flex-col md:flex-row items-center gap-6 md:gap-10 ${isRTL ? 'md:flex-row-reverse' : ''}`}>
-                    {/* App Icon */}
-                    <div className="flex-shrink-0">
-                      <img
-                        src="/images/doppler-icon.jpg"
-                        alt="Doppler VPN"
-                        width={80}
-                        height={80}
-                        className="w-[72px] h-[72px] md:w-20 md:h-20 rounded-[18px] md:rounded-[22px] shadow-lg"
-                      />
-                    </div>
+              <div className="relative bg-gray-50 overflow-hidden animate-fade-in-up">
+                <div className={`flex flex-col md:flex-row ${isRTL ? 'md:flex-row-reverse' : ''}`}>
+                  {/* Image — left half on desktop, full width on mobile */}
+                  <div className="relative h-56 sm:h-64 md:h-auto md:w-1/2 overflow-hidden">
+                    <Image
+                      src="/images/logo_icon/doppler.avif"
+                      alt="Doppler VPN"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      loading="lazy"
+                    />
+                  </div>
 
-                    {/* Text */}
-                    <div className={`flex-1 min-w-0 ${isRTL ? 'text-right' : ''}`}>
-                      <span className="text-xs font-semibold tracking-widest uppercase text-tufts-blue mb-1 block">
-                        {t('activation.doppler.badge', 'By Simnetiq')}
-                      </span>
-                      <h3 className="text-xl md:text-2xl font-semibold text-gray-900 mb-2">
-                        {t('activation.doppler.title', 'Doppler VPN')}
-                      </h3>
-                      <p className="text-sm text-gray-500 leading-relaxed max-w-lg mb-3">
+                  {/* Content — right half */}
+                  <div className="relative flex-1 p-6 lg:p-10 flex flex-col justify-end">
+                    {/* Large decorative watermark */}
+                    <span className={`absolute top-4 text-[5rem] md:text-[7rem] lg:text-[9rem] font-semibold leading-none text-gray-500/10 select-none pointer-events-none ${isRTL ? 'left-4 lg:left-8' : 'right-4 lg:right-8'}`} aria-hidden="true">
+                      VPN
+                    </span>
+
+                    <div className="relative">
+                      <div className={`flex items-center gap-3 mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <img
+                          src="/images/doppler-icon.jpg"
+                          alt="Doppler VPN"
+                          width={48}
+                          height={48}
+                          className="w-12 h-12 rounded-[12px] shadow "
+                        />
+                        <div>
+                          <p className={`text-xs font-medium tracking-widest uppercase text-tufts-blue mb-1 ${isRTL ? 'text-right' : 'text-left'}`}>
+                            {t('activation.doppler.badge', 'By Simnetiq')}
+                          </p>
+                          <h3 className={`text-xl lg:text-2xl font-semibold text-eerie-black tracking-tight ${isRTL ? 'text-right' : 'text-left'}`}>
+                            {t('activation.doppler.title', 'Doppler VPN')}
+                          </h3>
+                        </div>
+                      </div>
+
+                      <p className={`text-gray-500 text-sm sm:text-base leading-relaxed max-w-md mb-3 ${isRTL ? 'text-right' : 'text-left'}`}>
                         {t('activation.doppler.description', 'Fast, no-logs VPN powered by WireGuard on mobile and advanced VLESS via Telegram bot. All major platforms, up to 10 devices.')}
                       </p>
-                      <div className={`inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
+
+                      <div className={`inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
                         <span className="text-xs font-semibold text-emerald-700">
-                          {t('activation.doppler.promo', 'Launch offer: use code 20 for 20% off')}
+                          {t('activation.doppler.promo', 'Launch offer: use code LAUNCH20 for 20% off')}
                         </span>
                       </div>
-                    </div>
 
-                    {/* CTA Buttons */}
-                    <div className={`flex flex-col sm:flex-row gap-3 flex-shrink-0 ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
-                      <a
-                        href="https://apps.apple.com/at/app/doppler-vpn-fast-secure/id6757091773"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`inline-flex items-center gap-2.5 rounded-full bg-gray-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-150 hover:bg-gray-800 hover:scale-[1.02] ${isRTL ? 'flex-row-reverse' : ''}`}
-                      >
-                        <AppleIcon />
-                        <span>{t('activation.doppler.appStore', 'Get on App Store')}</span>
-                      </a>
-                      <a
-                        href="https://dopplervpn.org/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`inline-flex items-center gap-2.5 rounded-full bg-white px-5 py-2.5 text-sm font-medium text-gray-900 ring-1 ring-gray-200 shadow-sm transition-all duration-150 hover:bg-gray-50 hover:scale-[1.02] ${isRTL ? 'flex-row-reverse' : ''}`}
-                      >
-                        <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/>
-                        </svg>
-                        <span>{t('activation.doppler.learnMore', 'Learn More')}</span>
-                      </a>
+                      {/* CTA Buttons */}
+                      <div className={`flex flex-col sm:flex-row gap-3 ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
+                        <a
+                          href="https://apps.apple.com/at/app/doppler-vpn-fast-secure/id6757091773"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center rounded-full bg-gray-900 pl-5 pr-1 py-1 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-gray-800 hover:scale-[1.02] w-full sm:w-auto"
+                        >
+                          <span className="flex-1 text-center">{t('activation.doppler.appStore', 'App Store')}</span>
+                          <span className="ml-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-white/20 w-8 h-8">
+                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <line x1="21" y1="17" x2="18" y2="17"/><line x1="20" y1="21" x2="14.29" y2="10.72"/><line x1="12" y1="6.6" x2="10" y2="3"/><line x1="14" y1="3" x2="4" y2="21"/><line x1="13" y1="17" x2="3" y2="17"/>
+                            </svg>
+                          </span>
+                        </a>
+                        <a
+                          href="https://dopplervpn.org/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center rounded-full bg-white pl-5 pr-1 py-1 text-sm font-semibold text-gray-900 ring-1 ring-gray-200 shadow-sm transition-all duration-150 hover:bg-gray-50 hover:scale-[1.02] w-full sm:w-auto"
+                        >
+                          <span className="flex-1 text-center">{t('activation.doppler.learnMore', 'Learn More')}</span>
+                          <span className="ml-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-gray-100 w-8 h-8">
+                            <svg className="w-3.5 h-3.5 text-gray-900" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M7 17 17 7"/><path d="M7 7h10v10"/>
+                            </svg>
+                          </span>
+                        </a>
+                      </div>
                     </div>
                   </div>
                 </div>

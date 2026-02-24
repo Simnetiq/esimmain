@@ -55,17 +55,28 @@ const FlexiblePlanCard = ({ plan, t, onClick, isRTL = false }) => {
     return (
         <div
             onClick={onClick}
-            className="bg-white border border-gray-100 p-4 shadow-sm hover:shadow-md transition-all cursor-pointer group h-full flex flex-col justify-between relative overflow-hidden"
+            className="bg-gray-50 p-4 hover:bg-white transition-all duration-500 cursor-pointer group h-full flex flex-col justify-between relative overflow-hidden"
             dir={isRTL ? 'rtl' : 'ltr'}
         >
-            <div className={`absolute top-0 w-16 h-16 bg-tufts-blue/5 transition-transform group-hover:scale-110 ${isRTL ? 'left-0 rounded-br-full -ml-8 -mt-8' : 'right-0 rounded-bl-full -mr-8 -mt-8'}`} />
+            {/* Price — big watermark on the right */}
+            <span
+                className={`absolute top-3 text-[3rem] sm:text-[3.5rem] font-semibold leading-none text-gray-700 select-none pointer-events-none ${isRTL ? 'left-3' : 'right-3'}`}
+                aria-hidden="true"
+            >
+                ${plan.price}
+            </span>
 
             <div>
-                <h4 className="font-bold text-lg text-eerie-black mb-2 text-left">
-                    {validity ? (isRTL ? `${validity} - ${dataAmount}` : `${dataAmount} - ${validity}`) : dataAmount}
+                <h4 className={`font-semibold text-lg text-eerie-black ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {dataAmount}
                 </h4>
+                {validity && (
+                    <p className={`text-xs font-medium tracking-widest uppercase text-tufts-blue mt-1 mb-3 ${isRTL ? 'text-right' : 'text-left'}`}>
+                        {validity}
+                    </p>
+                )}
 
-                {/* Badges — global CSS handles flex/inline-flex reversal in RTL */}
+                {/* Badges */}
                 <div className="flex flex-wrap items-center gap-1.5 mb-2">
                     {plan.isFeatured && (
                         <span className="inline-flex items-center gap-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
@@ -98,23 +109,19 @@ const FlexiblePlanCard = ({ plan, t, onClick, isRTL = false }) => {
                     )}
                 </div>
 
-                {countryCount > 0 && (
-                    <p className={`text-xs text-tufts-blue/80 font-medium truncate text-left ${isRTL ? 'pl-4' : 'pr-4'}`}>
-                        {t('deals.covers', 'Covers')} {countryCount} {countryCount === 1 ? t('deals.country', 'country') : t('deals.countries', 'countries')}
-                    </p>
-                )}
-            </div>
-
-            {/* Price + arrow — global CSS reverses flex order in RTL */}
-            <div className="mt-4 flex items-center justify-between">
-                <span className="font-bold text-eerie-black text-lg">
-                    ${plan.price}
-                </span>
-                <div className={`w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-tufts-blue group-hover:text-white transition-colors ${isRTL ? 'rotate-180' : ''}`}>
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                <div className="flex items-center justify-between">
+                    {countryCount > 0 ? (
+                        <p className={`text-xs text-tufts-blue/80 font-medium truncate ${isRTL ? 'text-right pl-4' : 'text-left pr-4'}`}>
+                            {t('deals.covers', 'Covers')} {countryCount} {countryCount === 1 ? t('deals.country', 'country') : t('deals.countries', 'countries')}
+                        </p>
+                    ) : <span />}
+                    <div className={`w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0 group-hover:bg-eerie-black group-hover:text-white transition-colors duration-300 ${isRTL ? 'rotate-180' : ''}`}>
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                    </div>
                 </div>
+
             </div>
         </div>
     );
@@ -424,7 +431,7 @@ const EsimPlans = ({ isHomePage = false }) => {
             <div className="w-full h-px bg-gray-100 mt-4 sm:mt-6"></div>
 
             {/* Sticky Search */}
-            <div className="w-full sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100">
+            <div className="w-full sticky top-0 z-40 bg-white border-b border-gray-100">
                 <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
                     <input
                         type="text"

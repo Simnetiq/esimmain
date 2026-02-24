@@ -13,7 +13,6 @@ import LanguageSelector from './LanguageSelector';
 import CurrencyToggle from './CurrencyToggle';
 import { detectLanguageFromPath, getLocalizedBlogListUrl, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
-import { getPlatformAppStoreLink } from '@esim/shared/utils/appStoreLinks';
 import PlatformDownloadCTA from './cta/PlatformDownloadCTA';
 // Inline SVG icons to avoid lucide-react bundle overhead on every page
 const ChevronDown = ({ className }) => (
@@ -138,14 +137,21 @@ const Navbar = ({ hideLanguageSelector = false }) => {
 
     const controlNavbar = () => {
       const currentScrollY = window.scrollY;
+      const delta = currentScrollY - lastScrollYRef.current;
 
-      // Show navbar when at top or scrolling up
-      if (currentScrollY < 10 || currentScrollY < lastScrollYRef.current) {
-        setIsVisible(true);
-      } else {
-        // Hide navbar when scrolling down
-        setIsVisible(false);
+      // Dead zone: ignore tiny scroll movements (< 5px)
+      if (Math.abs(delta) < 5) {
+        ticking = false;
+        return;
       }
+
+      const shouldBeVisible = currentScrollY < 10 || delta < 0;
+
+      // Only update state if it actually changed
+      setIsVisible(prev => {
+        if (prev === shouldBeVisible) return prev;
+        return shouldBeVisible;
+      });
 
       lastScrollYRef.current = currentScrollY;
       ticking = false;
@@ -211,7 +217,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
 
   return (
     <header
-      className={`navbar-header fixed bg-white/30 backdrop-blur-md w-full left-0 right-0 justify-center top-0 transition-transform duration-300 ${
+      className={`navbar-header fixed bg-white/80 backdrop-blur-sm w-full left-0 right-0 justify-center top-0 transition-transform duration-150 ${
         isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}
       style={{ zIndex: 9999 }}
@@ -318,6 +324,14 @@ const Navbar = ({ hideLanguageSelector = false }) => {
             className="text-sm font-semibold text-eerie-black hover:text-tufts-blue transition-colors"
           >
             {t('navbar.blog', 'Blog')}
+          </Link>
+
+          {/* About link */}
+          <Link
+            href={getLocalizedUrl('/about')}
+            className="text-sm font-semibold text-eerie-black hover:text-tufts-blue transition-colors"
+          >
+            {t('navbar.about', 'About')}
           </Link>
         </div>
         
@@ -564,20 +578,19 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                       {t('navbar.contactUs', 'Contact Us')}
                     </Link>
 
+                    <Link
+                      href={getLocalizedUrl('/about')}
+                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-gray-600 hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {t('navbar.about', 'About')}
+                    </Link>
+
                     <div className="border-t border-gray-200 my-4 mx-8" />
 
-                    <a
-                      href={getPlatformAppStoreLink()}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => {
-                        handleDownloadApp();
-                        setIsMenuOpen(false);
-                      }}
-                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4"
-                    >
-                      {t('navbar.downloadApp', 'Download App')}
-                    </a>
+                    <div className="flex justify-center py-3 px-4">
+                      <PlatformDownloadCTA variant="secondary" size="sm" source="mobile_menu" />
+                    </div>
 
                     <div className="border-t border-gray-200 my-4 mx-8" />
 
@@ -589,13 +602,6 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                       {t('navbar.login', 'Login')}
                     </Link>
 
-                    <Link
-                      href={getLocalizedUrl('/register')}
-                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-eerie-black hover:text-tufts-blue hover:bg-white rounded-md transition-all duration-200 py-3 px-4"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {t('navbar.register', 'Register')}
-                    </Link>
                   </>
                 )}
               </div>

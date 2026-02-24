@@ -190,7 +190,7 @@ const Login = () => {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 text-xs font-medium text-tufts-blue hover:text-cobalt-blue transition-colors"
                   >
-                    {t('auth.login.getOnAppStore', 'Get on App Store')}
+                    {t('auth.login.getOnAppStore', 'App Store')}
                     <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
                     </svg>

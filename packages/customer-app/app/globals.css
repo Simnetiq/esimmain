@@ -29,7 +29,6 @@
 
   /* Base typography - uses Tailwind's font-sans which is configured with our fonts */
   html {
-    scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;

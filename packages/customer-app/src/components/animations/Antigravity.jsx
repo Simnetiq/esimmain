@@ -19,7 +19,8 @@ const AntigravityInner = ({
   depthFactor = 1,
   pulseSpeed = 3,
   particleShape = 'capsule',
-  fieldStrength = 10
+  fieldStrength = 10,
+  paused = false
 }) => {
   const meshRef = useRef(null);
   const { viewport } = useThree();
@@ -72,7 +73,7 @@ const AntigravityInner = ({
 
   useFrame(state => {
     const mesh = meshRef.current;
-    if (!mesh) return;
+    if (!mesh || paused) return;
 
     const { viewport: v, pointer: m } = state;
 

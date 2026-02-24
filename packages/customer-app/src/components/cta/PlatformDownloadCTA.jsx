@@ -4,30 +4,36 @@ import { usePlatform, appStoreLinks } from '../../hooks/usePlatform';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
 
-// Inline SVG icons
-const AppleIcon = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+// App Store icon (line-based, black)
+const AppStoreIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="21" y1="17" x2="18" y2="17"/>
+    <line x1="20" y1="21" x2="14.29" y2="10.72"/>
+    <line x1="12" y1="6.6" x2="10" y2="3"/>
+    <line x1="14" y1="3" x2="4" y2="21"/>
+    <line x1="13" y1="17" x2="3" y2="17"/>
   </svg>
 );
 
-const AndroidIcon = ({ className }) => (
+// Google Play icon (filled, black)
+const GooglePlayIcon = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4483-.9993.9993-.9993c.5511 0 .9993.4483.9993.9993.0001.5511-.4482.9997-.9993.9997zm-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4483.9993.9993 0 .5511-.4483.9997-.9993.9997zm11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.2439 13.8533 7.8508 12 7.8508s-3.5902.3931-5.1367 1.0989L4.841 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3435-4.1021-2.6892-7.5743-6.1185-9.4396z"/>
+    <path fillRule="evenodd" clipRule="evenodd" d="M2 3.65629C2 2.15127 3.59967 1.18549 4.93149 1.88645L20.7844 10.2301C22.2091 10.9799 22.2091 13.0199 20.7844 13.7698L4.9315 22.1134C3.59968 22.8144 2 21.8486 2 20.3436V3.65629ZM19.8529 11.9999L16.2682 10.1132L14.2243 11.9999L16.2682 13.8866L19.8529 11.9999ZM14.3903 14.875L12.75 13.3608L6.75782 18.8921L14.3903 14.875ZM12.75 10.639L14.3903 9.12488L6.75782 5.10777L12.75 10.639ZM4 5.28391L11.2757 11.9999L4 18.7159V5.28391Z"/>
   </svg>
 );
 
 /**
  * Single download button for a specific platform
+ * Layout matches ExploreStoreCTA: text centered, store icon in circle at end
  */
 function DownloadButton({ platform, variant, size, source, className = '' }) {
   const { t } = useI18n();
 
   const isIOS = platform === 'ios';
-  const Icon = isIOS ? AppleIcon : AndroidIcon;
+  const Icon = isIOS ? AppStoreIcon : GooglePlayIcon;
   const label = isIOS
-    ? t('hero.downloadAppIOS', 'Download our iOS app')
-    : t('hero.downloadAppAndroid', 'Download our Android app');
+    ? t('hero.downloadAppIOS', 'Download for iOS')
+    : t('hero.downloadAppAndroid', 'Download for Android');
   const link = isIOS ? appStoreLinks.ios : appStoreLinks.android;
 
   const handleClick = () => {
@@ -41,23 +47,25 @@ function DownloadButton({ platform, variant, size, source, className = '' }) {
     });
   };
 
-  // Size classes
-  const sizeClasses = {
-    sm: 'px-5 py-2.5 text-sm gap-2',
-    md: 'px-6 py-3.5 text-base gap-2.5',
-    lg: 'px-10 py-5 text-lg gap-3'
+  // Match ExploreStoreCTA sizing: asymmetric padding, circle flush on right
+  const sizeConfig = {
+    sm: { outer: 'pl-5 pr-1 py-1 text-sm', circle: 'w-8 h-8', icon: 'w-4 h-4' },
+    md: { outer: 'pl-6 pr-1.5 py-1.5 text-base', circle: 'w-9 h-9', icon: 'w-5 h-5' },
+    lg: { outer: 'pl-10 pr-2 py-2 text-lg', circle: 'w-11 h-11', icon: 'w-6 h-6' },
   };
 
-  const iconSizeClasses = {
-    sm: 'w-5 h-5',
-    md: 'w-5 h-5',
-    lg: 'w-7 h-7'
-  };
+  const config = sizeConfig[size];
 
   // Variant classes
   const variantClasses = {
     primary: 'bg-gray-900 text-white shadow-lg hover:bg-gray-800 hover:scale-[1.02]',
     secondary: 'bg-white text-gray-900 border border-gray-200 shadow-sm hover:border-tufts-blue hover:text-tufts-blue'
+  };
+
+  // Circle colors per variant
+  const circleClasses = {
+    primary: 'bg-white/20',
+    secondary: 'bg-gray-100'
   };
 
   return (
@@ -67,15 +75,17 @@ function DownloadButton({ platform, variant, size, source, className = '' }) {
       rel="noopener noreferrer"
       onClick={handleClick}
       className={`
-        inline-flex items-center justify-center rounded-full font-semibold
+        inline-flex items-center rounded-full font-semibold
         transition-all duration-200
-        ${sizeClasses[size]}
+        ${config.outer}
         ${variantClasses[variant]}
         ${className}
       `}
     >
-      <Icon className={iconSizeClasses[size]} />
-      <span>{label}</span>
+      <span className="flex-1 text-center">{label}</span>
+      <span className={`ml-3 flex-shrink-0 inline-flex items-center justify-center rounded-full ${circleClasses[variant]} ${config.circle}`}>
+        <Icon className={config.icon} />
+      </span>
     </a>
   );
 }
@@ -114,7 +124,6 @@ export default function PlatformDownloadCTA({
   }
 
   // On desktop, show both buttons side by side
-  // The wrapper inherits className for consistent sizing with sibling CTAs
   return (
     <div className={`flex flex-row items-center justify-center gap-3 ${className}`}>
       <DownloadButton

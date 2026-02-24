@@ -125,7 +125,7 @@ export default function FeaturesSection() {
 
               {/* Hero Feature Card — full width, horizontal on desktop */}
               <div
-                className={`group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 animate-fade-in-up mb-4 ${isRTL ? 'md:flex-row-reverse' : ''}`}
+                className={`relative bg-gray-50 overflow-hidden animate-fade-in-up mb-4 ${isRTL ? 'md:flex-row-reverse' : ''}`}
               >
                 <div className={`flex flex-col md:flex-row ${isRTL ? 'md:flex-row-reverse' : ''}`}>
                   {/* Image — left half on desktop, full width on mobile */}
@@ -134,30 +134,24 @@ export default function FeaturesSection() {
                       src={heroFeature.image}
                       alt={heroFeature.title}
                       fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-700"
+                      className="object-cover"
                       sizes="(max-width: 768px) 100vw, 50vw"
                       priority
                       loading="eager"
                       fetchPriority="high"
-                    />
-                    {/* Bottom gradient overlay — fades image into content on mobile */}
-                    <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-gray-50 to-transparent md:hidden" />
-                    {/* Side gradient overlay — fades image into content on desktop */}
-                    <div className={`hidden md:block absolute inset-y-0 w-24 bg-gradient-to-l from-gray-50 to-transparent group-hover:from-white transition-colors duration-500 ${isRTL ? 'left-0 bg-gradient-to-r' : 'right-0'}`}
-                      style={isRTL ? { background: 'linear-gradient(to right, rgb(249 250 251), transparent)' } : undefined}
                     />
                   </div>
 
                   {/* Content — right half */}
                   <div className="relative flex-1 p-6 lg:p-10 flex flex-col justify-center">
                     {/* Large step number */}
-                    <span className={`absolute top-4 text-[7rem] lg:text-[9rem] font-semibold leading-none text-eerie-black/[0.04] select-none pointer-events-none ${isRTL ? 'left-4 lg:left-8' : 'right-4 lg:right-8'}`} aria-hidden="true">
+                    <span className={`absolute top-4 text-[5rem] md:text-[7rem] lg:text-[9rem] font-semibold leading-none text-eerie-black/[0.04] select-none pointer-events-none ${isRTL ? 'left-4 lg:left-8' : 'right-4 lg:right-8'}`} aria-hidden="true">
                       {heroFeature.number}
                     </span>
 
                     <div className="relative">
                       {/* Icon pill */}
-                      <div className={`w-11 h-11 rounded-lg bg-tufts-blue/10 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 ${isRTL ? 'ml-auto' : ''}`}>
+                      <div className={`w-11 h-11 rounded-lg bg-tufts-blue/10 hidden md:flex items-center justify-center mb-5 ${isRTL ? 'ml-auto' : ''}`}>
                         <heroFeature.Icon className="w-5 h-5 text-tufts-blue" />
                       </div>
 
@@ -180,7 +174,7 @@ export default function FeaturesSection() {
                 {gridFeatures.map((feature, index) => (
                   <div
                     key={index}
-                    className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 animate-fade-in-up content-visibility-auto"
+                    className="relative bg-gray-50 overflow-hidden animate-fade-in-up content-visibility-auto"
                     style={{ animationDelay: `${(index + 1) * 100}ms` }}
                   >
                     {/* Image Area */}
@@ -189,15 +183,12 @@ export default function FeaturesSection() {
                         src={feature.image}
                         alt={feature.title}
                         fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-700"
+                        className="object-cover"
                         sizes="(max-width: 768px) 100vw, 33vw"
                         priority={feature.priority}
                         loading={feature.priority ? 'eager' : 'lazy'}
                         fetchPriority={feature.priority ? 'high' : 'low'}
                       />
-                      {/* Bottom gradient overlay */}
-                      <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-gray-50 to-transparent group-hover:from-white transition-colors duration-500" />
-
                     </div>
 
                     {/* Content */}
