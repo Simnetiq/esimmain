@@ -106,7 +106,7 @@ export default function HeroSection() {
     <div className="hero-section relative min-h-screen flex flex-col bg-white" dir={direction} lang={detectedLanguage}>
       {/* SVG dot grid with routes — zero JS, zero TBT impact */}
       <div className="absolute inset-0 flex items-center justify-center overflow-hidden" aria-hidden="true" style={{ maskImage: 'radial-gradient(ellipse 60% 55% at 50% 50%, black 40%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse 60% 55% at 50% 50%, black 40%, transparent 100%)' }}>
-        <svg className="max-w-9xl w-full aspect-square" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+        <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
           {/* Route lines */}
           {ROUTES.map((route, ri) => (
             <polyline
