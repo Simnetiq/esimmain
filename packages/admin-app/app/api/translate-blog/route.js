@@ -1,33 +1,35 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
+import { createClient } from '@supabase/supabase-js';
 
-function isAuthorized(request) {
-  const apiKey = process.env.BLOG_API_KEY;
-  if (!apiKey) return false;
+const LANGUAGE_NAMES = {
+  es: 'Spanish', fr: 'French', de: 'German', ar: 'Arabic',
+  he: 'Hebrew', hi: 'Hindi', ja: 'Japanese', pl: 'Polish',
+  pt: 'Portuguese', ru: 'Russian', uk: 'Ukrainian', zh: 'Chinese',
+};
 
-  // Allow calls with BLOG_API_KEY (external/n8n)
-  const auth = request.headers.get('authorization');
-  if (auth?.startsWith('Bearer ') && auth.slice(7) === apiKey) {
-    return true;
+function getSupabase() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!supabaseUrl || !supabaseServiceKey) {
+    throw new Error('Supabase environment variables not configured');
   }
+  return createClient(supabaseUrl, supabaseServiceKey);
+}
 
-  // Allow calls with internal header (from admin app on same origin)
-  const internalKey = request.headers.get('x-internal-key');
-  if (internalKey && internalKey === apiKey) {
-    return true;
+async function getOpenAIKey(supabase) {
+  const { data, error } = await supabase
+    .from('app_config')
+    .select('value')
+    .eq('key', 'openai')
+    .single();
+
+  if (error || !data?.value?.api_key) {
+    throw new Error('OpenAI API key not configured in app_config');
   }
-
-  return false;
+  return data.value.api_key;
 }
 
 export async function POST(request) {
-  if (!isAuthorized(request)) {
-    return NextResponse.json(
-      { success: false, error: 'Unauthorized' },
-      { status: 401 }
-    );
-  }
-
   try {
     const { title, content, targetLanguage } = await request.json();
 
@@ -38,40 +40,10 @@ export async function POST(request) {
       );
     }
 
-    // Fetch OpenAI API key from Supabase config
-    const supabase = getSupabaseAdmin();
-    const { data: configData, error: configError } = await supabase
-      .from('app_config')
-      .select('value')
-      .eq('key', 'openai')
-      .single();
+    const supabase = getSupabase();
+    const openaiApiKey = await getOpenAIKey(supabase);
 
-    if (configError || !configData?.value?.api_key) {
-      return NextResponse.json(
-        { success: false, error: 'OpenAI API key not configured' },
-        { status: 400 }
-      );
-    }
-
-    const openaiApiKey = configData.value.api_key;
-
-    const languageNames = {
-      'en': 'English',
-      'es': 'Spanish',
-      'fr': 'French',
-      'de': 'German',
-      'ar': 'Arabic',
-      'he': 'Hebrew',
-      'hi': 'Hindi',
-      'ja': 'Japanese',
-      'pl': 'Polish',
-      'pt': 'Portuguese',
-      'ru': 'Russian',
-      'uk': 'Ukrainian',
-      'zh': 'Chinese'
-    };
-
-    const targetLanguageName = languageNames[targetLanguage] || targetLanguage;
+    const targetLanguageName = LANGUAGE_NAMES[targetLanguage] || targetLanguage;
     const isRTL = ['ar', 'he'].includes(targetLanguage);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -98,7 +70,6 @@ ${isRTL ? '- For RTL languages: translate naturally, the app handles RTL renderi
 - seo_description: max 220 chars, compelling summary for search results
 - og_title: max 70 chars, engaging title for social media sharing
 - og_description: max 200 chars, social media preview description
-- If a field would be identical to another, still provide it separately
 - Do NOT add commentary - return ONLY the JSON object`
           },
           {
@@ -107,7 +78,7 @@ ${isRTL ? '- For RTL languages: translate naturally, the app handles RTL renderi
           }
         ],
         temperature: 0.3,
-        response_format: { type: "json_object" }
+        response_format: { type: 'json_object' }
       })
     });
 
@@ -120,9 +91,7 @@ ${isRTL ? '- For RTL languages: translate naturally, the app handles RTL renderi
     const translatedContent = JSON.parse(data.choices[0].message.content);
 
     // Post-process to ensure pure markdown
-    let cleanContent = translatedContent.content;
-
-    cleanContent = cleanContent
+    let cleanContent = translatedContent.content
       .replace(/<!--[\s\S]*?-->/g, '')
       .replace(/<br\s*\/?>/gi, '\n')
       .replace(/<p>([\s\S]*?)<\/p>/gi, '\n$1\n')
@@ -142,7 +111,6 @@ ${isRTL ? '- For RTL languages: translate naturally, the app handles RTL renderi
       .replace(/\n{3,}/g, '\n\n')
       .trim();
 
-    // Truncate SEO fields to DB constraints
     return NextResponse.json({
       success: true,
       translation: {

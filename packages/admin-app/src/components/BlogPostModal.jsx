@@ -85,8 +85,10 @@ const BlogPostModal = ({
               title: result.translation.title,
               content: result.translation.content,
               slug: `${baseSlug}-${editingTranslation}`,
-              seoTitle: result.translation.title,
-              seoDescription: result.translation.title
+              seoTitle: result.translation.seo_title || result.translation.title.slice(0, 70),
+              seoDescription: result.translation.seo_description || '',
+              ogTitle: result.translation.og_title || '',
+              ogDescription: result.translation.og_description || ''
             }
           }
         };
@@ -103,7 +105,7 @@ const BlogPostModal = ({
 
   const handleInputChange = (field, value) => {
     // Handle translation-specific fields
-    const translationFields = ['title', 'slug', 'excerpt', 'content', 'seoTitle', 'seoDescription'];
+    const translationFields = ['title', 'slug', 'excerpt', 'content', 'seoTitle', 'seoDescription', 'ogTitle', 'ogDescription', 'imageAlt'];
     
     if (translationFields.includes(field)) {
       setFormData(prev => {
@@ -462,105 +464,94 @@ const BlogPostModal = ({
               onChange={(e) => handleInputChange('content', e.target.value)}
               rows="12"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent font-mono text-sm"
-              placeholder="Write your blog post content here using HTML tags for formatting..."
+              placeholder="Write your blog post content here in Markdown format..."
             />
-            
-            {/* Enhanced Formatting Guide */}
-            <div className="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <h4 className="text-sm font-semibold text-gray-900 mb-3">✨ Content Formatting Guide</h4>
-              
-              <div className="space-y-4">
-                {/* Markdown-Style Formatting */}
-                <div>
-                  <h5 className="text-xs font-semibold text-gray-700 mb-2">📝 Markdown-Style Formatting</h5>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                    <div className="bg-white p-3 rounded border border-gray-200">
-                      <div className="font-semibold text-gray-900 mb-1">Headings:</div>
-                      <div className="font-mono text-gray-600 space-y-1">
-                        <div>## Main Section</div>
-                        <div>### Subsection</div>
-                      </div>
-                    </div>
-                    <div className="bg-white p-3 rounded border border-gray-200">
-                      <div className="font-semibold text-gray-900 mb-1">Text Styling:</div>
-                      <div className="font-mono text-gray-600 space-y-1">
-                        <div>**Bold text**</div>
-                        <div>*Italic text*</div>
-                      </div>
-                    </div>
-                    <div className="bg-white p-3 rounded border border-gray-200">
-                      <div className="font-semibold text-gray-900 mb-1">Lists:</div>
-                      <div className="font-mono text-gray-600 space-y-1">
-                        <div>- Bullet item</div>
-                        <div>- Another item</div>
-                      </div>
-                    </div>
-                    <div className="bg-white p-3 rounded border border-gray-200">
-                      <div className="font-semibold text-gray-900 mb-1">Links:</div>
-                      <div className="font-mono text-gray-600">
-                        [Link Text](https://url.com)
-                      </div>
-                    </div>
-                  </div>
-                </div>
+          </div>
 
-                {/* Tables */}
-                <div>
-                  <h5 className="text-xs font-semibold text-gray-700 mb-2">📊 Tables</h5>
-                  <div className="bg-white p-3 rounded border border-gray-200">
-                    <div className="font-mono text-xs text-gray-600 space-y-1">
-                      <div>| Item | Price | Duration |</div>
-                      <div>|------|-------|----------|</div>
-                      <div>| Flights | €100-300 | 2h |</div>
-                      <div>| Hotel | €75 | 3 days |</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Images */}
-                <div>
-                  <h5 className="text-xs font-semibold text-gray-700 mb-2">🖼️ Images Between Paragraphs</h5>
-                  <div className="bg-white p-3 rounded border border-gray-200">
-                    <div className="font-mono text-xs text-gray-600 space-y-1">
-                      <div>&lt;img src=&quot;image-url.jpg&quot; alt=&quot;Description&quot; /&gt;</div>
-                      <div className="text-gray-500 mt-1">or</div>
-                      <div>![Alt text](image-url.jpg)</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Budget Examples */}
-                <div>
-                  <h5 className="text-xs font-semibold text-gray-700 mb-2">💰 Budget Breakdown Example</h5>
-                  <div className="bg-white p-3 rounded border border-gray-200">
-                    <div className="font-mono text-xs text-gray-600 space-y-1">
-                      <div>**Solo Traveler (3 days)**:</div>
-                      <div>- Flights: €100-300</div>
-                      <div>- Accommodation: €75 (€25×3)</div>
-                      <div>- Food: €60 (€20×3)</div>
-                      <div>- **TOTAL: €305-505**</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Horizontal Rules */}
-                <div>
-                  <h5 className="text-xs font-semibold text-gray-700 mb-2">➖ Dividers</h5>
-                  <div className="bg-white p-3 rounded border border-gray-200">
-                    <div className="font-mono text-xs text-gray-600">
-                      --- (three dashes)
-                    </div>
-                  </div>
-                </div>
-
-                {/* Quick Tips */}
-                <div className="bg-blue-50 border border-blue-200 rounded p-3">
-                  <div className="text-xs text-blue-900">
-                    <strong>💡 Tips:</strong> Mix HTML and Markdown freely. Use markdown for quick formatting, HTML for complex structures like tables with styling.
-                  </div>
-                </div>
+          {/* SEO & Open Graph */}
+          <div className="mt-6 border border-gray-200 rounded-lg p-5">
+            <h3 className="text-sm font-semibold text-gray-900 mb-4">SEO & Open Graph</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  SEO Title
+                  <span className={`ml-2 ${(formData.translations[editingTranslation]?.seoTitle || '').length > 70 ? 'text-red-600 font-bold' : 'text-gray-400'}`}>
+                    {(formData.translations[editingTranslation]?.seoTitle || '').length}/70
+                  </span>
+                </label>
+                <input
+                  type="text"
+                  maxLength={70}
+                  value={formData.translations[editingTranslation]?.seoTitle || ''}
+                  onChange={(e) => handleInputChange('seoTitle', e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-sm ${(formData.translations[editingTranslation]?.seoTitle || '').length > 70 ? 'border-red-400' : 'border-gray-300'}`}
+                  placeholder="Defaults to post title"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  OG Title
+                  <span className={`ml-2 ${(formData.translations[editingTranslation]?.ogTitle || '').length > 70 ? 'text-red-600 font-bold' : 'text-gray-400'}`}>
+                    {(formData.translations[editingTranslation]?.ogTitle || '').length}/70
+                  </span>
+                </label>
+                <input
+                  type="text"
+                  maxLength={70}
+                  value={formData.translations[editingTranslation]?.ogTitle || ''}
+                  onChange={(e) => handleInputChange('ogTitle', e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-sm ${(formData.translations[editingTranslation]?.ogTitle || '').length > 70 ? 'border-red-400' : 'border-gray-300'}`}
+                  placeholder="Defaults to SEO title"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  SEO Description
+                  <span className={`ml-2 ${(formData.translations[editingTranslation]?.seoDescription || '').length > 220 ? 'text-red-600 font-bold' : 'text-gray-400'}`}>
+                    {(formData.translations[editingTranslation]?.seoDescription || '').length}/220
+                  </span>
+                </label>
+                <textarea
+                  maxLength={220}
+                  rows={2}
+                  value={formData.translations[editingTranslation]?.seoDescription || ''}
+                  onChange={(e) => handleInputChange('seoDescription', e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-sm ${(formData.translations[editingTranslation]?.seoDescription || '').length > 220 ? 'border-red-400' : 'border-gray-300'}`}
+                  placeholder="Defaults to excerpt"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  OG Description
+                  <span className={`ml-2 ${(formData.translations[editingTranslation]?.ogDescription || '').length > 200 ? 'text-red-600 font-bold' : 'text-gray-400'}`}>
+                    {(formData.translations[editingTranslation]?.ogDescription || '').length}/200
+                  </span>
+                </label>
+                <textarea
+                  maxLength={200}
+                  rows={2}
+                  value={formData.translations[editingTranslation]?.ogDescription || ''}
+                  onChange={(e) => handleInputChange('ogDescription', e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-sm ${(formData.translations[editingTranslation]?.ogDescription || '').length > 200 ? 'border-red-400' : 'border-gray-300'}`}
+                  placeholder="Defaults to SEO description"
+                />
               </div>
             </div>
+            <div className="mt-4">
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Image Alt Text
+              </label>
+              <input
+                type="text"
+                value={formData.translations[editingTranslation]?.imageAlt || ''}
+                onChange={(e) => handleInputChange('imageAlt', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-sm"
+                placeholder="Descriptive text for the featured image (defaults to title)"
+              />
+            </div>
+            <p className="text-xs text-gray-400 mt-3">
+              Empty fields use fallbacks: OG title falls back to SEO title, then post title. OG description falls back to SEO description, then excerpt.
+            </p>
           </div>
         </div>
         

@@ -61,6 +61,9 @@ const transformPost = (row) => {
     excerpt: row.excerpt,
     seoTitle: row.seo_title,
     seoDescription: row.seo_description,
+    ogTitle: row.og_title,
+    ogDescription: row.og_description,
+    imageAlt: row.image_alt,
     isFallback: row.is_fallback || false,
     availableLanguages: row.available_languages || []
   };
@@ -84,6 +87,9 @@ const transformTranslations = (translations) => {
       excerpt: t.excerpt,
       seoTitle: t.seo_title,
       seoDescription: t.seo_description,
+      ogTitle: t.og_title,
+      ogDescription: t.og_description,
+      imageAlt: t.image_alt,
       language: t.language,
       createdAt: t.created_at ? new Date(t.created_at) : null,
       updatedAt: t.updated_at ? new Date(t.updated_at) : null
@@ -256,6 +262,9 @@ export const blogServiceSupabase = {
         excerpt: data.excerpt,
         seoTitle: data.seo_title,
         seoDescription: data.seo_description,
+        ogTitle: data.og_title,
+        ogDescription: data.og_description,
+        imageAlt: data.image_alt,
         createdAt: data.created_at ? new Date(data.created_at) : null,
         updatedAt: data.updated_at ? new Date(data.updated_at) : null
       };
@@ -477,8 +486,11 @@ export const blogServiceSupabase = {
           slug: slug,
           content: translation.content,
           excerpt: translation.excerpt || '',
-          seo_title: translation.seoTitle || translation.title,
-          seo_description: translation.seoDescription || ''
+          seo_title: (translation.seoTitle || translation.title).slice(0, 70),
+          seo_description: (translation.seoDescription || '').slice(0, 220),
+          og_title: translation.ogTitle ? translation.ogTitle.slice(0, 70) : null,
+          og_description: translation.ogDescription ? translation.ogDescription.slice(0, 200) : null,
+          image_alt: translation.imageAlt || null
         });
       }
 
@@ -579,8 +591,11 @@ export const blogServiceSupabase = {
             slug: slug,
             content: translation.content,
             excerpt: translation.excerpt || '',
-            seo_title: translation.seoTitle || translation.title,
-            seo_description: translation.seoDescription || ''
+            seo_title: (translation.seoTitle || translation.title).slice(0, 70),
+            seo_description: (translation.seoDescription || '').slice(0, 220),
+            og_title: translation.ogTitle ? translation.ogTitle.slice(0, 70) : null,
+            og_description: translation.ogDescription ? translation.ogDescription.slice(0, 200) : null,
+            image_alt: translation.imageAlt || null
           };
 
           // Upsert translation (insert or update on conflict)

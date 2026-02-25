@@ -103,7 +103,7 @@
   },
   "plans": {
     "title": "eSIM-Pläne",
-    "subtitle": "Wählen Sie Ihren perfekten eSIM-Plan",
+    "subtitle": "Wählen Sie Ihren eSIM-Plan",
     "searchPlaceholder": "Länder suchen...",
     "noPlansAvailable": "Keine Pläne verfügbar",
     "noCountriesFound": "Keine Länder gefunden, die Ihrer Suche entsprechen",
@@ -206,9 +206,9 @@
   "QRCodeModal": {},
   "accountSettings": {},
   "contact": {
-    "title": "Kontakt aufnehmen",
-    "subtitle": "Wir helfen Ihnen bei allen eSIM-Bedürfnissen",
-    "description": "Kontaktieren Sie unser Team für Support, Fragen oder Partnerschaften. Wir helfen Ihnen bei allen Konnektivitätsbedürfnissen.",
+    "title": "Wir helfen Ihnen bei allen eSIM-Bedürfnissen",
+    "subtitle": "eSIM Hilfezentrum",
+    "description": "Kontaktieren Sie unser Team für Support, Fragen oder Partnerschaften.",
     "guideCard": {
       "title": "eSIM-Installationsanleitung",
       "description": "Schritt-für-Schritt-Anleitung für iPhone, Android und manuelle Installation"

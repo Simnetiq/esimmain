@@ -67,7 +67,7 @@ async function translateContent(title, content, targetLanguage, openaiKey) {
       messages: [
         {
           role: 'system',
-          content: `You are a professional translator. Translate the blog post title and content from English to ${languageName}.
+          content: `You are a professional translator for an eSIM technology blog. Translate the blog post from English to ${languageName}.
 
 Rules:
 - Output MUST be pure Markdown format - NO HTML tags
@@ -75,7 +75,12 @@ Rules:
 - Preserve ALL Markdown formatting exactly
 - Keep technical terms in English: eSIM, SIM, QR code, APN, LTE, 5G, iOS, Android, GB, MB
 - Keep brand names in English: Simnetiq, Apple, Google, Samsung
-${isRTL ? '- For RTL languages: translate naturally, the app handles RTL rendering\n' : ''}- Return valid JSON with "title" and "content" keys only`,
+${isRTL ? '- For RTL languages: translate naturally, the app handles RTL rendering\n' : ''}- Return valid JSON with these exact keys: title, content, seo_title, seo_description, og_title, og_description
+- seo_title: max 70 chars, optimized for search engines
+- seo_description: max 220 chars, compelling summary for search results
+- og_title: max 70 chars, engaging title for social media sharing
+- og_description: max 200 chars, social media preview description
+- Do NOT add commentary - return ONLY the JSON object`,
         },
         {
           role: 'user',
@@ -104,6 +109,10 @@ ${isRTL ? '- For RTL languages: translate naturally, the app handles RTL renderi
   return {
     title: result.title,
     content: cleanContent,
+    seo_title: (result.seo_title || result.title).slice(0, 70),
+    seo_description: (result.seo_description || '').slice(0, 220),
+    og_title: (result.og_title || result.seo_title || result.title).slice(0, 70),
+    og_description: (result.og_description || result.seo_description || '').slice(0, 200),
     tokens_used: data.usage?.total_tokens || null,
   };
 }
@@ -198,10 +207,10 @@ export async function POST(request) {
       slug,
       content,
       excerpt,
-      seo_title: body.seo_title || title,
-      seo_description: body.seo_description || excerpt,
-      og_title: body.og_title || null,
-      og_description: body.og_description || null,
+      seo_title: (body.seo_title || title).slice(0, 70),
+      seo_description: (body.seo_description || excerpt).slice(0, 220),
+      og_title: body.og_title ? body.og_title.slice(0, 70) : null,
+      og_description: body.og_description ? body.og_description.slice(0, 200) : null,
     });
 
   if (enError) {
@@ -276,8 +285,10 @@ export async function POST(request) {
           slug, // Same slug for all languages
           content: translated.content,
           excerpt: translatedExcerpt,
-          seo_title: translated.title,
-          seo_description: translatedExcerpt,
+          seo_title: translated.seo_title || translated.title.slice(0, 70),
+          seo_description: translated.seo_description || translatedExcerpt.slice(0, 220),
+          og_title: translated.og_title || null,
+          og_description: translated.og_description || null,
         });
 
         // Update job status

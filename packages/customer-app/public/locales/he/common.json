@@ -30,8 +30,8 @@
     "countries": "200+ מדינות",
     "instantActivation": "הפעלה מיידית",
     "securePayment": "תשלום מאובטח",
-    "downloadAppIOS": "הורידו את האפליקציה ל-iOS",
-    "downloadAppAndroid": "הורידו את האפליקציה ל-Android",
+    "downloadAppIOS": "הורידו ל-iOS",
+    "downloadAppAndroid": "הורידו ל-Android",
     "exploreStore": "חנות eSIM",
     "downloadApp": "הורד אפליקציה"
   },
@@ -72,7 +72,7 @@
       "title": "Doppler VPN",
       "description": "VPN מהיר ללא תיעוד מבוסס WireGuard לנייד ו-VLESS מתקדם דרך בוט Telegram. כל הפלטפורמות המרכזיות, עד 10 מכשירים.",
       "promo": "מבצע השקה: קוד 20 להנחה של 20%",
-      "appStore": "הורדה מ-App Store",
+      "appStore": "App Store",
       "learnMore": "למידע נוסף"
     }
   },
@@ -103,7 +103,7 @@
   },
   "plans": {
     "title": "תוכניות eSIM",
-    "subtitle": "בחר את תוכנית eSIM המושלמת שלך",
+    "subtitle": "בחר את חבילת ה-eSIM שמתאימה לך",
     "searchPlaceholder": "חפש מדינות...",
     "noPlansAvailable": "אין תוכניות זמינות",
     "noCountriesFound": "לא נמצאו מדינות התואמות לחיפוש שלך",
@@ -196,7 +196,7 @@
       "continueWithApple": "המשך עם Apple",
       "downloadApp": "הורד את האפליקציה שלנו",
       "appDescription": "הפעלת eSIM מיידית וניהול התוכניות שלך בדרכים.",
-      "getOnAppStore": "הורד מ-App Store",
+      "getOnAppStore": "App Store",
       "termsNotice": "בהמשך, אתה מסכים ל",
       "termsOfService": "תנאי השירות",
       "and": "ו",
@@ -205,9 +205,9 @@
     "loggedIn": "Logged in successfully"
   },
   "contact": {
-    "title": "צור קשר",
-    "subtitle": "אנחנו כאן כדי לעזור עם כל הצרכים שלך ב-eSIM",
-    "description": "צור קשר עם הצוות שלנו לתמיכה, שאלות או שותפויות. אנחנו כאן כדי לעזור עם כל צרכי הקישוריות שלך.",
+    "title": "כאן בשבילך בכל מה שקשור ל-eSIM",
+    "subtitle": "מרכז תמיכה",
+    "description": "צור קשר עם הצוות שלנו לתמיכה, שאלות או שותפויות.",
     "guideCard": {
       "title": "מדריך התקנת eSIM",
       "description": "הוראות שלב אחר שלב לאייפון, אנדרואיד והתקנה ידנית"
@@ -620,7 +620,7 @@
   },
   "faq": {
     "title": "שאלות נפוצות",
-    "subtitle": "כל מה שאתה צריך לדעת על eSIM",
+    "subtitle": "כל מה שצריך לדעת על eSIM",
     "whatIsEsim": "מה זה eSIM ואיך זה עובד?",
     "whatIsEsimAnswer": "eSIM (SIM מוטבע) הוא כרטיס SIM דיגיטלי שמובנה במכשיר שלך. במקום להכניס כרטיס SIM פיזי, אתה יכול להוריד ולהפעיל תוכנית סלולרית ישירות על המכשיר שלך. זה מאפשר לך לעבור בין ספקים ותוכניות מבלי לצורך להחליף כרטיסים פיזיים.",
     "deviceSupport": "אילו מכשירים תומכים ב-eSIM?",

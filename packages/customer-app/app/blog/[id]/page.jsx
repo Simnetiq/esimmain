@@ -28,7 +28,12 @@ export async function generateMetadata({ params }) {
       (post.featuredImage.startsWith('http') ? post.featuredImage : `${baseUrl}${post.featuredImage}`) :
       `${baseUrl}/images/og-image.svg`;
 
-    const description = post.excerpt || post.seoDescription || 'Read our latest insights about eSIM technology and global connectivity.';
+    // Fallback cascade: og_* -> seo_* -> content fields
+    const seoTitle = post.seoTitle || post.title;
+    const seoDescription = post.seoDescription || post.excerpt || 'Read our latest insights about eSIM technology and global connectivity.';
+    const ogTitle = post.ogTitle || seoTitle;
+    const ogDescription = post.ogDescription || seoDescription;
+    const imageAlt = post.imageAlt || post.title;
     const availableLanguages = post.availableLanguages || [];
 
     // Build hreflang only for languages with actual translations
@@ -42,8 +47,8 @@ export async function generateMetadata({ params }) {
     });
 
     return {
-      title: `${post.seoTitle || post.title} | Simnetiq Blog`,
-      description,
+      title: `${seoTitle} | Simnetiq Blog`,
+      description: seoDescription,
       keywords: post.seoKeywords?.length > 0 ? post.seoKeywords : ['eSIM', 'travel', 'connectivity', 'blog'],
       authors: [{ name: post.author || 'Simnetiq Team' }],
       creator: post.author || 'Simnetiq',
@@ -52,10 +57,10 @@ export async function generateMetadata({ params }) {
         type: 'article',
         locale: 'en_US',
         url: postUrl,
-        title: post.seoTitle || post.title,
-        description,
+        title: ogTitle,
+        description: ogDescription,
         siteName: 'Simnetiq',
-        images: [{ url: imageUrl, width: 1200, height: 630, alt: post.title }],
+        images: [{ url: imageUrl, width: 1200, height: 630, alt: imageAlt }],
         article: {
           publishedTime: post.publishedAt?.toISOString(),
           modifiedTime: post.updatedAt?.toISOString(),
@@ -66,8 +71,8 @@ export async function generateMetadata({ params }) {
       },
       twitter: {
         card: 'summary_large_image',
-        title: post.seoTitle || post.title,
-        description,
+        title: ogTitle,
+        description: ogDescription,
         images: [imageUrl],
         creator: '@Simnetiq',
         site: '@Simnetiq',

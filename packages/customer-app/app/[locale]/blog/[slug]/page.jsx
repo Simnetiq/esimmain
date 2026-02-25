@@ -50,7 +50,12 @@ export async function generateMetadata({ params }) {
       ? post.featuredImage
       : `${baseUrl}${post.featuredImage || '/images/og-image.svg'}`;
 
-    const description = post.excerpt || post.seoDescription || FALLBACK_DESC[locale] || FALLBACK_DESC.en;
+    // Fallback cascade: og_* -> seo_* -> content fields
+    const seoTitle = post.seoTitle || post.title;
+    const seoDescription = post.seoDescription || post.excerpt || FALLBACK_DESC[locale] || FALLBACK_DESC.en;
+    const ogTitle = post.ogTitle || seoTitle;
+    const ogDescription = post.ogDescription || seoDescription;
+    const imageAlt = post.imageAlt || post.title;
     const availableLanguages = post.availableLanguages || [];
 
     // Build hreflang only for languages that actually have translations
@@ -66,18 +71,18 @@ export async function generateMetadata({ params }) {
     });
 
     return {
-      title: `${post.seoTitle || post.title} | Simnetiq Blog`,
-      description,
+      title: `${seoTitle} | Simnetiq Blog`,
+      description: seoDescription,
       keywords: post.seoKeywords?.length > 0 ? post.seoKeywords : ['eSIM', 'travel', 'connectivity'],
       authors: [{ name: post.author || 'Simnetiq Team' }],
       openGraph: {
         type: 'article',
         locale: OG_LOCALES[locale] || 'en_US',
         url: postUrl,
-        title: post.seoTitle || post.title,
-        description,
+        title: ogTitle,
+        description: ogDescription,
         siteName: 'Simnetiq',
-        images: [{ url: imageUrl, width: 1200, height: 630, alt: post.title }],
+        images: [{ url: imageUrl, width: 1200, height: 630, alt: imageAlt }],
         article: {
           publishedTime: post.publishedAt?.toISOString(),
           modifiedTime: post.updatedAt?.toISOString(),
@@ -88,8 +93,8 @@ export async function generateMetadata({ params }) {
       },
       twitter: {
         card: 'summary_large_image',
-        title: post.seoTitle || post.title,
-        description,
+        title: ogTitle,
+        description: ogDescription,
         images: [imageUrl],
       },
       alternates: { canonical: postUrl, languages },

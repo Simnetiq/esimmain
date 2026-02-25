@@ -8,7 +8,7 @@ export function BlogJsonLd({ post, locale }) {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
-    headline: post.title,
+    headline: post.seoTitle || post.title,
     description: post.seoDescription || post.excerpt || '',
     image: post.featuredImage || `${baseUrl}/images/og-image.svg`,
     datePublished: post.publishedAt instanceof Date ? post.publishedAt.toISOString() : post.publishedAt,

@@ -68,7 +68,10 @@ const BlogManagement = () => {
         slug: '',
         content: '',
         seoTitle: '',
-        seoDescription: ''
+        seoDescription: '',
+        ogTitle: '',
+        ogDescription: '',
+        imageAlt: ''
       }
     }
   });
@@ -89,7 +92,10 @@ const BlogManagement = () => {
             slug: prev.baseSlug ? `${prev.baseSlug}-${languageCode}` : '',
             content: '',
             seoTitle: '',
-            seoDescription: ''
+            seoDescription: '',
+            ogTitle: '',
+            ogDescription: '',
+            imageAlt: ''
           }
         }
       }));
@@ -280,7 +286,10 @@ const BlogManagement = () => {
           slug: '',
           content: '',
           seoTitle: '',
-          seoDescription: ''
+          seoDescription: '',
+          ogTitle: '',
+          ogDescription: '',
+          imageAlt: ''
         }
       }
     });
@@ -309,7 +318,10 @@ const BlogManagement = () => {
           content: translation.content || '',
           excerpt: translation.excerpt || '',
           seoTitle: translation.seoTitle || '',
-          seoDescription: translation.seoDescription || ''
+          seoDescription: translation.seoDescription || '',
+          ogTitle: translation.ogTitle || '',
+          ogDescription: translation.ogDescription || '',
+          imageAlt: translation.imageAlt || ''
         };
       }
 
@@ -464,22 +476,21 @@ const BlogManagement = () => {
             throw new Error(result.error || 'Translation failed');
           }
 
-          // Update the post with new translation
-          const updatedTranslations = {
-            ...fullPost.translations,
-            [targetLang]: {
-              title: result.translation.title,
-              slug: baseSlug, // All languages use the same base slug
-              content: result.translation.content,
-              excerpt: result.translation.content.substring(0, 160).replace(/<[^>]*>/g, ''),
-              seoTitle: result.translation.title,
-              seoDescription: result.translation.title.substring(0, 160)
-            }
-          };
-
-          // Save updated post
+          // Update the post with only the new translation
+          const excerpt = result.translation.content.substring(0, 160).replace(/<[^>]*>/g, '').replace(/[#*_~`>\-|]/g, '');
           await blogServiceSupabase.updatePost(post.id, {
-            translations: updatedTranslations
+            translations: {
+              [targetLang]: {
+                title: result.translation.title,
+                slug: baseSlug,
+                content: result.translation.content,
+                excerpt,
+                seoTitle: result.translation.seo_title || result.translation.title.slice(0, 70),
+                seoDescription: result.translation.seo_description || excerpt.slice(0, 220),
+                ogTitle: result.translation.og_title || '',
+                ogDescription: result.translation.og_description || ''
+              }
+            }
           });
 
           successCount++;
