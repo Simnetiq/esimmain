@@ -185,7 +185,7 @@ export default function RootLayout({ children }) {
               "contactPoint": {
                 "@type": "ContactPoint",
                 "contactType": "customer service",
-                "availableLanguage": ["English", "Spanish", "French", "German", "Arabic", "Hebrew", "Russian"]
+                "availableLanguage": ["English", "Spanish", "French", "German", "Arabic", "Hebrew", "Hindi", "Japanese", "Polish", "Portuguese", "Russian", "Ukrainian", "Chinese"]
               }
             })
           }}

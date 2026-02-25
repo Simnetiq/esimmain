@@ -55,6 +55,12 @@ export async function generateMetadata({ params }) {
         'ru': `https://www.simnetiq.store/ru/esim/${country.slug}`,
         'ar': `https://www.simnetiq.store/ar/esim/${country.slug}`,
         'he': `https://www.simnetiq.store/he/esim/${country.slug}`,
+        'hi': `https://www.simnetiq.store/hi/esim/${country.slug}`,
+        'ja': `https://www.simnetiq.store/ja/esim/${country.slug}`,
+        'pl': `https://www.simnetiq.store/pl/esim/${country.slug}`,
+        'pt': `https://www.simnetiq.store/pt/esim/${country.slug}`,
+        'uk': `https://www.simnetiq.store/uk/esim/${country.slug}`,
+        'zh': `https://www.simnetiq.store/zh/esim/${country.slug}`,
       },
     },
   };
