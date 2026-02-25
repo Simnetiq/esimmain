@@ -8,13 +8,20 @@ const SUPPORTED_LANGUAGES = [
   { code: 'de', name: 'German' },
   { code: 'ar', name: 'Arabic' },
   { code: 'he', name: 'Hebrew' },
-  { code: 'ru', name: 'Russian' }
+  { code: 'hi', name: 'Hindi' },
+  { code: 'ja', name: 'Japanese' },
+  { code: 'pl', name: 'Polish' },
+  { code: 'pt', name: 'Portuguese' },
+  { code: 'ru', name: 'Russian' },
+  { code: 'uk', name: 'Ukrainian' },
+  { code: 'zh', name: 'Chinese' }
 ];
 
 async function translateCountryName(openaiApiKey, countryName, targetLanguage) {
   const languageNames = {
     'en': 'English', 'es': 'Spanish', 'fr': 'French', 'de': 'German',
-    'ar': 'Arabic', 'he': 'Hebrew', 'ru': 'Russian'
+    'ar': 'Arabic', 'he': 'Hebrew', 'hi': 'Hindi', 'ja': 'Japanese',
+    'pl': 'Polish', 'pt': 'Portuguese', 'ru': 'Russian', 'uk': 'Ukrainian', 'zh': 'Chinese'
   };
 
   const targetLanguageName = languageNames[targetLanguage] || targetLanguage;

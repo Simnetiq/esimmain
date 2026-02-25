@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 import { revalidatePath } from 'next/cache';
 
-const SUPPORTED_LANGUAGES = ['es', 'fr', 'de', 'ar', 'he', 'ru'];
+const SUPPORTED_LANGUAGES = ['es', 'fr', 'de', 'ar', 'he', 'hi', 'ja', 'pl', 'pt', 'ru', 'uk', 'zh'];
 
 const LANGUAGE_NAMES = {
   es: 'Spanish',
@@ -10,7 +10,13 @@ const LANGUAGE_NAMES = {
   de: 'German',
   ar: 'Arabic',
   he: 'Hebrew',
+  hi: 'Hindi',
+  ja: 'Japanese',
+  pl: 'Polish',
+  pt: 'Portuguese',
   ru: 'Russian',
+  uk: 'Ukrainian',
+  zh: 'Chinese',
 };
 
 function requireApiKey(request) {

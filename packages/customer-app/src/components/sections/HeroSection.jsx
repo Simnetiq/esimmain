@@ -66,20 +66,9 @@ export default function HeroSection() {
   // hydration mismatch from localStorage reads
   const ssrSafeLanguage = useMemo(() => detectLanguageFromPath(pathname) || 'en', [pathname]);
 
-  const detectedLanguage = useMemo(() => {
-    try {
-      if (i18nLoading) {
-        if (typeof window !== 'undefined') {
-          const savedLanguage = localStorage.getItem('Simnetiq-language');
-          if (savedLanguage) return savedLanguage;
-        }
-        return ssrSafeLanguage;
-      }
-      return locale || 'en';
-    } catch {
-      return 'en';
-    }
-  }, [locale, ssrSafeLanguage, i18nLoading]);
+  // Always use pathname-based language for initial render to avoid hydration mismatch.
+  // Once i18n finishes loading, switch to the context locale.
+  const detectedLanguage = i18nLoading ? ssrSafeLanguage : (locale || ssrSafeLanguage);
 
   // Apply IBM Plex Sans Italic for "easiest way" only in EN and DE
   const useIbmPlexSansItalic = detectedLanguage === 'en' || detectedLanguage === 'de';

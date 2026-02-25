@@ -70,7 +70,13 @@ export async function POST(request) {
       'de': 'German',
       'ar': 'Arabic',
       'he': 'Hebrew',
-      'ru': 'Russian'
+      'hi': 'Hindi',
+      'ja': 'Japanese',
+      'pl': 'Polish',
+      'pt': 'Portuguese',
+      'ru': 'Russian',
+      'uk': 'Ukrainian',
+      'zh': 'Chinese'
     };
 
     const targetLanguageName = languageNames[targetLanguage] || targetLanguage;

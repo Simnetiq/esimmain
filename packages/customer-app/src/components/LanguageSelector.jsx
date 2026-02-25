@@ -30,6 +30,12 @@ const LanguageSelector = () => {
     { code: 'fr', name: getNativeLanguageName('fr'), flag: getLanguageFlag('fr'), route: '/fr' },
     { code: 'he', name: getNativeLanguageName('he'), flag: getLanguageFlag('he'), route: '/he' },
     { code: 'ar', name: getNativeLanguageName('ar'), flag: getLanguageFlag('ar'), route: '/ar' },
+    { code: 'pt', name: getNativeLanguageName('pt'), flag: getLanguageFlag('pt'), route: '/pt' },
+    { code: 'ja', name: getNativeLanguageName('ja'), flag: getLanguageFlag('ja'), route: '/ja' },
+    { code: 'zh', name: getNativeLanguageName('zh'), flag: getLanguageFlag('zh'), route: '/zh' },
+    { code: 'pl', name: getNativeLanguageName('pl'), flag: getLanguageFlag('pl'), route: '/pl' },
+    { code: 'uk', name: getNativeLanguageName('uk'), flag: getLanguageFlag('uk'), route: '/uk' },
+    { code: 'hi', name: getNativeLanguageName('hi'), flag: getLanguageFlag('hi'), route: '/hi' },
   ];
 
   // Determine current language from context or pathname (no localStorage during render to avoid hydration mismatch)
@@ -45,6 +51,12 @@ const LanguageSelector = () => {
     if (pathname.startsWith('/de')) return languages.find(lang => lang.code === 'de');
     if (pathname.startsWith('/fr')) return languages.find(lang => lang.code === 'fr');
     if (pathname.startsWith('/es')) return languages.find(lang => lang.code === 'es');
+    if (pathname.startsWith('/pt')) return languages.find(lang => lang.code === 'pt');
+    if (pathname.startsWith('/ja')) return languages.find(lang => lang.code === 'ja');
+    if (pathname.startsWith('/zh')) return languages.find(lang => lang.code === 'zh');
+    if (pathname.startsWith('/pl')) return languages.find(lang => lang.code === 'pl');
+    if (pathname.startsWith('/uk')) return languages.find(lang => lang.code === 'uk');
+    if (pathname.startsWith('/hi')) return languages.find(lang => lang.code === 'hi');
     // Support old routes for backward compatibility
     if (pathname.startsWith('/hebrew')) return languages.find(lang => lang.code === 'he');
     if (pathname.startsWith('/arabic')) return languages.find(lang => lang.code === 'ar');
@@ -60,7 +72,7 @@ const LanguageSelector = () => {
     // Handle blog URLs specially
     if (currentPath.includes('/blog')) {
       // Check for blog post with language prefix first
-      const langBlogPostMatch = currentPath.match(/^\/(he|ar|ru|de|fr|es)\/blog\/(.+)$/);
+      const langBlogPostMatch = currentPath.match(/^\/(he|ar|ru|de|fr|es|pt|ja|zh|pl|uk|hi)\/blog\/(.+)$/);
       if (langBlogPostMatch) {
         const slug = langBlogPostMatch[2];
         return getLocalizedBlogUrl(slug, languageCode);
@@ -74,7 +86,7 @@ const LanguageSelector = () => {
       }
       
       // Check for localized blog list page
-      const langBlogListMatch = currentPath.match(/^\/(he|ar|ru|de|fr|es)\/blog\/?$/);
+      const langBlogListMatch = currentPath.match(/^\/(he|ar|ru|de|fr|es|pt|ja|zh|pl|uk|hi)\/blog\/?$/);
       if (langBlogListMatch) {
         return getLocalizedBlogListUrl(languageCode);
       }
@@ -88,7 +100,7 @@ const LanguageSelector = () => {
     // Remove any existing language prefix from the path
     let cleanPath = currentPath;
     const languagePrefixes = [
-      '/he', '/ar', '/ru', '/de', '/fr', '/es', // New language codes
+      '/he', '/ar', '/ru', '/de', '/fr', '/es', '/pt', '/ja', '/zh', '/pl', '/uk', '/hi', // Language codes
       '/hebrew', '/arabic', '/russian', '/german', '/french', '/spanish' // Old language names
     ];
     
@@ -113,7 +125,13 @@ const LanguageSelector = () => {
       'ru': '/ru',
       'de': '/de',
       'fr': '/fr',
-      'es': '/es'
+      'es': '/es',
+      'pt': '/pt',
+      'ja': '/ja',
+      'zh': '/zh',
+      'pl': '/pl',
+      'uk': '/uk',
+      'hi': '/hi'
     };
     
     const newPrefix = languageRoutes[languageCode] || '';

@@ -49,8 +49,17 @@
     font-family: var(--font-open-sans), var(--font-ibm-plex-arabic), ui-sans-serif, system-ui, sans-serif;
   }
 
-  /* Russian (Cyrillic) — Open Sans covers it */
-  html[lang="ru"] body {
+  /* Hebrew — Open Sans covers it (html[lang] for after hydration, [lang="he"] for SSR page wrappers) */
+  html[lang="he"] body,
+  [lang="he"] {
+    font-family: var(--font-open-sans), var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  /* Cyrillic languages (Russian, Ukrainian) — Open Sans covers them */
+  html[lang="ru"] body,
+  html[lang="uk"] body,
+  [lang="ru"],
+  [lang="uk"] {
     font-family: var(--font-open-sans), var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
   }
 

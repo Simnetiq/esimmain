@@ -31,7 +31,13 @@ function getLocaleCode(lang) {
     de: 'de_DE',
     ar: 'ar_AR',
     he: 'he_IL',
+    hi: 'hi_IN',
+    ja: 'ja_JP',
+    pl: 'pl_PL',
+    pt: 'pt_BR',
     ru: 'ru_RU',
+    uk: 'uk_UA',
+    zh: 'zh_CN',
   }
   return locales[lang] || 'en_US'
 }

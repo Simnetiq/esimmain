@@ -35,12 +35,10 @@ export const useI18n = () => {
 
 // Helper function to detect language from pathname
 const getLanguageFromPathname = (pathname) => {
-  if (pathname.startsWith('/he/') || pathname === '/he') return 'he';
-  if (pathname.startsWith('/ar/') || pathname === '/ar') return 'ar';
-  if (pathname.startsWith('/ru/') || pathname === '/ru') return 'ru';
-  if (pathname.startsWith('/de/') || pathname === '/de') return 'de';
-  if (pathname.startsWith('/fr/') || pathname === '/fr') return 'fr';
-  if (pathname.startsWith('/es/') || pathname === '/es') return 'es';
+  const langCodes = ['he', 'ar', 'ru', 'de', 'fr', 'es', 'pt', 'ja', 'hi', 'zh', 'pl', 'uk'];
+  for (const code of langCodes) {
+    if (pathname.startsWith(`/${code}/`) || pathname === `/${code}`) return code;
+  }
   return 'en';
 };
 

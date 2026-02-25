@@ -5,7 +5,7 @@ import { BlogJsonLd } from '../../../src/components/seo/BlogJsonLd'
 import Loading from '../../../src/components/Loading'
 import blogServiceSupabase from '@esim/shared/services/blogServiceSupabase'
 
-const SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'ar', 'he', 'ru'];
+const SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'ar', 'he', 'hi', 'ja', 'pl', 'pt', 'ru', 'uk', 'zh'];
 
 export const revalidate = 3600; // ISR: revalidate every hour
 

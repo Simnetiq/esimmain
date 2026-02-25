@@ -3,12 +3,13 @@ import BlogPost from '../../../../src/components/BlogPost';
 import { BlogJsonLd } from '../../../../src/components/seo/BlogJsonLd';
 import blogServiceSupabase from '@esim/shared/services/blogServiceSupabase';
 
-const VALID_LOCALES = ['ar', 'de', 'es', 'fr', 'he', 'ru'];
+const VALID_LOCALES = ['ar', 'de', 'es', 'fr', 'he', 'hi', 'ja', 'pl', 'pt', 'ru', 'uk', 'zh'];
 const ALL_LANGUAGES = ['en', ...VALID_LOCALES];
 
 const OG_LOCALES = {
   en: 'en_US', ar: 'ar_SA', de: 'de_DE', es: 'es_ES',
-  fr: 'fr_FR', he: 'he_IL', ru: 'ru_RU',
+  fr: 'fr_FR', he: 'he_IL', hi: 'hi_IN', ja: 'ja_JP',
+  pl: 'pl_PL', pt: 'pt_BR', ru: 'ru_RU', uk: 'uk_UA', zh: 'zh_CN',
 };
 
 const FALLBACK_DESC = {
@@ -19,6 +20,12 @@ const FALLBACK_DESC = {
   fr: 'Lisez nos dernières informations sur la technologie eSIM et la connectivité mondiale.',
   he: 'קראו את התובנות האחרונות שלנו על טכנולוגיית eSIM וקישוריות גלובלית.',
   ru: 'Читайте наши последние идеи о технологии eSIM и глобальной связи.',
+  pt: 'Leia nossas ultimas novidades sobre tecnologia eSIM e conectividade global.',
+  ja: 'eSIM技術とグローバル接続に関する最新情報をお読みください。',
+  hi: 'eSIM तकनीक और वैश्विक कनेक्टिविटी के बारे में हमारी नवीनतम जानकारी पढ़ें।',
+  zh: '阅读我们关于eSIM技术和全球连接的最新见解。',
+  pl: 'Przeczytaj nasze najnowsze informacje o technologii eSIM i globalnej łączności.',
+  uk: 'Читайте наші найновіші матеріали про технологію eSIM та глобальний зв\'язок.',
 };
 
 export const revalidate = 3600; // ISR: revalidate every hour

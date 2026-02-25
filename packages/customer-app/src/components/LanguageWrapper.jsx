@@ -9,8 +9,8 @@ const LanguageWrapper = ({ children }) => {
   // Pages that should have I18n context
   const translatedPages = [
     '/', 
-    // New language-code routes
-    '/he', '/ar', '/ru', '/de', '/fr', '/es',
+    // Language-code routes
+    '/he', '/ar', '/ru', '/de', '/fr', '/es', '/pt', '/ja', '/hi', '/zh', '/pl', '/uk',
     // Old language routes (for backward compatibility)
     '/hebrew', '/arabic', '/russian', '/german', '/french', '/spanish', 
     // Other translated pages
@@ -28,34 +28,46 @@ const LanguageWrapper = ({ children }) => {
 
   // Check for blog pages (both old and new language routes)
   const isBlogPage = pathname.startsWith('/blog') ||
-                    // New language-code blog routes
-                    pathname.startsWith('/he/blog') || 
-                    pathname.startsWith('/ar/blog') || 
-                    pathname.startsWith('/ru/blog') || 
-                    pathname.startsWith('/de/blog') || 
-                    pathname.startsWith('/fr/blog') || 
+                    // Language-code blog routes
+                    pathname.startsWith('/he/blog') ||
+                    pathname.startsWith('/ar/blog') ||
+                    pathname.startsWith('/ru/blog') ||
+                    pathname.startsWith('/de/blog') ||
+                    pathname.startsWith('/fr/blog') ||
                     pathname.startsWith('/es/blog') ||
+                    pathname.startsWith('/pt/blog') ||
+                    pathname.startsWith('/ja/blog') ||
+                    pathname.startsWith('/hi/blog') ||
+                    pathname.startsWith('/zh/blog') ||
+                    pathname.startsWith('/pl/blog') ||
+                    pathname.startsWith('/uk/blog') ||
                     // Old language blog routes (for backward compatibility)
-                    pathname.startsWith('/hebrew/blog') || 
-                    pathname.startsWith('/arabic/blog') || 
-                    pathname.startsWith('/russian/blog') || 
-                    pathname.startsWith('/german/blog') || 
-                    pathname.startsWith('/french/blog') || 
+                    pathname.startsWith('/hebrew/blog') ||
+                    pathname.startsWith('/arabic/blog') ||
+                    pathname.startsWith('/russian/blog') ||
+                    pathname.startsWith('/german/blog') ||
+                    pathname.startsWith('/french/blog') ||
                     pathname.startsWith('/spanish/blog');
 
   // Check for language-specific routes (e.g., /he/contact, /ru/login, etc.)
-  const isLanguageSpecificPage = pathname.startsWith('/he/') || 
-                                pathname.startsWith('/ar/') || 
-                                pathname.startsWith('/ru/') || 
-                                pathname.startsWith('/de/') || 
-                                pathname.startsWith('/fr/') || 
+  const isLanguageSpecificPage = pathname.startsWith('/he/') ||
+                                pathname.startsWith('/ar/') ||
+                                pathname.startsWith('/ru/') ||
+                                pathname.startsWith('/de/') ||
+                                pathname.startsWith('/fr/') ||
                                 pathname.startsWith('/es/') ||
+                                pathname.startsWith('/pt/') ||
+                                pathname.startsWith('/ja/') ||
+                                pathname.startsWith('/hi/') ||
+                                pathname.startsWith('/zh/') ||
+                                pathname.startsWith('/pl/') ||
+                                pathname.startsWith('/uk/') ||
                                 // Old language routes (for backward compatibility)
-                                pathname.startsWith('/hebrew/') || 
-                                pathname.startsWith('/arabic/') || 
-                                pathname.startsWith('/russian/') || 
-                                pathname.startsWith('/german/') || 
-                                pathname.startsWith('/french/') || 
+                                pathname.startsWith('/hebrew/') ||
+                                pathname.startsWith('/arabic/') ||
+                                pathname.startsWith('/russian/') ||
+                                pathname.startsWith('/german/') ||
+                                pathname.startsWith('/french/') ||
                                 pathname.startsWith('/spanish/');
   
   if (!translatedPages.includes(pathname) && !isBlogPage && !isHelpPage && !isLanguageSpecificPage && !isSpecialPage && !isSharePackagePage) {

@@ -27,12 +27,12 @@ const dmSans = DM_Sans({
   fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
 })
 
-// Open Sans — Hebrew + Russian (Cyrillic) support
+// Open Sans — Hebrew + Russian/Ukrainian (Cyrillic) support
 const openSans = Open_Sans({
   subsets: ['hebrew', 'cyrillic', 'latin'],
   weight: ['400', '600', '700'],
   variable: '--font-open-sans',
-  display: 'optional',
+  display: 'swap',
   preload: false,
   fallback: ['system-ui', 'sans-serif'],
 })
