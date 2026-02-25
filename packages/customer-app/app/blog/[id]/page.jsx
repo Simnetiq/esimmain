@@ -11,7 +11,8 @@ export const revalidate = 3600; // ISR: revalidate every hour
 
 export async function generateMetadata({ params }) {
   try {
-    const post = await blogServiceSupabase.getPostBySlug(params.id);
+    const { id } = await params;
+    const post = await blogServiceSupabase.getPostBySlug(id);
 
     if (!post) {
       return {
@@ -22,7 +23,7 @@ export async function generateMetadata({ params }) {
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.simnetiq.store';
-    const slug = post.baseSlug || params.id;
+    const slug = post.baseSlug || id;
     const postUrl = `${baseUrl}/blog/${slug}`;
     const imageUrl = post.featuredImage ?
       (post.featuredImage.startsWith('http') ? post.featuredImage : `${baseUrl}${post.featuredImage}`) :
@@ -100,10 +101,11 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function BlogPostPage({ params }) {
+  const { id } = await params;
   // Verify the post exists server-side for proper 404
   let post = null;
   try {
-    post = await blogServiceSupabase.getPostBySlug(params.id);
+    post = await blogServiceSupabase.getPostBySlug(id);
   } catch {
     // Fall through to notFound
   }
@@ -116,7 +118,7 @@ export default async function BlogPostPage({ params }) {
     <>
       <BlogJsonLd post={post} locale="en" />
       <Suspense fallback={<Loading />}>
-        <BlogPost slug={params.id} />
+        <BlogPost slug={id} />
       </Suspense>
     </>
   )

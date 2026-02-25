@@ -14,7 +14,13 @@ const supportedLanguages = [
   { code: 'de', name: 'German', flag: '🇩🇪' },
   { code: 'ar', name: 'Arabic', flag: '🇸🇦' },
   { code: 'he', name: 'Hebrew', flag: '🇮🇱' },
-  { code: 'ru', name: 'Russian', flag: '🇷🇺' }
+  { code: 'hi', name: 'Hindi', flag: '🇮🇳' },
+  { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
+  { code: 'pl', name: 'Polish', flag: '🇵🇱' },
+  { code: 'pt', name: 'Portuguese', flag: '🇵🇹' },
+  { code: 'ru', name: 'Russian', flag: '🇷🇺' },
+  { code: 'uk', name: 'Ukrainian', flag: '🇺🇦' },
+  { code: 'zh', name: 'Chinese', flag: '🇨🇳' }
 ];
 
 const BlogPostModal = ({ 

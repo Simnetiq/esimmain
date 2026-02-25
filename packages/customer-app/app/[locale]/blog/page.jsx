@@ -25,7 +25,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }) {
-  const locale = VALID_LOCALES.includes(params.locale) ? params.locale : null;
+  const { locale: localeParam } = await params;
+  const locale = VALID_LOCALES.includes(localeParam) ? localeParam : null;
   if (!locale) return {};
 
   const meta = LOCALE_META[locale];
@@ -50,8 +51,9 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default function LocaleBlogPage({ params }) {
-  if (!VALID_LOCALES.includes(params.locale)) {
+export default async function LocaleBlogPage({ params }) {
+  const { locale } = await params;
+  if (!VALID_LOCALES.includes(locale)) {
     return null;
   }
   

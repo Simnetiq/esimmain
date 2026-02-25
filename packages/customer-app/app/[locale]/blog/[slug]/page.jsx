@@ -31,11 +31,12 @@ const FALLBACK_DESC = {
 export const revalidate = 3600; // ISR: revalidate every hour
 
 export async function generateMetadata({ params }) {
-  const locale = VALID_LOCALES.includes(params.locale) ? params.locale : null;
+  const { locale: localeParam, slug: slugParam } = await params;
+  const locale = VALID_LOCALES.includes(localeParam) ? localeParam : null;
   if (!locale) return {};
 
   try {
-    const post = await blogServiceSupabase.getPostBySlug(params.slug, locale);
+    const post = await blogServiceSupabase.getPostBySlug(slugParam, locale);
     if (!post) {
       return {
         title: 'Post Not Found | Simnetiq',
@@ -44,7 +45,7 @@ export async function generateMetadata({ params }) {
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.simnetiq.store';
-    const slug = post.baseSlug || params.slug;
+    const slug = post.baseSlug || slugParam;
     const postUrl = `${baseUrl}/${locale}/blog/${slug}`;
     const imageUrl = post.featuredImage?.startsWith('http')
       ? post.featuredImage
@@ -111,14 +112,15 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function LocaleBlogPostPage({ params }) {
-  if (!VALID_LOCALES.includes(params.locale)) {
+  const { locale, slug } = await params;
+  if (!VALID_LOCALES.includes(locale)) {
     notFound();
   }
 
   // Verify post exists server-side for proper 404
   let post = null;
   try {
-    post = await blogServiceSupabase.getPostBySlug(params.slug, params.locale);
+    post = await blogServiceSupabase.getPostBySlug(slug, locale);
   } catch {
     // Fall through to notFound
   }
@@ -129,8 +131,8 @@ export default async function LocaleBlogPostPage({ params }) {
 
   return (
     <>
-      <BlogJsonLd post={post} locale={params.locale} />
-      <BlogPost slug={params.slug} />
+      <BlogJsonLd post={post} locale={locale} />
+      <BlogPost slug={slug} />
     </>
   );
 }
