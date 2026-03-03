@@ -12,6 +12,7 @@ const otpRoutes = require('./routes/otp');
 const emailRoutes = require('./routes/email');
 const transactionRoutes = require('./routes/transaction');
 const healthRoutes = require('./routes/health');
+const dopplerVerificationRoutes = require('./routes/doppler-verification');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -40,6 +41,7 @@ app.use('/api/payment', paymentRoutes);
 app.use('/api/otp', otpRoutes);
 app.use('/api/email', emailRoutes);
 app.use('/api/transactions', transactionRoutes);
+app.use('/api/doppler', dopplerVerificationRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -52,7 +54,8 @@ app.get('/', (req, res) => {
       payment: '/api/payment',
       otp: '/api/otp',
       email: '/api/email',
-      transactions: '/api/transactions'
+      transactions: '/api/transactions',
+      doppler: '/api/doppler'
     }
   });
 });
