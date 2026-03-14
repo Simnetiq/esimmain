@@ -164,7 +164,7 @@ export default function RootLayout({ children }) {
         {/* Stripe.js - only dns-prefetch since it's not needed on every page */}
         <link rel="dns-prefetch" href="https://js.stripe.com" />
         
-        <meta name="theme-color" content="#468BE6" />
+        <meta name="theme-color" content="#0a0a0a" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         
         {/* Structured Data for SEO — Organization */}
@@ -185,7 +185,7 @@ export default function RootLayout({ children }) {
                 "@type": "ContactPoint",
                 "contactType": "customer service",
                 "email": "support@simnetiq.store",
-                "availableLanguage": ["English", "Spanish", "French", "German", "Arabic", "Hebrew", "Hindi", "Japanese", "Polish", "Portuguese", "Russian", "Ukrainian", "Chinese"]
+                "availableLanguage": ["English", "Spanish", "French", "German", "Arabic", "Hebrew", "Hindi", "Japanese", "Korean", "Dutch", "Polish", "Portuguese", "Russian", "Thai", "Turkish", "Ukrainian", "Chinese"]
               }
             })
           }}
@@ -316,22 +316,7 @@ export default function RootLayout({ children }) {
             <Suspense fallback={null}>
               <Analytics />
             </Suspense>
-            <div className="bg-white min-h-screen overflow-x-hidden max-w-full relative">
-              {/* Grid Pattern Rails — single source, continuous across all pages */}
-              <div
-                className="hidden xl:block absolute left-0 top-0 bottom-0 w-32 z-50 pointer-events-none"
-                style={{
-                  backgroundSize: '10px 10px',
-                  backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-                }}
-              />
-              <div
-                className="hidden xl:block absolute right-0 top-0 bottom-0 w-32 z-50 pointer-events-none"
-                style={{
-                  backgroundSize: '10px 10px',
-                  backgroundImage: 'repeating-linear-gradient(315deg, rgba(229, 231, 235, 0.5) 0, rgba(229, 231, 235, 0.5) 1px, transparent 0, transparent 50%)'
-                }}
-              />
+            <div className="min-h-screen overflow-x-hidden max-w-full relative">
               <ConditionalNavbar />
               <main className="pt-12 overflow-x-hidden">
                 {children}
