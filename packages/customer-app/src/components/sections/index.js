@@ -1,8 +1,10 @@
-export { default as HeroSection } from './HeroSection';
-export { default as FeaturesSection } from './FeaturesSection';
+export { default as NewHeroSection } from './NewHeroSection';
+export { default as TrustIndicators } from './TrustIndicators';
+export { default as HowItWorks } from './HowItWorks';
 export { default as PlansSection } from './PlansSection';
-export { default as ActivationSection } from './ActivationSection';
-export { default as TravelBlogsSection } from './TravelBlogsSection';
+export { default as ComparisonTable } from './ComparisonTable';
+export { default as RoamingComparison } from './RoamingComparison';
+export { default as FeaturesBento } from './FeaturesBento';
 export { default as CoverageStats } from './CoverageStats';
 export { default as DeviceCompatibility } from './DeviceCompatibility';
 export { default as PromoCodeBanner } from './PromoCodeBanner';
@@ -10,11 +12,5 @@ export { default as AppDownload } from './AppDownload';
 export { default as DopplerCrossSell } from './DopplerCrossSell';
 export { default as SocialProof } from './SocialProof';
 export { default as FAQSection } from './FAQSection';
+export { default as TravelBlogsSection } from './TravelBlogsSection';
 export { default as FinalCTA } from './FinalCTA';
-// Dark theme redesign sections
-export { default as NewHeroSection } from './NewHeroSection';
-export { default as TrustIndicators } from './TrustIndicators';
-export { default as HowItWorks } from './HowItWorks';
-export { default as ComparisonTable } from './ComparisonTable';
-export { default as RoamingComparison } from './RoamingComparison';
-export { default as FeaturesBento } from './FeaturesBento';
