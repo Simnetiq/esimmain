@@ -81,14 +81,16 @@ export default function ExploreStoreCTA({
     >
       <span className="flex-1 text-center">{t('hero.exploreStore', 'eSIM Store')}</span>
       <span
-        className={`ms-3 flex-shrink-0 inline-flex items-center justify-center rounded-full rtl-native-flex ${config.circle}`}
+        className={`ms-3 flex-shrink-0 inline-flex items-center justify-center rounded-full rtl-native-flex ${
+          variant === 'darkPrimary' ? 'bg-white' : (isDarkStyle ? '' : (variant === 'secondary' ? 'bg-gray-100' : 'bg-white/20'))
+        } ${config.circle}`}
         style={isThemed ? {
           backgroundColor: 'var(--cta-primary-circle-bg)',
         } : undefined}
       >
         <ArrowUpRightIcon
           className={`${config.icon} rtl:-scale-x-100 ${
-            isDarkStyle ? 'text-white' : (variant === 'secondary' ? 'text-eerie-black' : 'text-white')
+            variant === 'darkPrimary' ? 'text-tufts-blue' : (isDarkStyle ? 'text-white' : (variant === 'secondary' ? 'text-eerie-black' : 'text-white'))
           }`}
           style={isThemed ? { color: 'var(--cta-primary-circle-text)' } : undefined}
         />

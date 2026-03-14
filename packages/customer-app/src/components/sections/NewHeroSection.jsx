@@ -131,35 +131,51 @@ export default function NewHeroSection({ promo = null }) {
                 {subtitleText}
               </p>
 
-              {/* CTAs — pill-with-circle design, single row */}
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-10 w-full sm:w-auto rtl-native-flex">
-                {/* Primary: Explore Plans — pill with arrow circle */}
+              {/* CTAs — pill-with-circle design */}
+              {/* Row 1: Explore Plans */}
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-4 w-full sm:w-auto rtl-native-flex">
                 <ExploreStoreCTA
                   variant="darkPrimary"
                   size="md"
                   source="hero_primary_cta"
                   className="w-full sm:w-auto"
                 />
-
-                {/* Secondary: Download App — single pill with Apple icon circle */}
+              </div>
+              {/* Row 2: App Store + Google Play */}
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 mb-10 w-full sm:w-auto rtl-native-flex">
+                {/* iOS */}
                 <a
                   href={appStoreLinks.ios}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center rounded-full font-semibold transition-all duration-200 rtl-native-flex ps-6 pe-1.5 py-1.5 text-base w-full sm:w-auto"
+                  className="inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:scale-[1.02] rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto bg-gray-900 text-white shadow-sm hover:bg-gray-800"
+                >
+                  <span className="flex-1 text-center">{t('hero.appStore', 'App Store')}</span>
+                  <span className="ms-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-white/20 w-8 h-8 rtl-native-flex">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="21" y1="17" x2="18" y2="17"/><line x1="20" y1="21" x2="14.29" y2="10.72"/><line x1="12" y1="6.6" x2="10" y2="3"/><line x1="14" y1="3" x2="4" y2="21"/><line x1="13" y1="17" x2="3" y2="17"/>
+                    </svg>
+                  </span>
+                </a>
+                {/* Android */}
+                <a
+                  href={appStoreLinks.android}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:scale-[1.02] rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto"
                   style={{
                     backgroundColor: 'var(--cta-secondary-bg)',
                     color: 'var(--cta-secondary-text)',
                     border: '1px solid var(--cta-secondary-border)',
                   }}
                 >
-                  <span className="flex-1 text-center">{t('hero.downloadApp', 'Download App')}</span>
+                  <span className="flex-1 text-center">{t('hero.googlePlay', 'Google Play')}</span>
                   <span
-                    className="ms-3 flex-shrink-0 inline-flex items-center justify-center rounded-full w-9 h-9 rtl-native-flex"
+                    className="ms-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full w-8 h-8 rtl-native-flex"
                     style={{ backgroundColor: 'var(--cta-secondary-circle-bg)' }}
                   >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="21" y1="17" x2="18" y2="17"/><line x1="20" y1="21" x2="14.29" y2="10.72"/><line x1="12" y1="6.6" x2="10" y2="3"/><line x1="14" y1="3" x2="4" y2="21"/><line x1="13" y1="17" x2="3" y2="17"/>
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path fillRule="evenodd" clipRule="evenodd" d="M2 3.65629C2 2.15127 3.59967 1.18549 4.93149 1.88645L20.7844 10.2301C22.2091 10.9799 22.2091 13.0199 20.7844 13.7698L4.9315 22.1134C3.59968 22.8144 2 21.8486 2 20.3436V3.65629ZM19.8529 11.9999L16.2682 10.1132L14.2243 11.9999L16.2682 13.8866L19.8529 11.9999ZM14.3903 14.875L12.75 13.3608L6.75782 18.8921L14.3903 14.875ZM12.75 10.639L14.3903 9.12488L6.75782 5.10777L12.75 10.639ZM4 5.28391L11.2757 11.9999L4 18.7159V5.28391Z"/>
                     </svg>
                   </span>
                 </a>
