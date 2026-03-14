@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import Reveal from '../ui/Reveal';
 
@@ -38,75 +37,8 @@ const WifiIcon = ({ className }) => (
   </svg>
 );
 
-/**
- * ConnectorLine — animated SVG dashed line between steps.
- * Horizontal on desktop (md+), vertical on mobile.
- */
-function ConnectorLine({ isVisible }) {
-  return (
-    <>
-      {/* Horizontal line — desktop only */}
-      <div className="hidden md:flex items-center flex-1 px-2" aria-hidden="true">
-        <svg width="100%" height="2" viewBox="0 0 100 2" preserveAspectRatio="none">
-          <line
-            x1="0" y1="1" x2="100" y2="1"
-            stroke="rgba(73,117,212,0.3)"
-            strokeWidth="1.5"
-            strokeDasharray="6 4"
-            strokeLinecap="round"
-            style={{
-              strokeDashoffset: isVisible ? 0 : 100,
-              transition: 'stroke-dashoffset 1s ease-out 0.4s',
-            }}
-          />
-        </svg>
-      </div>
-
-      {/* Vertical line — mobile only */}
-      <div className="flex md:hidden justify-center my-2" aria-hidden="true">
-        <svg width="2" height="40" viewBox="0 0 2 40">
-          <line
-            x1="1" y1="0" x2="1" y2="40"
-            stroke="rgba(73,117,212,0.3)"
-            strokeWidth="1.5"
-            strokeDasharray="6 4"
-            strokeLinecap="round"
-            style={{
-              strokeDashoffset: isVisible ? 0 : 40,
-              transition: 'stroke-dashoffset 1s ease-out 0.4s',
-            }}
-          />
-        </svg>
-      </div>
-    </>
-  );
-}
-
 export default function HowItWorks() {
   const { t } = useI18n();
-  const sectionRef = useRef(null);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) {
-      setIsVisible(true);
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      { threshold: 0.2 }
-    );
-
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => observer.disconnect();
-  }, []);
 
   const steps = [
     {
@@ -136,7 +68,6 @@ export default function HowItWorks() {
     <section
       className="bg-bg-primary"
       aria-labelledby="how-it-works-heading"
-      ref={sectionRef}
       id="how-it-works"
     >
       <div className="max-w-7xl mx-auto px-4 py-16 lg:py-24">
@@ -159,45 +90,30 @@ export default function HowItWorks() {
           </Reveal>
         </div>
 
-        {/* Steps row — flex row on desktop, column on mobile */}
-        <div className="flex flex-col md:flex-row md:items-start gap-0 rtl-native-flex">
-          {steps.map((step, index) => (
-            <div key={step.number} className="flex flex-col md:flex-row md:items-start flex-1 rtl-native-flex">
-              {/* Step card */}
-              <Reveal delay={step.delay} className="flex-1">
-                <article className="glass-card relative overflow-hidden h-full" aria-label={`Step ${step.number}: ${step.title}`}>
-                  {/* Faded step number — decorative background */}
-                  <span
-                    className="absolute top-4 end-4 text-7xl font-bold leading-none select-none pointer-events-none text-white/[0.04]"
-                    aria-hidden="true"
-                  >
-                    {step.number}
-                  </span>
+        {/* Steps grid — clean equal-width columns */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {steps.map((step) => (
+            <Reveal key={step.number} delay={step.delay}>
+              <article className="glass-card relative overflow-hidden h-full" aria-label={`Step ${step.number}: ${step.title}`}>
+                {/* Faded step number */}
+                <span className="absolute top-4 end-4 text-7xl font-bold leading-none select-none pointer-events-none text-white/[0.04]" aria-hidden="true">
+                  {step.number}
+                </span>
 
-                  {/* Icon circle */}
-                  <div className="w-12 h-12 rounded-xl bg-tufts-blue/10 flex items-center justify-center mb-5">
-                    <step.Icon className="w-6 h-6 text-tufts-blue" />
-                  </div>
+                {/* Icon circle */}
+                <div className="w-12 h-12 rounded-xl bg-tufts-blue/10 flex items-center justify-center mb-5">
+                  <step.Icon className="w-6 h-6 text-tufts-blue" />
+                </div>
 
-                  {/* Step number badge */}
-                  <p className="text-xs font-bold tracking-widest uppercase text-tufts-blue mb-2">
-                    {t('howItWorks.stepLabel', 'Step')} {step.number}
-                  </p>
+                {/* Step label */}
+                <p className="text-xs font-bold tracking-widest uppercase text-tufts-blue mb-2">
+                  {t('howItWorks.stepLabel', 'Step')} {step.number}
+                </p>
 
-                  <h3 className="text-lg font-bold text-text-primary mb-2">
-                    {step.title}
-                  </h3>
-                  <p className="text-sm text-text-muted leading-relaxed">
-                    {step.description}
-                  </p>
-                </article>
-              </Reveal>
-
-              {/* Connector line between steps (not after last) */}
-              {index < steps.length - 1 && (
-                <ConnectorLine isVisible={isVisible} />
-              )}
-            </div>
+                <h3 className="text-lg font-bold text-text-primary mb-2">{step.title}</h3>
+                <p className="text-sm text-text-muted leading-relaxed">{step.description}</p>
+              </article>
+            </Reveal>
           ))}
         </div>
 
