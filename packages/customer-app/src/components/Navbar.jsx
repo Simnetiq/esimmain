@@ -217,10 +217,10 @@ const Navbar = ({ hideLanguageSelector = false }) => {
 
   return (
     <header
-      className={`navbar-header fixed bg-[#0a0a0a]/80 backdrop-blur-sm w-full inset-x-0 justify-center top-0 transition-transform duration-150 ${
+      className={`navbar-header fixed backdrop-blur-sm w-full inset-x-0 justify-center top-0 transition-transform duration-150 ${
         isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}
-      style={{ zIndex: 9999 }}
+      style={{ zIndex: 9999, backgroundColor: 'var(--navbar-bg)' }}
       dir={direction}
       lang={currentLanguage}
     >
@@ -283,7 +283,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
 
             {/* Store Dropdown Menu */}
             {isStoreDropdownOpen && (
-              <div className="absolute top-full start-0 mt-2 w-48 bg-bg-secondary border border-white/10 shadow-xl shadow-black/30 z-50">
+              <div className="absolute top-full start-0 mt-2 w-48 bg-bg-secondary shadow-xl rounded-lg z-50" style={{ border: '1px solid var(--card-border)', boxShadow: '0 20px 25px -5px var(--shadow-color)' }}>
                 <ul className="p-2 text-sm font-medium text-text-muted">
                   {regions
                     .filter(r => r.id !== 'popular' && r.id !== 'all')
@@ -291,7 +291,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                       <li key={region.id}>
                         <Link
                           href={getLocalizedUrl(`/esim-plans?region=${region.id}`)}
-                          className="inline-flex items-center w-full p-2 hover:bg-white/5 hover:text-text-primary rounded transition-colors"
+                          className="inline-flex items-center w-full p-2 hover:bg-[var(--hover-bg)] hover:text-text-primary rounded transition-colors"
                           onClick={() => setIsStoreDropdownOpen(false)}
                         >
                           {region.displayName}
@@ -343,7 +343,8 @@ const Navbar = ({ hideLanguageSelector = false }) => {
           {!currentUser && (
             <Link
               href={getLocalizedUrl('/login')}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm font-medium text-[#0a0a0a] bg-white rounded-full hover:bg-white/90 transition-colors"
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm font-medium rounded-full hover:opacity-90 transition-colors"
+              style={{ backgroundColor: 'var(--login-bg)', color: 'var(--login-text)' }}
             >
               {t('navbar.login', 'Login')}
             </Link>
@@ -366,9 +367,9 @@ const Navbar = ({ hideLanguageSelector = false }) => {
 
               {/* User Dropdown Menu */}
               {isUserDropdownOpen && (
-                <div className="absolute top-full mt-2 w-48 bg-bg-secondary border border-white/10 shadow-xl shadow-black/30 z-50 end-0">
+                <div className="absolute top-full mt-2 w-48 bg-bg-secondary shadow-xl rounded-lg z-50 end-0" style={{ border: '1px solid var(--card-border)', boxShadow: '0 20px 25px -5px var(--shadow-color)' }}>
                   {/* User info header */}
-                  <div className="px-4 py-3 border-b border-white/10">
+                  <div className="px-4 py-3 border-b border-[var(--divider)]">
                     <p className="text-sm font-medium text-text-primary truncate text-start">
                       {currentUser.displayName || t('navbar.user', 'User')}
                     </p>
@@ -381,7 +382,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                     <li>
                       <Link
                         href={getLocalizedUrl('/settings')}
-                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-white/5 hover:text-text-primary rounded transition-colors`}
+                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-[var(--hover-bg)] hover:text-text-primary rounded transition-colors`}
                         onClick={() => setIsUserDropdownOpen(false)}
                       >
                         <SettingsIcon className="w-4 h-4" />
@@ -391,14 +392,14 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                     <li>
                       <Link
                         href={getLocalizedUrl('/contact')}
-                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-white/5 hover:text-text-primary rounded transition-colors`}
+                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-[var(--hover-bg)] hover:text-text-primary rounded transition-colors`}
                         onClick={() => setIsUserDropdownOpen(false)}
                       >
                         <Headphones className="w-4 h-4" />
                         {t('navbar.support', 'Support')}
                       </Link>
                     </li>
-                    <li className="border-t border-white/10 mt-1 pt-1">
+                    <li className="border-t border-[var(--divider)] mt-1 pt-1">
                       <span className="block px-2 py-1 text-xs text-text-muted/70 uppercase tracking-wider">
                         {t('navbar.getTheApp', 'Get the App')}
                       </span>
@@ -408,7 +409,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                         href="https://apps.apple.com/gb/app/simnetiq-global-esim/id6755963262"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-white/5 hover:text-text-primary rounded transition-colors`}
+                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-[var(--hover-bg)] hover:text-text-primary rounded transition-colors`}
                         onClick={() => {
                           setIsUserDropdownOpen(false);
                           handleDownloadApp();
@@ -423,7 +424,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                         href="https://play.google.com/store/apps/details?id=com.simnetiq.storeAndroid&hl=en"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-white/5 hover:text-text-primary rounded transition-colors`}
+                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-[var(--hover-bg)] hover:text-text-primary rounded transition-colors`}
                         onClick={() => {
                           setIsUserDropdownOpen(false);
                           handleDownloadApp();
@@ -433,7 +434,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                         {t('navbar.androidApp', 'Android App')}
                       </a>
                     </li>
-                    <li className="border-t border-white/10 mt-1 pt-1">
+                    <li className="border-t border-[var(--divider)] mt-1 pt-1">
                       <button
                         onClick={handleLogout}
                         disabled={isLoggingOut}
@@ -455,7 +456,8 @@ const Navbar = ({ hideLanguageSelector = false }) => {
       {isMenuOpen && mounted && createPortal(
         <div className="lg:hidden" style={{ zIndex: 99999, position: 'fixed', inset: 0 }} dir={direction} lang={currentLanguage}>
           <div
-            className="fixed inset-0 w-full h-full overflow-y-auto bg-[#0a0a0a]/90 backdrop-blur-md"
+            className="fixed inset-0 w-full h-full overflow-y-auto backdrop-blur-md"
+            style={{ backgroundColor: 'var(--overlay-bg)' }}
             style={{ zIndex: 99999 }}
           >
             {/* Header with logo and close button */}
@@ -475,7 +477,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                 <button
                   type="button"
                   onClick={() => setIsMenuOpen(false)}
-                  className="-m-2.5 rounded-md p-2.5 text-text-primary hover:bg-white/5 transition-colors"
+                  className="-m-2.5 rounded-md p-2.5 text-text-primary hover:bg-[var(--hover-bg)] transition-colors"
                 >
                   <span className="sr-only">{t('navbar.closeMenu', 'Close menu')}</span>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" className="size-6">
@@ -496,12 +498,12 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                       {currentUser.displayName || t('navbar.user', 'User')}
                     </p>
 
-                    <div className="border-t border-white/10 my-2 mx-8" />
+                    <div className="border-t border-[var(--divider)] my-2 mx-8" />
 
                     {/* Edit Profile */}
                     <Link
                       href={getLocalizedUrl('/settings')}
-                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-text-primary hover:text-tufts-blue hover:bg-white/5 rounded-md transition-all duration-200 py-3 px-4"
+                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-text-primary hover:text-tufts-blue hover:bg-[var(--hover-bg)] rounded-md transition-all duration-200 py-3 px-4"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {t('navbar.editProfile', 'Edit Profile')}
@@ -510,7 +512,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                     {/* My eSIMs */}
                     <Link
                       href={getLocalizedUrl('/dashboard')}
-                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-text-primary hover:text-tufts-blue hover:bg-white/5 rounded-md transition-all duration-200 py-3 px-4"
+                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-text-primary hover:text-tufts-blue hover:bg-[var(--hover-bg)] rounded-md transition-all duration-200 py-3 px-4"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {t('navbar.myEsims', 'My eSIMs')}
@@ -519,25 +521,25 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                     {/* Store */}
                     <Link
                       href={getLocalizedUrl('/esim-plans')}
-                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-text-primary hover:text-tufts-blue hover:bg-white/5 rounded-md transition-all duration-200 py-3 px-4"
+                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-text-primary hover:text-tufts-blue hover:bg-[var(--hover-bg)] rounded-md transition-all duration-200 py-3 px-4"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {t('navbar.store', 'Store')}
                     </Link>
 
-                    <div className="border-t border-white/10 my-2 mx-8" />
+                    <div className="border-t border-[var(--divider)] my-2 mx-8" />
 
                     {/* Download App — device-aware */}
                     <div className="flex justify-center py-3 px-4">
                       <PlatformDownloadCTA variant="secondary" size="sm" source="mobile_menu" />
                     </div>
 
-                    <div className="border-t border-white/10 my-2 mx-8" />
+                    <div className="border-t border-[var(--divider)] my-2 mx-8" />
 
                     {/* Support */}
                     <Link
                       href={getLocalizedUrl('/contact')}
-                      className="flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-text-primary hover:text-tufts-blue hover:bg-white/5 rounded-md transition-all duration-200 py-3 px-4"
+                      className="flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-text-primary hover:text-tufts-blue hover:bg-[var(--hover-bg)] rounded-md transition-all duration-200 py-3 px-4"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <Headphones className="w-5 h-5" />
@@ -560,17 +562,17 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                     {/* Non-authenticated menu — unchanged */}
                     <Link
                       href={getLocalizedUrl("/esim-plans")}
-                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-text-primary hover:text-tufts-blue hover:bg-white/5 rounded-md transition-all duration-200 py-3 px-4"
+                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-text-primary hover:text-tufts-blue hover:bg-[var(--hover-bg)] rounded-md transition-all duration-200 py-3 px-4"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {t('navbar.store', 'Store')}
                     </Link>
 
-                    <div className="border-t border-white/10 my-4 mx-8" />
+                    <div className="border-t border-[var(--divider)] my-4 mx-8" />
 
                     <Link
                       href={getLocalizedBlogListUrl(currentLanguage)}
-                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-text-muted hover:text-tufts-blue hover:bg-white/5 rounded-md transition-all duration-200 py-3 px-4"
+                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-text-muted hover:text-tufts-blue hover:bg-[var(--hover-bg)] rounded-md transition-all duration-200 py-3 px-4"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {t('navbar.blog', 'Blog')}
@@ -578,7 +580,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
 
                     <Link
                       href={getLocalizedUrl('/contact')}
-                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-text-muted hover:text-tufts-blue hover:bg-white/5 rounded-md transition-all duration-200 py-3 px-4"
+                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-text-muted hover:text-tufts-blue hover:bg-[var(--hover-bg)] rounded-md transition-all duration-200 py-3 px-4"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {t('navbar.contactUs', 'Contact Us')}
@@ -586,23 +588,23 @@ const Navbar = ({ hideLanguageSelector = false }) => {
 
                     <Link
                       href={getLocalizedUrl('/about')}
-                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-text-muted hover:text-tufts-blue hover:bg-white/5 rounded-md transition-all duration-200 py-3 px-4"
+                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-text-muted hover:text-tufts-blue hover:bg-[var(--hover-bg)] rounded-md transition-all duration-200 py-3 px-4"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {t('navbar.about', 'About')}
                     </Link>
 
-                    <div className="border-t border-white/10 my-4 mx-8" />
+                    <div className="border-t border-[var(--divider)] my-4 mx-8" />
 
                     <div className="flex justify-center py-3 px-4">
                       <PlatformDownloadCTA variant="secondary" size="sm" source="mobile_menu" />
                     </div>
 
-                    <div className="border-t border-white/10 my-4 mx-8" />
+                    <div className="border-t border-[var(--divider)] my-4 mx-8" />
 
                     <Link
                       href={getLocalizedUrl('/login')}
-                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-text-primary hover:text-tufts-blue hover:bg-white/5 rounded-md transition-all duration-200 py-3 px-4"
+                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-text-primary hover:text-tufts-blue hover:bg-[var(--hover-bg)] rounded-md transition-all duration-200 py-3 px-4"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {t('navbar.login', 'Login')}

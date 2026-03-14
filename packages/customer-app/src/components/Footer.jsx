@@ -89,7 +89,7 @@ const SocialLink = memo(({ href, icon: Icon, label, external = true }) => (
     href={href}
     target={external ? '_blank' : undefined}
     rel={external ? 'noopener noreferrer' : undefined}
-    className="w-9 h-9 flex items-center justify-center text-text-muted hover:text-tufts-blue hover:scale-110 rounded-full hover:bg-white/5 transition-all duration-200"
+    className="w-9 h-9 flex items-center justify-center text-text-muted hover:text-tufts-blue hover:scale-110 rounded-full hover:bg-[var(--hover-bg)] transition-all duration-200"
     aria-label={label}
   >
     <Icon />
@@ -155,7 +155,7 @@ const Footer = () => {
       className="relative overflow-hidden"
     >
       {/* Top Border — gradient fade */}
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[var(--divider)] to-transparent" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
         {/* Main Footer Content */}
@@ -163,7 +163,7 @@ const Footer = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 lg:gap-12">
             {/* Brand Column — gradient card */}
             <div className="col-span-2 lg:col-span-2 relative items-start text-start">
-              <div className="flex flex-col items-start bg-gradient-to-br from-white/5 to-transparent p-6 -mx-2">
+              <div className="flex flex-col items-start bg-gradient-to-br from-[var(--card-bg)] to-transparent p-6 -mx-2">
                 <Link href={getLocalizedUrl("/")} className="inline-block mb-4 group">
                   <span className="text-3xl font-bold text-text-primary group-hover:text-tufts-blue transition-colors">
                     {t('footer.brandName', 'Simnetiq')}
@@ -227,7 +227,7 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-white/10 py-8">
+        <div className="border-t border-[var(--divider)] py-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rtl-native-flex">
             <p className="text-text-muted text-sm">
               &copy; {new Date().getFullYear()} {t('footer.brandName', 'Simnetiq')} &middot; {t('footer.allRightsReserved', 'All rights reserved')}

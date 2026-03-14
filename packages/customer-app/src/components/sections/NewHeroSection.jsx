@@ -130,13 +130,13 @@ export default function NewHeroSection({ promo = null }) {
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-10 w-full rtl-native-flex">
                 <ExploreStoreCTA
-                  variant="darkPrimary"
+                  variant="themed"
                   size="md"
                   source="new_hero_primary_cta"
                   className="w-full sm:w-auto"
                 />
                 <PlatformDownloadCTA
-                  variant="outline"
+                  variant="themed"
                   size="md"
                   source="new_hero_secondary_cta"
                   className="w-full sm:w-auto"

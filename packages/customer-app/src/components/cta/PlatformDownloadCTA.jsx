@@ -4,9 +4,9 @@ import { usePlatform, appStoreLinks } from '../../hooks/usePlatform';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
 
-// App Store icon (line-based, black)
-const AppStoreIcon = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+// App Store icon (line-based)
+const AppStoreIcon = ({ className, style }) => (
+  <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <line x1="21" y1="17" x2="18" y2="17"/>
     <line x1="20" y1="21" x2="14.29" y2="10.72"/>
     <line x1="12" y1="6.6" x2="10" y2="3"/>
@@ -15,16 +15,21 @@ const AppStoreIcon = ({ className }) => (
   </svg>
 );
 
-// Google Play icon (filled, black)
-const GooglePlayIcon = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+// Google Play icon (filled)
+const GooglePlayIcon = ({ className, style }) => (
+  <svg className={className} style={style} viewBox="0 0 24 24" fill="currentColor">
     <path fillRule="evenodd" clipRule="evenodd" d="M2 3.65629C2 2.15127 3.59967 1.18549 4.93149 1.88645L20.7844 10.2301C22.2091 10.9799 22.2091 13.0199 20.7844 13.7698L4.9315 22.1134C3.59968 22.8144 2 21.8486 2 20.3436V3.65629ZM19.8529 11.9999L16.2682 10.1132L14.2243 11.9999L16.2682 13.8866L19.8529 11.9999ZM14.3903 14.875L12.75 13.3608L6.75782 18.8921L14.3903 14.875ZM12.75 10.639L14.3903 9.12488L6.75782 5.10777L12.75 10.639ZM4 5.28391L11.2757 11.9999L4 18.7159V5.28391Z"/>
   </svg>
 );
 
 /**
- * Single download button for a specific platform
- * Layout matches ExploreStoreCTA: text centered, store icon in circle at end
+ * Single download button for a specific platform.
+ *
+ * Variants:
+ * - 'primary': Dark bg (for light backgrounds)
+ * - 'secondary': White bg with border (for light backgrounds)
+ * - 'outline': Transparent with white border (for dark backgrounds)
+ * - 'themed': Adapts to current theme via CSS variables (recommended)
  */
 function DownloadButton({ platform, variant, size, source, className = '' }) {
   const { t } = useI18n();
@@ -38,8 +43,8 @@ function DownloadButton({ platform, variant, size, source, className = '' }) {
 
   const handleClick = () => {
     trackCustomFacebookEvent('DownloadAppCTA', {
-      platform: platform,
-      source: source,
+      platform,
+      source,
       content_type: 'app_download',
       button_location: 'hero_cta',
       event_category: 'engagement',
@@ -47,7 +52,6 @@ function DownloadButton({ platform, variant, size, source, className = '' }) {
     });
   };
 
-  // Match ExploreStoreCTA sizing: asymmetric padding, circle flush on end side
   const sizeConfig = {
     sm: { outer: 'ps-5 pe-1 py-1 text-sm', circle: 'w-8 h-8', icon: 'w-4 h-4' },
     md: { outer: 'ps-6 pe-1.5 py-1.5 text-base', circle: 'w-9 h-9', icon: 'w-5 h-5' },
@@ -55,19 +59,21 @@ function DownloadButton({ platform, variant, size, source, className = '' }) {
   };
 
   const config = sizeConfig[size];
+  const isThemed = variant === 'themed';
 
-  // Variant classes
+  // Static variant classes
   const variantClasses = {
     primary: 'bg-gray-900 text-white shadow-lg hover:bg-gray-800 hover:scale-[1.02]',
     secondary: 'bg-white text-gray-900 border border-gray-200 shadow-sm hover:border-tufts-blue hover:text-tufts-blue',
     outline: 'bg-transparent text-white border border-white/20 shadow-sm hover:border-white/40 hover:bg-white/5',
+    themed: 'shadow-sm hover:scale-[1.02] hover:opacity-90',
   };
 
-  // Circle colors per variant
   const circleClasses = {
     primary: 'bg-white/20',
     secondary: 'bg-gray-100',
     outline: 'bg-white/10',
+    themed: '',
   };
 
   return (
@@ -83,10 +89,21 @@ function DownloadButton({ platform, variant, size, source, className = '' }) {
         ${variantClasses[variant]}
         ${className}
       `}
+      style={isThemed ? {
+        backgroundColor: 'var(--cta-secondary-bg)',
+        color: 'var(--cta-secondary-text)',
+        border: '1px solid var(--cta-secondary-border)',
+      } : undefined}
     >
       <span className="flex-1 text-center">{label}</span>
-      <span className={`ms-3 flex-shrink-0 inline-flex items-center justify-center rounded-full rtl-native-flex ${circleClasses[variant]} ${config.circle}`}>
-        <Icon className={config.icon} />
+      <span
+        className={`ms-3 flex-shrink-0 inline-flex items-center justify-center rounded-full rtl-native-flex ${circleClasses[variant]} ${config.circle}`}
+        style={isThemed ? { backgroundColor: 'var(--cta-secondary-circle-bg)' } : undefined}
+      >
+        <Icon
+          className={config.icon}
+          style={isThemed ? { color: 'var(--cta-secondary-circle-text)' } : undefined}
+        />
       </span>
     </a>
   );
@@ -98,10 +115,10 @@ function DownloadButton({ platform, variant, size, source, className = '' }) {
  * - Mobile: Shows only the platform-specific button
  *
  * @param {Object} props
- * @param {'primary' | 'secondary' | 'outline'} props.variant - Button style variant
- * @param {'sm' | 'md' | 'lg'} props.size - Button size
- * @param {string} props.className - Additional CSS classes
- * @param {string} props.source - Analytics source identifier
+ * @param {'primary' | 'secondary' | 'outline' | 'themed'} props.variant
+ * @param {'sm' | 'md' | 'lg'} props.size
+ * @param {string} props.className
+ * @param {string} props.source
  */
 export default function PlatformDownloadCTA({
   variant = 'primary',
@@ -113,12 +130,10 @@ export default function PlatformDownloadCTA({
   const isMobile = platform === 'ios' || platform === 'android';
   const detected = platform !== null;
 
-  // Reserve space with invisible placeholder, fade in once platform is detected
   const fadeClass = detected
     ? 'opacity-100 transition-opacity duration-300'
     : 'opacity-0';
 
-  // On mobile, show only the platform-specific button
   if (isMobile) {
     return (
       <DownloadButton
@@ -131,24 +146,12 @@ export default function PlatformDownloadCTA({
     );
   }
 
-  // Before detection or on desktop, show both buttons (both reserve space during null)
   return (
     <div className={`flex flex-row items-center justify-center gap-3 rtl-native-flex ${className} ${fadeClass}`}>
-      <DownloadButton
-        platform="ios"
-        variant={variant}
-        size={size}
-        source={source}
-      />
-      <DownloadButton
-        platform="android"
-        variant={variant}
-        size={size}
-        source={source}
-      />
+      <DownloadButton platform="ios" variant={variant} size={size} source={source} />
+      <DownloadButton platform="android" variant={variant} size={size} source={source} />
     </div>
   );
 }
 
-// Export individual button for direct use if needed
 export { DownloadButton };

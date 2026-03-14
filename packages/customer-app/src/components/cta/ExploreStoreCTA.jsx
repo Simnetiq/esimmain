@@ -15,11 +15,12 @@ const ArrowUpRightIcon = ({ className }) => (
  * CTA for exploring the eSIM store
  * Links to /esim-plans page
  *
- * @param {Object} props
- * @param {'primary' | 'secondary' | 'dark' | 'darkPrimary'} props.variant - Button style variant
- * @param {'sm' | 'md' | 'lg'} props.size - Button size
- * @param {string} props.className - Additional CSS classes
- * @param {string} props.source - Analytics source identifier
+ * Variants:
+ * - 'primary': Tufts-blue bg, always blue regardless of theme
+ * - 'dark': Dark bg button (for light backgrounds)
+ * - 'secondary': White bg with border (for light backgrounds)
+ * - 'darkPrimary': Tufts-blue bg with glow (for dark backgrounds)
+ * - 'themed': Adapts to current theme via CSS variables (recommended for hero/landing)
  */
 export default function ExploreStoreCTA({
   variant = 'primary',
@@ -29,12 +30,11 @@ export default function ExploreStoreCTA({
 }) {
   const { t, locale } = useI18n();
 
-  // Build localized URL
   const esimPlansUrl = locale && locale !== 'en' ? `/${locale}/esim-plans` : '/esim-plans';
 
   const handleClick = () => {
     trackCustomFacebookEvent('ExploreStore', {
-      source: source,
+      source,
       content_type: 'navigation',
       destination: 'esim_plans',
       event_category: 'engagement',
@@ -42,17 +42,19 @@ export default function ExploreStoreCTA({
     });
   };
 
-  // Variant classes
+  // Static variant classes (theme-unaware)
   const variantClasses = {
     primary: 'bg-tufts-blue text-white shadow-lg hover:bg-tufts-blue/90 hover:scale-[1.02]',
     dark: 'bg-eerie-black text-white shadow-lg hover:bg-eerie-black/90 hover:scale-[1.02]',
     secondary: 'bg-white text-gray-900 border border-gray-200 shadow-sm hover:border-tufts-blue hover:text-tufts-blue',
     darkPrimary: 'bg-tufts-blue text-white shadow-lg shadow-tufts-blue/20 hover:bg-tufts-blue/90 hover:scale-[1.02]',
+    themed: 'shadow-lg hover:scale-[1.02] hover:opacity-90',
   };
 
-  const isDarkVariant = variant === 'darkPrimary';
+  // 'themed' variant uses CSS variables for bg/text, adapts to light/dark
+  const isThemed = variant === 'themed';
+  const isDarkStyle = variant === 'darkPrimary' || isThemed;
 
-  // Button padding: start side has normal padding, end side is minimal (arrow circle sits flush)
   const sizeConfig = {
     sm: { outer: 'ps-5 pe-1 py-1 text-sm', circle: 'w-8 h-8', icon: 'w-3.5 h-3.5' },
     md: { outer: 'ps-6 pe-1.5 py-1.5 text-base', circle: 'w-9 h-9', icon: 'w-4 h-4' },
@@ -72,10 +74,24 @@ export default function ExploreStoreCTA({
         ${variantClasses[variant]}
         ${className}
       `}
+      style={isThemed ? {
+        backgroundColor: 'var(--cta-primary-bg)',
+        color: 'var(--cta-primary-text)',
+      } : undefined}
     >
-      <span className="flex-1 text-center">{t('hero.exploreStore', 'Explore eSIM Store')}</span>
-      <span className={`ms-3 flex-shrink-0 inline-flex items-center justify-center rounded-full rtl-native-flex ${isDarkVariant ? 'bg-white/20' : 'bg-white'} ${config.circle}`}>
-        <ArrowUpRightIcon className={`${config.icon} ${isDarkVariant ? 'text-white' : 'text-eerie-black'} rtl:-scale-x-100`} />
+      <span className="flex-1 text-center">{t('hero.exploreStore', 'eSIM Store')}</span>
+      <span
+        className={`ms-3 flex-shrink-0 inline-flex items-center justify-center rounded-full rtl-native-flex ${config.circle}`}
+        style={isThemed ? {
+          backgroundColor: 'var(--cta-primary-circle-bg)',
+        } : undefined}
+      >
+        <ArrowUpRightIcon
+          className={`${config.icon} rtl:-scale-x-100 ${
+            isDarkStyle ? 'text-white' : (variant === 'secondary' ? 'text-eerie-black' : 'text-white')
+          }`}
+          style={isThemed ? { color: 'var(--cta-primary-circle-text)' } : undefined}
+        />
       </span>
     </Link>
   );
