@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 // Note: English (en) uses root-level pages, other languages have their own folders
-const languagesWithFolders = ['ar', 'de', 'es', 'fr', 'he', 'hi', 'ja', 'pl', 'pt', 'ru', 'uk', 'zh'];
+const languagesWithFolders = ['ar', 'de', 'es', 'fr', 'he', 'hi', 'it', 'ja', 'ko', 'nl', 'pl', 'pt', 'ru', 'th', 'tr', 'uk', 'zh'];
 const supportedLanguages = ['en', ...languagesWithFolders];
 const defaultLanguage = 'en';
 
@@ -71,7 +71,12 @@ export function middleware(request) {
                   pathname.startsWith('/hi') ? 'hi' :
                   pathname.startsWith('/zh') ? 'zh' :
                   pathname.startsWith('/pl') ? 'pl' :
-                  pathname.startsWith('/uk') ? 'uk' : 'en';
+                  pathname.startsWith('/uk') ? 'uk' :
+                  pathname.startsWith('/ko') ? 'ko' :
+                  pathname.startsWith('/tr') ? 'tr' :
+                  pathname.startsWith('/it') ? 'it' :
+                  pathname.startsWith('/th') ? 'th' :
+                  pathname.startsWith('/nl') ? 'nl' : 'en';
   
   response.headers.set('x-language', language);
   

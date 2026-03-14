@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-const LOCALE = 'ar';
+const LOCALE = 'tr';
 
 function getSupabase() {
   const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
