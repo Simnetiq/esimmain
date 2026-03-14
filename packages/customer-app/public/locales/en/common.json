@@ -33,7 +33,15 @@
     "downloadAppIOS": "Download for iOS",
     "downloadAppAndroid": "Download for Android",
     "exploreStore": "Explore eSIM Store",
-    "downloadApp": "Download App"
+    "downloadApp": "Download App",
+    "darkHeadlinePart1": "Stay connected",
+    "darkHeadlineHighlight": "anywhere",
+    "darkHeadlinePart2": "in the world",
+    "darkSubtitle": "Instant eSIM activation for 200+ countries. No SIM cards, no roaming fees, no hassle.",
+    "promoPrefix": "Use code",
+    "promoSuffix": "for {discount}% off your first eSIM",
+    "fiveStarRated": "5-Star Rated",
+    "sevenDayRefund": "7-Day Refund"
   },
   "features": {
     "title": "Connect globally",
@@ -771,5 +779,128 @@
     "price": "Price",
     "data": "Data",
     "days": "Days"
+  },
+  "trust": {
+    "title": "Why Travelers Trust Simnetiq",
+    "noRoamingFees": "No Roaming Fees",
+    "noRoamingFeesDesc": "Save hundreds on international data charges",
+    "qrActivation": "QR Activation",
+    "qrActivationDesc": "Scan, activate, connect — under 2 minutes",
+    "languages": "18 Languages",
+    "languagesDesc": "Support in your language, wherever you're from",
+    "moneyBack": "Money-Back Guarantee",
+    "moneyBackDesc": "7-day full refund on unused plans"
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "subtitle": "Three simple steps to stay connected",
+    "step1Title": "Choose Your Plan",
+    "step1Desc": "Pick your destination and data plan from 200+ countries",
+    "step2Title": "Scan QR Code",
+    "step2Desc": "Receive your QR code instantly and scan it with your phone",
+    "step3Title": "You're Connected",
+    "step3Desc": "Data activates automatically when you arrive. That's it."
+  },
+  "comparison": {
+    "title": "eSIM vs Physical SIM",
+    "subtitle": "See why travelers are switching to eSIM",
+    "activation": "Activation",
+    "physicalActivation": "Find a store, wait in line",
+    "esimActivation": "Scan QR, ready in 2 min",
+    "availability": "Availability",
+    "physicalAvailability": "Airport/city shops only",
+    "esimAvailability": "Buy online, anytime",
+    "switching": "Switching plans",
+    "physicalSwitching": "Buy new card, swap physically",
+    "esimSwitching": "Add new plan digitally",
+    "keepNumber": "Keep your number",
+    "physicalKeepNumber": "Must remove main SIM",
+    "esimKeepNumber": "Runs alongside your SIM",
+    "multiCountry": "Multiple countries",
+    "physicalMultiCountry": "New SIM per country",
+    "esimMultiCountry": "Switch plans instantly",
+    "cost": "Cost",
+    "physicalCost": "Store markup + taxi to shop",
+    "esimCost": "Direct pricing, no extras"
+  },
+  "roaming": {
+    "title": "Simnetiq vs Roaming Costs",
+    "subtitle": "See how much you can save",
+    "carrierTurkey": "Typical carrier roaming (Turkey)",
+    "carrierEurope": "Typical carrier roaming (Europe)",
+    "carrierAsia": "Typical carrier roaming (Asia)",
+    "simnetiq": "Simnetiq eSIM",
+    "perWeek": "/week",
+    "saveUpTo": "Save up to 90%",
+    "fromPrice": "From $3/week",
+    "noBills": "No surprise bills",
+    "cancelAnytime": "Cancel anytime"
+  },
+  "featuresBento": {
+    "title": "Why Choose Simnetiq",
+    "globalCoverage": "Global Coverage",
+    "globalCoverageDesc": "200+ countries, 400+ carriers. One app.",
+    "instantActivation": "Instant Activation",
+    "instantActivationDesc": "From purchase to connected in under 2 minutes",
+    "topUp": "Top-Up Anytime",
+    "topUpDesc": "Running low? Add more data without reinstalling your eSIM",
+    "securePayments": "Secure Payments",
+    "securePaymentsDesc": "Stripe-powered checkout. Apple Pay, Google Pay, all major cards.",
+    "multiLanguage": "Multi-Language",
+    "multiLanguageDesc": "Full support in 18 languages including Arabic, Hebrew, Japanese, and more",
+    "support": "Dedicated Support",
+    "supportDesc": "Real human support via email and in-app. No chatbots."
+  },
+  "coverage": {
+    "title": "Global Coverage",
+    "countries": "Countries",
+    "dataPlans": "Data Plans",
+    "languages": "Languages",
+    "avgActivation": "Avg Activation",
+    "europe": "Europe",
+    "asia": "Asia",
+    "americas": "Americas",
+    "africa": "Africa",
+    "oceania": "Oceania",
+    "middleEast": "Middle East"
+  },
+  "devices": {
+    "title": "Device Compatibility",
+    "notSure": "Not sure if your device supports eSIM?",
+    "checkFaq": "Check FAQ"
+  },
+  "promoBanner": {
+    "headline": "Get {discount}% off your first eSIM plan",
+    "cta": "Shop Plans Now",
+    "finePrint": "Valid for new customers. One use per account.",
+    "copied": "Copied!"
+  },
+  "appDownload": {
+    "badge": "AVAILABLE ON IOS",
+    "badgeBoth": "AVAILABLE ON IOS & ANDROID",
+    "title": "Manage everything from your phone",
+    "bullet1": "Buy and activate eSIMs",
+    "bullet2": "Monitor data usage in real-time",
+    "bullet3": "Top up with one tap",
+    "bullet4": "Get QR codes instantly"
+  },
+  "dopplerCrossSell": {
+    "badge": "By Simnetiq",
+    "title": "Doppler VPN",
+    "description": "No-logs VPN with WireGuard + VLESS. Up to 10 devices.",
+    "promo": "Use code LAUNCH20 for 20% off",
+    "cta": "Learn More"
+  },
+  "socialProof": {
+    "rating": "4.5",
+    "appStore": "App Store",
+    "tagline": "Trusted by travelers in 200+ countries"
+  },
+  "finalCta": {
+    "title": "Ready to stay connected worldwide?",
+    "subtitle": "Get your eSIM in minutes. Works on any unlocked device.",
+    "browsePlans": "Browse Plans",
+    "downloadApp": "Download App",
+    "promoReminder": "Use code {code} for {discount}% off"
   }
 }

@@ -59,13 +59,15 @@ function DownloadButton({ platform, variant, size, source, className = '' }) {
   // Variant classes
   const variantClasses = {
     primary: 'bg-gray-900 text-white shadow-lg hover:bg-gray-800 hover:scale-[1.02]',
-    secondary: 'bg-white text-gray-900 border border-gray-200 shadow-sm hover:border-tufts-blue hover:text-tufts-blue'
+    secondary: 'bg-white text-gray-900 border border-gray-200 shadow-sm hover:border-tufts-blue hover:text-tufts-blue',
+    outline: 'bg-transparent text-white border border-white/20 shadow-sm hover:border-white/40 hover:bg-white/5',
   };
 
   // Circle colors per variant
   const circleClasses = {
     primary: 'bg-white/20',
-    secondary: 'bg-gray-100'
+    secondary: 'bg-gray-100',
+    outline: 'bg-white/10',
   };
 
   return (
@@ -96,7 +98,7 @@ function DownloadButton({ platform, variant, size, source, className = '' }) {
  * - Mobile: Shows only the platform-specific button
  *
  * @param {Object} props
- * @param {'primary' | 'secondary'} props.variant - Button style variant
+ * @param {'primary' | 'secondary' | 'outline'} props.variant - Button style variant
  * @param {'sm' | 'md' | 'lg'} props.size - Button size
  * @param {string} props.className - Additional CSS classes
  * @param {string} props.source - Analytics source identifier

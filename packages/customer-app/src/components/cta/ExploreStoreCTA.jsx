@@ -16,7 +16,7 @@ const ArrowUpRightIcon = ({ className }) => (
  * Links to /esim-plans page
  *
  * @param {Object} props
- * @param {'primary' | 'secondary' | 'dark'} props.variant - Button style variant
+ * @param {'primary' | 'secondary' | 'dark' | 'darkPrimary'} props.variant - Button style variant
  * @param {'sm' | 'md' | 'lg'} props.size - Button size
  * @param {string} props.className - Additional CSS classes
  * @param {string} props.source - Analytics source identifier
@@ -46,8 +46,11 @@ export default function ExploreStoreCTA({
   const variantClasses = {
     primary: 'bg-tufts-blue text-white shadow-lg hover:bg-tufts-blue/90 hover:scale-[1.02]',
     dark: 'bg-eerie-black text-white shadow-lg hover:bg-eerie-black/90 hover:scale-[1.02]',
-    secondary: 'bg-white text-gray-900 border border-gray-200 shadow-sm hover:border-tufts-blue hover:text-tufts-blue'
+    secondary: 'bg-white text-gray-900 border border-gray-200 shadow-sm hover:border-tufts-blue hover:text-tufts-blue',
+    darkPrimary: 'bg-tufts-blue text-white shadow-lg shadow-tufts-blue/20 hover:bg-tufts-blue/90 hover:scale-[1.02]',
   };
+
+  const isDarkVariant = variant === 'darkPrimary';
 
   // Button padding: start side has normal padding, end side is minimal (arrow circle sits flush)
   const sizeConfig = {
@@ -71,8 +74,8 @@ export default function ExploreStoreCTA({
       `}
     >
       <span className="flex-1 text-center">{t('hero.exploreStore', 'Explore eSIM Store')}</span>
-      <span className={`ms-3 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-white rtl-native-flex ${config.circle}`}>
-        <ArrowUpRightIcon className={`${config.icon} text-eerie-black rtl:-scale-x-100`} />
+      <span className={`ms-3 flex-shrink-0 inline-flex items-center justify-center rounded-full rtl-native-flex ${isDarkVariant ? 'bg-white/20' : 'bg-white'} ${config.circle}`}>
+        <ArrowUpRightIcon className={`${config.icon} ${isDarkVariant ? 'text-white' : 'text-eerie-black'} rtl:-scale-x-100`} />
       </span>
     </Link>
   );
