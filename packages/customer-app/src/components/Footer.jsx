@@ -60,7 +60,7 @@ const FooterLink = memo(({ href, children, external = false, icon: Icon = null }
   return (
     <Component
       href={href}
-      className="text-gray-600 hover:text-tufts-blue transition-colors duration-200 text-sm py-1 flex items-center gap-2 rtl-native-flex"
+      className="text-text-muted hover:text-tufts-blue transition-colors duration-200 text-sm py-1 flex items-center gap-2 rtl-native-flex"
       {...linkProps}
     >
       {Icon && <Icon />}
@@ -73,7 +73,7 @@ FooterLink.displayName = 'FooterLink';
 // Footer column component
 const FooterColumn = memo(({ title, children }) => (
   <div className="flex flex-col gap-4 items-start">
-    <h3 className="text-xs font-bold text-eerie-black uppercase tracking-wider rtl:tracking-tight">
+    <h3 className="text-xs font-bold text-text-primary uppercase tracking-wider rtl:tracking-tight">
       {title}
     </h3>
     <div className="flex flex-col gap-2 items-start">
@@ -89,7 +89,7 @@ const SocialLink = memo(({ href, icon: Icon, label, external = true }) => (
     href={href}
     target={external ? '_blank' : undefined}
     rel={external ? 'noopener noreferrer' : undefined}
-    className="w-9 h-9 flex items-center justify-center text-gray-600 hover:text-tufts-blue hover:scale-110 rounded-full hover:bg-blue-50 transition-all duration-200"
+    className="w-9 h-9 flex items-center justify-center text-text-muted hover:text-tufts-blue hover:scale-110 rounded-full hover:bg-white/5 transition-all duration-200"
     aria-label={label}
   >
     <Icon />
@@ -152,10 +152,10 @@ const Footer = () => {
 
   return (
     <footer
-      className="relative bg-white overflow-hidden"
+      className="relative overflow-hidden"
     >
       {/* Top Border — gradient fade */}
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
         {/* Main Footer Content */}
@@ -163,13 +163,13 @@ const Footer = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 lg:gap-12">
             {/* Brand Column — gradient card */}
             <div className="col-span-2 lg:col-span-2 relative items-start text-start">
-              <div className="flex flex-col items-start bg-gradient-to-br from-blue-50 to-white p-6 -mx-2">
+              <div className="flex flex-col items-start bg-gradient-to-br from-white/5 to-transparent p-6 -mx-2">
                 <Link href={getLocalizedUrl("/")} className="inline-block mb-4 group">
-                  <span className="text-3xl font-bold text-eerie-black group-hover:text-tufts-blue transition-colors">
+                  <span className="text-3xl font-bold text-text-primary group-hover:text-tufts-blue transition-colors">
                     {t('footer.brandName', 'Simnetiq')}
                   </span>
                 </Link>
-                <p className="text-gray-600 text-sm max-w-xs mb-6 leading-relaxed text-start">
+                <p className="text-text-muted text-sm max-w-xs mb-6 leading-relaxed text-start">
                   {t('footer.tagline', 'Stay connected wherever you travel. Instant eSIM activation for 150+ countries.')}
                 </p>
                 {/* Social Icons */}
@@ -227,9 +227,9 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-gray-200 py-8">
+        <div className="border-t border-white/10 py-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rtl-native-flex">
-            <p className="text-gray-500 text-sm">
+            <p className="text-text-muted text-sm">
               &copy; {new Date().getFullYear()} {t('footer.brandName', 'Simnetiq')} &middot; {t('footer.allRightsReserved', 'All rights reserved')}
             </p>
           </div>
