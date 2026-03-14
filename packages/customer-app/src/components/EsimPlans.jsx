@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -55,19 +56,19 @@ const FlexiblePlanCard = ({ plan, t, onClick, isRTL = false }) => {
     return (
         <div
             onClick={onClick}
-            className="bg-gray-50 p-4 hover:bg-white transition-all duration-500 cursor-pointer group h-full flex flex-col justify-between relative overflow-hidden"
+            className="bg-white/[0.03] p-4 hover:bg-white/5 transition-all duration-500 cursor-pointer group h-full flex flex-col justify-between relative overflow-hidden"
             dir={isRTL ? 'rtl' : 'ltr'}
         >
             {/* Price — big watermark on the right */}
             <span
-                className="absolute top-3 end-3 text-[3rem] sm:text-[3.5rem] font-semibold leading-none text-gray-700 select-none pointer-events-none"
+                className="absolute top-3 end-3 text-[3rem] sm:text-[3.5rem] font-semibold leading-none text-text-muted select-none pointer-events-none"
                 aria-hidden="true"
             >
                 ${plan.price}
             </span>
 
             <div>
-                <h4 className="font-semibold text-lg text-eerie-black text-start">
+                <h4 className="font-semibold text-lg text-text-primary text-start">
                     {dataAmount}
                 </h4>
                 {validity && (
@@ -115,7 +116,7 @@ const FlexiblePlanCard = ({ plan, t, onClick, isRTL = false }) => {
                             {t('deals.covers', 'Covers')} {countryCount} {countryCount === 1 ? t('deals.country', 'country') : t('deals.countries', 'countries')}
                         </p>
                     ) : <span />}
-                    <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0 group-hover:bg-eerie-black group-hover:text-white transition-colors duration-300 rtl:rotate-180">
+                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 group-hover:bg-eerie-black group-hover:text-white transition-colors duration-300 rtl:rotate-180">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
@@ -381,18 +382,18 @@ const EsimPlans = ({ isHomePage = false }) => {
 
     if (!isMounted) {
         return (
-            <div className="min-h-screen bg-white">
+            <div className="min-h-screen">
                 {/* Header skeleton */}
                 <div className="w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-8 sm:mt-12 lg:mt-20">
-                    <div className="h-4 sm:h-5 bg-gray-100 rounded w-32 animate-pulse" />
-                    <div className="h-7 sm:h-8 lg:h-10 xl:h-12 bg-gray-100 rounded w-80 mt-3 sm:mt-4 animate-pulse" />
+                    <div className="h-4 sm:h-5 bg-white/10 rounded w-32 animate-pulse" />
+                    <div className="h-7 sm:h-8 lg:h-10 xl:h-12 bg-white/10 rounded w-80 mt-3 sm:mt-4 animate-pulse" />
                 </div>
-                <div className="w-full h-px bg-gray-100 mt-4 sm:mt-6" />
+                <div className="w-full h-px bg-white/5 mt-4 sm:mt-6" />
 
                 {/* Search skeleton */}
-                <div className="w-full border-b border-gray-100">
+                <div className="w-full border-b border-white/5">
                     <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
-                        <div className="h-10 sm:h-11 bg-gray-100 rounded w-full animate-pulse" />
+                        <div className="h-10 sm:h-11 bg-white/10 rounded w-full animate-pulse" />
                     </div>
                 </div>
 
@@ -401,14 +402,14 @@ const EsimPlans = ({ isHomePage = false }) => {
                     {/* Region tabs skeleton */}
                     <div className="flex gap-2 mb-8">
                         {[1,2,3,4,5].map(i => (
-                            <div key={i} className="h-8 bg-gray-100 rounded-full w-20 animate-pulse" />
+                            <div key={i} className="h-8 bg-white/10 rounded-full w-20 animate-pulse" />
                         ))}
                     </div>
                     {/* Countries grid skeleton */}
-                    <div className="h-5 bg-gray-100 rounded w-28 mb-4 animate-pulse" />
+                    <div className="h-5 bg-white/10 rounded w-28 mb-4 animate-pulse" />
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                         {Array.from({length: 8}).map((_, i) => (
-                            <div key={i} className="h-16 bg-gray-50 rounded animate-pulse" />
+                            <div key={i} className="h-16 bg-white/[0.03] rounded animate-pulse" />
                         ))}
                     </div>
                 </div>
@@ -417,21 +418,21 @@ const EsimPlans = ({ isHomePage = false }) => {
     }
 
     return (
-        <div className={`min-h-screen bg-white transition-opacity duration-150 ${isMounted ? 'opacity-100' : 'opacity-0'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className={`min-h-screen transition-opacity duration-150 ${isMounted ? 'opacity-100' : 'opacity-0'}`} dir={isRTL ? 'rtl' : 'ltr'}>
 
             {/* Header */}
             <div className="w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-8 sm:mt-12 lg:mt-20">
-                <p className="font-mono text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 rtl:font-bold rtl:tracking-tight">
+                <p className="font-mono text-sm sm:text-base font-medium tracking-widest uppercase text-text-muted rtl:font-bold rtl:tracking-tight">
                     {t('plans.title', 'eSIM Plans')}
                 </p>
-                <h2 className="my-3 sm:my-4 text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-eerie-black">
+                <h2 className="my-3 sm:my-4 text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-text-primary">
                     {t('plans.subtitle', 'Choose your perfect eSIM plan')}
                 </h2>
             </div>
-            <div className="w-full h-px bg-gray-100 mt-4 sm:mt-6"></div>
+            <div className="w-full h-px bg-white/5 mt-4 sm:mt-6"></div>
 
             {/* Sticky Search */}
-            <div className="w-full sticky top-0 z-40 bg-white border-b border-gray-100">
+            <div className="w-full sticky top-0 z-40 border-b border-white/5">
                 <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
                     <input
                         type="text"
@@ -471,7 +472,7 @@ const EsimPlans = ({ isHomePage = false }) => {
                         {regionalPlans.length > 0 && (
                             <div className="mb-6">
                                 <div className="flex items-center justify-between mb-3 rtl-native-flex">
-                                    <h3 className="text-lg font-bold text-eerie-black">
+                                    <h3 className="text-lg font-bold text-text-primary">
                                         {t('plans.regionalPlans', 'Regional Plans')}
                                     </h3>
                                     {allRegionalPlans.length > 4 && (
@@ -506,11 +507,11 @@ const EsimPlans = ({ isHomePage = false }) => {
                         {/* Countries Grid */}
                         <div>
                             <div className="flex items-center justify-between mb-3 rtl-native-flex">
-                                <h3 className="text-lg font-bold text-eerie-black">
+                                <h3 className="text-lg font-bold text-text-primary">
                                     {t('plans.countries', 'Countries')}
                                 </h3>
                                 {filteredCountries.length > 0 && (
-                                    <span className="text-sm text-gray-500">
+                                    <span className="text-sm text-text-muted">
                                         {filteredCountries.length} {t('plans.available', 'available')}
                                     </span>
                                 )}
@@ -531,6 +532,14 @@ const EsimPlans = ({ isHomePage = false }) => {
                     </>
                 )}
             </div>
+
+            {isHomePage && (
+                <div className="text-center mt-8">
+                    <Link href={locale && locale !== 'en' ? `/${locale}/esim-plans` : '/esim-plans'} className="text-tufts-blue hover:text-tufts-blue/80 font-semibold transition-colors">
+                        {t('plans.viewAll', 'View All 200+ Destinations →')}
+                    </Link>
+                </div>
+            )}
 
             <PlanSelectionBottomSheet
                 isOpen={showCheckoutModal}
