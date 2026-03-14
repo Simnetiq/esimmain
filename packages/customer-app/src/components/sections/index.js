@@ -11,3 +11,10 @@ export { default as DopplerCrossSell } from './DopplerCrossSell';
 export { default as SocialProof } from './SocialProof';
 export { default as FAQSection } from './FAQSection';
 export { default as FinalCTA } from './FinalCTA';
+// Dark theme redesign sections
+export { default as NewHeroSection } from './NewHeroSection';
+export { default as TrustIndicators } from './TrustIndicators';
+export { default as HowItWorks } from './HowItWorks';
+export { default as ComparisonTable } from './ComparisonTable';
+export { default as RoamingComparison } from './RoamingComparison';
+export { default as FeaturesBento } from './FeaturesBento';
