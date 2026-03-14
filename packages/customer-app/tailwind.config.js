@@ -21,6 +21,12 @@ module.exports = {
         'cobalt-blue': 'var(--cobalt-blue)',
         'cool-black': 'var(--cool-black)',
         'eerie-black': 'var(--eerie-black)',
+        'bg-primary': '#0a0a0a',
+        'bg-secondary': '#141414',
+        'text-primary': '#f5f5f5',
+        'text-muted': '#a0a0a0',
+        'accent-success': '#22c55e',
+        'accent-highlight': '#f59e0b',
       },
       fontFamily: {
         sans: ['var(--font-dm-sans)', 'var(--font-open-sans)', 'var(--font-ibm-plex-arabic)', 'system-ui', 'sans-serif'],
