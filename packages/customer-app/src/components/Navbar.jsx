@@ -11,6 +11,7 @@ import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { useRegionsSupabase as useRegions } from '@esim/shared/hooks/useRegionsSupabase';
 import LanguageSelector from './LanguageSelector';
 import CurrencyToggle from './CurrencyToggle';
+import ThemeToggle from './ThemeToggle';
 import { detectLanguageFromPath, getLocalizedBlogListUrl, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
 import PlatformDownloadCTA from './cta/PlatformDownloadCTA';
@@ -348,6 +349,7 @@ const Navbar = ({ hideLanguageSelector = false }) => {
             </Link>
           )}
 
+          <ThemeToggle />
           {!hideLanguageSelector && <LanguageSelector />}
           {process.env.NEXT_PUBLIC_ENABLE_CURRENCY_TOGGLE === 'true' && <CurrencyToggle />}
 
@@ -468,16 +470,19 @@ const Navbar = ({ hideLanguageSelector = false }) => {
                 />
                 <span className="text-base font-bold text-text-primary">Simnetiq</span>
               </Link>
-              <button
-                type="button"
-                onClick={() => setIsMenuOpen(false)}
-                className="-m-2.5 rounded-md p-2.5 text-text-primary hover:bg-white/5 transition-colors"
-              >
-                <span className="sr-only">{t('navbar.closeMenu', 'Close menu')}</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" className="size-6">
-                  <path d="M6 18 18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
+              <div className="flex items-center gap-2">
+                <ThemeToggle />
+                <button
+                  type="button"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="-m-2.5 rounded-md p-2.5 text-text-primary hover:bg-white/5 transition-colors"
+                >
+                  <span className="sr-only">{t('navbar.closeMenu', 'Close menu')}</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" className="size-6">
+                    <path d="M6 18 18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+              </div>
             </div>
 
             {/* Centered menu items */}

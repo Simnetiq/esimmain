@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',
   content: [
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './src/**/*.{js,ts,jsx,tsx,mdx}',
@@ -21,12 +22,12 @@ module.exports = {
         'cobalt-blue': 'var(--cobalt-blue)',
         'cool-black': 'var(--cool-black)',
         'eerie-black': 'var(--eerie-black)',
-        'bg-primary': '#0a0a0a',
-        'bg-secondary': '#141414',
-        'text-primary': '#f5f5f5',
-        'text-muted': '#a0a0a0',
-        'accent-success': '#22c55e',
-        'accent-highlight': '#f59e0b',
+        'bg-primary': 'var(--bg-primary)',
+        'bg-secondary': 'var(--bg-secondary)',
+        'text-primary': 'var(--text-primary)',
+        'text-muted': 'var(--text-muted)',
+        'accent-success': 'var(--accent-success)',
+        'accent-highlight': 'var(--accent-highlight)',
       },
       fontFamily: {
         sans: ['var(--font-dm-sans)', 'var(--font-open-sans)', 'var(--font-ibm-plex-arabic)', 'system-ui', 'sans-serif'],

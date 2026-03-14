@@ -15,13 +15,21 @@
     /* Shadow colors */
     --shadow-primary: #4975d4a0;
     --shadow-secondary: #c4cfcd40;
-    /* Dark theme */
+    /* Theme-aware colors — LIGHT mode defaults */
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F5F5F5;
+    --text-primary: #1F1F1F;
+    --text-muted: #6B7280;
+    --accent-success: #22c55e;
+    --accent-highlight: #f59e0b;
+  }
+
+  .dark {
+    /* Theme-aware colors — DARK mode */
     --bg-primary: #0a0a0a;
     --bg-secondary: #141414;
     --text-primary: #f5f5f5;
     --text-muted: #a0a0a0;
-    --accent-success: #22c55e;
-    --accent-highlight: #f59e0b;
   }
 
   /* Font fallback with size-adjust for CLS prevention */
@@ -184,7 +192,7 @@
 
   /* Blog prose styles moved to blog-prose.css for code splitting */
 
-  /* Glass card — dark theme utility */
+  /* Glass card — theme-aware utility */
   .glass-card {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -195,6 +203,16 @@
   .glass-card:hover {
     border-color: rgba(73, 117, 212, 0.3);
     transform: translateY(-2px);
+  }
+
+  :root .glass-card {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.08);
+  }
+
+  .dark .glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
   }
 }
 
