@@ -36,17 +36,23 @@ export function middleware(request) {
   
   // Only redirect root path based on browser language
   if (pathname === '/') {
-    const acceptLanguage = request.headers.get('accept-language');
-    const detectedLanguage = detectLanguageFromHeader(acceptLanguage);
-    
-    // If detected language is English or not in languagesWithFolders, stay on root
-    // Otherwise redirect to language folder
-    if (detectedLanguage !== 'en' && languagesWithFolders.includes(detectedLanguage)) {
-      const url = request.nextUrl.clone();
-      url.pathname = `/${detectedLanguage}`;
-      return NextResponse.redirect(url);
+    // Don't redirect search engine crawlers — they should see English content at /
+    const userAgent = request.headers.get('user-agent') || '';
+    const isBot = /googlebot|bingbot|yandex|baiduspider|duckduckbot|slurp|msnbot|facebookexternalhit|twitterbot|linkedinbot|applebot/i.test(userAgent);
+
+    if (!isBot) {
+      const acceptLanguage = request.headers.get('accept-language');
+      const detectedLanguage = detectLanguageFromHeader(acceptLanguage);
+
+      // If detected language is English or not in languagesWithFolders, stay on root
+      // Otherwise redirect to language folder
+      if (detectedLanguage !== 'en' && languagesWithFolders.includes(detectedLanguage)) {
+        const url = request.nextUrl.clone();
+        url.pathname = `/${detectedLanguage}`;
+        return NextResponse.redirect(url);
+      }
     }
-    // For English, stay on root (no redirect needed)
+    // For English or bots, stay on root (no redirect needed)
   }
   
   // Add pathname to headers for language detection in server components

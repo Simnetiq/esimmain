@@ -1,3 +1,5 @@
+import { generateAlternates } from '../../src/config/metadata';
+
 export const metadata = {
   title: 'eSIM для подорожей — Simnetiq | Мобільний інтернет без роумінгу',
   description: 'Забудьте про дорогий роумінг. Simnetiq eSIM: інтернет у 200+ країнах, миттєва активація, тарифи від $3. Ідеально для мандрівників та цифрових кочівників.',
@@ -28,9 +30,7 @@ export const metadata = {
     title: 'eSIM для подорожей — Simnetiq | Мобільний інтернет без роумінгу',
     description: 'Забудьте про дорогий роумінг. Simnetiq eSIM: інтернет у 200+ країнах, миттєва активація, тарифи від $3. Ідеально для мандрівників та цифрових кочівників.',
   },
-  alternates: {
-    canonical: '/uk',
-  },
+  alternates: generateAlternates('/'),
 }
 
 export default function UkrainianLayout({ children }) {

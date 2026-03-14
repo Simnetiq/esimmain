@@ -84,7 +84,7 @@ export const metadata = {
     siteName: 'Simnetiq',
     images: [
       {
-        url: '/images/og-image.svg',
+        url: '/images/og-image.png',
         width: 1200,
         height: 630,
         alt: 'Simnetiq - Global eSIM for Seamless Travel Connectivity',
@@ -95,7 +95,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: defaultMetadata.openGraph.title,
     description: defaultMetadata.openGraph.description,
-    images: ['/images/og-image.svg'],
+    images: ['/images/og-image.png'],
   },
   icons: {  
     icon: [
@@ -167,7 +167,7 @@ export default function RootLayout({ children }) {
         <meta name="theme-color" content="#468BE6" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         
-        {/* Structured Data for SEO */}
+        {/* Structured Data for SEO — Organization */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -179,14 +179,131 @@ export default function RootLayout({ children }) {
               "logo": "https://www.simnetiq.store/images/logo_icon/logo.png",
               "description": "Global eSIM plans for travelers, backpackers, and digital nomads. Instant activation in 200+ countries.",
               "sameAs": [
-                "https://twitter.com/Simnetiq",
-                "https://facebook.com/Simnetiq"
+                "https://apps.apple.com/app/simnetiq-esim/id6499061702"
               ],
               "contactPoint": {
                 "@type": "ContactPoint",
                 "contactType": "customer service",
+                "email": "support@simnetiq.store",
                 "availableLanguage": ["English", "Spanish", "French", "German", "Arabic", "Hebrew", "Hindi", "Japanese", "Polish", "Portuguese", "Russian", "Ukrainian", "Chinese"]
               }
+            })
+          }}
+        />
+        {/* Structured Data — WebSite with SearchAction */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "Simnetiq",
+              "url": "https://www.simnetiq.store",
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": "https://www.simnetiq.store/esim-plans?q={search_term_string}",
+                "query-input": "required name=search_term_string"
+              }
+            })
+          }}
+        />
+        {/* Structured Data — SoftwareApplication */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              "name": "Simnetiq",
+              "operatingSystem": "iOS, Android",
+              "applicationCategory": "TravelApplication",
+              "description": "eSIM app for instant mobile data in 200+ countries. No roaming fees, instant activation.",
+              "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+              },
+              "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.5",
+                "ratingCount": "50"
+              }
+            })
+          }}
+        />
+        {/* Structured Data — FAQPage */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": [
+                {
+                  "@type": "Question",
+                  "name": "What is an eSIM and how does it work?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "An eSIM (embedded SIM) is a digital SIM card built into your device. Instead of inserting a physical SIM card, you can download and activate a cellular plan directly onto your device. This allows you to switch between carriers and plans without needing to swap physical cards."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Which devices support eSIM?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Most modern smartphones support eSIM, including iPhone XS and newer, Google Pixel 3 and newer, Samsung Galaxy S20 and newer, and many others. Check your device settings or contact us to confirm compatibility."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "How do I activate my eSIM?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "After purchase, you'll receive a QR code via email. Simply scan this code with your device's camera in the cellular settings, and your eSIM will be activated automatically. Detailed instructions are provided for each device type."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "What payment methods do you accept?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "We accept all major credit cards (Visa, Mastercard, American Express), Apple Pay, Google Pay, and various local payment methods. All payments are processed securely through Stripe."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Can I get a refund if I'm not satisfied?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, we offer a 7-day money-back guarantee for unused data plans. If you haven't activated your eSIM or used any data, you can request a full refund within 7 days of purchase."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "My eSIM isn't connecting to the network. What should I do?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "First, ensure you're in an area with network coverage. Try restarting your device, toggling airplane mode on/off, or manually selecting the network in your cellular settings. If issues persist, contact our support team."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Can I use my eSIM for calls and SMS?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Our eSIM plans are primarily data-only. However, you can use VoIP services like WhatsApp, Skype, or FaceTime for calls and messaging over your data connection."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "How do I check my data usage?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "You can monitor your data usage through your device's settings or our mobile app. We also send notifications when you're approaching your data limit."
+                  }
+                }
+              ]
             })
           }}
         />

@@ -8,12 +8,12 @@ export const dynamic = 'force-dynamic';
 const VALID_LOCALES = ['ar', 'de', 'es', 'fr', 'he', 'hi', 'ja', 'pl', 'pt', 'ru', 'uk', 'zh'];
 
 export const metadata = {
-  title: 'Blog - eSIM Plans',
-  description: 'Latest news, tips, and insights about eSIM technology, travel connectivity, and global data plans.',
-  keywords: ['eSIM blog', 'travel tips', 'connectivity news', 'data plans guide'],
+  title: 'eSIM Travel Blog — Tips & Guides | Simnetiq',
+  description: 'eSIM travel tips, setup guides, and destination insights. Compare eSIM providers, avoid roaming charges, and stay connected in 200+ countries with Simnetiq.',
+  keywords: ['eSIM blog', 'travel tips', 'connectivity news', 'data plans guide', 'eSIM comparison', 'travel connectivity', 'Simnetiq blog'],
   openGraph: {
-    title: 'Blog - eSIM Plans',
-    description: 'Latest news, tips, and insights about eSIM technology, travel connectivity, and global data plans.',
+    title: 'eSIM Travel Blog — Tips & Guides | Simnetiq',
+    description: 'eSIM travel tips, setup guides, and destination insights. Compare eSIM providers, avoid roaming charges, and stay connected in 200+ countries with Simnetiq.',
     url: '/blog',
     locale: 'en_US',
   },

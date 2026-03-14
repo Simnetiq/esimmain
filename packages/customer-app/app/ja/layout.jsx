@@ -1,3 +1,5 @@
+import { generateAlternates } from '../../src/config/metadata';
+
 export const metadata = {
   title: 'eSIM 旅行用 — Simnetiq | ローミング不要のモバイルデータ',
   description: '高額なローミング料金はもう不要。Simnetiq eSIM: 200以上の国でインターネット接続、即時アクティベーション、$3からのプラン。旅行者やデジタルノマドに最適。',
@@ -28,9 +30,7 @@ export const metadata = {
     title: 'eSIM 旅行用 — Simnetiq | ローミング不要のモバイルデータ',
     description: '高額なローミング料金はもう不要。Simnetiq eSIM: 200以上の国でインターネット接続、即時アクティベーション、$3からのプラン。旅行者やデジタルノマドに最適。',
   },
-  alternates: {
-    canonical: '/ja',
-  },
+  alternates: generateAlternates('/'),
 }
 
 export default function JapaneseLayout({ children }) {

@@ -1,3 +1,5 @@
+import { generateAlternates } from '../../src/config/metadata';
+
 export const metadata = {
   title: '旅行eSIM — Simnetiq | 无漫游移动数据',
   description: '告别昂贵的漫游费用。Simnetiq eSIM：200+国家的互联网连接，即时激活，低至$3的套餐。旅行者和数字游民的完美选择。',
@@ -28,9 +30,7 @@ export const metadata = {
     title: '旅行eSIM — Simnetiq | 无漫游移动数据',
     description: '告别昂贵的漫游费用。Simnetiq eSIM：200+国家的互联网连接，即时激活，低至$3的套餐。旅行者和数字游民的完美选择。',
   },
-  alternates: {
-    canonical: '/zh',
-  },
+  alternates: generateAlternates('/'),
 }
 
 export default function ChineseLayout({ children }) {

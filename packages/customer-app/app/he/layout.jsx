@@ -1,3 +1,5 @@
+import { generateAlternates } from '../../src/config/metadata';
+
 export const metadata = {
   title: 'eSIM לטיולים — Simnetiq | אינטרנט סלולרי בלי רומינג',
   description: 'שכחו מרומינג יקר. Simnetiq eSIM: אינטרנט ב-200+ מדינות, הפעלה תוך דקה, מחירים מ-$3. מושלם למטיילים ונוודים דיגיטליים.',
@@ -31,9 +33,7 @@ export const metadata = {
     title: 'eSIM לטיולים — Simnetiq | אינטרנט סלולרי בלי רומינג',
     description: 'שכחו מרומינג יקר. Simnetiq eSIM: אינטרנט ב-200+ מדינות, הפעלה תוך דקה, מחירים מ-$3. מושלם למטיילים ונוודים דיגיטליים.',
   },
-  alternates: {
-    canonical: '/he',
-  },
+  alternates: generateAlternates('/'),
 }
 
 export default function HebrewLayout({ children }) {

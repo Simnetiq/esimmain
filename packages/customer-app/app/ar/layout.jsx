@@ -1,3 +1,5 @@
+import { generateAlternates } from '../../src/config/metadata';
+
 export const metadata = {
   title: 'eSIM للسفر — Simnetiq | إنترنت متنقل بدون رسوم التجوال',
   description: 'انسَ رسوم التجوال الباهظة. Simnetiq eSIM: إنترنت في أكثر من 200 دولة، تفعيل فوري، باقات تبدأ من 3$. مثالي للمسافرين والرحالة الرقميين.',
@@ -31,9 +33,7 @@ export const metadata = {
     title: 'eSIM للسفر — Simnetiq | إنترنت متنقل بدون رسوم التجوال',
     description: 'انسَ رسوم التجوال الباهظة. Simnetiq eSIM: إنترنت في أكثر من 200 دولة، تفعيل فوري، باقات تبدأ من 3$. مثالي للمسافرين والرحالة الرقميين.',
   },
-  alternates: {
-    canonical: '/ar',
-  },
+  alternates: generateAlternates('/'),
 }
 
 export default function ArabicLayout({ children }) {

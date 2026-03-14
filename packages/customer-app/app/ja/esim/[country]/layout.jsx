@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
+const LOCALE = 'ja';
+
 function getSupabase() {
   const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -28,6 +30,7 @@ export async function generateMetadata({ params }) {
 
   const title = `eSIM for ${country.name} — From $${country.min_price || '5'} | Simnetiq`;
   const description = `Buy eSIM data plans for ${country.name}. ${country.plan_count || 'Multiple'} plans available from $${country.min_price || '5'}. Instant activation, no roaming charges. Stay connected with Simnetiq.`;
+  const base = 'https://www.simnetiq.store';
 
   return {
     title,
@@ -35,7 +38,7 @@ export async function generateMetadata({ params }) {
     openGraph: {
       title,
       description,
-      url: `https://www.simnetiq.store/ja/esim/${country.slug}`,
+      url: `${base}/${LOCALE}/esim/${country.slug}`,
       siteName: 'Simnetiq',
       images: country.image_url ? [{ url: country.image_url, width: 600, height: 400 }] : [],
       type: 'website',
@@ -46,16 +49,22 @@ export async function generateMetadata({ params }) {
       description,
     },
     alternates: {
-      canonical: `https://www.simnetiq.store/esim/${country.slug}`,
+      canonical: `${base}/${LOCALE}/esim/${country.slug}`,
       languages: {
-        'en': `https://www.simnetiq.store/esim/${country.slug}`,
-        'es': `https://www.simnetiq.store/es/esim/${country.slug}`,
-        'fr': `https://www.simnetiq.store/fr/esim/${country.slug}`,
-        'de': `https://www.simnetiq.store/de/esim/${country.slug}`,
-        'ru': `https://www.simnetiq.store/ru/esim/${country.slug}`,
-        'ar': `https://www.simnetiq.store/ar/esim/${country.slug}`,
-        'he': `https://www.simnetiq.store/he/esim/${country.slug}`,
-        'ja': `https://www.simnetiq.store/ja/esim/${country.slug}`,
+        'x-default': `${base}/esim/${country.slug}`,
+        'en': `${base}/esim/${country.slug}`,
+        'ar': `${base}/ar/esim/${country.slug}`,
+        'de': `${base}/de/esim/${country.slug}`,
+        'es': `${base}/es/esim/${country.slug}`,
+        'fr': `${base}/fr/esim/${country.slug}`,
+        'he': `${base}/he/esim/${country.slug}`,
+        'hi': `${base}/hi/esim/${country.slug}`,
+        'ja': `${base}/ja/esim/${country.slug}`,
+        'pl': `${base}/pl/esim/${country.slug}`,
+        'pt': `${base}/pt/esim/${country.slug}`,
+        'ru': `${base}/ru/esim/${country.slug}`,
+        'uk': `${base}/uk/esim/${country.slug}`,
+        'zh': `${base}/zh/esim/${country.slug}`,
       },
     },
   };

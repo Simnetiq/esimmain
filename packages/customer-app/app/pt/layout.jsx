@@ -1,3 +1,5 @@
+import { generateAlternates } from '../../src/config/metadata';
+
 export const metadata = {
   title: 'eSIM para Viagem — Simnetiq | Internet Movel sem Roaming',
   description: 'Esqueca o roaming caro. Simnetiq eSIM: internet em mais de 200 paises, ativacao instantanea, planos a partir de $3. Perfeito para viajantes e nomades digitais.',
@@ -30,9 +32,7 @@ export const metadata = {
     title: 'eSIM para Viagem — Simnetiq | Internet Movel sem Roaming',
     description: 'Esqueca o roaming caro. Simnetiq eSIM: internet em mais de 200 paises, ativacao instantanea, planos a partir de $3. Perfeito para viajantes e nomades digitais.',
   },
-  alternates: {
-    canonical: '/pt',
-  },
+  alternates: generateAlternates('/'),
 }
 
 export default function PortugueseLayout({ children }) {

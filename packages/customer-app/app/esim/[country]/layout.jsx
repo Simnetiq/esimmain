@@ -48,6 +48,7 @@ export async function generateMetadata({ params }) {
     alternates: {
       canonical: `https://www.simnetiq.store/esim/${country.slug}`,
       languages: {
+        'x-default': `https://www.simnetiq.store/esim/${country.slug}`,
         'en': `https://www.simnetiq.store/esim/${country.slug}`,
         'es': `https://www.simnetiq.store/es/esim/${country.slug}`,
         'fr': `https://www.simnetiq.store/fr/esim/${country.slug}`,
