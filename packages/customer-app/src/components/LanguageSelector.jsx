@@ -53,7 +53,6 @@ const LanguageSelector = ({ variant = 'desktop', onClose }) => {
   const [panelPos, setPanelPos] = useState(null);
   const btnRef = useRef(null);
   const panelRef = useRef(null);
-  const navRef = useRef(null);
 
   useEffect(() => { setMounted(true); }, []);
 

@@ -52,7 +52,7 @@ export default function NewHeroSection({ promo = null }) {
   const headlinePart1 = t('hero.darkHeadlinePart1', 'Stay connected');
   const headlineHighlight = t('hero.darkHeadlineHighlight', 'anywhere');
   const headlinePart2 = t('hero.darkHeadlinePart2', 'in the world');
-  const subtitleText = t('hero.darkSubtitle', 'Activate your eSIM in minutes. No physical SIM needed — instant data in 200+ countries.');
+  const subtitleText = t('hero.darkSubtitle', 'Instant eSIM activation for 200+ countries. No SIM cards, no roaming fees, no hassle.');
 
   const trustBadges = [
     t('hero.countries', '200+ Countries'),

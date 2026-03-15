@@ -129,7 +129,7 @@ export const blogServiceSupabase = {
         });
 
       if (error) {
-        console.error('[getPublishedPosts] Error:', error);
+        console.error('[getPublishedPosts] Supabase RPC error:', error.message || error.code || JSON.stringify(error));
         throw error;
       }
 
@@ -140,8 +140,8 @@ export const blogServiceSupabase = {
         hasMore: posts.length === limitCount
       };
     } catch (error) {
-      console.error('[getPublishedPosts] Error:', error);
-      throw error;
+      console.error('[getPublishedPosts] Error:', error.message || error.code || JSON.stringify(error));
+      return { posts: [], hasMore: false };
     }
   },
 

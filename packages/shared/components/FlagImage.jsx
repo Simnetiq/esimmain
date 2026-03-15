@@ -5,7 +5,7 @@
 
 const FLAG_SVG_SET = new Set([
   // Original set (language selector)
-  'us', 'es', 'ru', 'de', 'fr', 'il', 'sa', 'br', 'jp', 'cn', 'pl', 'ua', 'in', 'kr', 'th',
+  'us', 'es', 'ru', 'de', 'fr', 'il', 'sa', 'br', 'jp', 'cn', 'pl', 'ua', 'in', 'kr', 'th', 'nl', 'tr',
   // CoverageStats regions
   'it', 'gb', 'sg', 'ca', 'mx', 'ar', 'za', 'ke', 'ng', 'eg', 'ma', 'au', 'nz', 'fj', 'pg', 'ws', 'ae', 'jo', 'qa',
 ]);

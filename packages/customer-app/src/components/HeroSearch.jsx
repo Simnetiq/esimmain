@@ -153,7 +153,7 @@ export default function HeroSearch({ esimPlansUrl }) {
       </div>
 
       {/* Dropdown */}
-      {isOpen && filtered.length > 0 && (
+      {isOpen && (filtered.length > 0 || query.trim()) && (
         <div
           ref={dropdownRef}
           role="listbox"

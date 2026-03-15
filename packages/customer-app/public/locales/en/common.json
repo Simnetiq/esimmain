@@ -799,8 +799,10 @@
     "moneyBackDesc": "7-day full refund on unused plans"
   },
   "howItWorks": {
+    "label": "Three simple steps",
     "title": "How It Works",
     "subtitle": "Three simple steps to stay connected",
+    "stepLabel": "Step",
     "step1Title": "Choose Your Plan",
     "step1Desc": "Pick your destination and data plan from 200+ countries",
     "step2Title": "Scan QR Code",

@@ -44,22 +44,22 @@ export default function HowItWorks() {
     {
       number: '01',
       Icon: MapPinIcon,
-      title: t('howItWorks.step1Title', 'Choose your destination'),
-      description: t('howItWorks.step1Desc', 'Browse plans for 200+ countries. Filter by region, duration, or data size to find the perfect fit.'),
+      title: t('howItWorks.step1Title', 'Choose Your Plan'),
+      description: t('howItWorks.step1Desc', 'Pick your destination and data plan from 200+ countries'),
       delay: 0,
     },
     {
       number: '02',
       Icon: QrCodeIcon,
-      title: t('howItWorks.step2Title', 'Scan & install'),
-      description: t('howItWorks.step2Desc', 'You get a QR code by email instantly. Scan it in your phone settings and the eSIM installs in seconds.'),
+      title: t('howItWorks.step2Title', 'Scan QR Code'),
+      description: t('howItWorks.step2Desc', 'Receive your QR code instantly and scan it with your phone'),
       delay: 150,
     },
     {
       number: '03',
       Icon: WifiIcon,
-      title: t('howItWorks.step3Title', 'Connect and go'),
-      description: t('howItWorks.step3Desc', 'Enable your eSIM at the airport or when you land. Full-speed data starts immediately — no setup needed.'),
+      title: t('howItWorks.step3Title', 'You\'re Connected'),
+      description: t('howItWorks.step3Desc', 'Data activates automatically when you arrive. That\'s it.'),
       delay: 300,
     },
   ];
@@ -85,7 +85,7 @@ export default function HowItWorks() {
               {t('howItWorks.title', 'How It Works')}
             </h2>
             <p className="text-text-muted mt-3 max-w-lg text-base">
-              {t('howItWorks.subtitle', 'No queues, no contracts, no physical cards. Just fast, reliable data wherever you go.')}
+              {t('howItWorks.subtitle', 'Three simple steps to stay connected')}
             </p>
           </Reveal>
         </div>
