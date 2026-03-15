@@ -23,17 +23,25 @@
     "about": "אודות"
   },
   "hero": {
-    "headlinePart1": "הדרך הקלה ביותר לקבל נתוני סלולר",
-    "headlineHighlight": "בכל מקום",
-    "headlinePart2": "בעולם",
-    "subtitle": "הפעל את ה-eSIM שלך תוך דקות והישאר מחובר ביותר מ-200 יעדים ברחבי העולם.",
+    "headlinePart1": "אינטרנט בחו״ל",
+    "headlineHighlight": "בקלות מוחלטת",
+    "headlinePart2": "ביותר מ-200 מדינות",
+    "subtitle": "חבילות נתונים eSIM מוכנות תוך דקות. בלי כרטיס SIM פיזי, בלי עלויות רומינג.",
     "countries": "200+ מדינות",
     "instantActivation": "הפעלה מיידית",
     "securePayment": "תשלום מאובטח",
     "downloadAppIOS": "App Store",
     "downloadAppAndroid": "Google Play",
-    "exploreStore": "חנות eSIM",
-    "downloadApp": "הורד אפליקציה"
+    "exploreStore": "לחבילות eSIM",
+    "downloadApp": "הורד את האפליקציה",
+    "darkHeadlinePart1": "הישאר מחובר",
+    "darkHeadlineHighlight": "בכל מקום",
+    "darkHeadlinePart2": "בעולם",
+    "darkSubtitle": "הפעלת eSIM מיידית ליותר מ-200 מדינות. בלי כרטיס SIM, בלי דמי רומינג, בלי טרחה.",
+    "promoPrefix": "השתמש בקוד",
+    "promoSuffix": "לקבלת {{discount}}% הנחה על ה-eSIM הראשון שלך",
+    "fiveStarRated": "דירוג 5 כוכבים",
+    "sevenDayRefund": "החזר תוך 7 ימים"
   },
   "features": {
     "title": "התחבר גלובלית",
@@ -448,7 +456,7 @@
     "continue": "המשך",
     "selectPlanToContinue": "בחר תוכנית להמשך",
     "globalPlans": "תוכניות גלובליות",
-    "regionalPlansFor": "תוכניות {region}"
+    "regionalPlansFor": "תוכניות {{region}}"
   },
   "planSort": {
     "price": "מחיר ↑",
@@ -739,7 +747,7 @@
     "benefit3": "ללא חיובי נדידה או עמלות מפתיעות",
     "benefit4": "שמור על המספר הראשי שלך בזמן שימוש בנתונים בחו\"ל",
     "benefit5": "תמיכת לקוחות 24/7",
-    "regionalPlans": "תוכניות אזוריות ל{{region}}"
+    "regionalPlans": "תוכניות אזוריות ל{{{region}}}"
   },
   "about": {
     "sectionLabel": "אודותינו",
@@ -770,5 +778,157 @@
     "ctaTitle": "מוכנים לצאת לעולם?",
     "ctaDesc": "קבלו eSIM תוך דקות. עובד על כל מכשיר לא נעול.",
     "ctaButton": "לצפייה בתוכניות"
+  },
+  "roaming": {
+    "label": "מחירי המפעילים האמיתיים",
+    "title": "הפסיקו לשלם יתר על נדידה",
+    "subtitle": "מחירים אמיתיים של המפעילים הגדולים מול Simnetiq. מבוסס על נסיעה של שבוע עם 5GB נתונים.",
+    "horrorTitle": "בלי חבילת נדידה?",
+    "horrorDesc": "AT&T ו-Verizon גובים $2.05 ל-MB — כלומר $10,250 בשביל 5GB בלבד.",
+    "horrorSource": "מקור: תעריפי pay-as-you-go של att.com ו-verizon.com",
+    "selectDest": "בחר יעד",
+    "chartTitle": "נסיעה של שבוע · 5GB נתונים",
+    "saveLabel": "חסכו עד",
+    "dest": {
+      "turkey": "טורקיה",
+      "thailand": "תאילנד",
+      "japan": "יפן",
+      "brazil": "ברזיל",
+      "egypt": "מצרים"
+    },
+    "carrier": {
+      "att": "AT&T / Verizon (ארה\"ב)",
+      "vodafoneDE": "Vodafone (גרמניה)",
+      "telekomDE": "Telekom (גרמניה)",
+      "simnetiq": "Simnetiq eSIM"
+    },
+    "note": {
+      "dayPass": "Day Pass $12/יום × 7",
+      "easyTravel": "EasyTravel €7.99/יום",
+      "reisePaket": "ReisePaket World 4GB/שבוע",
+      "travelMobil": "Travel Mobil Basic 5GB",
+      "travelMobilWorld": "Travel Mobil World 5GB",
+      "esim5gb": "חבילת 5GB"
+    },
+    "saveUpTo": "חיסכון מרבי לעומת נדידת מפעיל",
+    "fromPriceValue": "$5",
+    "fromPrice": "מחיר טיפוסי לחבילת 5GB",
+    "noBillsValue": "$0",
+    "noBills": "חשבונות מפתיעים או עמלות נסתרות",
+    "noContractValue": "0",
+    "noContract": "חוזים נדרשים",
+    "disclaimer": "תעריפי המפעילים מבוססים על מחירים רשמיים שפורסמו (מרץ 2026). מחירי eSIM משקפים מחירי שוק טיפוסיים.",
+    "sources": "telekom.de · att.com · vodafone.de · airalo.com"
+  },
+  "coverage": {
+    "title": "כיסוי גלובלי",
+    "countries": "מדינות",
+    "dataPlans": "תוכניות נתונים",
+    "languages": "שפות",
+    "avgActivation": "הפעלה ממוצעת",
+    "europe": "אירופה",
+    "asia": "אסיה",
+    "americas": "אמריקה",
+    "africa": "אפריקה",
+    "oceania": "אוקיאניה",
+    "middleEast": "המזרח התיכון",
+    "exploreCTA": "גלו את {{region}} עכשיו"
+  },
+  "trust": {
+    "title": "למה מטיילים סומכים על Simnetiq",
+    "noRoamingFees": "ללא דמי רומינג",
+    "noRoamingFeesDesc": "חסכו מאות על חיובי נתונים בינלאומיים",
+    "qrActivation": "הפעלת QR",
+    "qrActivationDesc": "סרקו, הפעילו, התחברו — תוך פחות מ-2 דקות",
+    "languages": "18 שפות",
+    "languagesDesc": "תמיכה בשפה שלך, מאיפה שלא תהיו",
+    "moneyBack": "ערבות החזר כספי",
+    "moneyBackDesc": "החזר מלא תוך 7 ימים על תוכניות שלא נוצלו"
+  },
+  "howItWorks": {
+    "title": "איך זה עובד",
+    "subtitle": "שלושה צעדים פשוטים להישאר מחובר",
+    "step1Title": "בחרו תוכנית",
+    "step1Desc": "בחרו יעד ותוכנית נתונים מ-200+ מדינות",
+    "step2Title": "סרקו קוד QR",
+    "step2Desc": "קבלו את קוד ה-QR מיד וסרקו אותו עם הטלפון",
+    "step3Title": "אתם מחוברים",
+    "step3Desc": "הנתונים מופעלים אוטומטית כשמגיעים ליעד. זה הכל."
+  },
+  "comparison": {
+    "title": "eSIM לעומת SIM פיזי",
+    "subtitle": "גלו למה מטיילים עוברים ל-eSIM",
+    "activation": "הפעלה",
+    "physicalActivation": "מצאו חנות, חכו בתור",
+    "esimActivation": "סרקו QR, מוכן תוך 2 דקות",
+    "availability": "זמינות",
+    "physicalAvailability": "רק בשדות תעופה ובערים",
+    "esimAvailability": "קנו אונליין, בכל זמן",
+    "switching": "החלפת תוכניות",
+    "physicalSwitching": "קנו כרטיס חדש, החליפו פיזית",
+    "esimSwitching": "הוסיפו תוכנית חדשה דיגיטלית",
+    "keepNumber": "שמירה על המספר",
+    "physicalKeepNumber": "חובה להוציא את ה-SIM הראשי",
+    "esimKeepNumber": "עובד לצד ה-SIM שלכם",
+    "multiCountry": "מספר מדינות",
+    "physicalMultiCountry": "SIM חדש לכל מדינה",
+    "esimMultiCountry": "החליפו תוכניות מיידית",
+    "cost": "עלות",
+    "physicalCost": "מרווח חנות + הגעה לחנות",
+    "esimCost": "תמחור ישיר, ללא תוספות"
+  },
+  "featuresBento": {
+    "title": "למה לבחור ב-Simnetiq",
+    "globalCoverage": "כיסוי גלובלי",
+    "globalCoverageDesc": "200+ מדינות, 400+ ספקים. אפליקציה אחת.",
+    "instantActivation": "הפעלה מיידית",
+    "instantActivationDesc": "מרכישה לחיבור תוך פחות מ-2 דקות",
+    "topUp": "טעינה בכל עת",
+    "topUpDesc": "נגמר הנפח? הוסיפו נתונים בלי להתקין מחדש את ה-eSIM",
+    "securePayments": "תשלומים מאובטחים",
+    "securePaymentsDesc": "תשלום מבוסס Stripe. Apple Pay, Google Pay, כל הכרטיסים המובילים.",
+    "multiLanguage": "רב-לשוני",
+    "multiLanguageDesc": "תמיכה מלאה ב-18 שפות כולל ערבית, עברית, יפנית ועוד",
+    "support": "תמיכה ייעודית",
+    "supportDesc": "תמיכה אנושית אמיתית באימייל ובאפליקציה. בלי צ'אטבוטים."
+  },
+  "devices": {
+    "title": "תאימות מכשירים",
+    "notSure": "לא בטוחים אם המכשיר שלכם תומך ב-eSIM?",
+    "checkFaq": "בדקו את השאלות הנפוצות"
+  },
+  "promoBanner": {
+    "headline": "קבלו {{discount}}% הנחה על תוכנית ה-eSIM הראשונה",
+    "cta": "לצפייה בתוכניות",
+    "finePrint": "בתוקף ללקוחות חדשים. שימוש אחד לחשבון.",
+    "copied": "הועתק!"
+  },
+  "appDownload": {
+    "badge": "זמין ב-iOS",
+    "badgeBoth": "זמין ב-iOS וב-Android",
+    "title": "נהלו הכל מהטלפון",
+    "bullet1": "קנו והפעילו eSIM",
+    "bullet2": "עקבו אחרי שימוש בנתונים בזמן אמת",
+    "bullet3": "טעינה בלחיצה אחת",
+    "bullet4": "קבלו קודי QR מיד"
+  },
+  "dopplerCrossSell": {
+    "badge": "מבית Simnetiq",
+    "title": "Doppler VPN",
+    "description": "VPN ללא תיעוד עם WireGuard + VLESS. עד 10 מכשירים.",
+    "promo": "השתמשו בקוד LAUNCH20 ל-20% הנחה",
+    "cta": "למידע נוסף"
+  },
+  "socialProof": {
+    "rating": "4.5",
+    "appStore": "App Store",
+    "tagline": "מהימן על ידי מטיילים ב-200+ מדינות"
+  },
+  "finalCta": {
+    "title": "מוכנים להישאר מחוברים בכל העולם?",
+    "subtitle": "קבלו eSIM תוך דקות. עובד על כל מכשיר לא נעול.",
+    "browsePlans": "לצפייה בתוכניות",
+    "downloadApp": "הורדת האפליקציה",
+    "promoReminder": "השתמשו בקוד {{code}} ל-{{discount}}% הנחה"
   }
 }

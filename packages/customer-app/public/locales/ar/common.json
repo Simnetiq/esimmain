@@ -23,17 +23,25 @@
     "about": "حول"
   },
   "hero": {
-    "headlinePart1": "أسهل طريقة للحصول على بيانات الجوال",
-    "headlineHighlight": "في أي مكان",
-    "headlinePart2": "في العالم",
-    "subtitle": "قم بتفعيل eSIM الخاص بك في دقائق وابق متصلاً في أكثر من 200 وجهة حول العالم.",
+    "headlinePart1": "إنترنت في الخارج",
+    "headlineHighlight": "بكل سهولة",
+    "headlinePart2": "في أكثر من 200 دولة",
+    "subtitle": "باقات بيانات eSIM جاهزة في دقائق. بدون شريحة فعلية، بدون رسوم تجوال.",
     "countries": "200+ دولة",
-    "instantActivation": "التفعيل الفوري",
-    "securePayment": "الدفع الآمن",
+    "instantActivation": "تفعيل فوري",
+    "securePayment": "دفع آمن",
     "downloadAppIOS": "حمّل تطبيق iOS",
     "downloadAppAndroid": "حمّل تطبيق Android",
-    "exploreStore": "استكشف متجر eSIM",
-    "downloadApp": "تحميل التطبيق"
+    "exploreStore": "تصفّح باقات eSIM",
+    "downloadApp": "حمّل التطبيق",
+    "darkHeadlinePart1": "ابقَ متصلاً",
+    "darkHeadlineHighlight": "في أي مكان",
+    "darkHeadlinePart2": "حول العالم",
+    "darkSubtitle": "تفعيل فوري لـ eSIM في أكثر من 200 دولة. بدون شريحة SIM، بدون رسوم تجوال، بدون عناء.",
+    "promoPrefix": "استخدم الرمز",
+    "promoSuffix": "للحصول على خصم {{discount}}% على أول eSIM",
+    "fiveStarRated": "تقييم 5 نجوم",
+    "sevenDayRefund": "استرداد خلال 7 أيام"
   },
   "features": {
     "title": "تواصل عالمياً",
@@ -449,7 +457,7 @@
     "continue": "متابعة",
     "selectPlanToContinue": "اختر خطة للمتابعة",
     "globalPlans": "الخطط العالمية",
-    "regionalPlansFor": "خطط {region}"
+    "regionalPlansFor": "خطط {{region}}"
   },
   "planSort": {
     "price": "السعر ↑",
@@ -740,7 +748,7 @@
     "benefit3": "بدون رسوم تجوال أو رسوم مفاجئة",
     "benefit4": "احتفظ برقمك الأساسي أثناء استخدام البيانات في الخارج",
     "benefit5": "دعم عملاء على مدار الساعة",
-    "regionalPlans": "خطط {{region}} الإقليمية"
+    "regionalPlans": "خطط {{{region}}} الإقليمية"
   },
   "about": {
     "sectionLabel": "من نحن",
@@ -771,5 +779,157 @@
     "ctaTitle": "مستعد للانطلاق عالمياً؟",
     "ctaDesc": "احصل على eSIM في دقائق. يعمل على أي جهاز غير مقفل.",
     "ctaButton": "تصفح الخطط"
+  },
+  "roaming": {
+    "label": "أسعار المشغّلين الحقيقية",
+    "title": "توقف عن الدفع الزائد للتجوال",
+    "subtitle": "الأسعار الحقيقية للمشغّلين الكبار مقابل Simnetiq. استناداً إلى رحلة أسبوعية باستخدام 5 جيجابايت من البيانات.",
+    "horrorTitle": "بدون باقة تجوال؟",
+    "horrorDesc": "تفرض AT&T و Verizon رسوم $2.05/ميغابايت — أي $10,250 مقابل 5 جيجابايت فقط من البيانات.",
+    "horrorSource": "المصدر: أسعار الدفع لكل استخدام في att.com وverizon.com",
+    "selectDest": "اختر الوجهة",
+    "chartTitle": "رحلة أسبوع · 5 جيجابايت بيانات",
+    "saveLabel": "وفّر حتى",
+    "dest": {
+      "turkey": "تركيا",
+      "thailand": "تايلاند",
+      "japan": "اليابان",
+      "brazil": "البرازيل",
+      "egypt": "مصر"
+    },
+    "carrier": {
+      "att": "AT&T / Verizon (الولايات المتحدة)",
+      "vodafoneDE": "Vodafone (ألمانيا)",
+      "telekomDE": "Telekom (ألمانيا)",
+      "simnetiq": "Simnetiq eSIM"
+    },
+    "note": {
+      "dayPass": "Day Pass بـ $12/يوم × 7",
+      "easyTravel": "EasyTravel بـ €7.99/يوم",
+      "reisePaket": "ReisePaket World 4 جيجابايت/أسبوع",
+      "travelMobil": "Travel Mobil Basic 5 جيجابايت",
+      "travelMobilWorld": "Travel Mobil World 5 جيجابايت",
+      "esim5gb": "باقة 5 جيجابايت"
+    },
+    "saveUpTo": "أقصى توفير مقارنة بتجوال المشغّل",
+    "fromPriceValue": "$5",
+    "fromPrice": "السعر النموذجي لباقة 5 جيجابايت",
+    "noBillsValue": "$0",
+    "noBills": "فواتير مفاجئة أو رسوم خفية",
+    "noContractValue": "0",
+    "noContract": "عقود مطلوبة",
+    "disclaimer": "أسعار المشغّلين مبنية على الأسعار الرسمية المنشورة (مارس 2026). أسعار eSIM تعكس أسعار السوق النموذجية.",
+    "sources": "telekom.de · att.com · vodafone.de · airalo.com"
+  },
+  "coverage": {
+    "title": "التغطية العالمية",
+    "countries": "دول",
+    "dataPlans": "باقات بيانات",
+    "languages": "لغة",
+    "avgActivation": "متوسط التفعيل",
+    "europe": "أوروبا",
+    "asia": "آسيا",
+    "americas": "الأمريكتان",
+    "africa": "أفريقيا",
+    "oceania": "أوقيانوسيا",
+    "middleEast": "الشرق الأوسط",
+    "exploreCTA": "استكشف {{region}} الآن"
+  },
+  "trust": {
+    "title": "لماذا يثق المسافرون بـ Simnetiq",
+    "noRoamingFees": "بدون رسوم تجوال",
+    "noRoamingFeesDesc": "وفّر المئات على رسوم البيانات الدولية",
+    "qrActivation": "تفعيل QR",
+    "qrActivationDesc": "امسح، فعّل، اتصل — في أقل من دقيقتين",
+    "languages": "18 لغة",
+    "languagesDesc": "دعم بلغتك، أينما كنت",
+    "moneyBack": "ضمان استرداد المال",
+    "moneyBackDesc": "استرداد كامل خلال 7 أيام للباقات غير المستخدمة"
+  },
+  "howItWorks": {
+    "title": "كيف يعمل",
+    "subtitle": "ثلاث خطوات بسيطة للبقاء متصلاً",
+    "step1Title": "اختر باقتك",
+    "step1Desc": "حدد وجهتك وباقة البيانات من أكثر من 200 دولة",
+    "step2Title": "امسح رمز QR",
+    "step2Desc": "احصل على رمز QR فوراً وامسحه بهاتفك",
+    "step3Title": "أنت متصل الآن",
+    "step3Desc": "تُفعّل البيانات تلقائياً عند وصولك. هذا كل شيء."
+  },
+  "comparison": {
+    "title": "eSIM مقابل شريحة SIM التقليدية",
+    "subtitle": "اكتشف لماذا يتحول المسافرون إلى eSIM",
+    "activation": "التفعيل",
+    "physicalActivation": "ابحث عن متجر وانتظر في الطابور",
+    "esimActivation": "امسح QR، جاهز في دقيقتين",
+    "availability": "التوفر",
+    "physicalAvailability": "فقط في المطارات والمدن",
+    "esimAvailability": "اشترِ أونلاين في أي وقت",
+    "switching": "تغيير الباقة",
+    "physicalSwitching": "اشترِ بطاقة جديدة وبدّلها يدوياً",
+    "esimSwitching": "أضف باقة جديدة رقمياً",
+    "keepNumber": "الاحتفاظ بالرقم",
+    "physicalKeepNumber": "يجب إزالة شريحة SIM الأساسية",
+    "esimKeepNumber": "تعمل بجانب شريحتك الحالية",
+    "multiCountry": "عدة دول",
+    "physicalMultiCountry": "شريحة جديدة لكل دولة",
+    "esimMultiCountry": "بدّل الباقات فوراً",
+    "cost": "التكلفة",
+    "physicalCost": "هامش ربح المتجر + تكاليف التنقل",
+    "esimCost": "أسعار مباشرة بدون إضافات"
+  },
+  "featuresBento": {
+    "title": "لماذا تختار Simnetiq",
+    "globalCoverage": "تغطية عالمية",
+    "globalCoverageDesc": "200+ دولة، 400+ مشغّل. تطبيق واحد.",
+    "instantActivation": "تفعيل فوري",
+    "instantActivationDesc": "من الشراء إلى الاتصال في أقل من دقيقتين",
+    "topUp": "إعادة شحن في أي وقت",
+    "topUpDesc": "على وشك النفاد؟ أضف بيانات بدون إعادة تثبيت eSIM",
+    "securePayments": "مدفوعات آمنة",
+    "securePaymentsDesc": "دفع مدعوم من Stripe. Apple Pay، Google Pay، جميع البطاقات الرئيسية.",
+    "multiLanguage": "متعدد اللغات",
+    "multiLanguageDesc": "دعم كامل بـ 18 لغة تشمل العربية والعبرية واليابانية وغيرها",
+    "support": "دعم متخصص",
+    "supportDesc": "دعم بشري حقيقي عبر البريد الإلكتروني والتطبيق. بدون روبوتات."
+  },
+  "devices": {
+    "title": "توافق الأجهزة",
+    "notSure": "غير متأكد إذا كان جهازك يدعم eSIM؟",
+    "checkFaq": "تحقق من الأسئلة الشائعة"
+  },
+  "promoBanner": {
+    "headline": "احصل على خصم {{discount}}% على أول باقة eSIM",
+    "cta": "تسوّق الباقات الآن",
+    "finePrint": "صالح للعملاء الجدد. استخدام واحد لكل حساب.",
+    "copied": "تم النسخ!"
+  },
+  "appDownload": {
+    "badge": "متوفر على iOS",
+    "badgeBoth": "متوفر على iOS و Android",
+    "title": "أدر كل شيء من هاتفك",
+    "bullet1": "اشترِ وفعّل شرائح eSIM",
+    "bullet2": "تابع استهلاك البيانات لحظياً",
+    "bullet3": "أعد الشحن بلمسة واحدة",
+    "bullet4": "احصل على رموز QR فوراً"
+  },
+  "dopplerCrossSell": {
+    "badge": "من Simnetiq",
+    "title": "Doppler VPN",
+    "description": "VPN بدون سجلات مع WireGuard + VLESS. حتى 10 أجهزة.",
+    "promo": "استخدم الرمز LAUNCH20 للحصول على خصم 20%",
+    "cta": "اعرف المزيد"
+  },
+  "socialProof": {
+    "rating": "4.5",
+    "appStore": "App Store",
+    "tagline": "موثوق من المسافرين في أكثر من 200 دولة"
+  },
+  "finalCta": {
+    "title": "مستعد للبقاء متصلاً حول العالم؟",
+    "subtitle": "احصل على eSIM في دقائق. يعمل على أي جهاز غير مقفل.",
+    "browsePlans": "تصفح الباقات",
+    "downloadApp": "حمّل التطبيق",
+    "promoReminder": "استخدم الرمز {{code}} للحصول على خصم {{discount}}%"
   }
 }

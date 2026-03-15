@@ -44,11 +44,11 @@ export default function ExploreStoreCTA({
 
   // Static variant classes (theme-unaware)
   const variantClasses = {
-    primary: 'bg-tufts-blue text-white shadow-lg hover:bg-tufts-blue/90 hover:scale-[1.02]',
-    dark: 'bg-eerie-black text-white shadow-lg hover:bg-eerie-black/90 hover:scale-[1.02]',
+    primary: 'bg-tufts-blue text-white shadow-lg hover:bg-tufts-blue/90',
+    dark: 'bg-eerie-black text-white shadow-lg hover:bg-eerie-black/90',
     secondary: 'bg-[var(--bg-primary)] text-text-primary border border-[var(--card-border)] shadow-sm hover:border-tufts-blue hover:text-tufts-blue',
-    darkPrimary: 'bg-tufts-blue text-white shadow-lg shadow-tufts-blue/20 hover:bg-tufts-blue/90 hover:scale-[1.02]',
-    themed: 'shadow-lg hover:scale-[1.02] hover:opacity-90',
+    darkPrimary: 'bg-tufts-blue text-white shadow-lg shadow-tufts-blue/20 hover:bg-tufts-blue/90',
+    themed: 'shadow-lg hover:opacity-90',
   };
 
   // 'themed' variant uses CSS variables for bg/text, adapts to light/dark

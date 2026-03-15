@@ -67,7 +67,7 @@ export default function DopplerCrossSell() {
               href="https://dopplervpn.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full bg-tufts-blue hover:bg-tufts-blue/90 text-white ps-5 pe-1 py-1 text-sm font-semibold transition-all duration-150 hover:scale-[1.02] rtl-native-flex"
+              className="inline-flex items-center gap-2 rounded-full bg-tufts-blue hover:bg-tufts-blue/90 text-white ps-5 pe-1 py-1 text-sm font-semibold transition-all duration-150 rtl-native-flex"
             >
               <span>{t('dopplerCrossSell.cta', 'Try Doppler VPN')}</span>
               <span className="ms-1 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-white/20 w-8 h-8">

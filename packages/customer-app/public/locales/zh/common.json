@@ -23,17 +23,25 @@
     "about": "关于我们"
   },
   "hero": {
-    "headlinePart1": "",
-    "headlineHighlight": "最简单的方式",
-    "headlinePart2": "在全球任何地方获取数据",
-    "subtitle": "几分钟内激活您的 eSIM，在全球 200 多个目的地保持畅连。",
-    "countries": "200+ 国家",
+    "headlinePart1": "出境上网",
+    "headlineHighlight": "一键搞定",
+    "headlinePart2": "覆盖全球200+国家",
+    "subtitle": "eSIM流量套餐，分钟级激活。无需实体SIM卡，告别高额漫游费。",
+    "countries": "200+国家",
     "instantActivation": "即时激活",
     "securePayment": "安全支付",
     "downloadAppIOS": "iOS 下载",
     "downloadAppAndroid": "Android 下载",
-    "exploreStore": "浏览 eSIM 商店",
-    "downloadApp": "下载应用"
+    "exploreStore": "浏览eSIM套餐",
+    "downloadApp": "下载App",
+    "darkHeadlinePart1": "随时随地",
+    "darkHeadlineHighlight": "畅连全球",
+    "darkHeadlinePart2": "无忧上网",
+    "darkSubtitle": "200+国家即时eSIM激活。无需实体SIM卡，无漫游费，省心省力。",
+    "promoPrefix": "使用优惠码",
+    "promoSuffix": "首次购买 eSIM 立享{{discount}}%折扣",
+    "fiveStarRated": "五星好评",
+    "sevenDayRefund": "7天退款"
   },
   "features": {
     "title": "连接全球",
@@ -729,7 +737,7 @@
     "benefit3": "无漫游费或意外收费",
     "benefit4": "在国外使用数据的同时保持主号码可用",
     "benefit5": "7x24 小时客服支持",
-    "regionalPlans": "{{region}}区域套餐"
+    "regionalPlans": "{{{region}}}区域套餐"
   },
   "about": {
     "sectionLabel": "关于我们",
@@ -761,6 +769,47 @@
     "ctaDesc": "几分钟内获取您的 eSIM。适用于任何已解锁的设备。",
     "ctaButton": "浏览套餐"
   },
+  "roaming": {
+    "label": "运营商真实价格",
+    "title": "停止为漫游支付高价",
+    "subtitle": "主流运营商真实价格 vs. Simnetiq。基于一周行程、5GB 数据的比较。",
+    "horrorTitle": "没有漫游套餐？",
+    "horrorDesc": "AT&T 和 Verizon 收费 $2.05/MB — 仅 5GB 数据就要 $10,250。",
+    "horrorSource": "数据来源：att.com、verizon.com 按量计费资费",
+    "selectDest": "选择目的地",
+    "chartTitle": "1周行程 · 5GB流量",
+    "saveLabel": "最多节省",
+    "dest": {
+      "turkey": "土耳其",
+      "thailand": "泰国",
+      "japan": "日本",
+      "brazil": "巴西",
+      "egypt": "埃及"
+    },
+    "carrier": {
+      "att": "AT&T / Verizon（美国）",
+      "vodafoneDE": "Vodafone（德国）",
+      "telekomDE": "Telekom（德国）",
+      "simnetiq": "Simnetiq eSIM"
+    },
+    "note": {
+      "dayPass": "Day Pass $12/天 × 7",
+      "easyTravel": "EasyTravel €7.99/天",
+      "reisePaket": "ReisePaket World 4GB/周",
+      "travelMobil": "Travel Mobil Basic 5GB",
+      "travelMobilWorld": "Travel Mobil World 5GB",
+      "esim5gb": "5GB 套餐"
+    },
+    "saveUpTo": "与运营商漫游相比最大节省",
+    "fromPriceValue": "$5",
+    "fromPrice": "典型 5GB 套餐价格",
+    "noBillsValue": "$0",
+    "noBills": "意外账单或隐藏费用",
+    "noContractValue": "0",
+    "noContract": "所需合约",
+    "disclaimer": "运营商资费基于官方公布价格（2026年3月）。eSIM 价格反映典型市场价格。",
+    "sources": "telekom.de · att.com · vodafone.de · airalo.com"
+  },
   "plan": {
     "callsAvailable": "含通话",
     "smsAvailable": "含短信",
@@ -771,5 +820,116 @@
     "price": "价格",
     "data": "流量",
     "days": "天数"
+  },
+  "coverage": {
+    "exploreCTA": "立即探索{{region}}",
+    "title": "全球覆盖",
+    "countries": "个国家",
+    "dataPlans": "流量套餐",
+    "languages": "种语言",
+    "avgActivation": "平均激活时间",
+    "europe": "欧洲",
+    "asia": "亚洲",
+    "americas": "美洲",
+    "africa": "非洲",
+    "oceania": "大洋洲",
+    "middleEast": "中东"
+  },
+  "trust": {
+    "title": "旅行者为何信赖 Simnetiq",
+    "noRoamingFees": "零漫游费",
+    "noRoamingFeesDesc": "节省数百美元的国际数据费用",
+    "qrActivation": "QR 激活",
+    "qrActivationDesc": "扫码、激活、连接 — 不到2分钟",
+    "languages": "18种语言",
+    "languagesDesc": "无论您来自哪里，都有母语支持",
+    "moneyBack": "退款保障",
+    "moneyBackDesc": "未使用套餐7天内全额退款"
+  },
+  "howItWorks": {
+    "title": "使用流程",
+    "subtitle": "三步轻松联网",
+    "step1Title": "选择套餐",
+    "step1Desc": "从200+国家中选择目的地和流量套餐",
+    "step2Title": "扫描 QR Code",
+    "step2Desc": "即时获取 QR Code，用手机扫描即可",
+    "step3Title": "连接成功",
+    "step3Desc": "到达目的地后流量自动激活，就是这么简单。"
+  },
+  "comparison": {
+    "title": "eSIM vs 实体SIM卡",
+    "subtitle": "看看为什么旅行者纷纷转向 eSIM",
+    "activation": "激活方式",
+    "physicalActivation": "找店铺、排队等待",
+    "esimActivation": "扫描 QR Code，2分钟搞定",
+    "availability": "购买渠道",
+    "physicalAvailability": "仅限机场/城市店铺",
+    "esimAvailability": "随时随地在线购买",
+    "switching": "切换套餐",
+    "physicalSwitching": "重新购卡、手动更换",
+    "esimSwitching": "数字化添加新套餐",
+    "keepNumber": "保留号码",
+    "physicalKeepNumber": "需取出主SIM卡",
+    "esimKeepNumber": "与现有SIM卡同时使用",
+    "multiCountry": "多国使用",
+    "physicalMultiCountry": "每个国家换一张卡",
+    "esimMultiCountry": "即时切换套餐",
+    "cost": "费用",
+    "physicalCost": "门店溢价 + 交通成本",
+    "esimCost": "直接定价，无额外费用"
+  },
+  "featuresBento": {
+    "title": "为什么选择 Simnetiq",
+    "globalCoverage": "全球覆盖",
+    "globalCoverageDesc": "200+国家，400+运营商。一个应用搞定。",
+    "instantActivation": "即时激活",
+    "instantActivationDesc": "从购买到连接，不到2分钟",
+    "topUp": "随时充值",
+    "topUpDesc": "流量不够？无需重装 eSIM，直接加购流量",
+    "securePayments": "安全支付",
+    "securePaymentsDesc": "Stripe 安全结算。支持 Apple Pay、Google Pay 及所有主流银行卡。",
+    "multiLanguage": "多语言支持",
+    "multiLanguageDesc": "完整支持18种语言，包括阿拉伯语、希伯来语、日语等",
+    "support": "专属客服",
+    "supportDesc": "真人客服通过邮件和应用内支持，非机器人。"
+  },
+  "devices": {
+    "title": "设备兼容性",
+    "notSure": "不确定您的设备是否支持 eSIM？",
+    "checkFaq": "查看常见问题"
+  },
+  "promoBanner": {
+    "headline": "首次购买 eSIM 立享{{discount}}%折扣",
+    "cta": "立即选购",
+    "finePrint": "仅限新用户，每个账户使用一次。",
+    "copied": "已复制！"
+  },
+  "appDownload": {
+    "badge": "iOS 版现已上线",
+    "badgeBoth": "iOS 和 Android 版现已上线",
+    "title": "在手机上管理一切",
+    "bullet1": "购买和激活 eSIM",
+    "bullet2": "实时监控流量使用",
+    "bullet3": "一键充值",
+    "bullet4": "即时获取 QR Code"
+  },
+  "dopplerCrossSell": {
+    "badge": "Simnetiq 出品",
+    "title": "Doppler VPN",
+    "description": "零日志 VPN，采用 WireGuard + VLESS 技术。最多支持10台设备。",
+    "promo": "使用优惠码 LAUNCH20 享八折优惠",
+    "cta": "了解更多"
+  },
+  "socialProof": {
+    "rating": "4.5",
+    "appStore": "App Store",
+    "tagline": "受200+国家旅行者信赖"
+  },
+  "finalCta": {
+    "title": "准备好畅连全球了吗？",
+    "subtitle": "几分钟获取 eSIM，适用于所有已解锁设备。",
+    "browsePlans": "浏览套餐",
+    "downloadApp": "下载应用",
+    "promoReminder": "使用优惠码 {{code}} 享{{discount}}%折扣"
   }
 }

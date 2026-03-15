@@ -23,17 +23,17 @@
     "about": "About"
   },
   "hero": {
-    "headlinePart1": "The ",
-    "headlineHighlight": "easiest way",
-    "headlinePart2": "to get data anywhere in the world",
-    "subtitle": "Activate your eSIM in minutes and stay connected in 200+ destinations worldwide.",
-    "countries": "200+ Countries",
-    "instantActivation": "Instant Activation",
-    "securePayment": "Secure Payment",
+    "headlinePart1": "Internet all'estero",
+    "headlineHighlight": "semplice e veloce",
+    "headlinePart2": "in oltre 200 paesi",
+    "subtitle": "Piani dati eSIM pronti in pochi minuti. Nessuna SIM fisica, nessun costo di roaming.",
+    "countries": "200+ paesi",
+    "instantActivation": "Attivazione istantanea",
+    "securePayment": "Pagamento sicuro",
     "downloadAppIOS": "Download for iOS",
     "downloadAppAndroid": "Download for Android",
-    "exploreStore": "eSIM Store",
-    "downloadApp": "Download App",
+    "exploreStore": "Scopri i piani eSIM",
+    "downloadApp": "Scarica l'app",
     "darkHeadlinePart1": "Stay connected",
     "darkHeadlineHighlight": "anywhere",
     "darkHeadlinePart2": "in the world",
@@ -737,7 +737,7 @@
     "benefit3": "No roaming charges or surprise fees",
     "benefit4": "Keep your main number active while using data abroad",
     "benefit5": "24/7 customer support",
-    "regionalPlans": "{{region}} Regional Plans"
+    "regionalPlans": "{{{region}}} Regional Plans"
   },
   "about": {
     "sectionLabel": "About Us",
@@ -823,19 +823,6 @@
     "physicalCost": "Store markup + taxi to shop",
     "esimCost": "Direct pricing, no extras"
   },
-  "roaming": {
-    "title": "Simnetiq vs Roaming Costs",
-    "subtitle": "See how much you can save",
-    "carrierTurkey": "Typical carrier roaming (Turkey)",
-    "carrierEurope": "Typical carrier roaming (Europe)",
-    "carrierAsia": "Typical carrier roaming (Asia)",
-    "simnetiq": "Simnetiq eSIM",
-    "perWeek": "/week",
-    "saveUpTo": "Save up to 90%",
-    "fromPrice": "From $3/week",
-    "noBills": "No surprise bills",
-    "cancelAnytime": "Cancel anytime"
-  },
   "featuresBento": {
     "title": "Why Choose Simnetiq",
     "globalCoverage": "Global Coverage",
@@ -862,7 +849,8 @@
     "americas": "Americas",
     "africa": "Africa",
     "oceania": "Oceania",
-    "middleEast": "Middle East"
+    "middleEast": "Middle East",
+    "exploreCTA": "Scopri {{region}} ora"
   },
   "devices": {
     "title": "Device Compatibility",
@@ -902,5 +890,28 @@
     "browsePlans": "Browse Plans",
     "downloadApp": "Download App",
     "promoReminder": "Use code {code} for {discount}% off"
+  },
+  "roaming": {
+    "label": "Prezzi reali degli operatori",
+    "title": "Smetti di pagare troppo per il roaming",
+    "subtitle": "Prezzi reali dei principali operatori a confronto con Simnetiq. Basati su un viaggio di 1 settimana con 5GB di dati.",
+    "horrorTitle": "Senza un pacchetto roaming?",
+    "horrorDesc": "AT&T e Verizon fanno pagare $2.05/MB — ossia $10,250 per soli 5GB di dati.",
+    "horrorSource": "Fonte: att.com, verizon.com tariffe a consumo",
+    "selectDest": "Seleziona destinazione",
+    "chartTitle": "Viaggio di 1 settimana · 5GB dati",
+    "saveLabel": "Risparmia fino a",
+    "dest": { "turkey": "Turchia", "thailand": "Thailandia", "japan": "Giappone", "brazil": "Brasile", "egypt": "Egitto" },
+    "carrier": { "att": "AT&T / Verizon (US)", "vodafoneDE": "Vodafone (Germany)", "telekomDE": "Telekom (Germany)", "simnetiq": "Simnetiq eSIM" },
+    "note": { "dayPass": "Day Pass $12/day × 7", "easyTravel": "EasyTravel €7.99/day", "reisePaket": "ReisePaket World 4GB/week", "travelMobil": "Travel Mobil Basic 5GB", "travelMobilWorld": "Travel Mobil World 5GB", "esim5gb": "5GB plan" },
+    "saveUpTo": "Risparmio massimo rispetto al roaming dell'operatore",
+    "fromPriceValue": "$5",
+    "fromPrice": "Prezzo tipico del piano 5GB",
+    "noBillsValue": "$0",
+    "noBills": "Bollette a sorpresa o tariffe nascoste",
+    "noContractValue": "0",
+    "noContract": "Contratti richiesti",
+    "disclaimer": "Le tariffe degli operatori si basano sui prezzi ufficiali pubblicati (mar 2026). I prezzi eSIM riflettono le tariffe tipiche di mercato.",
+    "sources": "telekom.de · att.com · vodafone.de · airalo.com"
   }
 }

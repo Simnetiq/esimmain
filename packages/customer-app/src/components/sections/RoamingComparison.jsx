@@ -4,50 +4,137 @@ import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import Reveal from '../ui/Reveal';
 
-// Carrier roaming estimates based on general market research. Verify specific rates before naming carriers.
+/**
+ * Roaming cost comparison data — REAL prices based on carrier research (March 2026).
+ *
+ * Sources:
+ * - Telekom DE: telekom.de/unterwegs/tarife-und-optionen/roaming
+ *   Travel Mobil Basic (Zone 2: USA, Turkey): €14.95/5GB
+ *   Travel Mobil Basic World (Zone 3: Thailand, Japan, Brazil, Egypt): €29.95/5GB
+ * - AT&T: att.com/international/day-pass — $12/day International Day Pass
+ * - Verizon: verizon.com/plans/international — $12/day TravelPass
+ * - Vodafone DE: vodafone.de — EasyTravel €7.99/day (Zone 2), ReisePaket World €34.99/week/4GB (Zone 3)
+ * - eSIM market pricing: airalo.com, esimdb.com (5GB/30-day plans)
+ *
+ * Scenario: 1-week trip, ~5GB data usage
+ */
 
-const BARS = [
-  { labelKey: 'roaming.carrierTurkey', labelDefault: 'Carrier roaming (Turkey)', price: '$70/week', widthPct: 100, colorClass: 'bg-red-500/70' },
-  { labelKey: 'roaming.carrierEurope', labelDefault: 'Carrier roaming (Europe)', price: '$56/week', widthPct: 80, colorClass: 'bg-orange-500/70' },
-  { labelKey: 'roaming.carrierAsia', labelDefault: 'Carrier roaming (Asia)', price: '$84/week', widthPct: 120, colorClass: 'bg-red-500/70' },
-  { labelKey: 'roaming.simnetiq', labelDefault: 'Simnetiq eSIM', price: '~$5/week', widthPct: 7, colorClass: 'bg-accent-success' },
+const DESTINATIONS = [
+  {
+    id: 'turkey',
+    labelKey: 'roaming.dest.turkey',
+    labelDefault: 'Turkey',
+    flag: '🇹🇷',
+    carriers: [
+      { id: 'att', labelKey: 'roaming.carrier.att', labelDefault: 'AT&T / Verizon (US)', price: 84, noteKey: 'roaming.note.dayPass', noteDefault: 'Day Pass $12/day × 7' },
+      { id: 'vodafone', labelKey: 'roaming.carrier.vodafoneDE', labelDefault: 'Vodafone (Germany)', price: 56, noteKey: 'roaming.note.easyTravel', noteDefault: 'EasyTravel €7.99/day' },
+      { id: 'telekom', labelKey: 'roaming.carrier.telekomDE', labelDefault: 'Telekom (Germany)', price: 16, noteKey: 'roaming.note.travelMobil', noteDefault: 'Travel Mobil Basic 5GB' },
+      { id: 'simnetiq', labelKey: 'roaming.carrier.simnetiq', labelDefault: 'Simnetiq eSIM', price: 4.5, noteKey: 'roaming.note.esim5gb', noteDefault: '5GB plan' },
+    ],
+  },
+  {
+    id: 'thailand',
+    labelKey: 'roaming.dest.thailand',
+    labelDefault: 'Thailand',
+    flag: '🇹🇭',
+    carriers: [
+      { id: 'att', labelKey: 'roaming.carrier.att', labelDefault: 'AT&T / Verizon (US)', price: 84, noteKey: 'roaming.note.dayPass', noteDefault: 'Day Pass $12/day × 7' },
+      { id: 'vodafone', labelKey: 'roaming.carrier.vodafoneDE', labelDefault: 'Vodafone (Germany)', price: 38, noteKey: 'roaming.note.reisePaket', noteDefault: 'ReisePaket World 4GB/week' },
+      { id: 'telekom', labelKey: 'roaming.carrier.telekomDE', labelDefault: 'Telekom (Germany)', price: 33, noteKey: 'roaming.note.travelMobilWorld', noteDefault: 'Travel Mobil World 5GB' },
+      { id: 'simnetiq', labelKey: 'roaming.carrier.simnetiq', labelDefault: 'Simnetiq eSIM', price: 4.5, noteKey: 'roaming.note.esim5gb', noteDefault: '5GB plan' },
+    ],
+  },
+  {
+    id: 'japan',
+    labelKey: 'roaming.dest.japan',
+    labelDefault: 'Japan',
+    flag: '🇯🇵',
+    carriers: [
+      { id: 'att', labelKey: 'roaming.carrier.att', labelDefault: 'AT&T / Verizon (US)', price: 84, noteKey: 'roaming.note.dayPass', noteDefault: 'Day Pass $12/day × 7' },
+      { id: 'vodafone', labelKey: 'roaming.carrier.vodafoneDE', labelDefault: 'Vodafone (Germany)', price: 38, noteKey: 'roaming.note.reisePaket', noteDefault: 'ReisePaket World 4GB/week' },
+      { id: 'telekom', labelKey: 'roaming.carrier.telekomDE', labelDefault: 'Telekom (Germany)', price: 33, noteKey: 'roaming.note.travelMobilWorld', noteDefault: 'Travel Mobil World 5GB' },
+      { id: 'simnetiq', labelKey: 'roaming.carrier.simnetiq', labelDefault: 'Simnetiq eSIM', price: 5.5, noteKey: 'roaming.note.esim5gb', noteDefault: '5GB plan' },
+    ],
+  },
+  {
+    id: 'brazil',
+    labelKey: 'roaming.dest.brazil',
+    labelDefault: 'Brazil',
+    flag: '🇧🇷',
+    carriers: [
+      { id: 'att', labelKey: 'roaming.carrier.att', labelDefault: 'AT&T / Verizon (US)', price: 84, noteKey: 'roaming.note.dayPass', noteDefault: 'Day Pass $12/day × 7' },
+      { id: 'vodafone', labelKey: 'roaming.carrier.vodafoneDE', labelDefault: 'Vodafone (Germany)', price: 38, noteKey: 'roaming.note.reisePaket', noteDefault: 'ReisePaket World 4GB/week' },
+      { id: 'telekom', labelKey: 'roaming.carrier.telekomDE', labelDefault: 'Telekom (Germany)', price: 33, noteKey: 'roaming.note.travelMobilWorld', noteDefault: 'Travel Mobil World 5GB' },
+      { id: 'simnetiq', labelKey: 'roaming.carrier.simnetiq', labelDefault: 'Simnetiq eSIM', price: 6, noteKey: 'roaming.note.esim5gb', noteDefault: '5GB plan' },
+    ],
+  },
+  {
+    id: 'egypt',
+    labelKey: 'roaming.dest.egypt',
+    labelDefault: 'Egypt',
+    flag: '🇪🇬',
+    carriers: [
+      { id: 'att', labelKey: 'roaming.carrier.att', labelDefault: 'AT&T / Verizon (US)', price: 84, noteKey: 'roaming.note.dayPass', noteDefault: 'Day Pass $12/day × 7' },
+      { id: 'vodafone', labelKey: 'roaming.carrier.vodafoneDE', labelDefault: 'Vodafone (Germany)', price: 38, noteKey: 'roaming.note.reisePaket', noteDefault: 'ReisePaket World 4GB/week' },
+      { id: 'telekom', labelKey: 'roaming.carrier.telekomDE', labelDefault: 'Telekom (Germany)', price: 33, noteKey: 'roaming.note.travelMobilWorld', noteDefault: 'Travel Mobil World 5GB' },
+      { id: 'simnetiq', labelKey: 'roaming.carrier.simnetiq', labelDefault: 'Simnetiq eSIM', price: 5, noteKey: 'roaming.note.esim5gb', noteDefault: '5GB plan' },
+    ],
+  },
 ];
 
-// Normalize bars so the highest bar = 100% of the visual container
-const MAX_PCT = Math.max(...BARS.map((b) => b.widthPct));
-const normalizedBars = BARS.map((b) => ({ ...b, visualPct: (b.widthPct / MAX_PCT) * 100 }));
+function DestinationTab({ dest, isActive, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`
+        flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-all duration-200 whitespace-nowrap
+        ${isActive
+          ? 'bg-tufts-blue text-white shadow-sm'
+          : 'text-text-muted hover:text-text-primary hover:bg-[var(--hover-bg)]'
+        }
+      `}
+      aria-pressed={isActive}
+    >
+      <span className="text-base">{dest.flag}</span>
+      {dest.labelDefault}
+    </button>
+  );
+}
 
-function BarRow({ bar, isVisible, index }) {
-  const { t } = useI18n();
-  const isSimnetiq = bar.labelKey === 'roaming.simnetiq';
+function CarrierBar({ carrier, maxPrice, isVisible, index, t }) {
+  const isSimnetiq = carrier.id === 'simnetiq';
+  const widthPct = Math.max((carrier.price / maxPrice) * 100, 3); // min 3% so small bars are visible
 
   return (
-    <Reveal delay={index * 100}>
-      <div className="mb-5 last:mb-0">
-        <div className="flex justify-between items-center mb-1.5 rtl-native-flex">
-          <span className={`text-sm font-medium ${isSimnetiq ? 'text-accent-success' : 'text-text-muted'}`}>
-            {t(bar.labelKey, bar.labelDefault)}
+    <div className="mb-4 last:mb-0">
+      <div className="flex justify-between items-baseline mb-1.5 gap-4 rtl-native-flex">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className={`text-sm font-medium truncate ${isSimnetiq ? 'text-tufts-blue font-semibold' : 'text-text-primary'}`}>
+            {t(carrier.labelKey, carrier.labelDefault)}
           </span>
-          <span className={`text-sm font-bold tabular-nums ${isSimnetiq ? 'text-accent-success' : 'text-red-400'}`}>
-            {bar.price}
+          <span className="text-xs text-text-muted hidden sm:inline truncate">
+            {t(carrier.noteKey, carrier.noteDefault)}
           </span>
         </div>
-        <div className="w-full h-3 rounded-full bg-white/5 overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all duration-1000 ease-out ${bar.colorClass}`}
-            style={{
-              width: isVisible ? `${bar.visualPct}%` : '0%',
-              transitionDelay: `${index * 120}ms`,
-            }}
-            role="meter"
-            aria-label={`${t(bar.labelKey, bar.labelDefault)}: ${bar.price}`}
-            aria-valuenow={bar.widthPct}
-            aria-valuemin={0}
-            aria-valuemax={MAX_PCT}
-          />
-        </div>
+        <span className="text-sm font-bold tabular-nums shrink-0 text-text-primary">
+          ${carrier.price}
+        </span>
       </div>
-    </Reveal>
+      <div className="w-full h-3.5 bg-[var(--subtle-bg)] overflow-hidden">
+        <div
+          className="h-full transition-all duration-700 ease-out bg-tufts-blue"
+          style={{
+            width: isVisible ? `${widthPct}%` : '0%',
+            transitionDelay: `${index * 100}ms`,
+          }}
+          role="meter"
+          aria-label={`${t(carrier.labelKey, carrier.labelDefault)}: $${carrier.price}`}
+          aria-valuenow={carrier.price}
+          aria-valuemin={0}
+          aria-valuemax={maxPrice}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -55,6 +142,13 @@ export default function RoamingComparison() {
   const { t } = useI18n();
   const sectionRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [activeDestIdx, setActiveDestIdx] = useState(0);
+
+  const activeDest = DESTINATIONS[activeDestIdx];
+  const maxPrice = Math.max(...activeDest.carriers.map(c => c.price));
+  const simnetiqPrice = activeDest.carriers.find(c => c.id === 'simnetiq')?.price || 5;
+  const highestCarrierPrice = activeDest.carriers.filter(c => c.id !== 'simnetiq').reduce((max, c) => Math.max(max, c.price), 0);
+  const savingsPercent = Math.round(((highestCarrierPrice - simnetiqPrice) / highestCarrierPrice) * 100);
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -77,29 +171,6 @@ export default function RoamingComparison() {
     return () => observer.disconnect();
   }, []);
 
-  const statBoxes = [
-    {
-      value: t('roaming.saveUpToValue', '93%'),
-      label: t('roaming.saveUpTo', 'Average savings vs. carrier roaming'),
-      delay: 0,
-    },
-    {
-      value: t('roaming.fromPriceValue', '$1'),
-      label: t('roaming.fromPrice', 'Plans starting from per day'),
-      delay: 100,
-    },
-    {
-      value: t('roaming.noBillsValue', '$0'),
-      label: t('roaming.noBills', 'Surprise bills or hidden fees'),
-      delay: 200,
-    },
-    {
-      value: t('roaming.cancelAnytimeValue', '∞'),
-      label: t('roaming.cancelAnytime', 'No contracts — use as needed'),
-      delay: 300,
-    },
-  ];
-
   return (
     <section
       className="relative"
@@ -109,10 +180,10 @@ export default function RoamingComparison() {
       <div className="max-w-7xl mx-auto px-4 py-16 lg:py-24">
 
         {/* Section header */}
-        <div className="mb-12 text-start">
+        <div className="mb-10 text-start">
           <Reveal>
             <p className="text-xs font-semibold tracking-widest uppercase text-text-muted mb-3">
-              {t('roaming.label', 'The cost reality')}
+              {t('roaming.label', 'Real carrier prices')}
             </p>
             <h2
               id="roaming-heading"
@@ -121,38 +192,57 @@ export default function RoamingComparison() {
               {t('roaming.title', 'Stop overpaying for roaming')}
             </h2>
             <p className="text-text-muted mt-3 max-w-lg text-base">
-              {t('roaming.subtitle', 'Carrier roaming fees are shocking. Simnetiq gives you real data at traveller-friendly prices.')}
+              {t('roaming.subtitle', 'Real prices from major carriers vs. Simnetiq. Based on a 1-week trip with 5GB of data.')}
             </p>
           </Reveal>
         </div>
 
-        {/* Bar chart */}
-        <div className="glass-card mb-8">
-          <p className="text-xs font-semibold tracking-widest uppercase text-text-muted mb-6">
-            {t('roaming.chartTitle', 'Weekly data cost comparison')}
-          </p>
-          {normalizedBars.map((bar, index) => (
-            <BarRow key={bar.labelKey} bar={bar} isVisible={isVisible} index={index} />
-          ))}
-          <p className="text-xs text-text-muted mt-4 opacity-60">
-            {t('roaming.disclaimer', '* Carrier estimates based on general market research. Actual rates vary by provider.')}
-          </p>
-        </div>
+        {/* Destination tabs */}
+        <Reveal>
+          <div className="flex gap-1 overflow-x-auto pb-1 mb-1 scrollbar-hide" role="tablist" aria-label={t('roaming.selectDest', 'Select destination')}>
+            {DESTINATIONS.map((dest, idx) => (
+              <DestinationTab
+                key={dest.id}
+                dest={dest}
+                isActive={idx === activeDestIdx}
+                onClick={() => setActiveDestIdx(idx)}
+              />
+            ))}
+          </div>
+        </Reveal>
 
-        {/* Stat boxes */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" role="list">
-          {statBoxes.map(({ value, label, delay }) => (
-            <Reveal key={label} delay={delay}>
-              <div role="listitem" className="glass-card text-center">
-                <p className="text-3xl lg:text-4xl font-bold text-tufts-blue mb-1">
-                  {value}
-                </p>
-                <p className="text-sm text-text-muted leading-snug">
-                  {label}
-                </p>
-              </div>
-            </Reveal>
+        {/* Comparison chart */}
+        <div className="glass-card mb-6" style={{ borderRadius: 0 }}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-2">
+            <p className="text-xs font-semibold tracking-widest uppercase text-text-muted">
+              {t('roaming.chartTitle', '1-week trip · 5GB data')}
+            </p>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold text-[var(--accent-success)]" style={{ backgroundColor: 'color-mix(in srgb, var(--accent-success) 10%, transparent)' }}>
+                {t('roaming.saveLabel', 'Save up to')} {savingsPercent}%
+              </span>
+            </div>
+          </div>
+
+          {activeDest.carriers.map((carrier, index) => (
+            <CarrierBar
+              key={`${activeDest.id}-${carrier.id}`}
+              carrier={carrier}
+              maxPrice={maxPrice}
+              isVisible={isVisible}
+              index={index}
+              t={t}
+            />
           ))}
+
+          <div className="mt-5 pt-4 border-t border-[var(--divider)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <p className="text-xs text-text-muted opacity-70">
+              {t('roaming.disclaimer', 'Carrier rates based on official published prices (Mar 2026). eSIM prices reflect typical market rates.')}
+            </p>
+            <p className="text-xs text-text-muted opacity-70">
+              {t('roaming.sources', 'telekom.de · att.com · vodafone.de · airalo.com')}
+            </p>
+          </div>
         </div>
 
       </div>

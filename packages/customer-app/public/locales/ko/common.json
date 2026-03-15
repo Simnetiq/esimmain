@@ -23,17 +23,17 @@
     "about": "About"
   },
   "hero": {
-    "headlinePart1": "The ",
-    "headlineHighlight": "easiest way",
-    "headlinePart2": "to get data anywhere in the world",
-    "subtitle": "Activate your eSIM in minutes and stay connected in 200+ destinations worldwide.",
-    "countries": "200+ Countries",
-    "instantActivation": "Instant Activation",
-    "securePayment": "Secure Payment",
+    "headlinePart1": "해외 인터넷이",
+    "headlineHighlight": "이렇게 쉬울 줄",
+    "headlinePart2": "— 200개국 이상 지원",
+    "subtitle": "eSIM 데이터 요금제를 몇 분 만에 활성화. 물리적 SIM 없이, 로밍 요금 없이.",
+    "countries": "200개국+",
+    "instantActivation": "즉시 활성화",
+    "securePayment": "안전한 결제",
     "downloadAppIOS": "Download for iOS",
     "downloadAppAndroid": "Download for Android",
-    "exploreStore": " eSIM Store",
-    "downloadApp": "Download App",
+    "exploreStore": "eSIM 요금제 보기",
+    "downloadApp": "앱 다운로드",
     "darkHeadlinePart1": "Stay connected",
     "darkHeadlineHighlight": "anywhere",
     "darkHeadlinePart2": "in the world",
@@ -737,7 +737,7 @@
     "benefit3": "No roaming charges or surprise fees",
     "benefit4": "Keep your main number active while using data abroad",
     "benefit5": "24/7 customer support",
-    "regionalPlans": "{{region}} Regional Plans"
+    "regionalPlans": "{{{region}}} Regional Plans"
   },
   "about": {
     "sectionLabel": "About Us",
@@ -823,19 +823,6 @@
     "physicalCost": "Store markup + taxi to shop",
     "esimCost": "Direct pricing, no extras"
   },
-  "roaming": {
-    "title": "Simnetiq vs Roaming Costs",
-    "subtitle": "See how much you can save",
-    "carrierTurkey": "Typical carrier roaming (Turkey)",
-    "carrierEurope": "Typical carrier roaming (Europe)",
-    "carrierAsia": "Typical carrier roaming (Asia)",
-    "simnetiq": "Simnetiq eSIM",
-    "perWeek": "/week",
-    "saveUpTo": "Save up to 90%",
-    "fromPrice": "From $3/week",
-    "noBills": "No surprise bills",
-    "cancelAnytime": "Cancel anytime"
-  },
   "featuresBento": {
     "title": "Why Choose Simnetiq",
     "globalCoverage": "Global Coverage",
@@ -862,7 +849,8 @@
     "americas": "Americas",
     "africa": "Africa",
     "oceania": "Oceania",
-    "middleEast": "Middle East"
+    "middleEast": "Middle East",
+    "exploreCTA": "지금 {{region}} 탐색하기"
   },
   "devices": {
     "title": "Device Compatibility",
@@ -902,5 +890,28 @@
     "browsePlans": "Browse Plans",
     "downloadApp": "Download App",
     "promoReminder": "Use code {code} for {discount}% off"
+  },
+  "roaming": {
+    "label": "실제 통신사 요금",
+    "title": "로밍 과금을 멈추세요",
+    "subtitle": "주요 통신사의 실제 요금과 Simnetiq 비교. 5GB 데이터로 1주일 여행 기준.",
+    "horrorTitle": "로밍 패키지 없이?",
+    "horrorDesc": "AT&T와 Verizon은 $2.05/MB를 청구합니다 — 5GB에 무려 $10,250입니다.",
+    "horrorSource": "출처: att.com, verizon.com 종량제 요금",
+    "selectDest": "목적지 선택",
+    "chartTitle": "1주일 여행 · 5GB 데이터",
+    "saveLabel": "최대 절약",
+    "dest": { "turkey": "터키", "thailand": "태국", "japan": "일본", "brazil": "브라질", "egypt": "이집트" },
+    "carrier": { "att": "AT&T / Verizon (US)", "vodafoneDE": "Vodafone (Germany)", "telekomDE": "Telekom (Germany)", "simnetiq": "Simnetiq eSIM" },
+    "note": { "dayPass": "Day Pass $12/day × 7", "easyTravel": "EasyTravel €7.99/day", "reisePaket": "ReisePaket World 4GB/week", "travelMobil": "Travel Mobil Basic 5GB", "travelMobilWorld": "Travel Mobil World 5GB", "esim5gb": "5GB plan" },
+    "saveUpTo": "통신사 로밍 대비 최대 절약액",
+    "fromPriceValue": "$5",
+    "fromPrice": "일반적인 5GB 요금제 가격",
+    "noBillsValue": "$0",
+    "noBills": "예상치 못한 청구서 또는 숨겨진 요금",
+    "noContractValue": "0",
+    "noContract": "필요한 약정",
+    "disclaimer": "통신사 요금은 공식 게시 가격 기준입니다 (2026년 3월). eSIM 가격은 일반적인 시장 요금을 반영합니다.",
+    "sources": "telekom.de · att.com · vodafone.de · airalo.com"
   }
 }

@@ -23,17 +23,39 @@
     "about": "À propos"
   },
   "hero": {
-    "headlinePart1": "Le moyen le plus simple d'obtenir des données mobiles",
-    "headlineHighlight": "partout",
-    "headlinePart2": "dans le monde",
-    "subtitle": "Activez votre eSIM en quelques minutes et restez connecté dans plus de 200 destinations à travers le monde.",
+    "headlinePart1": "Internet à l'étranger —",
+    "headlineHighlight": "simple et rapide",
+    "headlinePart2": "partout dans le monde",
+    "subtitle": "Forfaits eSIM pour plus de 200 pays. Activation en quelques minutes — sans carte SIM, sans frais de roaming.",
     "countries": "200+ pays",
     "instantActivation": "Activation instantanée",
     "securePayment": "Paiement sécurisé",
     "downloadAppIOS": "Télécharger l'app iOS",
     "downloadAppAndroid": "Télécharger l'app Android",
-    "exploreStore": "Explorer la boutique eSIM",
-    "downloadApp": "Télécharger l'application"
+    "exploreStore": "Voir les forfaits eSIM",
+    "downloadApp": "Télécharger l'appli",
+    "darkHeadlinePart1": "Restez connecté",
+    "darkHeadlineHighlight": "partout",
+    "darkHeadlinePart2": "dans le monde",
+    "darkSubtitle": "Activation eSIM instantanée dans plus de 200 pays. Pas de carte SIM, pas de frais de roaming, aucune complication.",
+    "promoPrefix": "Utilisez le code",
+    "promoSuffix": "pour {{discount}}% de réduction sur votre première eSIM",
+    "fiveStarRated": "Noté 5 étoiles",
+    "sevenDayRefund": "Remboursement 7 jours"
+  },
+  "coverage": {
+    "exploreCTA": "Explorez {{region}} maintenant",
+    "title": "Couverture mondiale",
+    "countries": "Pays",
+    "dataPlans": "Forfaits data",
+    "languages": "Langues",
+    "avgActivation": "Activation moy.",
+    "europe": "Europe",
+    "asia": "Asie",
+    "americas": "Amériques",
+    "africa": "Afrique",
+    "oceania": "Océanie",
+    "middleEast": "Moyen-Orient"
   },
   "features": {
     "title": "Connectez-vous globalement",
@@ -448,7 +470,7 @@
     "continue": "Continuer",
     "selectPlanToContinue": "Sélectionnez un plan pour continuer",
     "globalPlans": "Forfaits globaux",
-    "regionalPlansFor": "Forfaits {region}"
+    "regionalPlansFor": "Forfaits {{region}}"
   },
   "planSort": {
     "price": "Prix ↑",
@@ -739,7 +761,7 @@
     "benefit3": "Pas de frais d'itinérance ni de frais surprises",
     "benefit4": "Gardez votre numéro principal actif tout en utilisant les données à l'étranger",
     "benefit5": "Support client 24/7",
-    "regionalPlans": "Forfaits régionaux {{region}}"
+    "regionalPlans": "Forfaits régionaux {{{region}}}"
   },
   "about": {
     "sectionLabel": "À propos",
@@ -770,5 +792,143 @@
     "ctaTitle": "Prêt à passer au global ?",
     "ctaDesc": "Obtenez votre eSIM en quelques minutes. Fonctionne sur tout appareil déverrouillé.",
     "ctaButton": "Voir les forfaits"
+  },
+  "roaming": {
+    "label": "Prix réels des opérateurs",
+    "title": "Arrêtez de surpayer pour le roaming",
+    "subtitle": "Prix réels des grands opérateurs vs. Simnetiq. Basé sur un voyage d'une semaine avec 5 Go de données.",
+    "horrorTitle": "Sans forfait roaming ?",
+    "horrorDesc": "AT&T et Verizon facturent $2,05/Mo — soit $10 250 pour seulement 5 Go de données.",
+    "horrorSource": "Source : att.com, tarifs à la consommation verizon.com",
+    "selectDest": "Choisir une destination",
+    "chartTitle": "Voyage d'1 semaine · 5 Go de données",
+    "saveLabel": "Économisez jusqu'à",
+    "dest": {
+      "turkey": "Turquie",
+      "thailand": "Thaïlande",
+      "japan": "Japon",
+      "brazil": "Brésil",
+      "egypt": "Égypte"
+    },
+    "carrier": {
+      "att": "AT&T / Verizon (États-Unis)",
+      "vodafoneDE": "Vodafone (Allemagne)",
+      "telekomDE": "Telekom (Allemagne)",
+      "simnetiq": "Simnetiq eSIM"
+    },
+    "note": {
+      "dayPass": "Day Pass $12/jour × 7",
+      "easyTravel": "EasyTravel €7,99/jour",
+      "reisePaket": "ReisePaket World 4 Go/semaine",
+      "travelMobil": "Travel Mobil Basic 5 Go",
+      "travelMobilWorld": "Travel Mobil World 5 Go",
+      "esim5gb": "Forfait 5 Go"
+    },
+    "saveUpTo": "Économies max vs. roaming opérateur",
+    "fromPriceValue": "$5",
+    "fromPrice": "Prix typique d'un forfait 5 Go",
+    "noBillsValue": "$0",
+    "noBills": "Factures surprises ou frais cachés",
+    "noContractValue": "0",
+    "noContract": "Contrats requis",
+    "disclaimer": "Tarifs opérateurs basés sur les prix officiels publiés (mars 2026). Les prix eSIM reflètent les tarifs typiques du marché.",
+    "sources": "telekom.de · att.com · vodafone.de · airalo.com"
+  },
+  "trust": {
+    "title": "Pourquoi les voyageurs font confiance à Simnetiq",
+    "noRoamingFees": "Pas de frais de roaming",
+    "noRoamingFeesDesc": "Économisez des centaines d'euros sur vos données à l'étranger",
+    "qrActivation": "Activation par QR",
+    "qrActivationDesc": "Scannez, activez, connectez-vous — en moins de 2 minutes",
+    "languages": "18 langues",
+    "languagesDesc": "Un support dans votre langue, où que vous soyez",
+    "moneyBack": "Satisfait ou remboursé",
+    "moneyBackDesc": "Remboursement intégral sous 7 jours pour les forfaits non utilisés"
+  },
+  "howItWorks": {
+    "title": "Comment ça marche",
+    "subtitle": "Trois étapes simples pour rester connecté",
+    "step1Title": "Choisissez votre forfait",
+    "step1Desc": "Sélectionnez votre destination et un forfait data parmi plus de 200 pays",
+    "step2Title": "Scannez le QR code",
+    "step2Desc": "Recevez votre QR code instantanément et scannez-le avec votre téléphone",
+    "step3Title": "Vous êtes connecté",
+    "step3Desc": "Les données s'activent automatiquement à votre arrivée. C'est tout."
+  },
+  "comparison": {
+    "title": "eSIM vs SIM physique",
+    "subtitle": "Découvrez pourquoi les voyageurs passent à l'eSIM",
+    "activation": "Activation",
+    "physicalActivation": "Trouver une boutique, faire la queue",
+    "esimActivation": "Scanner le QR, prêt en 2 min",
+    "availability": "Disponibilité",
+    "physicalAvailability": "Boutiques aéroport/ville uniquement",
+    "esimAvailability": "Achat en ligne, à tout moment",
+    "switching": "Changer de forfait",
+    "physicalSwitching": "Acheter une nouvelle carte, échanger physiquement",
+    "esimSwitching": "Ajouter un nouveau forfait numériquement",
+    "keepNumber": "Garder votre numéro",
+    "physicalKeepNumber": "La SIM principale doit être retirée",
+    "esimKeepNumber": "Fonctionne en parallèle de votre SIM",
+    "multiCountry": "Plusieurs pays",
+    "physicalMultiCountry": "Nouvelle SIM par pays",
+    "esimMultiCountry": "Changez de forfait instantanément",
+    "cost": "Coût",
+    "physicalCost": "Majoration en boutique + déplacement",
+    "esimCost": "Prix directs, sans extras"
+  },
+  "featuresBento": {
+    "title": "Pourquoi choisir Simnetiq",
+    "globalCoverage": "Couverture mondiale",
+    "globalCoverageDesc": "Plus de 200 pays, 400+ opérateurs. Une seule app.",
+    "instantActivation": "Activation instantanée",
+    "instantActivationDesc": "De l'achat à la connexion en moins de 2 minutes",
+    "topUp": "Rechargez à tout moment",
+    "topUpDesc": "Presque à court de données ? Rechargez sans réinstaller votre eSIM",
+    "securePayments": "Paiement sécurisé",
+    "securePaymentsDesc": "Paiement via Stripe. Apple Pay, Google Pay, toutes les cartes courantes.",
+    "multiLanguage": "Multilingue",
+    "multiLanguageDesc": "Support complet en 18 langues dont l'arabe, l'hébreu, le japonais et plus",
+    "support": "Support dédié",
+    "supportDesc": "Un vrai support humain par e-mail et dans l'app. Pas de chatbots."
+  },
+  "devices": {
+    "title": "Compatibilité des appareils",
+    "notSure": "Vous ne savez pas si votre appareil prend en charge l'eSIM ?",
+    "checkFaq": "Consultez la FAQ"
+  },
+  "promoBanner": {
+    "headline": "{{discount}}% de réduction sur votre premier forfait eSIM",
+    "cta": "Voir les forfaits",
+    "finePrint": "Valable pour les nouveaux clients. Une utilisation par compte.",
+    "copied": "Copié !"
+  },
+  "appDownload": {
+    "badge": "DISPONIBLE SUR IOS",
+    "badgeBoth": "DISPONIBLE SUR IOS & ANDROID",
+    "title": "Gérez tout depuis votre téléphone",
+    "bullet1": "Achetez et activez des eSIMs",
+    "bullet2": "Suivez votre consommation en temps réel",
+    "bullet3": "Rechargez en un clic",
+    "bullet4": "Recevez vos QR codes instantanément"
+  },
+  "dopplerCrossSell": {
+    "badge": "Par Simnetiq",
+    "title": "Doppler VPN",
+    "description": "VPN sans journaux avec WireGuard + VLESS. Jusqu'à 10 appareils.",
+    "promo": "Code LAUNCH20 pour 20% de réduction",
+    "cta": "En savoir plus"
+  },
+  "socialProof": {
+    "rating": "4.5",
+    "appStore": "App Store",
+    "tagline": "Adopté par les voyageurs dans plus de 200 pays"
+  },
+  "finalCta": {
+    "title": "Prêt à rester connecté partout dans le monde ?",
+    "subtitle": "Obtenez votre eSIM en quelques minutes. Compatible avec tout appareil déverrouillé.",
+    "browsePlans": "Voir les forfaits",
+    "downloadApp": "Télécharger l'app",
+    "promoReminder": "Code {{code}} pour {{discount}}% de réduction"
   }
 }

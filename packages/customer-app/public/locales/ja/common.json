@@ -23,17 +23,25 @@
     "about": "Simnetiqについて"
   },
   "hero": {
-    "headlinePart1": "世界中どこでも",
-    "headlineHighlight": "最も簡単に",
-    "headlinePart2": "データ通信を利用する方法",
-    "subtitle": "数分でeSIMを有効化し、世界200以上の国と地域で常につながりましょう。",
-    "countries": "200以上の国と地域",
+    "headlinePart1": "海外でのデータ通信が",
+    "headlineHighlight": "驚くほど簡単",
+    "headlinePart2": "に — 200ヶ国以上対応",
+    "subtitle": "eSIMデータプランが数分で使えます。物理SIM不要、ローミング料金ゼロ。",
+    "countries": "200+ヶ国",
     "instantActivation": "即時アクティベーション",
-    "securePayment": "安全なお支払い",
+    "securePayment": "安全な決済",
     "downloadAppIOS": "iOSでダウンロード",
     "downloadAppAndroid": "Androidでダウンロード",
-    "exploreStore": "eSIMストアを見る",
-    "downloadApp": "アプリをダウンロード"
+    "exploreStore": "eSIMプランを見る",
+    "downloadApp": "アプリをダウンロード",
+    "darkHeadlinePart1": "世界中",
+    "darkHeadlineHighlight": "どこでも",
+    "darkHeadlinePart2": "つながる安心",
+    "darkSubtitle": "200ヶ国以上で即時eSIMアクティベーション。SIMカード不要、ローミング料金なし、手間いらず。",
+    "promoPrefix": "コード",
+    "promoSuffix": "で初回eSIMが{{discount}}%オフ",
+    "fiveStarRated": "5つ星評価",
+    "sevenDayRefund": "7日間返金保証"
   },
   "features": {
     "title": "世界中とつながる",
@@ -729,7 +737,7 @@
     "benefit3": "ローミング料金や予期しない費用なし",
     "benefit4": "海外でデータを使用しながらメインの番号を維持",
     "benefit5": "24時間年中無休のカスタマーサポート",
-    "regionalPlans": "{{region}}地域プラン"
+    "regionalPlans": "{{{region}}}地域プラン"
   },
   "about": {
     "sectionLabel": "Simnetiqについて",
@@ -761,6 +769,47 @@
     "ctaDesc": "数分でeSIMを取得。SIMロック解除済みのデバイスで利用可能。",
     "ctaButton": "プランを閲覧"
   },
+  "roaming": {
+    "label": "キャリアの実際の料金",
+    "title": "ローミング料金の払いすぎをやめましょう",
+    "subtitle": "主要キャリアの実際の料金 vs. Simnetiq。5GBデータを使った1週間の旅行を基準とした比較。",
+    "horrorTitle": "ローミングパッケージなしでは？",
+    "horrorDesc": "AT&TとVerizonは1MBあたり$2.05を請求 — つまり5GBだけで$10,250になります。",
+    "horrorSource": "出典: att.com、verizon.com のペイ・アズ・ユー・ゴー料金",
+    "selectDest": "目的地を選択",
+    "chartTitle": "1週間の旅行 · 5GBデータ",
+    "saveLabel": "最大節約額",
+    "dest": {
+      "turkey": "トルコ",
+      "thailand": "タイ",
+      "japan": "日本",
+      "brazil": "ブラジル",
+      "egypt": "エジプト"
+    },
+    "carrier": {
+      "att": "AT&T / Verizon（米国）",
+      "vodafoneDE": "Vodafone（ドイツ）",
+      "telekomDE": "Telekom（ドイツ）",
+      "simnetiq": "Simnetiq eSIM"
+    },
+    "note": {
+      "dayPass": "Day Pass $12/日 × 7",
+      "easyTravel": "EasyTravel €7.99/日",
+      "reisePaket": "ReisePaket World 4GB/週",
+      "travelMobil": "Travel Mobil Basic 5GB",
+      "travelMobilWorld": "Travel Mobil World 5GB",
+      "esim5gb": "5GBプラン"
+    },
+    "saveUpTo": "キャリアローミングとの最大節約額",
+    "fromPriceValue": "$5",
+    "fromPrice": "5GBプランの一般的な価格",
+    "noBillsValue": "$0",
+    "noBills": "予想外の請求や隠れた費用",
+    "noContractValue": "0",
+    "noContract": "必要な契約",
+    "disclaimer": "キャリア料金は公式発表価格に基づいています（2026年3月）。eSIM価格は典型的な市場価格を反映しています。",
+    "sources": "telekom.de · att.com · vodafone.de · airalo.com"
+  },
   "plan": {
     "callsAvailable": "通話可能",
     "smsAvailable": "SMS利用可能",
@@ -771,5 +820,116 @@
     "price": "価格",
     "data": "データ",
     "days": "日数"
+  },
+  "coverage": {
+    "exploreCTA": "{{region}}を今すぐ探索",
+    "title": "グローバルカバレッジ",
+    "countries": "ヶ国",
+    "dataPlans": "データプラン",
+    "languages": "言語",
+    "avgActivation": "平均開通時間",
+    "europe": "ヨーロッパ",
+    "asia": "アジア",
+    "americas": "アメリカ大陸",
+    "africa": "アフリカ",
+    "oceania": "オセアニア",
+    "middleEast": "中東"
+  },
+  "trust": {
+    "title": "旅行者に選ばれる理由",
+    "noRoamingFees": "ローミング料金ゼロ",
+    "noRoamingFeesDesc": "国際データ通信料を数百ドル節約",
+    "qrActivation": "QRコードで即時開通",
+    "qrActivationDesc": "スキャン、開通、接続 — わずか2分",
+    "languages": "18言語対応",
+    "languagesDesc": "どの国の方でも母国語でサポート",
+    "moneyBack": "返金保証",
+    "moneyBackDesc": "未使用プランは7日間全額返金"
+  },
+  "howItWorks": {
+    "title": "ご利用の流れ",
+    "subtitle": "3つの簡単ステップで接続",
+    "step1Title": "プランを選ぶ",
+    "step1Desc": "200ヶ国以上から渡航先とデータプランを選択",
+    "step2Title": "QRコードをスキャン",
+    "step2Desc": "QRコードを即座に受け取り、スマホでスキャン",
+    "step3Title": "接続完了",
+    "step3Desc": "到着すると自動的にデータが使えます。それだけです。"
+  },
+  "comparison": {
+    "title": "eSIM vs 物理SIM",
+    "subtitle": "旅行者がeSIMに乗り換える理由",
+    "activation": "アクティベーション",
+    "physicalActivation": "お店を探して並ぶ",
+    "esimActivation": "QRスキャンで2分で完了",
+    "availability": "入手方法",
+    "physicalAvailability": "空港・街中のショップのみ",
+    "esimAvailability": "いつでもオンラインで購入",
+    "switching": "プラン変更",
+    "physicalSwitching": "新しいカードを購入して差し替え",
+    "esimSwitching": "デジタルで新プランを追加",
+    "keepNumber": "番号の維持",
+    "physicalKeepNumber": "メインSIMを取り外す必要あり",
+    "esimKeepNumber": "既存のSIMと併用可能",
+    "multiCountry": "複数国での利用",
+    "physicalMultiCountry": "国ごとに新しいSIMが必要",
+    "esimMultiCountry": "プランを即座に切り替え",
+    "cost": "コスト",
+    "physicalCost": "店舗の割増価格 + 移動費",
+    "esimCost": "直接価格、追加費用なし"
+  },
+  "featuresBento": {
+    "title": "Simnetiqが選ばれる理由",
+    "globalCoverage": "グローバルカバレッジ",
+    "globalCoverageDesc": "200ヶ国以上、400以上のキャリア。ひとつのアプリで。",
+    "instantActivation": "即時アクティベーション",
+    "instantActivationDesc": "購入から接続まで2分以内",
+    "topUp": "いつでもチャージ",
+    "topUpDesc": "残量が少ない？eSIMを再インストールせずにデータを追加",
+    "securePayments": "安全な決済",
+    "securePaymentsDesc": "Stripe搭載の決済。Apple Pay、Google Pay、主要カードに対応。",
+    "multiLanguage": "多言語対応",
+    "multiLanguageDesc": "アラビア語、ヘブライ語、日本語など18言語を完全サポート",
+    "support": "専任サポート",
+    "supportDesc": "メールとアプリ内で実際のスタッフが対応。チャットボットではありません。"
+  },
+  "devices": {
+    "title": "対応デバイス",
+    "notSure": "お使いのデバイスがeSIMに対応しているか分からない？",
+    "checkFaq": "よくある質問を確認"
+  },
+  "promoBanner": {
+    "headline": "初回eSIMプランが{{discount}}%オフ",
+    "cta": "プランを見る",
+    "finePrint": "新規のお客様限定。1アカウントにつき1回のみ。",
+    "copied": "コピーしました！"
+  },
+  "appDownload": {
+    "badge": "iOSで配信中",
+    "badgeBoth": "iOS & Androidで配信中",
+    "title": "スマホですべて管理",
+    "bullet1": "eSIMの購入とアクティベーション",
+    "bullet2": "リアルタイムでデータ使用量を確認",
+    "bullet3": "ワンタップでチャージ",
+    "bullet4": "QRコードを即座に取得"
+  },
+  "dopplerCrossSell": {
+    "badge": "Simnetiq提供",
+    "title": "Doppler VPN",
+    "description": "ログなしVPN。WireGuard + VLESS搭載。最大10デバイス対応。",
+    "promo": "コード LAUNCH20 で20%オフ",
+    "cta": "詳しく見る"
+  },
+  "socialProof": {
+    "rating": "4.5",
+    "appStore": "App Store",
+    "tagline": "200ヶ国以上の旅行者に信頼されています"
+  },
+  "finalCta": {
+    "title": "世界中でつながる準備はできましたか？",
+    "subtitle": "数分でeSIMを取得。SIMロック解除済みのデバイスで利用可能。",
+    "browsePlans": "プランを閲覧",
+    "downloadApp": "アプリをダウンロード",
+    "promoReminder": "コード {{code}} で{{discount}}%オフ"
   }
 }

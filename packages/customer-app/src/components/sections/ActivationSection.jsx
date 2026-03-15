@@ -147,7 +147,7 @@ export default function ActivationSection() {
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={handleIOSDownload}
-                          className="inline-flex items-center rounded-full ps-5 pe-1 py-1 text-sm font-semibold shadow-sm transition-all duration-150 hover:scale-[1.02] hover:opacity-90 w-full sm:w-auto rtl-native-flex"
+                          className="inline-flex items-center rounded-full ps-5 pe-1 py-1 text-sm font-semibold shadow-sm transition-all duration-150 hover:opacity-90 w-full sm:w-auto rtl-native-flex"
                           style={{ backgroundColor: 'var(--cta-primary-bg)', color: 'var(--cta-primary-text)' }}
                         >
                           <span className="flex-1 text-center">{t('activation.appStore', 'App Store')}</span>
@@ -162,7 +162,7 @@ export default function ActivationSection() {
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={handleAndroidDownload}
-                          className="inline-flex items-center rounded-full ps-5 pe-1 py-1 text-sm font-semibold shadow-sm transition-all duration-150 hover:scale-[1.02] hover:opacity-90 w-full sm:w-auto rtl-native-flex"
+                          className="inline-flex items-center rounded-full ps-5 pe-1 py-1 text-sm font-semibold shadow-sm transition-all duration-150 hover:opacity-90 w-full sm:w-auto rtl-native-flex"
                           style={{ backgroundColor: 'var(--cta-secondary-bg)', color: 'var(--cta-secondary-text)', border: '1px solid var(--cta-secondary-border)' }}
                         >
                           <span className="flex-1 text-center">{t('activation.googlePlay', 'Google Play')}</span>
@@ -241,7 +241,7 @@ export default function ActivationSection() {
                           href="https://apps.apple.com/at/app/doppler-vpn-fast-secure/id6757091773"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center rounded-full ps-5 pe-1 py-1 text-sm font-semibold shadow-sm transition-all duration-150 hover:scale-[1.02] hover:opacity-90 w-full sm:w-auto rtl-native-flex"
+                          className="inline-flex items-center rounded-full ps-5 pe-1 py-1 text-sm font-semibold shadow-sm transition-all duration-150 hover:opacity-90 w-full sm:w-auto rtl-native-flex"
                           style={{ backgroundColor: 'var(--cta-primary-bg)', color: 'var(--cta-primary-text)' }}
                         >
                           <span className="flex-1 text-center">{t('activation.doppler.appStore', 'App Store')}</span>
@@ -255,7 +255,7 @@ export default function ActivationSection() {
                           href="https://dopplervpn.org/"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center rounded-full ps-5 pe-1 py-1 text-sm font-semibold shadow-sm transition-all duration-150 hover:scale-[1.02] hover:opacity-90 w-full sm:w-auto rtl-native-flex"
+                          className="inline-flex items-center rounded-full ps-5 pe-1 py-1 text-sm font-semibold shadow-sm transition-all duration-150 hover:opacity-90 w-full sm:w-auto rtl-native-flex"
                           style={{ backgroundColor: 'var(--cta-secondary-bg)', color: 'var(--cta-secondary-text)', border: '1px solid var(--cta-secondary-border)' }}
                         >
                           <span className="flex-1 text-center">{t('activation.doppler.learnMore', 'Learn More')}</span>

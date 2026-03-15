@@ -31,13 +31,13 @@ export default function FinalCTA({ promo }) {
           <div className="flex flex-col sm:flex-row gap-4 rtl-native-flex">
             <Link
               href={localizedPath('/esim-plans')}
-              className="inline-flex items-center justify-center rounded-full bg-white text-[#0a0a0a] px-8 py-3 font-semibold transition-all duration-150 hover:bg-white/90 hover:scale-[1.02]"
+              className="inline-flex items-center justify-center rounded-full bg-white text-[#0a0a0a] px-8 py-3 font-semibold transition-all duration-150 hover:bg-white/90"
             >
               {t('finalCta.browsePlans', 'Browse Plans')}
             </Link>
             <Link
               href={localizedPath('/esim-plans')}
-              className="inline-flex items-center justify-center rounded-full border border-white/30 text-white px-8 py-3 font-semibold transition-all duration-150 hover:bg-white/10 hover:scale-[1.02]"
+              className="inline-flex items-center justify-center rounded-full border border-white/30 text-white px-8 py-3 font-semibold transition-all duration-150 hover:bg-white/10"
             >
               {t('finalCta.downloadApp', 'Download App')}
             </Link>

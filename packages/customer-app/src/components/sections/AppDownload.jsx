@@ -75,7 +75,7 @@ export default function AppDownload() {
                 href={IOS_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center rounded-full bg-[#f5f5f5] text-[#0a0a0a] ps-5 pe-1 py-1 text-sm font-semibold shadow-sm transition-all duration-150 hover:bg-white hover:scale-[1.02] w-full sm:w-auto rtl-native-flex"
+                className="inline-flex items-center rounded-full bg-[#f5f5f5] text-[#0a0a0a] ps-5 pe-1 py-1 text-sm font-semibold shadow-sm transition-all duration-150 hover:bg-white  w-full sm:w-auto rtl-native-flex"
               >
                 <span className="flex-1 text-center">{t('appDownload.appStore', 'App Store')}</span>
                 <span className="ms-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-black/10 w-8 h-8">
@@ -88,7 +88,7 @@ export default function AppDownload() {
                   href={GOOGLE_PLAY_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center rounded-full bg-white/10 border border-white/20 text-text-primary ps-5 pe-1 py-1 text-sm font-semibold transition-all duration-150 hover:bg-white/20 hover:scale-[1.02] w-full sm:w-auto rtl-native-flex"
+                  className="inline-flex items-center rounded-full bg-white/10 border border-white/20 text-text-primary ps-5 pe-1 py-1 text-sm font-semibold transition-all duration-150 hover:bg-white/20  w-full sm:w-auto rtl-native-flex"
                 >
                   <span className="flex-1 text-center">{t('appDownload.googlePlay', 'Google Play')}</span>
                   <span className="ms-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-white/10 w-8 h-8">

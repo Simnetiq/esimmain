@@ -23,17 +23,25 @@
     "about": "O nas"
   },
   "hero": {
-    "headlinePart1": "Naj",
-    "headlineHighlight": "prostszy sposób",
-    "headlinePart2": "na internet w dowolnym miejscu na świecie",
-    "subtitle": "Aktywuj swoją kartę eSIM w kilka minut i pozostań w zasięgu w ponad 200 krajach na całym świecie.",
+    "headlinePart1": "Internet za granicą",
+    "headlineHighlight": "bez komplikacji",
+    "headlinePart2": "w ponad 200 krajach",
+    "subtitle": "Plany eSIM gotowe w kilka minut. Bez fizycznej karty SIM, bez opłat za roaming.",
     "countries": "200+ krajów",
     "instantActivation": "Natychmiastowa aktywacja",
     "securePayment": "Bezpieczna płatność",
     "downloadAppIOS": "Pobierz na iOS",
     "downloadAppAndroid": "Pobierz na Android",
-    "exploreStore": "Przeglądaj sklep eSIM",
-    "downloadApp": "Pobierz aplikację"
+    "exploreStore": "Zobacz plany eSIM",
+    "downloadApp": "Pobierz aplikację",
+    "darkHeadlinePart1": "Bądź w zasięgu",
+    "darkHeadlineHighlight": "gdziekolwiek",
+    "darkHeadlinePart2": "na świecie",
+    "darkSubtitle": "Natychmiastowa aktywacja eSIM w ponad 200 krajach. Bez karty SIM, bez roamingu, bez komplikacji.",
+    "promoPrefix": "Użyj kodu",
+    "promoSuffix": "i otrzymaj {{discount}}% zniżki na pierwszą kartę eSIM",
+    "fiveStarRated": "Ocena 5 gwiazdek",
+    "sevenDayRefund": "7 dni na zwrot"
   },
   "features": {
     "title": "Łącz się globalnie",
@@ -729,7 +737,7 @@
     "benefit3": "Bez opłat roamingowych i ukrytych kosztów",
     "benefit4": "Zachowaj swój główny numer, korzystając z danych za granicą",
     "benefit5": "Wsparcie klienta 24/7",
-    "regionalPlans": "Plany regionalne — {{region}}"
+    "regionalPlans": "Plany regionalne — {{{region}}}"
   },
   "about": {
     "sectionLabel": "O nas",
@@ -761,6 +769,47 @@
     "ctaDesc": "Uzyskaj swoją kartę eSIM w kilka minut. Działa na każdym odblokowanym urządzeniu.",
     "ctaButton": "Przeglądaj plany"
   },
+  "roaming": {
+    "label": "Rzeczywiste ceny operatorów",
+    "title": "Przestań przepłacać za roaming",
+    "subtitle": "Rzeczywiste ceny głównych operatorów vs. Simnetiq. Na podstawie tygodniowego wyjazdu z 5 GB danych.",
+    "horrorTitle": "Bez pakietu roamingowego?",
+    "horrorDesc": "AT&T i Verizon pobierają $2,05/MB — to $10 250 za zaledwie 5 GB danych.",
+    "horrorSource": "Źródło: stawki pay-as-you-go att.com, verizon.com",
+    "selectDest": "Wybierz cel podróży",
+    "chartTitle": "Tygodniowy wyjazd · 5 GB danych",
+    "saveLabel": "Oszczędź do",
+    "dest": {
+      "turkey": "Turcja",
+      "thailand": "Tajlandia",
+      "japan": "Japonia",
+      "brazil": "Brazylia",
+      "egypt": "Egipt"
+    },
+    "carrier": {
+      "att": "AT&T / Verizon (USA)",
+      "vodafoneDE": "Vodafone (Niemcy)",
+      "telekomDE": "Telekom (Niemcy)",
+      "simnetiq": "Simnetiq eSIM"
+    },
+    "note": {
+      "dayPass": "Day Pass $12/dzień × 7",
+      "easyTravel": "EasyTravel €7,99/dzień",
+      "reisePaket": "ReisePaket World 4 GB/tydzień",
+      "travelMobil": "Travel Mobil Basic 5 GB",
+      "travelMobilWorld": "Travel Mobil World 5 GB",
+      "esim5gb": "Plan 5 GB"
+    },
+    "saveUpTo": "Maksymalne oszczędności vs. roaming operatora",
+    "fromPriceValue": "$5",
+    "fromPrice": "Typowa cena planu 5 GB",
+    "noBillsValue": "$0",
+    "noBills": "Niespodziewane rachunki lub ukryte opłaty",
+    "noContractValue": "0",
+    "noContract": "Wymagane umowy",
+    "disclaimer": "Stawki operatorów oparte na oficjalnie opublikowanych cenach (mar. 2026). Ceny eSIM odzwierciedlają typowe stawki rynkowe.",
+    "sources": "telekom.de · att.com · vodafone.de · airalo.com"
+  },
   "plan": {
     "callsAvailable": "Dostępne połączenia",
     "smsAvailable": "Dostępne SMS",
@@ -771,5 +820,116 @@
     "price": "Cena",
     "data": "Dane",
     "days": "Dni"
+  },
+  "coverage": {
+    "title": "Globalny zasięg",
+    "countries": "Kraje",
+    "dataPlans": "Plany danych",
+    "languages": "Języki",
+    "avgActivation": "Śr. aktywacja",
+    "europe": "Europa",
+    "asia": "Azja",
+    "americas": "Ameryki",
+    "africa": "Afryka",
+    "oceania": "Oceania",
+    "middleEast": "Bliski Wschód",
+    "exploreCTA": "Odkryj {{region}} teraz"
+  },
+  "trust": {
+    "title": "Dlaczego podróżnicy ufają Simnetiq",
+    "noRoamingFees": "Bez opłat za roaming",
+    "noRoamingFeesDesc": "Zaoszczędź setki na międzynarodowych opłatach za dane",
+    "qrActivation": "Aktywacja QR",
+    "qrActivationDesc": "Skanuj, aktywuj, łącz się — w mniej niż 2 minuty",
+    "languages": "18 języków",
+    "languagesDesc": "Wsparcie w Twoim języku, skądkolwiek jesteś",
+    "moneyBack": "Gwarancja zwrotu",
+    "moneyBackDesc": "7-dniowy pełny zwrot za niewykorzystane plany"
+  },
+  "howItWorks": {
+    "title": "Jak to działa",
+    "subtitle": "Trzy proste kroki, aby być w zasięgu",
+    "step1Title": "Wybierz plan",
+    "step1Desc": "Wybierz cel podróży i plan danych z ponad 200 krajów",
+    "step2Title": "Zeskanuj QR Code",
+    "step2Desc": "Otrzymaj QR Code natychmiast i zeskanuj go telefonem",
+    "step3Title": "Jesteś połączony",
+    "step3Desc": "Dane aktywują się automatycznie po przyjeździe. To wszystko."
+  },
+  "comparison": {
+    "title": "eSIM vs fizyczna karta SIM",
+    "subtitle": "Zobacz, dlaczego podróżnicy przechodzą na eSIM",
+    "activation": "Aktywacja",
+    "physicalActivation": "Znajdź sklep, czekaj w kolejce",
+    "esimActivation": "Skanuj QR, gotowe w 2 min",
+    "availability": "Dostępność",
+    "physicalAvailability": "Tylko na lotniskach i w miastach",
+    "esimAvailability": "Kup online, w dowolnym momencie",
+    "switching": "Zmiana planu",
+    "physicalSwitching": "Kup nową kartę, wymień fizycznie",
+    "esimSwitching": "Dodaj nowy plan cyfrowo",
+    "keepNumber": "Zachowanie numeru",
+    "physicalKeepNumber": "Trzeba wyjąć główną kartę SIM",
+    "esimKeepNumber": "Działa obok Twojej karty SIM",
+    "multiCountry": "Wiele krajów",
+    "physicalMultiCountry": "Nowa karta SIM w każdym kraju",
+    "esimMultiCountry": "Przełączaj plany natychmiast",
+    "cost": "Koszt",
+    "physicalCost": "Marża sklepu + dojazd",
+    "esimCost": "Bezpośrednie ceny, bez dodatkowych opłat"
+  },
+  "featuresBento": {
+    "title": "Dlaczego warto wybrać Simnetiq",
+    "globalCoverage": "Globalny zasięg",
+    "globalCoverageDesc": "200+ krajów, 400+ operatorów. Jedna aplikacja.",
+    "instantActivation": "Natychmiastowa aktywacja",
+    "instantActivationDesc": "Od zakupu do połączenia w mniej niż 2 minuty",
+    "topUp": "Doładowanie w dowolnym momencie",
+    "topUpDesc": "Kończy się pakiet? Dodaj dane bez reinstalacji eSIM",
+    "securePayments": "Bezpieczne płatności",
+    "securePaymentsDesc": "Płatności obsługiwane przez Stripe. Apple Pay, Google Pay, wszystkie główne karty.",
+    "multiLanguage": "Wielojęzyczność",
+    "multiLanguageDesc": "Pełne wsparcie w 18 językach, w tym arabskim, hebrajskim, japońskim i innych",
+    "support": "Dedykowane wsparcie",
+    "supportDesc": "Prawdziwe wsparcie od ludzi przez e-mail i w aplikacji. Bez chatbotów."
+  },
+  "devices": {
+    "title": "Kompatybilność urządzeń",
+    "notSure": "Nie wiesz, czy Twoje urządzenie obsługuje eSIM?",
+    "checkFaq": "Sprawdź FAQ"
+  },
+  "promoBanner": {
+    "headline": "Odbierz {{discount}}% zniżki na pierwszy plan eSIM",
+    "cta": "Przeglądaj plany",
+    "finePrint": "Tylko dla nowych klientów. Jednorazowe użycie na konto.",
+    "copied": "Skopiowano!"
+  },
+  "appDownload": {
+    "badge": "DOSTĘPNA NA iOS",
+    "badgeBoth": "DOSTĘPNA NA iOS I ANDROID",
+    "title": "Zarządzaj wszystkim ze swojego telefonu",
+    "bullet1": "Kupuj i aktywuj karty eSIM",
+    "bullet2": "Monitoruj zużycie danych w czasie rzeczywistym",
+    "bullet3": "Doładuj jednym kliknięciem",
+    "bullet4": "Otrzymuj QR Code natychmiast"
+  },
+  "dopplerCrossSell": {
+    "badge": "Od Simnetiq",
+    "title": "Doppler VPN",
+    "description": "VPN bez logów z WireGuard + VLESS. Do 10 urządzeń.",
+    "promo": "Użyj kodu LAUNCH20 i uzyskaj 20% zniżki",
+    "cta": "Dowiedz się więcej"
+  },
+  "socialProof": {
+    "rating": "4.5",
+    "appStore": "App Store",
+    "tagline": "Zaufanie podróżników w ponad 200 krajach"
+  },
+  "finalCta": {
+    "title": "Gotowy na internet na całym świecie?",
+    "subtitle": "Uzyskaj kartę eSIM w kilka minut. Działa na każdym odblokowanym urządzeniu.",
+    "browsePlans": "Przeglądaj plany",
+    "downloadApp": "Pobierz aplikację",
+    "promoReminder": "Użyj kodu {{code}} i uzyskaj {{discount}}% zniżki"
   }
 }

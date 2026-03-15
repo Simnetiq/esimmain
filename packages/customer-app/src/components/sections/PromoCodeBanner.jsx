@@ -93,7 +93,7 @@ export default function PromoCodeBanner({ promo }) {
         {/* CTA */}
         <Link
           href={localizedPath('/esim-plans')}
-          className="inline-flex items-center gap-2 bg-tufts-blue hover:bg-tufts-blue/90 text-white rounded-full px-6 py-3 font-semibold transition-all duration-150 hover:scale-[1.02]"
+          className="inline-flex items-center gap-2 bg-tufts-blue hover:bg-tufts-blue/90 text-white rounded-full px-6 py-3 font-semibold transition-all duration-150"
         >
           {t('promoBanner.cta', 'Browse Plans')} →
         </Link>

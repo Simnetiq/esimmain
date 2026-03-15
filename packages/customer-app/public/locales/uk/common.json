@@ -23,17 +23,25 @@
     "about": "Про нас"
   },
   "hero": {
-    "headlinePart1": "",
-    "headlineHighlight": "Найпростіший спосіб",
-    "headlinePart2": "отримати інтернет будь-де у світі",
-    "subtitle": "Активуйте eSIM за кілька хвилин і залишайтесь на зв'язку в понад 200 напрямках по всьому світу.",
+    "headlinePart1": "Інтернет за кордоном —",
+    "headlineHighlight": "легко та швидко",
+    "headlinePart2": "у понад 200 країнах",
+    "subtitle": "eSIM-тарифи з миттєвою активацією. Без фізичної SIM-картки, без роумінгу, без прихованих платежів.",
     "countries": "200+ країн",
     "instantActivation": "Миттєва активація",
     "securePayment": "Безпечна оплата",
     "downloadAppIOS": "Завантажити для iOS",
     "downloadAppAndroid": "Завантажити для Android",
-    "exploreStore": "Переглянути магазин eSIM",
-    "downloadApp": "Завантажити додаток"
+    "exploreStore": "Переглянути тарифи eSIM",
+    "downloadApp": "Завантажити додаток",
+    "darkHeadlinePart1": "Залишайтесь на зв'язку",
+    "darkHeadlineHighlight": "будь-де",
+    "darkHeadlinePart2": "у світі",
+    "darkSubtitle": "Миттєва активація eSIM для 200+ країн. Без фізичної SIM, без роумінгу, без зайвих клопотів.",
+    "promoPrefix": "Використайте код",
+    "promoSuffix": "та отримайте знижку {{discount}}% на перший eSIM",
+    "fiveStarRated": "Оцінка 5 зірок",
+    "sevenDayRefund": "Повернення за 7 днів"
   },
   "features": {
     "title": "Зв'язок по всьому світу",
@@ -729,7 +737,7 @@
     "benefit3": "Без плати за роумінг та несподіваних витрат",
     "benefit4": "Зберігайте основний номер активним, використовуючи дані за кордоном",
     "benefit5": "Підтримка клієнтів 24/7",
-    "regionalPlans": "Регіональні тарифи {{region}}"
+    "regionalPlans": "Регіональні тарифи {{{region}}}"
   },
   "about": {
     "sectionLabel": "Про нас",
@@ -761,6 +769,47 @@
     "ctaDesc": "Отримайте вашу eSIM за кілька хвилин. Працює на будь-якому розблокованому пристрої.",
     "ctaButton": "Переглянути тарифи"
   },
+  "roaming": {
+    "label": "Реальні ціни операторів",
+    "title": "Перестаньте переплачувати за роумінг",
+    "subtitle": "Реальні ціни великих операторів vs. Simnetiq. На основі тижневої поїздки з 5 ГБ даних.",
+    "horrorTitle": "Без роумінгового пакета?",
+    "horrorDesc": "AT&T та Verizon стягують $2,05/МБ — це $10 250 лише за 5 ГБ даних.",
+    "horrorSource": "Джерело: тарифи att.com, verizon.com з оплатою за фактом",
+    "selectDest": "Обрати напрямок",
+    "chartTitle": "Поїздка на 1 тиждень · 5 ГБ даних",
+    "saveLabel": "Економія до",
+    "dest": {
+      "turkey": "Туреччина",
+      "thailand": "Таїланд",
+      "japan": "Японія",
+      "brazil": "Бразилія",
+      "egypt": "Єгипет"
+    },
+    "carrier": {
+      "att": "AT&T / Verizon (США)",
+      "vodafoneDE": "Vodafone (Німеччина)",
+      "telekomDE": "Telekom (Німеччина)",
+      "simnetiq": "Simnetiq eSIM"
+    },
+    "note": {
+      "dayPass": "Day Pass $12/день × 7",
+      "easyTravel": "EasyTravel €7,99/день",
+      "reisePaket": "ReisePaket World 4 ГБ/тиждень",
+      "travelMobil": "Travel Mobil Basic 5 ГБ",
+      "travelMobilWorld": "Travel Mobil World 5 ГБ",
+      "esim5gb": "Пакет 5 ГБ"
+    },
+    "saveUpTo": "Максимальна економія vs. роумінг оператора",
+    "fromPriceValue": "$5",
+    "fromPrice": "Типова ціна пакета 5 ГБ",
+    "noBillsValue": "$0",
+    "noBills": "Несподівані рахунки або приховані збори",
+    "noContractValue": "0",
+    "noContract": "Необхідні контракти",
+    "disclaimer": "Тарифи операторів засновані на офіційно опублікованих цінах (березень 2026). Ціни eSIM відображають типові ринкові тарифи.",
+    "sources": "telekom.de · att.com · vodafone.de · airalo.com"
+  },
   "plan": {
     "callsAvailable": "Дзвінки доступні",
     "smsAvailable": "SMS доступні",
@@ -771,5 +820,116 @@
     "price": "Ціна",
     "data": "Дані",
     "days": "Дні"
+  },
+  "coverage": {
+    "exploreCTA": "Відкрийте для себе {{region}}",
+    "title": "Глобальне покриття",
+    "countries": "Країн",
+    "dataPlans": "Тарифів",
+    "languages": "Мов",
+    "avgActivation": "Середній час активації",
+    "europe": "Європа",
+    "asia": "Азія",
+    "americas": "Америка",
+    "africa": "Африка",
+    "oceania": "Океанія",
+    "middleEast": "Близький Схід"
+  },
+  "trust": {
+    "title": "Чому мандрівники обирають Simnetiq",
+    "noRoamingFees": "Без роумінгу",
+    "noRoamingFeesDesc": "Заощаджуйте сотні на міжнародному трафіку",
+    "qrActivation": "Активація через QR",
+    "qrActivationDesc": "Скануйте, активуйте, підключайтесь — менше ніж за 2 хвилини",
+    "languages": "18 мов",
+    "languagesDesc": "Підтримка вашою мовою, звідки б ви не були",
+    "moneyBack": "Гарантія повернення",
+    "moneyBackDesc": "Повне повернення протягом 7 днів для невикористаних тарифів"
+  },
+  "howItWorks": {
+    "title": "Як це працює",
+    "subtitle": "Три прості кроки для підключення",
+    "step1Title": "Оберіть тариф",
+    "step1Desc": "Вкажіть напрямок та тарифний план з 200+ країн",
+    "step2Title": "Скануйте QR-код",
+    "step2Desc": "Отримайте QR-код миттєво та скануйте телефоном",
+    "step3Title": "Ви підключені",
+    "step3Desc": "Інтернет активується автоматично по прибутті. Ось і все."
+  },
+  "comparison": {
+    "title": "eSIM vs Фізична SIM",
+    "subtitle": "Дізнайтесь, чому мандрівники переходять на eSIM",
+    "activation": "Активація",
+    "physicalActivation": "Шукати магазин, стояти в черзі",
+    "esimActivation": "Скануйте QR — готово за 2 хв",
+    "availability": "Доступність",
+    "physicalAvailability": "Тільки в магазинах аеропорту/міста",
+    "esimAvailability": "Купуйте онлайн у будь-який час",
+    "switching": "Зміна тарифу",
+    "physicalSwitching": "Купувати нову картку, міняти вручну",
+    "esimSwitching": "Додайте новий тариф цифрово",
+    "keepNumber": "Зберегти номер",
+    "physicalKeepNumber": "Потрібно дістати основну SIM",
+    "esimKeepNumber": "Працює паралельно з вашою SIM",
+    "multiCountry": "Кілька країн",
+    "physicalMultiCountry": "Нова SIM для кожної країни",
+    "esimMultiCountry": "Миттєва зміна тарифу",
+    "cost": "Вартість",
+    "physicalCost": "Націнка магазину + таксі до нього",
+    "esimCost": "Прямі ціни, без переплат"
+  },
+  "featuresBento": {
+    "title": "Чому Simnetiq",
+    "globalCoverage": "Глобальне покриття",
+    "globalCoverageDesc": "200+ країн, 400+ операторів. Один додаток.",
+    "instantActivation": "Миттєва активація",
+    "instantActivationDesc": "Від покупки до підключення — менше 2 хвилин",
+    "topUp": "Поповнення будь-коли",
+    "topUpDesc": "Закінчуються дані? Додайте трафік без перевстановлення eSIM",
+    "securePayments": "Безпечні платежі",
+    "securePaymentsDesc": "Оплата через Stripe. Apple Pay, Google Pay та всі основні картки.",
+    "multiLanguage": "Багатомовність",
+    "multiLanguageDesc": "Повна підтримка 18 мовами: арабська, іврит, японська та інші",
+    "support": "Персональна підтримка",
+    "supportDesc": "Живі люди через email та в додатку. Жодних чат-ботів."
+  },
+  "devices": {
+    "title": "Сумісність пристроїв",
+    "notSure": "Не впевнені, чи підтримує ваш пристрій eSIM?",
+    "checkFaq": "Читати FAQ"
+  },
+  "promoBanner": {
+    "headline": "Знижка {{discount}}% на ваш перший тариф eSIM",
+    "cta": "Переглянути тарифи",
+    "finePrint": "Тільки для нових клієнтів. Одне використання на акаунт.",
+    "copied": "Скопійовано!"
+  },
+  "appDownload": {
+    "badge": "ДОСТУПНО НА IOS",
+    "badgeBoth": "ДОСТУПНО НА IOS ТА ANDROID",
+    "title": "Керуйте всім з телефону",
+    "bullet1": "Купуйте та активуйте eSIM",
+    "bullet2": "Відстежуйте витрати даних у реальному часі",
+    "bullet3": "Поповнюйте одним дотиком",
+    "bullet4": "Отримуйте QR-коди миттєво"
+  },
+  "dopplerCrossSell": {
+    "badge": "Від Simnetiq",
+    "title": "Doppler VPN",
+    "description": "VPN без логів на базі WireGuard + VLESS. До 10 пристроїв.",
+    "promo": "Код LAUNCH20 — знижка 20%",
+    "cta": "Докладніше"
+  },
+  "socialProof": {
+    "rating": "4.5",
+    "appStore": "App Store",
+    "tagline": "Нам довіряють мандрівники у 200+ країнах"
+  },
+  "finalCta": {
+    "title": "Готові залишатися на зв'язку по всьому світу?",
+    "subtitle": "Отримайте eSIM за лічені хвилини. Працює на будь-якому розблокованому пристрої.",
+    "browsePlans": "Переглянути тарифи",
+    "downloadApp": "Завантажити додаток",
+    "promoReminder": "Використайте код {{code}} — знижка {{discount}}%"
   }
 }

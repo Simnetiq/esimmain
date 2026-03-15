@@ -23,17 +23,25 @@
     "about": "О нас"
   },
   "hero": {
-    "headlinePart1": "Самый простой способ получить",
-    "headlineHighlight": "мобильный интернет",
-    "headlinePart2": "в любой точке мира",
-    "subtitle": "Активируйте ваш eSIM за считанные минуты и оставайтесь на связи в более чем 200 странах мира.",
+    "headlinePart1": "Интернет за границей —",
+    "headlineHighlight": "проще простого",
+    "headlinePart2": "в более чем 200 странах",
+    "subtitle": "eSIM-тарифы с мгновенной активацией. Без физической SIM-карты, без роуминга, без переплат.",
     "countries": "200+ стран",
     "instantActivation": "Мгновенная активация",
     "securePayment": "Безопасная оплата",
     "downloadAppIOS": "Скачать iOS приложение",
     "downloadAppAndroid": "Скачать Android приложение",
     "exploreStore": "Перейти в магазин eSIM",
-    "downloadApp": "Скачать приложение"
+    "downloadApp": "Скачать приложение",
+    "darkHeadlinePart1": "Оставайтесь на связи",
+    "darkHeadlineHighlight": "в любой точке",
+    "darkHeadlinePart2": "мира",
+    "darkSubtitle": "Мгновенная активация eSIM для 200+ стран. Без физической SIM, без роуминга, без лишних хлопот.",
+    "promoPrefix": "Используйте код",
+    "promoSuffix": "и получите скидку {{discount}}% на первый eSIM",
+    "fiveStarRated": "Оценка 5 звёзд",
+    "sevenDayRefund": "Возврат за 7 дней"
   },
   "QRCodeModal": {},
   "features": {
@@ -448,7 +456,7 @@
     "continue": "Продолжить",
     "selectPlanToContinue": "Выберите тариф для продолжения",
     "globalPlans": "Глобальные тарифы",
-    "regionalPlansFor": "Тарифы {region}"
+    "regionalPlansFor": "Тарифы {{region}}"
   },
   "planSort": {
     "price": "Цена ↑",
@@ -739,7 +747,7 @@
     "benefit3": "Без роуминговых сборов и скрытых платежей",
     "benefit4": "Сохраняйте основной номер при использовании данных за рубежом",
     "benefit5": "Поддержка клиентов 24/7",
-    "regionalPlans": "Региональные тарифы {{region}}"
+    "regionalPlans": "Региональные тарифы {{{region}}}"
   },
   "about": {
     "sectionLabel": "О нас",
@@ -770,5 +778,157 @@
     "ctaTitle": "Готовы стать глобальными?",
     "ctaDesc": "Получите eSIM за считанные минуты. Работает на любом разблокированном устройстве.",
     "ctaButton": "Смотреть тарифы"
+  },
+  "roaming": {
+    "label": "Реальные цены операторов",
+    "title": "Перестаньте переплачивать за роуминг",
+    "subtitle": "Реальные цены крупных операторов vs. Simnetiq. На основе поездки на 1 неделю с 5 ГБ данных.",
+    "horrorTitle": "Без роумингового пакета?",
+    "horrorDesc": "AT&T и Verizon берут $2,05/МБ — это $10 250 за всего 5 ГБ данных.",
+    "horrorSource": "Источник: тарифы att.com, verizon.com с оплатой по факту",
+    "selectDest": "Выбрать направление",
+    "chartTitle": "Поездка на 1 неделю · 5 ГБ данных",
+    "saveLabel": "Экономия до",
+    "dest": {
+      "turkey": "Турция",
+      "thailand": "Таиланд",
+      "japan": "Япония",
+      "brazil": "Бразилия",
+      "egypt": "Египет"
+    },
+    "carrier": {
+      "att": "AT&T / Verizon (США)",
+      "vodafoneDE": "Vodafone (Германия)",
+      "telekomDE": "Telekom (Германия)",
+      "simnetiq": "Simnetiq eSIM"
+    },
+    "note": {
+      "dayPass": "Day Pass $12/день × 7",
+      "easyTravel": "EasyTravel €7,99/день",
+      "reisePaket": "ReisePaket World 4 ГБ/неделя",
+      "travelMobil": "Travel Mobil Basic 5 ГБ",
+      "travelMobilWorld": "Travel Mobil World 5 ГБ",
+      "esim5gb": "Пакет 5 ГБ"
+    },
+    "saveUpTo": "Максимальная экономия vs. роуминг оператора",
+    "fromPriceValue": "$5",
+    "fromPrice": "Типичная цена пакета 5 ГБ",
+    "noBillsValue": "$0",
+    "noBills": "Неожиданные счета или скрытые платежи",
+    "noContractValue": "0",
+    "noContract": "Необходимые контракты",
+    "disclaimer": "Тарифы операторов основаны на официально опубликованных ценах (март 2026). Цены eSIM отражают типичные рыночные тарифы.",
+    "sources": "telekom.de · att.com · vodafone.de · airalo.com"
+  },
+  "coverage": {
+    "exploreCTA": "Откройте для себя {{region}}",
+    "title": "Глобальное покрытие",
+    "countries": "Стран",
+    "dataPlans": "Тарифов",
+    "languages": "Языков",
+    "avgActivation": "Среднее время активации",
+    "europe": "Европа",
+    "asia": "Азия",
+    "americas": "Америка",
+    "africa": "Африка",
+    "oceania": "Океания",
+    "middleEast": "Ближний Восток"
+  },
+  "trust": {
+    "title": "Почему путешественники выбирают Simnetiq",
+    "noRoamingFees": "Без роуминга",
+    "noRoamingFeesDesc": "Сэкономьте сотни на международном трафике",
+    "qrActivation": "Активация по QR",
+    "qrActivationDesc": "Отсканируйте, активируйте, подключитесь — менее чем за 2 минуты",
+    "languages": "18 языков",
+    "languagesDesc": "Поддержка на вашем языке, откуда бы вы ни были",
+    "moneyBack": "Гарантия возврата",
+    "moneyBackDesc": "Полный возврат за 7 дней для неиспользованных тарифов"
+  },
+  "howItWorks": {
+    "title": "Как это работает",
+    "subtitle": "Три простых шага для подключения",
+    "step1Title": "Выберите тариф",
+    "step1Desc": "Укажите направление и тарифный план из 200+ стран",
+    "step2Title": "Отсканируйте QR-код",
+    "step2Desc": "Получите QR-код мгновенно и отсканируйте телефоном",
+    "step3Title": "Вы подключены",
+    "step3Desc": "Интернет активируется автоматически по прибытии. Вот и всё."
+  },
+  "comparison": {
+    "title": "eSIM vs Физическая SIM",
+    "subtitle": "Узнайте, почему путешественники переходят на eSIM",
+    "activation": "Активация",
+    "physicalActivation": "Искать магазин, стоять в очереди",
+    "esimActivation": "Сканируйте QR — готово за 2 мин",
+    "availability": "Доступность",
+    "physicalAvailability": "Только в магазинах аэропорта/города",
+    "esimAvailability": "Покупайте онлайн в любое время",
+    "switching": "Смена тарифа",
+    "physicalSwitching": "Покупать новую карту, менять вручную",
+    "esimSwitching": "Добавьте новый тариф цифрово",
+    "keepNumber": "Сохранить номер",
+    "physicalKeepNumber": "Нужно извлечь основную SIM",
+    "esimKeepNumber": "Работает параллельно с вашей SIM",
+    "multiCountry": "Несколько стран",
+    "physicalMultiCountry": "Новая SIM для каждой страны",
+    "esimMultiCountry": "Мгновенная смена тарифа",
+    "cost": "Стоимость",
+    "physicalCost": "Наценка магазина + такси до него",
+    "esimCost": "Прямые цены, без переплат"
+  },
+  "featuresBento": {
+    "title": "Почему Simnetiq",
+    "globalCoverage": "Глобальное покрытие",
+    "globalCoverageDesc": "200+ стран, 400+ операторов. Одно приложение.",
+    "instantActivation": "Мгновенная активация",
+    "instantActivationDesc": "От покупки до подключения — менее 2 минут",
+    "topUp": "Пополнение в любое время",
+    "topUpDesc": "Заканчиваются данные? Добавьте трафик без переустановки eSIM",
+    "securePayments": "Безопасные платежи",
+    "securePaymentsDesc": "Оплата через Stripe. Apple Pay, Google Pay и все основные карты.",
+    "multiLanguage": "Мультиязычность",
+    "multiLanguageDesc": "Полная поддержка на 18 языках: арабский, иврит, японский и другие",
+    "support": "Персональная поддержка",
+    "supportDesc": "Живые люди по email и в приложении. Никаких чат-ботов."
+  },
+  "devices": {
+    "title": "Совместимость устройств",
+    "notSure": "Не уверены, поддерживает ли ваше устройство eSIM?",
+    "checkFaq": "Читать FAQ"
+  },
+  "promoBanner": {
+    "headline": "Скидка {{discount}}% на ваш первый тариф eSIM",
+    "cta": "Смотреть тарифы",
+    "finePrint": "Только для новых клиентов. Одно использование на аккаунт.",
+    "copied": "Скопировано!"
+  },
+  "appDownload": {
+    "badge": "ДОСТУПНО НА IOS",
+    "badgeBoth": "ДОСТУПНО НА IOS И ANDROID",
+    "title": "Управляйте всем с телефона",
+    "bullet1": "Покупайте и активируйте eSIM",
+    "bullet2": "Отслеживайте расход данных в реальном времени",
+    "bullet3": "Пополняйте одним нажатием",
+    "bullet4": "Получайте QR-коды мгновенно"
+  },
+  "dopplerCrossSell": {
+    "badge": "От Simnetiq",
+    "title": "Doppler VPN",
+    "description": "VPN без логов на базе WireGuard + VLESS. До 10 устройств.",
+    "promo": "Код LAUNCH20 — скидка 20%",
+    "cta": "Подробнее"
+  },
+  "socialProof": {
+    "rating": "4.5",
+    "appStore": "App Store",
+    "tagline": "Нам доверяют путешественники в 200+ странах"
+  },
+  "finalCta": {
+    "title": "Готовы оставаться на связи по всему миру?",
+    "subtitle": "Получите eSIM за считанные минуты. Работает на любом разблокированном устройстве.",
+    "browsePlans": "Смотреть тарифы",
+    "downloadApp": "Скачать приложение",
+    "promoReminder": "Используйте код {{code}} — скидка {{discount}}%"
   }
 }

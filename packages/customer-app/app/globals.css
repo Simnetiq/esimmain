@@ -21,6 +21,8 @@
     --text-primary: #1F1F1F;
     --text-muted: #6B7280;
     --accent-success: #22c55e;
+    --accent-warning: #f59e0b;
+    --accent-error: #ef4444;
     --accent-highlight: #f59e0b;
     /* Theme-aware semi-transparent surface colors — LIGHT */
     --navbar-bg: rgba(255, 255, 255, 0.8);
@@ -73,6 +75,10 @@
     --cta-secondary-border: rgba(255, 255, 255, 0.2);
     --cta-secondary-circle-bg: rgba(255, 255, 255, 0.1);
     --cta-secondary-circle-text: #f5f5f5;
+    /* Accent colors — DARK */
+    --accent-success: #34d399;
+    --accent-warning: #fbbf24;
+    --accent-error: #f87171;
     /* Login button */
     --login-bg: #FFFFFF;
     --login-text: #0a0a0a;
@@ -202,15 +208,13 @@
   /* Card */
   .card {
     background: var(--bg-primary);
-    border-radius: 4px;
+    border-radius: 0;
     padding: 24px;
     box-shadow: 0 2px 4px var(--shadow-color), 0 4px 8px var(--shadow-color);
     border: 1px solid var(--card-border);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: border-color 0.3s ease;
   }
   .card:hover {
-    box-shadow: 0 4px 8px var(--shadow-primary), 0 8px 16px var(--shadow-primary);
-    transform: translateY(-2px);
     border-color: var(--jordy-blue);
   }
 
@@ -263,11 +267,10 @@
     border: 1px solid var(--card-border);
     border-radius: 0;
     padding: 24px;
-    transition: border-color 0.3s ease, transform 0.3s ease;
+    transition: border-color 0.3s ease;
   }
   .glass-card:hover {
     border-color: rgba(73, 117, 212, 0.3);
-    transform: translateY(-2px);
   }
 
   /* Section background with decorative orbs — pure CSS, zero TBT */

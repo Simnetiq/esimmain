@@ -24,12 +24,12 @@
   },
   "hero": {
     "headlinePart1": "The ",
-    "headlineHighlight": "easiest way",
-    "headlinePart2": "to get data anywhere in the world",
-    "subtitle": "Activate your eSIM in minutes and stay connected in 200+ destinations worldwide.",
+    "headlineHighlight": "simplest way",
+    "headlinePart2": "to stay online abroad",
+    "subtitle": "Get eSIM data plans for 200+ countries. Activate in minutes — no SIM card, no roaming fees.",
     "countries": "200+ Countries",
-    "instantActivation": "Instant Activation",
-    "securePayment": "Secure Payment",
+    "instantActivation": "Instant Setup",
+    "securePayment": "Secure Checkout",
     "downloadAppIOS": "Download for iOS",
     "downloadAppAndroid": "Download for Android",
     "exploreStore": " eSIM Store",
@@ -39,7 +39,7 @@
     "darkHeadlinePart2": "in the world",
     "darkSubtitle": "Instant eSIM activation for 200+ countries. No SIM cards, no roaming fees, no hassle.",
     "promoPrefix": "Use code",
-    "promoSuffix": "for {discount}% off your first eSIM",
+    "promoSuffix": "for {{discount}}% off your first eSIM",
     "fiveStarRated": "5-Star Rated",
     "sevenDayRefund": "7-Day Refund"
   },
@@ -737,7 +737,7 @@
     "benefit3": "No roaming charges or surprise fees",
     "benefit4": "Keep your main number active while using data abroad",
     "benefit5": "24/7 customer support",
-    "regionalPlans": "{{region}} Regional Plans"
+    "regionalPlans": "{{{region}}} Regional Plans"
   },
   "about": {
     "sectionLabel": "About Us",
@@ -824,17 +824,35 @@
     "esimCost": "Direct pricing, no extras"
   },
   "roaming": {
-    "title": "Simnetiq vs Roaming Costs",
-    "subtitle": "See how much you can save",
-    "carrierTurkey": "Typical carrier roaming (Turkey)",
-    "carrierEurope": "Typical carrier roaming (Europe)",
-    "carrierAsia": "Typical carrier roaming (Asia)",
-    "simnetiq": "Simnetiq eSIM",
-    "perWeek": "/week",
-    "saveUpTo": "Save up to 90%",
-    "fromPrice": "From $3/week",
-    "noBills": "No surprise bills",
-    "cancelAnytime": "Cancel anytime"
+    "label": "Real carrier prices",
+    "title": "Stop overpaying for roaming",
+    "subtitle": "Real prices from major carriers vs. Simnetiq. Based on a 1-week trip with 5GB of data.",
+    "selectDest": "Select destination",
+    "chartTitle": "1-week trip · 5GB data",
+    "saveLabel": "Save up to",
+    "dest": {
+      "turkey": "Turkey",
+      "thailand": "Thailand",
+      "japan": "Japan",
+      "brazil": "Brazil",
+      "egypt": "Egypt"
+    },
+    "carrier": {
+      "att": "AT&T / Verizon (US)",
+      "vodafoneDE": "Vodafone (Germany)",
+      "telekomDE": "Telekom (Germany)",
+      "simnetiq": "Simnetiq eSIM"
+    },
+    "note": {
+      "dayPass": "Day Pass $12/day × 7",
+      "easyTravel": "EasyTravel €7.99/day",
+      "reisePaket": "ReisePaket World 4GB/week",
+      "travelMobil": "Travel Mobil Basic 5GB",
+      "travelMobilWorld": "Travel Mobil World 5GB",
+      "esim5gb": "5GB plan"
+    },
+    "disclaimer": "Carrier rates based on official published prices (Mar 2026). eSIM prices reflect typical market rates.",
+    "sources": "telekom.de · att.com · vodafone.de · airalo.com"
   },
   "featuresBento": {
     "title": "Why Choose Simnetiq",
@@ -862,7 +880,8 @@
     "americas": "Americas",
     "africa": "Africa",
     "oceania": "Oceania",
-    "middleEast": "Middle East"
+    "middleEast": "Middle East",
+    "exploreCTA": "Start exploring {{region}} now"
   },
   "devices": {
     "title": "Device Compatibility",
@@ -870,7 +889,7 @@
     "checkFaq": "Check FAQ"
   },
   "promoBanner": {
-    "headline": "Get {discount}% off your first eSIM plan",
+    "headline": "Get {{discount}}% off your first eSIM plan",
     "cta": "Shop Plans Now",
     "finePrint": "Valid for new customers. One use per account.",
     "copied": "Copied!"
@@ -901,6 +920,6 @@
     "subtitle": "Get your eSIM in minutes. Works on any unlocked device.",
     "browsePlans": "Browse Plans",
     "downloadApp": "Download App",
-    "promoReminder": "Use code {code} for {discount}% off"
+    "promoReminder": "Use code {{code}} for {{discount}}% off"
   }
 }

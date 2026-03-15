@@ -163,7 +163,7 @@ export default function NewHeroSection({ promo = null }) {
                   href={appStoreLinks.ios}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:scale-[1.02] hover:opacity-90 rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto shadow-sm"
+                  className="inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:opacity-90 rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto shadow-sm"
                   style={{
                     backgroundColor: 'var(--cta-secondary-bg)',
                     color: 'var(--cta-secondary-text)',
@@ -185,7 +185,7 @@ export default function NewHeroSection({ promo = null }) {
                   href={appStoreLinks.android}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:scale-[1.02] hover:opacity-90 rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto shadow-sm"
+                  className="inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:opacity-90 rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto shadow-sm"
                   style={{
                     backgroundColor: 'var(--cta-secondary-bg)',
                     color: 'var(--cta-secondary-text)',

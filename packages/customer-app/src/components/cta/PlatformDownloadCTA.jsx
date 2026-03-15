@@ -63,10 +63,10 @@ function DownloadButton({ platform, variant, size, source, className = '' }) {
 
   // Static variant classes
   const variantClasses = {
-    primary: 'bg-[var(--login-bg)] text-[var(--login-text)] shadow-lg hover:opacity-90 hover:scale-[1.02]',
+    primary: 'bg-[var(--login-bg)] text-[var(--login-text)] shadow-lg hover:opacity-90',
     secondary: 'bg-[var(--bg-primary)] text-text-primary border border-[var(--card-border)] shadow-sm hover:border-tufts-blue hover:text-tufts-blue',
     outline: 'bg-transparent text-white border border-white/20 shadow-sm hover:border-white/40 hover:bg-white/5',
-    themed: 'shadow-sm hover:scale-[1.02] hover:opacity-90',
+    themed: 'shadow-sm hover:opacity-90',
   };
 
   const circleClasses = {

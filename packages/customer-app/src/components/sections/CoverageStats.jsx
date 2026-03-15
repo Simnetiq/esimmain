@@ -138,7 +138,7 @@ export default function CoverageStats() {
           <Link
             key={region.key}
             href={localizedPath(`/esim-plans?region=${region.slug}`)}
-            className="glass-card flex flex-col gap-3 hover:bg-white/10 transition-colors duration-200"
+            className="glass-card flex flex-col gap-3 hover:border-[var(--tufts-blue)] transition-colors duration-200"
           >
             <p className="font-semibold text-text-primary text-start">
               {t(region.nameKey, region.nameFallback)}
@@ -148,6 +148,9 @@ export default function CoverageStats() {
                 <FlagImage key={fi} code={flag.code} emoji={flag.emoji} />
               ))}
             </div>
+            <p className="text-xs text-tufts-blue font-medium text-start mt-1">
+              {t('coverage.exploreCTA', 'Start exploring {{region}} now', { region: t(region.nameKey, region.nameFallback) })} →
+            </p>
           </Link>
         ))}
       </Reveal>

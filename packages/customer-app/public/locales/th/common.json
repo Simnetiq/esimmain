@@ -23,17 +23,17 @@
     "about": "About"
   },
   "hero": {
-    "headlinePart1": "The ",
-    "headlineHighlight": "easiest way",
-    "headlinePart2": "to get data anywhere in the world",
-    "subtitle": "Activate your eSIM in minutes and stay connected in 200+ destinations worldwide.",
-    "countries": "200+ Countries",
-    "instantActivation": "Instant Activation",
-    "securePayment": "Secure Payment",
+    "headlinePart1": "เน็ตต่างประเทศ",
+    "headlineHighlight": "ง่ายกว่าที่คิด",
+    "headlinePart2": "ครอบคลุม 200+ ประเทศ",
+    "subtitle": "แพ็กเกจ eSIM พร้อมใช้ในไม่กี่นาที ไม่ต้องใช้ซิมการ์ด ไม่มีค่าโรมมิ่ง",
+    "countries": "200+ ประเทศ",
+    "instantActivation": "เปิดใช้งานทันที",
+    "securePayment": "ชำระเงินปลอดภัย",
     "downloadAppIOS": "Download for iOS",
     "downloadAppAndroid": "Download for Android",
-    "exploreStore": "Explore eSIM Store",
-    "downloadApp": "Download App",
+    "exploreStore": "ดูแพ็กเกจ eSIM",
+    "downloadApp": "ดาวน์โหลดแอป",
     "darkHeadlinePart1": "Stay connected",
     "darkHeadlineHighlight": "anywhere",
     "darkHeadlinePart2": "in the world",
@@ -737,7 +737,7 @@
     "benefit3": "No roaming charges or surprise fees",
     "benefit4": "Keep your main number active while using data abroad",
     "benefit5": "24/7 customer support",
-    "regionalPlans": "{{region}} Regional Plans"
+    "regionalPlans": "{{{region}}} Regional Plans"
   },
   "about": {
     "sectionLabel": "About Us",
@@ -823,19 +823,6 @@
     "physicalCost": "Store markup + taxi to shop",
     "esimCost": "Direct pricing, no extras"
   },
-  "roaming": {
-    "title": "Simnetiq vs Roaming Costs",
-    "subtitle": "See how much you can save",
-    "carrierTurkey": "Typical carrier roaming (Turkey)",
-    "carrierEurope": "Typical carrier roaming (Europe)",
-    "carrierAsia": "Typical carrier roaming (Asia)",
-    "simnetiq": "Simnetiq eSIM",
-    "perWeek": "/week",
-    "saveUpTo": "Save up to 90%",
-    "fromPrice": "From $3/week",
-    "noBills": "No surprise bills",
-    "cancelAnytime": "Cancel anytime"
-  },
   "featuresBento": {
     "title": "Why Choose Simnetiq",
     "globalCoverage": "Global Coverage",
@@ -862,7 +849,8 @@
     "americas": "Americas",
     "africa": "Africa",
     "oceania": "Oceania",
-    "middleEast": "Middle East"
+    "middleEast": "Middle East",
+    "exploreCTA": "สำรวจ {{region}} เลย"
   },
   "devices": {
     "title": "Device Compatibility",
@@ -902,5 +890,28 @@
     "browsePlans": "Browse Plans",
     "downloadApp": "Download App",
     "promoReminder": "Use code {code} for {discount}% off"
+  },
+  "roaming": {
+    "label": "ราคาจริงจากผู้ให้บริการ",
+    "title": "หยุดจ่ายแพงสำหรับโรมมิ่ง",
+    "subtitle": "ราคาจริงจากผู้ให้บริการรายใหญ่เทียบกับ Simnetiq โดยอิงจากการเดินทาง 1 สัปดาห์ที่ใช้ข้อมูล 5GB",
+    "horrorTitle": "ไม่มีแพ็กเกจโรมมิ่ง?",
+    "horrorDesc": "AT&T และ Verizon คิด $2.05/MB — นั่นคือ $10,250 สำหรับ 5GB เท่านั้น",
+    "horrorSource": "ที่มา: att.com, verizon.com อัตราค่าบริการแบบจ่ายตามใช้",
+    "selectDest": "เลือกปลายทาง",
+    "chartTitle": "เดินทาง 1 สัปดาห์ · ข้อมูล 5GB",
+    "saveLabel": "ประหยัดสูงสุด",
+    "dest": { "turkey": "ตุรกี", "thailand": "ไทย", "japan": "ญี่ปุ่น", "brazil": "บราซิล", "egypt": "อียิปต์" },
+    "carrier": { "att": "AT&T / Verizon (US)", "vodafoneDE": "Vodafone (Germany)", "telekomDE": "Telekom (Germany)", "simnetiq": "Simnetiq eSIM" },
+    "note": { "dayPass": "Day Pass $12/day × 7", "easyTravel": "EasyTravel €7.99/day", "reisePaket": "ReisePaket World 4GB/week", "travelMobil": "Travel Mobil Basic 5GB", "travelMobilWorld": "Travel Mobil World 5GB", "esim5gb": "5GB plan" },
+    "saveUpTo": "ประหยัดสูงสุดเมื่อเทียบกับโรมมิ่งของผู้ให้บริการ",
+    "fromPriceValue": "$5",
+    "fromPrice": "ราคาทั่วไปของแพ็กเกจ 5GB",
+    "noBillsValue": "$0",
+    "noBills": "ค่าใช้จ่ายเกินความคาดหมายหรือค่าบริการที่ซ่อนอยู่",
+    "noContractValue": "0",
+    "noContract": "สัญญาที่ต้องทำ",
+    "disclaimer": "ราคาผู้ให้บริการอ้างอิงจากราคาที่เผยแพร่อย่างเป็นทางการ (มี.ค. 2026) ราคา eSIM สะท้อนอัตราตลาดทั่วไป",
+    "sources": "telekom.de · att.com · vodafone.de · airalo.com"
   }
 }

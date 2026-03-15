@@ -23,17 +23,25 @@
     "about": "हमारे बारे में"
   },
   "hero": {
-    "headlinePart1": "दुनिया में कहीं भी ",
-    "headlineHighlight": "डेटा पाने का",
-    "headlinePart2": " सबसे आसान तरीका",
-    "subtitle": "अपनी eSIM को मिनटों में सक्रिय करें और दुनियाभर के 200+ गंतव्यों में जुड़े रहें।",
+    "headlinePart1": "विदेश में इंटरनेट",
+    "headlineHighlight": "अब बेहद आसान",
+    "headlinePart2": "200+ देशों में",
+    "subtitle": "eSIM डेटा प्लान मिनटों में एक्टिव करें। फिज़िकल SIM की ज़रूरत नहीं, रोमिंग चार्ज नहीं।",
     "countries": "200+ देश",
-    "instantActivation": "तुरंत सक्रियण",
+    "instantActivation": "तुरंत एक्टिवेशन",
     "securePayment": "सुरक्षित भुगतान",
     "downloadAppIOS": "iOS के लिए डाउनलोड करें",
     "downloadAppAndroid": "Android के लिए डाउनलोड करें",
-    "exploreStore": "eSIM स्टोर देखें",
-    "downloadApp": "ऐप डाउनलोड करें"
+    "exploreStore": "eSIM प्लान देखें",
+    "downloadApp": "ऐप डाउनलोड करें",
+    "darkHeadlinePart1": "दुनिया में",
+    "darkHeadlineHighlight": "कहीं भी",
+    "darkHeadlinePart2": "जुड़े रहें",
+    "darkSubtitle": "200+ देशों में तुरंत eSIM एक्टिवेशन। SIM कार्ड नहीं, रोमिंग चार्ज नहीं, कोई झंझट नहीं।",
+    "promoPrefix": "कोड इस्तेमाल करें",
+    "promoSuffix": "और अपनी पहली eSIM पर {{discount}}% छूट पाएं",
+    "fiveStarRated": "5-स्टार रेटिंग",
+    "sevenDayRefund": "7-दिन रिफंड"
   },
   "features": {
     "title": "वैश्विक रूप से जुड़ें",
@@ -729,7 +737,7 @@
     "benefit3": "कोई रोमिंग शुल्क या अचानक फीस नहीं",
     "benefit4": "विदेश में डेटा उपयोग करते हुए अपना मुख्य नंबर सक्रिय रखें",
     "benefit5": "24/7 ग्राहक सहायता",
-    "regionalPlans": "{{region}} क्षेत्रीय प्लान"
+    "regionalPlans": "{{{region}}} क्षेत्रीय प्लान"
   },
   "about": {
     "sectionLabel": "हमारे बारे में",
@@ -761,6 +769,47 @@
     "ctaDesc": "मिनटों में अपनी eSIM पाएं। किसी भी अनलॉक्ड डिवाइस पर काम करता है।",
     "ctaButton": "प्लान देखें"
   },
+  "roaming": {
+    "label": "कैरियर की असली कीमतें",
+    "title": "रोमिंग के लिए अधिक भुगतान बंद करें",
+    "subtitle": "प्रमुख कैरियर की असली कीमतें बनाम Simnetiq। 5 GB डेटा के साथ 1 सप्ताह की यात्रा पर आधारित।",
+    "horrorTitle": "रोमिंग पैकेज के बिना?",
+    "horrorDesc": "AT&T और Verizon $2.05/MB चार्ज करते हैं — सिर्फ 5 GB डेटा के लिए $10,250।",
+    "horrorSource": "स्रोत: att.com, verizon.com पे-एज़-यू-गो दरें",
+    "selectDest": "गंतव्य चुनें",
+    "chartTitle": "1 सप्ताह की यात्रा · 5 GB डेटा",
+    "saveLabel": "तक बचाएं",
+    "dest": {
+      "turkey": "तुर्की",
+      "thailand": "थाईलैंड",
+      "japan": "जापान",
+      "brazil": "ब्राजील",
+      "egypt": "मिस्र"
+    },
+    "carrier": {
+      "att": "AT&T / Verizon (अमेरिका)",
+      "vodafoneDE": "Vodafone (जर्मनी)",
+      "telekomDE": "Telekom (जर्मनी)",
+      "simnetiq": "Simnetiq eSIM"
+    },
+    "note": {
+      "dayPass": "Day Pass $12/दिन × 7",
+      "easyTravel": "EasyTravel €7.99/दिन",
+      "reisePaket": "ReisePaket World 4 GB/सप्ताह",
+      "travelMobil": "Travel Mobil Basic 5 GB",
+      "travelMobilWorld": "Travel Mobil World 5 GB",
+      "esim5gb": "5 GB प्लान"
+    },
+    "saveUpTo": "कैरियर रोमिंग की तुलना में अधिकतम बचत",
+    "fromPriceValue": "$5",
+    "fromPrice": "5 GB प्लान की सामान्य कीमत",
+    "noBillsValue": "$0",
+    "noBills": "अचानक बिल या छिपे हुए शुल्क",
+    "noContractValue": "0",
+    "noContract": "आवश्यक अनुबंध",
+    "disclaimer": "कैरियर दरें आधिकारिक रूप से प्रकाशित कीमतों पर आधारित हैं (मार्च 2026)। eSIM कीमतें सामान्य बाजार दरों को दर्शाती हैं।",
+    "sources": "telekom.de · att.com · vodafone.de · airalo.com"
+  },
   "plan": {
     "callsAvailable": "कॉल उपलब्ध",
     "smsAvailable": "SMS उपलब्ध",
@@ -771,5 +820,116 @@
     "price": "मूल्य",
     "data": "डेटा",
     "days": "दिन"
+  },
+  "coverage": {
+    "exploreCTA": "अभी {{region}} एक्सप्लोर करें",
+    "title": "वैश्विक कवरेज",
+    "countries": "देश",
+    "dataPlans": "डेटा प्लान",
+    "languages": "भाषाएं",
+    "avgActivation": "औसत एक्टिवेशन",
+    "europe": "यूरोप",
+    "asia": "एशिया",
+    "americas": "अमेरिका",
+    "africa": "अफ्रीका",
+    "oceania": "ओशिनिया",
+    "middleEast": "मध्य पूर्व"
+  },
+  "trust": {
+    "title": "यात्री Simnetiq पर भरोसा क्यों करते हैं",
+    "noRoamingFees": "शून्य रोमिंग शुल्क",
+    "noRoamingFeesDesc": "अंतरराष्ट्रीय डेटा शुल्क पर सैकड़ों डॉलर बचाएं",
+    "qrActivation": "QR एक्टिवेशन",
+    "qrActivationDesc": "स्कैन करें, एक्टिव करें, कनेक्ट हों — 2 मिनट से कम में",
+    "languages": "18 भाषाएं",
+    "languagesDesc": "आप जहां से भी हों, आपकी भाषा में सहायता",
+    "moneyBack": "मनी-बैक गारंटी",
+    "moneyBackDesc": "अप्रयुक्त प्लान पर 7-दिन की पूर्ण रिफंड"
+  },
+  "howItWorks": {
+    "title": "यह कैसे काम करता है",
+    "subtitle": "तीन आसान कदमों में कनेक्ट हों",
+    "step1Title": "अपना प्लान चुनें",
+    "step1Desc": "200+ देशों में से अपना गंतव्य और डेटा प्लान चुनें",
+    "step2Title": "QR Code स्कैन करें",
+    "step2Desc": "अपना QR Code तुरंत प्राप्त करें और फोन से स्कैन करें",
+    "step3Title": "आप कनेक्ट हैं",
+    "step3Desc": "गंतव्य पहुंचने पर डेटा अपने आप एक्टिव हो जाता है। बस इतना ही।"
+  },
+  "comparison": {
+    "title": "eSIM बनाम फिज़िकल SIM",
+    "subtitle": "देखें क्यों यात्री eSIM अपना रहे हैं",
+    "activation": "एक्टिवेशन",
+    "physicalActivation": "दुकान ढूंढें, लाइन में लगें",
+    "esimActivation": "QR स्कैन, 2 मिनट में तैयार",
+    "availability": "उपलब्धता",
+    "physicalAvailability": "सिर्फ एयरपोर्ट/शहर की दुकानें",
+    "esimAvailability": "ऑनलाइन खरीदें, कभी भी",
+    "switching": "प्लान बदलना",
+    "physicalSwitching": "नया कार्ड खरीदें, बदलें",
+    "esimSwitching": "डिजिटल रूप से नया प्लान जोड़ें",
+    "keepNumber": "नंबर बनाए रखें",
+    "physicalKeepNumber": "मुख्य SIM निकालना पड़ेगा",
+    "esimKeepNumber": "आपके SIM के साथ चलता है",
+    "multiCountry": "कई देश",
+    "physicalMultiCountry": "हर देश में नई SIM",
+    "esimMultiCountry": "प्लान तुरंत बदलें",
+    "cost": "लागत",
+    "physicalCost": "दुकान की ऊंची कीमत + आने-जाने का खर्च",
+    "esimCost": "सीधी कीमत, कोई अतिरिक्त शुल्क नहीं"
+  },
+  "featuresBento": {
+    "title": "Simnetiq क्यों चुनें",
+    "globalCoverage": "वैश्विक कवरेज",
+    "globalCoverageDesc": "200+ देश, 400+ कैरियर। एक ऐप।",
+    "instantActivation": "तुरंत एक्टिवेशन",
+    "instantActivationDesc": "खरीद से कनेक्शन तक 2 मिनट से कम",
+    "topUp": "कभी भी टॉप-अप",
+    "topUpDesc": "डेटा कम है? eSIM दोबारा इंस्टॉल किए बिना डेटा जोड़ें",
+    "securePayments": "सुरक्षित भुगतान",
+    "securePaymentsDesc": "Stripe-संचालित चेकआउट। Apple Pay, Google Pay, सभी प्रमुख कार्ड।",
+    "multiLanguage": "बहुभाषी सहायता",
+    "multiLanguageDesc": "अरबी, हिब्रू, जापानी सहित 18 भाषाओं में पूर्ण सहायता",
+    "support": "समर्पित सहायता",
+    "supportDesc": "ईमेल और ऐप-इन में वास्तविक मानव सहायता। कोई चैटबॉट नहीं।"
+  },
+  "devices": {
+    "title": "डिवाइस संगतता",
+    "notSure": "यकीन नहीं कि आपका डिवाइस eSIM सपोर्ट करता है?",
+    "checkFaq": "FAQ देखें"
+  },
+  "promoBanner": {
+    "headline": "अपने पहले eSIM प्लान पर {{discount}}% छूट पाएं",
+    "cta": "अभी प्लान देखें",
+    "finePrint": "नए ग्राहकों के लिए मान्य। प्रति अकाउंट एक बार उपयोग।",
+    "copied": "कॉपी हो गया!"
+  },
+  "appDownload": {
+    "badge": "iOS पर उपलब्ध",
+    "badgeBoth": "iOS और Android पर उपलब्ध",
+    "title": "सब कुछ अपने फोन से मैनेज करें",
+    "bullet1": "eSIM खरीदें और एक्टिव करें",
+    "bullet2": "रीयल-टाइम में डेटा उपयोग देखें",
+    "bullet3": "एक टैप से टॉप अप करें",
+    "bullet4": "QR Code तुरंत पाएं"
+  },
+  "dopplerCrossSell": {
+    "badge": "Simnetiq द्वारा",
+    "title": "Doppler VPN",
+    "description": "नो-लॉग VPN, WireGuard + VLESS के साथ। 10 डिवाइस तक।",
+    "promo": "कोड LAUNCH20 से 20% छूट पाएं",
+    "cta": "और जानें"
+  },
+  "socialProof": {
+    "rating": "4.5",
+    "appStore": "App Store",
+    "tagline": "200+ देशों के यात्रियों द्वारा विश्वसनीय"
+  },
+  "finalCta": {
+    "title": "दुनियाभर में जुड़े रहने के लिए तैयार?",
+    "subtitle": "मिनटों में अपनी eSIM पाएं। किसी भी अनलॉक्ड डिवाइस पर काम करता है।",
+    "browsePlans": "प्लान देखें",
+    "downloadApp": "ऐप डाउनलोड करें",
+    "promoReminder": "कोड {{code}} से {{discount}}% छूट पाएं"
   }
 }
