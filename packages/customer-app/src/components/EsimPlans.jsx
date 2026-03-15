@@ -280,6 +280,8 @@ const EsimPlans = ({ isHomePage = false }) => {
     useEffect(() => {
         const search = searchParams.get('search');
         if (search) setSearchTerm(search);
+        const region = searchParams.get('region');
+        if (region) setSelectedRegion(region);
     }, [searchParams]);
 
     // Fetch Regional Plans from Supabase (with cancellation to prevent race conditions)

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
@@ -58,8 +58,15 @@ export default function NewHeroSection({ promo = null }) {
     t('hero.countries', '200+ Countries'),
     t('hero.instantActivation', 'Instant Setup'),
     t('hero.fiveStarRated', '5-Star Rated'),
-    t('hero.sevenDayRefund', '7-Day Refund'),
   ];
+
+  // Platform detection — show both on SSR, hide irrelevant on client
+  const [platform, setPlatform] = useState('both'); // 'ios' | 'android' | 'both'
+  useEffect(() => {
+    const ua = navigator.userAgent || '';
+    if (/iPhone|iPad|iPod/i.test(ua)) setPlatform('ios');
+    else if (/Android/i.test(ua)) setPlatform('android');
+  }, []);
 
   return (
     <section
@@ -162,7 +169,8 @@ export default function NewHeroSection({ promo = null }) {
                   source="hero_primary_cta"
                   className="w-full sm:w-auto"
                 />
-                {/* iOS */}
+                {/* iOS — hidden on Android */}
+                {platform !== 'android' && (
                 <a
                   href={appStoreLinks.ios}
                   target="_blank"
@@ -184,7 +192,9 @@ export default function NewHeroSection({ promo = null }) {
                     </svg>
                   </span>
                 </a>
-                {/* Android */}
+                )}
+                {/* Android — hidden on iOS */}
+                {platform !== 'ios' && (
                 <a
                   href={appStoreLinks.android}
                   target="_blank"
@@ -206,6 +216,7 @@ export default function NewHeroSection({ promo = null }) {
                     </svg>
                   </span>
                 </a>
+                )}
               </div>
 
               {/* Trust badges — Doppler-style plain checkmark list */}

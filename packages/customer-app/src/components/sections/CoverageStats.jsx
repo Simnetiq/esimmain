@@ -145,9 +145,20 @@ export default function CoverageStats() {
               {t(region.nameKey, region.nameFallback)}
             </p>
             <div className="flex gap-1.5 flex-wrap items-center rtl-native-flex">
-              {region.flags.map((flag, fi) => (
+              {region.flags.slice(0, 3).map((flag, fi) => (
                 <FlagImage key={fi} code={flag.code} emoji={flag.emoji} />
               ))}
+              {region.flags.length > 3 && (
+                <span
+                  className="inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold"
+                  style={{
+                    backgroundColor: 'var(--hover-bg)',
+                    color: 'var(--text-muted)',
+                  }}
+                >
+                  +{region.flags.length - 3}
+                </span>
+              )}
             </div>
             <div className="flex items-center justify-between mt-1 rtl-native-flex">
               <p className="text-xs text-tufts-blue font-medium text-start">

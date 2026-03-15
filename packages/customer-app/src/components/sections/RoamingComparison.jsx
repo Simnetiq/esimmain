@@ -107,16 +107,16 @@ function CarrierBar({ carrier, maxPrice, isVisible, index, t }) {
 
   return (
     <div className="mb-4 last:mb-0">
-      <div className="flex justify-between items-baseline mb-1.5 gap-4 rtl-native-flex">
-        <div className="flex items-center gap-2 min-w-0">
-          <span className={`text-sm font-medium truncate ${isSimnetiq ? 'text-tufts-blue font-semibold' : 'text-text-primary'}`}>
+      <div className="flex justify-between items-baseline mb-1.5 gap-2 sm:gap-4 rtl-native-flex">
+        <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 overflow-hidden">
+          <span className={`text-xs sm:text-sm font-medium truncate ${isSimnetiq ? 'text-tufts-blue font-semibold' : 'text-text-primary'}`}>
             {t(carrier.labelKey, carrier.labelDefault)}
           </span>
-          <span className="text-xs text-text-muted hidden sm:inline truncate">
+          <span className="text-xs text-text-muted hidden sm:inline truncate min-w-0">
             {t(carrier.noteKey, carrier.noteDefault)}
           </span>
         </div>
-        <span className="text-sm font-bold tabular-nums shrink-0 text-text-primary">
+        <span className="text-xs sm:text-sm font-bold tabular-nums shrink-0 text-text-primary">
           ${carrier.price}
         </span>
       </div>
@@ -199,7 +199,7 @@ export default function RoamingComparison() {
 
         {/* Destination tabs */}
         <Reveal>
-          <div className="flex gap-1 overflow-x-auto pb-1 mb-1 scrollbar-hide" role="tablist" aria-label={t('roaming.selectDest', 'Select destination')}>
+          <div className="flex gap-1 overflow-x-auto pb-1 mb-1 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0" role="tablist" aria-label={t('roaming.selectDest', 'Select destination')}>
             {DESTINATIONS.map((dest, idx) => (
               <DestinationTab
                 key={dest.id}
