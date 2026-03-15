@@ -5,7 +5,7 @@ import PlansSection from '../src/components/sections/PlansSection';
 import HomePageWrapper from '../src/components/HomePageWrapper';
 
 // Dark skeleton placeholder for lazy-loaded sections
-const loadingFallback = <div className="h-96 bg-[#141414] animate-pulse rounded-2xl mx-4" />;
+const loadingFallback = <div className="h-96 bg-[var(--card-bg)] animate-pulse mx-4" />;
 
 const TrustIndicators = dynamic(() => import('../src/components/sections/TrustIndicators'), { loading: () => loadingFallback });
 const HowItWorks = dynamic(() => import('../src/components/sections/HowItWorks'), { loading: () => loadingFallback });

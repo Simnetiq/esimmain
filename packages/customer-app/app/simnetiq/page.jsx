@@ -113,9 +113,9 @@ const SimnetiqPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[var(--bg-primary)]">
       {/* Header Section */}
-      <section className="bg-white py-16">
+      <section className="bg-[var(--bg-primary)] py-16">
         <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
           <div className="text-center">
             <h2 className="text-center text-xl font-semibold text-tufts-blue">
@@ -141,12 +141,12 @@ const SimnetiqPage = () => {
       </section>
 
       {/* Content Section */}
-      <section className="bg-white">
+      <section className="bg-[var(--bg-primary)]">
         <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
 
           {/* App Overview */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">App Overview</h2>
@@ -171,7 +171,7 @@ const SimnetiqPage = () => {
 
           {/* Key Features */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-6">Key Features</h2>
@@ -198,7 +198,7 @@ const SimnetiqPage = () => {
 
           {/* Additional Benefits */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-6">Why Use Simnetiq</h2>
@@ -223,7 +223,7 @@ const SimnetiqPage = () => {
 
           {/* How It Works */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">How It Works</h2>
@@ -287,7 +287,7 @@ const SimnetiqPage = () => {
 
           {/* Supported Platforms */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-6">Supported Platforms</h2>
@@ -295,7 +295,7 @@ const SimnetiqPage = () => {
                   {platforms.map((platform, index) => {
                     const IconComponent = platform.icon;
                     return (
-                      <div key={index} className="text-center p-4 bg-gray-50 rounded-xl">
+                      <div key={index} className="text-center p-4 bg-[var(--bg-secondary)] rounded-xl">
                         <IconComponent className="w-10 h-10 text-tufts-blue mx-auto mb-3" />
                         <h3 className="text-lg font-medium text-eerie-black mb-1">{platform.name}</h3>
                         <p className="text-cool-black text-sm">{platform.requirement}</p>
@@ -316,7 +316,7 @@ const SimnetiqPage = () => {
 
           {/* Privacy & Data Use */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Privacy & Data Use</h2>
@@ -326,7 +326,7 @@ const SimnetiqPage = () => {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
                     <thead>
-                      <tr className="border-b border-gray-200">
+                      <tr className="border-b border-[var(--card-border)]">
                         <th className="py-3 px-4 text-sm font-medium text-eerie-black">Data Type</th>
                         <th className="py-3 px-4 text-sm font-medium text-eerie-black">Collected</th>
                         <th className="py-3 px-4 text-sm font-medium text-eerie-black">Purpose</th>
@@ -334,7 +334,7 @@ const SimnetiqPage = () => {
                     </thead>
                     <tbody>
                       {privacyData.map((item, index) => (
-                        <tr key={index} className="border-b border-gray-100">
+                        <tr key={index} className="border-b border-[var(--card-border)]">
                           <td className="py-3 px-4 text-sm text-cool-black">{item.type}</td>
                           <td className="py-3 px-4 text-sm text-cool-black">{item.collected}</td>
                           <td className="py-3 px-4 text-sm text-cool-black">{item.purpose}</td>
@@ -353,7 +353,7 @@ const SimnetiqPage = () => {
 
           {/* FAQ Section */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <div className="flex items-center mb-6">
@@ -362,7 +362,7 @@ const SimnetiqPage = () => {
                 </div>
                 <div className="space-y-6">
                   {faqs.map((faq, index) => (
-                    <div key={index} className="border-b border-gray-100 pb-4 last:border-b-0">
+                    <div key={index} className="border-b border-[var(--card-border)] pb-4 last:border-b-0">
                       <h3 className="text-lg font-medium text-eerie-black mb-2">
                         {faq.question}
                       </h3>
@@ -379,7 +379,7 @@ const SimnetiqPage = () => {
 
           {/* Contact & Support */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Contact & Support</h2>
@@ -387,14 +387,14 @@ const SimnetiqPage = () => {
                   Our support team is available to assist you with any questions or issues.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="flex items-center p-4 bg-gray-50 rounded-xl">
+                  <div className="flex items-center p-4 bg-[var(--bg-secondary)] rounded-xl">
                     <Mail className="w-6 h-6 text-tufts-blue mr-3" />
                     <div>
                       <p className="text-sm font-medium text-eerie-black">Email Support</p>
                       <p className="text-sm text-cool-black">support@simnetiq.com</p>
                     </div>
                   </div>
-                  <div className="flex items-center p-4 bg-gray-50 rounded-xl">
+                  <div className="flex items-center p-4 bg-[var(--bg-secondary)] rounded-xl">
                     <HelpCircle className="w-6 h-6 text-tufts-blue mr-3" />
                     <div>
                       <p className="text-sm font-medium text-eerie-black">Response Time</p>
@@ -412,7 +412,7 @@ const SimnetiqPage = () => {
 
           {/* Related Information */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Related Information</h2>
@@ -430,14 +430,14 @@ const SimnetiqPage = () => {
                     </Link>
                     <Link
                       href="/privacy-policy"
-                      className="flex items-center space-x-3 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      className="flex items-center space-x-3 px-4 py-3 bg-[var(--subtle-bg)] text-text-primary rounded-lg hover:bg-[var(--hover-bg)] transition-colors"
                     >
                       <FileText className="w-5 h-5" />
                       <span>Privacy Policy</span>
                     </Link>
                     <Link
                       href="/contact"
-                      className="flex items-center space-x-3 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      className="flex items-center space-x-3 px-4 py-3 bg-[var(--subtle-bg)] text-text-primary rounded-lg hover:bg-[var(--hover-bg)] transition-colors"
                     >
                       <Mail className="w-5 h-5" />
                       <span>Contact Us</span>

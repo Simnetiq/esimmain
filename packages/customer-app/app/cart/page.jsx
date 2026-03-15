@@ -8,17 +8,17 @@ const CartErrorPage = () => {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+    <div className="min-h-screen bg-[var(--bg-secondary)] flex items-center justify-center px-4">
+      <div className="max-w-md w-full bg-[var(--bg-primary)] rounded-lg shadow-lg p-8 text-center">
         <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <AlertCircle className="w-8 h-8 text-red-600" />
         </div>
         
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">
+        <h1 className="text-2xl font-bold text-text-primary mb-4">
           Payment Cancelled
         </h1>
         
-        <p className="text-gray-600 mb-6">
+        <p className="text-text-muted mb-6">
           Your payment was cancelled and you were redirected here. If you intended to make a purchase, 
           please try again from our eSIM plans page.
         </p>
@@ -33,8 +33,8 @@ const CartErrorPage = () => {
           </button>
         </div>
         
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <p className="text-sm text-gray-500">
+        <div className="mt-6 pt-6 border-t border-[var(--card-border)]">
+          <p className="text-sm text-text-muted">
             Need help? Contact our support team for assistance.
           </p>
         </div>

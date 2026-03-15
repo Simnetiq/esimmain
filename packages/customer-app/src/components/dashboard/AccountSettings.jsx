@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { getSupabase } from '@esim/shared/lib/supabase';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
@@ -97,13 +97,13 @@ const showToast = async (type, message) => {
 
 const SettingsField = ({ icon: Icon, label, value, badge, onEdit, editing, editContent }) => (
   <div className="space-y-1.5 min-h-[60px]">
-    <label className="flex items-center gap-1.5 text-xs font-medium tracking-widest uppercase text-gray-500 rtl-native-flex">
+    <label className="flex items-center gap-1.5 text-xs font-medium tracking-widest uppercase text-text-muted rtl-native-flex">
       <Icon className="w-3.5 h-3.5" />
       {label}
     </label>
     {editing ? editContent : (
-      <div className="flex items-center justify-between p-3 bg-white transition-colors duration-300 rtl-native-flex">
-        <span className="text-sm text-gray-900 break-all">{value}</span>
+      <div className="flex items-center justify-between p-3 bg-[var(--bg-primary)] transition-colors duration-300 rtl-native-flex">
+        <span className="text-sm text-text-primary break-all">{value}</span>
         <div className="flex items-center gap-2 flex-shrink-0 rtl-native-flex">
           {badge}
           {onEdit && (
@@ -145,6 +145,19 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
   const [editingPhone, setEditingPhone] = useState(false);
   const [newName, setNewName] = useState(userProfile?.display_name || currentUser?.user_metadata?.display_name || currentUser?.user_metadata?.full_name || '');
   const [newPhone, setNewPhone] = useState(userProfile?.phone || '');
+
+  useEffect(() => {
+    if (userProfile?.display_name) {
+      setNewName(userProfile.display_name);
+    }
+  }, [userProfile?.display_name]);
+
+  useEffect(() => {
+    if (userProfile?.phone !== undefined) {
+      setNewPhone(userProfile.phone || '');
+    }
+  }, [userProfile?.phone]);
+
   const [isUpdating, setIsUpdating] = useState(false);
   const [isUnsubscribing, setIsUnsubscribing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -273,19 +286,19 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
         type={type}
         value={value}
         onChange={onChange}
-        className="flex-1 p-3 bg-white text-sm text-gray-900 focus:ring-2 focus:ring-tufts-blue/20 outline-none transition-all duration-300 text-start"
+        className="flex-1 p-3 bg-[var(--bg-primary)] text-sm text-text-primary focus:ring-2 focus:ring-tufts-blue/20 outline-none transition-all duration-300 text-start"
         placeholder={placeholder}
       />
       <button
         onClick={onSave}
         disabled={isUpdating}
-        className="p-3 bg-eerie-black text-white rounded-full hover:bg-gray-800 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="p-3 bg-[var(--login-bg)] text-[var(--login-text)] rounded-full hover:opacity-90 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isUpdating ? <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" /> : <CheckIcon className="w-4 h-4" />}
       </button>
       <button
         onClick={onCancel}
-        className="p-3 bg-gray-100 text-gray-500 rounded-full hover:bg-gray-200 transition-colors duration-300"
+        className="p-3 bg-[var(--subtle-bg)] text-text-muted rounded-full hover:bg-[var(--hover-bg)] transition-colors duration-300"
       >
         <XIcon className="w-4 h-4" />
       </button>
@@ -306,9 +319,9 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
           <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl space-y-4">
 
         {/* ── Personal Information ── */}
-        <div className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 p-5">
+        <div className="group relative bg-[var(--bg-secondary)] overflow-hidden hover:bg-[var(--bg-primary)] transition-all duration-500 p-5">
           <span
-            className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-400/20 select-none pointer-events-none"
+            className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-text-primary/10 select-none pointer-events-none"
             aria-hidden="true"
           >
             01
@@ -390,9 +403,9 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
 
         {/* ── Social Provider ── */}
         {(isGoogleUser || isAppleUser) && (
-          <div className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 p-5">
+          <div className="group relative bg-[var(--bg-secondary)] overflow-hidden hover:bg-[var(--bg-primary)] transition-all duration-500 p-5">
             <span
-              className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-400/20 select-none pointer-events-none"
+              className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-text-primary/10 select-none pointer-events-none"
               aria-hidden="true"
             >
               02
@@ -400,7 +413,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
 
             <div className="relative">
               <div className="flex items-center gap-3 rtl-native-flex">
-                <div className="w-11 h-11 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-11 h-11 rounded-lg bg-[var(--subtle-bg)] flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
                   {isGoogleUser ? <GoogleIcon /> : <AppleIcon />}
                 </div>
                 <div className="min-w-0">
@@ -410,7 +423,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
                       : t('dashboard.appleAccount', 'Signed in with Apple')
                     }
                   </p>
-                  <p className="text-sm text-gray-500 leading-relaxed mt-1 text-start">
+                  <p className="text-sm text-text-muted leading-relaxed mt-1 text-start">
                     {isGoogleUser
                       ? t('dashboard.googleAccountInfo', 'Your password is managed by Google. Visit your Google Account to change it.')
                       : t('dashboard.appleAccountInfo', 'Your password is managed by Apple. Visit your Apple ID settings to change it.')
@@ -423,9 +436,9 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
         )}
 
         {/* ── Newsletter ── */}
-        <div className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 p-5">
+        <div className="group relative bg-[var(--bg-secondary)] overflow-hidden hover:bg-[var(--bg-primary)] transition-all duration-500 p-5">
           <span
-            className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-400/20 select-none pointer-events-none"
+            className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-text-primary/10 select-none pointer-events-none"
             aria-hidden="true"
           >
             {isGoogleUser || isAppleUser ? '03' : '02'}
@@ -443,7 +456,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
                 {t('settings.newsletterPreferences', 'Newsletter')}
               </h3>
             </div>
-            <p className="text-sm text-gray-500 leading-relaxed mt-2 mb-4 text-start">
+            <p className="text-sm text-text-muted leading-relaxed mt-2 mb-4 text-start">
               {isSubscribedToNewsletter
                 ? t('settings.currentlySubscribed', 'You are currently subscribed to our newsletter and promotional emails.')
                 : t('settings.currentlyUnsubscribed', 'You are not subscribed to our newsletter.')
@@ -455,7 +468,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
               className={`inline-flex items-center gap-1.5 px-5 py-2.5 text-sm font-medium rounded-full transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
                 isSubscribedToNewsletter
                   ? 'bg-amber-50 text-amber-700 hover:bg-amber-100'
-                  : 'bg-eerie-black text-white hover:bg-gray-800'
+                  : 'bg-[var(--login-bg)] text-[var(--login-text)] hover:opacity-90'
               }`}
             >
               {isUnsubscribing ? (
@@ -474,7 +487,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
         </div>
 
         {/* ── Danger Zone ── */}
-        <div className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 p-5">
+        <div className="group relative bg-[var(--bg-secondary)] overflow-hidden hover:bg-[var(--bg-primary)] transition-all duration-500 p-5">
           <span
             className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-red-400/15 select-none pointer-events-none"
             aria-hidden="true"
@@ -491,7 +504,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
                 {t('settings.deleteAccount', 'Delete Account')}
               </h3>
             </div>
-            <p className="text-sm text-gray-500 leading-relaxed mt-2 mb-4 text-start">
+            <p className="text-sm text-text-muted leading-relaxed mt-2 mb-4 text-start">
               {t('settings.deleteAccountDescription', 'Permanently delete your account and all associated data. This action cannot be undone.')}
             </p>
             <button
@@ -514,7 +527,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
           onClick={() => setShowDeleteModal(false)}
         >
           <div
-            className="bg-white max-w-md w-full p-6"
+            className="bg-[var(--bg-primary)] max-w-md w-full p-6"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center gap-3 mb-4 rtl-native-flex">
@@ -528,12 +541,12 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
               </div>
             </div>
 
-            <p className="text-sm text-gray-500 leading-relaxed mb-5 text-start">
+            <p className="text-sm text-text-muted leading-relaxed mb-5 text-start">
               {t('settings.deleteWarning', 'This will permanently delete your account, all your eSIMs, order history, and personal data. This action cannot be undone.')}
             </p>
 
             <div className="mb-5">
-              <label className="block text-xs font-medium tracking-widest uppercase text-gray-500 mb-1.5 text-start">
+              <label className="block text-xs font-medium tracking-widest uppercase text-text-muted mb-1.5 text-start">
                 {t('settings.typeDeleteToConfirm', 'Type DELETE to confirm')}
               </label>
               <input
@@ -541,7 +554,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
                 value={deleteConfirmText}
                 onChange={(e) => setDeleteConfirmText(e.target.value)}
                 placeholder="DELETE"
-                className="w-full px-4 py-3 bg-gray-50 text-sm focus:ring-2 focus:ring-red-200 outline-none transition-all duration-300 text-start"
+                className="w-full px-4 py-3 bg-[var(--bg-secondary)] text-sm focus:ring-2 focus:ring-red-200 outline-none transition-all duration-300 text-start"
               />
               <div className="h-5" />
             </div>
@@ -549,7 +562,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
             <div className="flex gap-3 rtl-native-flex">
               <button
                 onClick={() => { setShowDeleteModal(false); setDeleteConfirmText(''); }}
-                className="flex-1 py-3 text-sm font-medium text-gray-700 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors duration-300"
+                className="flex-1 py-3 text-sm font-medium text-text-muted bg-[var(--subtle-bg)] rounded-full hover:bg-[var(--hover-bg)] transition-colors duration-300"
               >
                 {t('common.cancel', 'Cancel')}
               </button>

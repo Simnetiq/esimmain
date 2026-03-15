@@ -70,12 +70,12 @@ const ThankYou = ({ orderDetails }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-[var(--bg-secondary)]" dir={isRTL ? 'rtl' : 'ltr'}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className={`max-w-2xl w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200 ${isRTL ? 'font-arabic' : ''}`}
+        className={`max-w-2xl w-full bg-[var(--bg-primary)] rounded-2xl shadow-xl overflow-hidden border border-[var(--card-border)] ${isRTL ? 'font-arabic' : ''}`}
       >
         {/* Success Header */}
         <div className="relative bg-gradient-to-br from-emerald-500 via-emerald-600 to-green-600 p-8 text-center overflow-hidden">
@@ -108,12 +108,12 @@ const ThankYou = ({ orderDetails }) => {
         {/* Order Details */}
         <div className="p-8">
           <div className="mb-8">
-            <h2 className={`text-xl font-semibold text-gray-900 mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+            <h2 className={`text-xl font-semibold text-text-primary mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
               {t('thankYou.orderDetails', 'Order Details')}
             </h2>
-            
+
             {orderDetails && (
-              <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
+              <div className="bg-[var(--bg-secondary)] rounded-xl border border-[var(--card-border)] overflow-hidden">
                 {/* Plan Header */}
                 {(planName || countryName) && (
                   <div className="bg-gray-900 px-5 py-4">
@@ -123,7 +123,7 @@ const ThankYou = ({ orderDetails }) => {
                       </div>
                       <div className={isRTL ? 'text-right' : 'text-left'}>
                         <p className="font-semibold text-white">{planName || t('thankYou.esimPlan', 'eSIM Plan')}</p>
-                        {countryName && <p className="text-sm text-gray-400">{countryName}</p>}
+                        {countryName && <p className="text-sm text-gray-300">{countryName}</p>}
                       </div>
                     </div>
                   </div>
@@ -134,7 +134,7 @@ const ThankYou = ({ orderDetails }) => {
                   {/* Amount - Highlighted */}
                   {amount > 0 && (
                     <div className={`flex justify-between items-center py-2 `}>
-                      <span className="text-gray-600">{t('thankYou.amount', 'Amount')}</span>
+                      <span className="text-text-muted">{t('thankYou.amount', 'Amount')}</span>
                       <span className="text-lg font-bold text-tufts-blue">
                         {formatPrice(amount)}
                       </span>
@@ -166,21 +166,21 @@ const ThankYou = ({ orderDetails }) => {
                   )}
                   
                   {/* Divider */}
-                  <div className="border-t border-gray-200 my-2"></div>
+                  <div className="border-t border-[var(--card-border)] my-2"></div>
                   
                   {/* Email */}
                   {email && (
                     <div className={`flex justify-between items-center `}>
-                      <span className="text-sm text-gray-500">{t('thankYou.email', 'Email')}</span>
-                      <span className="text-sm font-medium text-gray-900">{email}</span>
+                      <span className="text-sm text-text-muted">{t('thankYou.email', 'Email')}</span>
+                      <span className="text-sm font-medium text-text-primary">{email}</span>
                     </div>
                   )}
                   
                   {/* Order ID */}
                   {orderId && (
                     <div className={`flex justify-between items-center `}>
-                      <span className="text-sm text-gray-500">{t('thankYou.orderId', 'Order ID')}</span>
-                      <span className="text-xs font-mono text-gray-600 bg-gray-100 px-2 py-1 rounded">{orderId}</span>
+                      <span className="text-sm text-text-muted">{t('thankYou.orderId', 'Order ID')}</span>
+                      <span className="text-xs font-mono text-text-muted bg-[var(--subtle-bg)] px-2 py-1 rounded">{orderId}</span>
                     </div>
                   )}
                 </div>
@@ -190,7 +190,7 @@ const ThankYou = ({ orderDetails }) => {
 
           {/* Next Steps */}
           <div className="mb-8">
-            <h2 className={`text-xl font-semibold text-gray-900 mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+            <h2 className={`text-xl font-semibold text-text-primary mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
               {t('thankYou.nextSteps', 'What Happens Next?')}
             </h2>
             
@@ -203,11 +203,11 @@ const ThankYou = ({ orderDetails }) => {
                 <div className={`flex-1 ${isRTL ? 'text-right' : 'text-left'}`}>
                   <div className={`flex items-center gap-2 mb-1 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
                     <span className="text-xs font-semibold text-blue-600 bg-blue-100 px-2 py-0.5 rounded">{t('thankYou.step', 'Step')} 1</span>
-                    <h3 className="font-semibold text-gray-900">
+                    <h3 className="font-semibold text-text-primary">
                       {t('thankYou.step1Title', 'Check Your Email')}
                     </h3>
                   </div>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-text-muted text-sm">
                     {t('thankYou.step1Desc', 'We\'ve sent a confirmation email with your eSIM details and QR code.')}
                   </p>
                 </div>
@@ -221,11 +221,11 @@ const ThankYou = ({ orderDetails }) => {
                 <div className={`flex-1 ${isRTL ? 'text-right' : 'text-left'}`}>
                   <div className={`flex items-center gap-2 mb-1 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
                     <span className="text-xs font-semibold text-purple-600 bg-purple-100 px-2 py-0.5 rounded">{t('thankYou.step', 'Step')} 2</span>
-                    <h3 className="font-semibold text-gray-900">
+                    <h3 className="font-semibold text-text-primary">
                       {t('thankYou.step2Title', 'Access Your Dashboard')}
                     </h3>
                   </div>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-text-muted text-sm">
                     {t('thankYou.step2Desc', 'View your eSIM QR code and activation instructions in your dashboard.')}
                   </p>
                 </div>
@@ -239,11 +239,11 @@ const ThankYou = ({ orderDetails }) => {
                 <div className={`flex-1 ${isRTL ? 'text-right' : 'text-left'}`}>
                   <div className={`flex items-center gap-2 mb-1 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
                     <span className="text-xs font-semibold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded">{t('thankYou.step', 'Step')} 3</span>
-                    <h3 className="font-semibold text-gray-900">
+                    <h3 className="font-semibold text-text-primary">
                       {t('thankYou.step3Title', 'Activate & Connect')}
                     </h3>
                   </div>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-text-muted text-sm">
                     {t('thankYou.step3Desc', 'Scan the QR code with your device to install and activate your eSIM.')}
                   </p>
                 </div>
@@ -255,7 +255,7 @@ const ThankYou = ({ orderDetails }) => {
           <div className="space-y-4">
             <button
               onClick={handleGoToDashboard}
-              className={`w-full bg-gray-900 hover:bg-gray-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl active:scale-[0.98] `}
+              className={`w-full bg-[var(--login-bg)] hover:opacity-90 text-[var(--login-text)] font-semibold py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl active:scale-[0.98] `}
             >
               <QrCode className="w-5 h-5" />
               {t('thankYou.goToDashboard', 'Go to Dashboard')}
@@ -264,15 +264,15 @@ const ThankYou = ({ orderDetails }) => {
 
             {autoRedirect && (
               <div className="text-center py-2">
-                <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2">
+                <div className="inline-flex items-center gap-2 bg-[var(--subtle-bg)] rounded-full px-4 py-2">
                   <div className="w-2 h-2 bg-tufts-blue rounded-full animate-pulse"></div>
-                  <p className="text-sm text-gray-600">
-                    {t('thankYou.autoRedirect', 'Redirecting automatically in')} <span className="font-bold text-gray-900">{countdown}</span> {t('thankYou.seconds', 'seconds')}
+                  <p className="text-sm text-text-muted">
+                    {t('thankYou.autoRedirect', 'Redirecting automatically in')} <span className="font-bold text-text-primary">{countdown}</span> {t('thankYou.seconds', 'seconds')}
                   </p>
                 </div>
                 <button
                   onClick={handleCancelAutoRedirect}
-                  className="mt-2 text-sm text-gray-500 hover:text-gray-700 underline"
+                  className="mt-2 text-sm text-text-muted hover:text-text-primary underline"
                 >
                   {t('thankYou.cancelRedirect', 'Cancel auto-redirect')}
                 </button>
@@ -281,8 +281,8 @@ const ThankYou = ({ orderDetails }) => {
           </div>
 
           {/* Support Note */}
-          <div className="mt-8 p-4 bg-gray-50 rounded-xl border border-gray-200">
-            <p className={`text-sm text-gray-600 text-center`}>
+          <div className="mt-8 p-4 bg-[var(--bg-secondary)] rounded-xl border border-[var(--card-border)]">
+            <p className={`text-sm text-text-muted text-center`}>
               {t('thankYou.support', 'Need help? Contact our support team at')}{' '}
               <a href="mailto:support@simnetiq.store" className="font-semibold text-tufts-blue hover:underline">
                 support@simnetiq.store

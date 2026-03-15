@@ -13,7 +13,7 @@ export default function FinalCTA({ promo }) {
   return (
     <section className="max-w-7xl mx-auto px-4 py-16 lg:py-24">
       <Reveal>
-        <div className="bg-gradient-to-r from-[#1a1a4e] via-tufts-blue to-[#4975D4] rounded-2xl py-16 lg:py-24 px-8 flex flex-col items-center text-center gap-6">
+        <div className="bg-gradient-to-r from-[#1a1a4e] via-tufts-blue to-[#4975D4] py-16 lg:py-24 px-8 flex flex-col items-center text-center gap-6">
           {/* Headline */}
           <h2 className="text-3xl lg:text-5xl font-bold text-white max-w-3xl leading-tight">
             {t('finalCta.title', 'Stay connected, wherever you go')}

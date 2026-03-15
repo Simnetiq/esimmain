@@ -37,7 +37,7 @@ const PlanCard = ({ plan, t, isRTL, onClick }) => {
   return (
     <div
       onClick={onClick}
-      className="bg-white border border-gray-100 p-4 shadow-sm hover:shadow-md transition-all cursor-pointer group h-full flex flex-col justify-between relative overflow-hidden"
+      className="bg-[var(--bg-primary)] border border-[var(--card-border)] p-4 shadow-sm hover:shadow-md transition-all cursor-pointer group h-full flex flex-col justify-between relative overflow-hidden"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       <div className={`absolute top-0 w-16 h-16 bg-tufts-blue/5 transition-transform group-hover:scale-110 ${isRTL ? 'left-0 rounded-br-full -ml-8 -mt-8' : 'right-0 rounded-bl-full -mr-8 -mt-8'}`} />
@@ -58,7 +58,7 @@ const PlanCard = ({ plan, t, isRTL, onClick }) => {
               </div>
             )}
             {plan.operatorName && (
-              <span className="text-xs text-gray-500 truncate">{plan.operatorName}</span>
+              <span className="text-xs text-text-muted truncate">{plan.operatorName}</span>
             )}
           </div>
         )}
@@ -104,7 +104,7 @@ const PlanCard = ({ plan, t, isRTL, onClick }) => {
         <span className="font-bold text-eerie-black text-lg">
           ${plan.price}
         </span>
-        <div className={`w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-tufts-blue group-hover:text-white transition-colors ${isRTL ? 'rotate-180' : ''}`}>
+        <div className={`w-8 h-8 rounded-full bg-[var(--bg-secondary)] flex items-center justify-center group-hover:bg-tufts-blue group-hover:text-white transition-colors ${isRTL ? 'rotate-180' : ''}`}>
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
@@ -216,7 +216,7 @@ export default function EsimCountryPage() {
 
   if (loading) {
     return (
-      <div className="bg-white min-h-screen flex items-center justify-center">
+      <div className="bg-[var(--bg-primary)] min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-tufts-blue" />
       </div>
     );
@@ -229,7 +229,7 @@ export default function EsimCountryPage() {
     : `/${currentLanguage}/esim-plans`;
 
   return (
-    <div className="bg-white min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="bg-[var(--bg-primary)] min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Hero Section */}
       <div className="w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-8 sm:mt-12 lg:mt-20 pb-8 sm:pb-12">
         <div className="flex items-center gap-4 mb-4">
@@ -248,29 +248,29 @@ export default function EsimCountryPage() {
             <h1 className="text-2xl sm:text-3xl lg:text-4xl tracking-tight font-semibold text-eerie-black">
               {t('countryPage.title', 'eSIM for {{country}}').replace('{{country}}', countryName)}
             </h1>
-            <p className="text-gray-500 mt-1">
+            <p className="text-text-muted mt-1">
               {t('countryPage.subtitle', 'Stay connected with instant eSIM data plans')}
             </p>
           </div>
         </div>
 
         <div className="flex flex-wrap gap-3 mt-6 text-sm">
-          <div className="border border-gray-100 rounded-lg px-4 py-2.5 bg-gray-50/50">
-            <span className="text-gray-500 text-xs uppercase tracking-wider font-medium block">
+          <div className="border border-[var(--card-border)] rounded-lg px-4 py-2.5 bg-[var(--bg-secondary)]">
+            <span className="text-text-muted text-xs uppercase tracking-wider font-medium block">
               {t('countryPage.plansAvailable', 'Plans available')}
             </span>
             <span className="block font-semibold text-lg text-eerie-black">{plans.length}</span>
           </div>
           {country.min_price && (
-            <div className="border border-gray-100 rounded-lg px-4 py-2.5 bg-gray-50/50">
-              <span className="text-gray-500 text-xs uppercase tracking-wider font-medium block">
+            <div className="border border-[var(--card-border)] rounded-lg px-4 py-2.5 bg-[var(--bg-secondary)]">
+              <span className="text-text-muted text-xs uppercase tracking-wider font-medium block">
                 {t('countryPage.startingFrom', 'Starting from')}
               </span>
               <span className="block font-semibold text-lg text-eerie-black">${country.min_price} USD</span>
             </div>
           )}
-          <div className="border border-gray-100 rounded-lg px-4 py-2.5 bg-gray-50/50">
-            <span className="text-gray-500 text-xs uppercase tracking-wider font-medium block">
+          <div className="border border-[var(--card-border)] rounded-lg px-4 py-2.5 bg-[var(--bg-secondary)]">
+            <span className="text-text-muted text-xs uppercase tracking-wider font-medium block">
               {t('countryPage.activation', 'Activation')}
             </span>
             <span className="block font-semibold text-lg text-eerie-black">
@@ -280,7 +280,7 @@ export default function EsimCountryPage() {
         </div>
       </div>
 
-      <div className="w-full h-px bg-gray-100" />
+      <div className="w-full h-px bg-[var(--card-border)]" />
 
       {/* Plans Section */}
       <div className="w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
@@ -289,7 +289,7 @@ export default function EsimCountryPage() {
         </h2>
 
         {plans.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-text-muted">
             <p className="text-lg">
               {t('countryPage.noPlans', 'No plans available for {{country}} at the moment.').replace('{{country}}', countryName)}
             </p>

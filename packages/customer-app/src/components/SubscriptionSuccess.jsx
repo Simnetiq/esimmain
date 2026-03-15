@@ -91,10 +91,10 @@ const SubscriptionSuccess = () => {
   // Show loading spinner while auth is loading
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-secondary)]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <p className="text-text-muted">Loading...</p>
         </div>
       </div>
     );
@@ -103,13 +103,13 @@ const SubscriptionSuccess = () => {
   // Check if user is authenticated
   if (!authLoading && !currentUser) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-6 text-center">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-secondary)]">
+        <div className="max-w-md mx-auto bg-[var(--bg-primary)] rounded-xl shadow-lg p-6 text-center">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          <h2 className="text-xl font-semibold text-text-primary mb-2">
             Authentication Required
           </h2>
-          <p className="text-gray-600 mb-4">
+          <p className="text-text-muted mb-4">
             You must be logged in to view your eSIM.
           </p>
           <button
@@ -125,13 +125,13 @@ const SubscriptionSuccess = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-6 text-center">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-secondary)]">
+        <div className="max-w-md mx-auto bg-[var(--bg-primary)] rounded-xl shadow-lg p-6 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          <h2 className="text-xl font-semibold text-text-primary mb-2">
             Processing Your Payment
           </h2>
-          <p className="text-gray-600">
+          <p className="text-text-muted">
             Please wait while we activate your eSIM...
           </p>
         </div>
@@ -141,13 +141,13 @@ const SubscriptionSuccess = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-6 text-center">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-secondary)]">
+        <div className="max-w-md mx-auto bg-[var(--bg-primary)] rounded-xl shadow-lg p-6 text-center">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          <h2 className="text-xl font-semibold text-text-primary mb-2">
             Payment Processing Error
           </h2>
-          <p className="text-gray-600 mb-4">
+          <p className="text-text-muted mb-4">
             {error}
           </p>
           <button
@@ -163,13 +163,13 @@ const SubscriptionSuccess = () => {
 
   if (!order || !qrCode) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-6 text-center">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-secondary)]">
+        <div className="max-w-md mx-auto bg-[var(--bg-primary)] rounded-xl shadow-lg p-6 text-center">
           <AlertCircle className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          <h2 className="text-xl font-semibold text-text-primary mb-2">
             Order Not Found
           </h2>
-          <p className="text-gray-600 mb-4">
+          <p className="text-text-muted mb-4">
             We couldn&apos;t find your order details. Please contact support.
           </p>
           <button
@@ -200,10 +200,10 @@ const SubscriptionSuccess = () => {
           >
             <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-6" />
           </motion.div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-text-primary mb-4">
             Payment Successful! 🎉
           </h1>
-          <p className="text-xl text-gray-600">
+          <p className="text-xl text-text-muted">
             Your eSIM is now active and ready to use
           </p>
         </div>
@@ -213,26 +213,26 @@ const SubscriptionSuccess = () => {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="bg-white rounded-2xl shadow-xl p-8 mb-8"
+          className="bg-[var(--bg-primary)] rounded-2xl shadow-xl p-8 mb-8"
         >
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+          <h2 className="text-2xl font-semibold text-text-primary mb-6">
             Order Details
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <h3 className="font-medium text-gray-700 mb-2">Plan</h3>
-              <p className="text-gray-900">{order.planName || 'eSIM Plan'}</p>
+              <h3 className="font-medium text-text-primary mb-2">Plan</h3>
+              <p className="text-text-primary">{order.planName || 'eSIM Plan'}</p>
             </div>
             <div>
-              <h3 className="font-medium text-gray-700 mb-2">Order ID</h3>
-              <p className="text-gray-900 font-mono">{order.orderId}</p>
+              <h3 className="font-medium text-text-primary mb-2">Order ID</h3>
+              <p className="text-text-primary font-mono">{order.orderId}</p>
             </div>
             <div>
-              <h3 className="font-medium text-gray-700 mb-2">Amount</h3>
-              <p className="text-gray-900">${order.amount}</p>
+              <h3 className="font-medium text-text-primary mb-2">Amount</h3>
+              <p className="text-text-primary">${order.amount}</p>
             </div>
             <div>
-              <h3 className="font-medium text-gray-700 mb-2">Status</h3>
+              <h3 className="font-medium text-text-primary mb-2">Status</h3>
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
                 Active
               </span>
@@ -245,14 +245,14 @@ const SubscriptionSuccess = () => {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="bg-white rounded-2xl shadow-xl p-8 mb-8"
+          className="bg-[var(--bg-primary)] rounded-2xl shadow-xl p-8 mb-8"
         >
           <div className="text-center">
             <QrCode className="w-12 h-12 text-blue-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+            <h2 className="text-2xl font-semibold text-text-primary mb-4">
               Your eSIM QR Code
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-text-muted mb-6">
               Scan this QR code with your device to activate your eSIM
             </p>
             
@@ -263,7 +263,7 @@ const SubscriptionSuccess = () => {
                   alt="eSIM QR Code" 
                   width={256}
                   height={256}
-                  className="w-64 h-64 border-4 border-gray-200 rounded-lg"
+                  className="w-64 h-64 border-4 border-[var(--card-border)] rounded-lg"
                 />
               </div>
             )}
@@ -286,7 +286,7 @@ const SubscriptionSuccess = () => {
               
               <button
                 onClick={() => router.push('/dashboard')}
-                className="inline-flex items-center px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                className="inline-flex items-center px-6 py-3 bg-[var(--login-bg)] text-[var(--login-text)] rounded-lg hover:opacity-90 transition-colors"
               >
                 Go to Dashboard
               </button>

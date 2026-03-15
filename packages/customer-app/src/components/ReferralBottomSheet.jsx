@@ -147,7 +147,7 @@ const ReferralBottomSheet = ({ isOpen, onClose }) => {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4"
+              className="bg-[var(--bg-primary)] rounded-xl shadow-2xl w-full max-w-md mx-4"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
@@ -173,7 +173,7 @@ const ReferralBottomSheet = ({ isOpen, onClose }) => {
                         value={referralCode}
                         onChange={handleCodeChange}
                         placeholder={t('referral.enterReferralCode', 'Enter referral code')}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-tufts-blue focus:border-transparent text-center text-lg font-mono tracking-wider"
+                        className="w-full px-4 py-3 border border-[var(--card-border)] rounded-lg focus:ring-2 focus:ring-tufts-blue focus:border-transparent text-center text-lg font-mono tracking-wider bg-[var(--bg-primary)] text-text-primary"
                         maxLength={8}
                         disabled={hasUsedReferral}
                       />
@@ -217,7 +217,7 @@ const ReferralBottomSheet = ({ isOpen, onClose }) => {
 
                     <button
                       onClick={handleClose}
-                      className="w-full bg-gray-100 hover:bg-gray-200 px-6 py-3 rounded-lg text-cool-black font-medium transition-colors"
+                      className="w-full bg-[var(--subtle-bg)] hover:bg-[var(--hover-bg)] px-6 py-3 rounded-lg text-cool-black font-medium transition-colors"
                     >
                       {t('referral.cancel', 'Cancel')}
                     </button>
@@ -228,7 +228,7 @@ const ReferralBottomSheet = ({ isOpen, onClose }) => {
               {/* Close button in top right */}
               <button
                 onClick={handleClose}
-                className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="absolute top-4 right-4 p-2 hover:bg-[var(--hover-bg)] rounded-full transition-colors"
               >
                 <X className="w-5 h-5 text-cool-black" />
               </button>

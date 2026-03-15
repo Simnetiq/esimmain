@@ -90,13 +90,13 @@ export default function ActivationSection() {
   };
 
   return (
-    <div className="bg-white flex flex-col overflow-hidden" id="how-it-works">
+    <div className="flex flex-col overflow-hidden relative" id="how-it-works">
       <div className="relative flex-1 flex flex-col">
         {/* Simnetiq App Download — FeaturesSection style */}
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
             <div className="px-4 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              <div className="relative bg-gray-50 overflow-hidden animate-fade-in-up">
+              <div className="relative overflow-hidden animate-fade-in-up" style={{ backgroundColor: 'var(--card-bg)' }}>
                 <div className="flex flex-col md:flex-row rtl-native-flex">
                   {/* Image — left half on desktop, full width on mobile */}
                   <div className="relative h-56 sm:h-64 md:h-auto md:w-1/2 overflow-hidden">
@@ -113,7 +113,7 @@ export default function ActivationSection() {
                   {/* Content — right half */}
                   <div className="relative flex-1 p-6 lg:p-10 flex flex-col justify-end">
                     {/* Large decorative watermark */}
-                    <span className="absolute top-4 end-4 lg:end-8 text-[5rem] md:text-[7rem] lg:text-[9rem] font-semibold leading-none text-gray-500/10 select-none pointer-events-none" aria-hidden="true">
+                    <span className="absolute top-4 end-4 lg:end-8 text-[5rem] md:text-[7rem] lg:text-[9rem] font-semibold leading-none text-text-muted/10 select-none pointer-events-none" aria-hidden="true">
                       eSIM
                     </span>
 
@@ -130,13 +130,13 @@ export default function ActivationSection() {
                           <p className="text-xs font-medium tracking-widest uppercase text-tufts-blue mb-1 text-start">
                             {t('activation.appBadge', 'DOWNLOAD THE APP')}
                           </p>
-                          <h3 className="text-xl lg:text-2xl font-semibold text-eerie-black tracking-tight text-start">
+                          <h3 className="text-xl lg:text-2xl font-semibold text-text-primary tracking-tight text-start">
                             {t('activation.appTitle', 'Stay connected wherever you travel')}
                           </h3>
                         </div>
                       </div>
 
-                      <p className="text-gray-500 text-sm sm:text-base leading-relaxed max-w-md mb-4 text-start">
+                      <p className="text-text-muted text-sm sm:text-base leading-relaxed max-w-md mb-4 text-start">
                         {t('activation.appDescription', 'Get instant eSIM data plans for 200+ countries. No physical SIM needed, activate in minutes.')}
                       </p>
 
@@ -147,10 +147,11 @@ export default function ActivationSection() {
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={handleIOSDownload}
-                          className="inline-flex items-center rounded-full bg-gray-900 ps-5 pe-1 py-1 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-gray-800 hover:scale-[1.02] w-full sm:w-auto rtl-native-flex"
+                          className="inline-flex items-center rounded-full ps-5 pe-1 py-1 text-sm font-semibold shadow-sm transition-all duration-150 hover:scale-[1.02] hover:opacity-90 w-full sm:w-auto rtl-native-flex"
+                          style={{ backgroundColor: 'var(--cta-primary-bg)', color: 'var(--cta-primary-text)' }}
                         >
                           <span className="flex-1 text-center">{t('activation.appStore', 'App Store')}</span>
-                          <span className="ms-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-white/20 w-8 h-8">
+                          <span className="ms-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full w-8 h-8" style={{ backgroundColor: 'var(--cta-primary-circle-bg)' }}>
                             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <line x1="21" y1="17" x2="18" y2="17"/><line x1="20" y1="21" x2="14.29" y2="10.72"/><line x1="12" y1="6.6" x2="10" y2="3"/><line x1="14" y1="3" x2="4" y2="21"/><line x1="13" y1="17" x2="3" y2="17"/>
                             </svg>
@@ -161,11 +162,12 @@ export default function ActivationSection() {
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={handleAndroidDownload}
-                          className="inline-flex items-center rounded-full bg-white ps-5 pe-1 py-1 text-sm font-semibold text-gray-900 ring-1 ring-gray-200 shadow-sm transition-all duration-150 hover:bg-gray-50 hover:scale-[1.02] w-full sm:w-auto rtl-native-flex"
+                          className="inline-flex items-center rounded-full ps-5 pe-1 py-1 text-sm font-semibold shadow-sm transition-all duration-150 hover:scale-[1.02] hover:opacity-90 w-full sm:w-auto rtl-native-flex"
+                          style={{ backgroundColor: 'var(--cta-secondary-bg)', color: 'var(--cta-secondary-text)', border: '1px solid var(--cta-secondary-border)' }}
                         >
                           <span className="flex-1 text-center">{t('activation.googlePlay', 'Google Play')}</span>
-                          <span className="ms-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-gray-100 w-8 h-8">
-                            <svg className="w-4 h-4 text-gray-900" viewBox="0 0 24 24" fill="currentColor">
+                          <span className="ms-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full w-8 h-8" style={{ backgroundColor: 'var(--cta-secondary-circle-bg)' }}>
+                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                               <path fillRule="evenodd" clipRule="evenodd" d="M2 3.65629C2 2.15127 3.59967 1.18549 4.93149 1.88645L20.7844 10.2301C22.2091 10.9799 22.2091 13.0199 20.7844 13.7698L4.9315 22.1134C3.59968 22.8144 2 21.8486 2 20.3436V3.65629ZM19.8529 11.9999L16.2682 10.1132L14.2243 11.9999L16.2682 13.8866L19.8529 11.9999ZM14.3903 14.875L12.75 13.3608L6.75782 18.8921L14.3903 14.875ZM12.75 10.639L14.3903 9.12488L6.75782 5.10777L12.75 10.639ZM4 5.28391L11.2757 11.9999L4 18.7159V5.28391Z"/>
                             </svg>
                           </span>
@@ -183,7 +185,7 @@ export default function ActivationSection() {
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl mt-6">
             <div className="px-4 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              <div className="relative bg-gray-50 overflow-hidden animate-fade-in-up">
+              <div className="relative overflow-hidden animate-fade-in-up" style={{ backgroundColor: 'var(--card-bg)' }}>
                 <div className="flex flex-col md:flex-row rtl-native-flex">
                   {/* Image — left half on desktop, full width on mobile */}
                   <div className="relative h-56 sm:h-64 md:h-auto md:w-1/2 overflow-hidden">
@@ -200,7 +202,7 @@ export default function ActivationSection() {
                   {/* Content — right half */}
                   <div className="relative flex-1 p-6 lg:p-10 flex flex-col justify-end">
                     {/* Large decorative watermark */}
-                    <span className="absolute top-4 end-4 lg:end-8 text-[5rem] md:text-[7rem] lg:text-[9rem] font-semibold leading-none text-gray-500/10 select-none pointer-events-none" aria-hidden="true">
+                    <span className="absolute top-4 end-4 lg:end-8 text-[5rem] md:text-[7rem] lg:text-[9rem] font-semibold leading-none text-text-muted/10 select-none pointer-events-none" aria-hidden="true">
                       VPN
                     </span>
 
@@ -217,18 +219,18 @@ export default function ActivationSection() {
                           <p className="text-xs font-medium tracking-widest uppercase text-tufts-blue mb-1 text-start">
                             {t('activation.doppler.badge', 'By Simnetiq')}
                           </p>
-                          <h3 className="text-xl lg:text-2xl font-semibold text-eerie-black tracking-tight text-start">
+                          <h3 className="text-xl lg:text-2xl font-semibold text-text-primary tracking-tight text-start">
                             {t('activation.doppler.title', 'Doppler VPN')}
                           </h3>
                         </div>
                       </div>
 
-                      <p className="text-gray-500 text-sm sm:text-base leading-relaxed max-w-md mb-3 text-start">
+                      <p className="text-text-muted text-sm sm:text-base leading-relaxed max-w-md mb-3 text-start">
                         {t('activation.doppler.description', 'Fast, no-logs VPN powered by WireGuard on mobile and advanced VLESS via Telegram bot. All major platforms, up to 10 devices.')}
                       </p>
 
-                      <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 mb-4 rtl-native-flex">
-                        <span className="text-xs font-semibold text-emerald-700">
+                      <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 mb-4 rtl-native-flex" style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)', border: '1px solid rgba(34, 197, 94, 0.2)' }}>
+                        <span className="text-xs font-semibold text-accent-success">
                           {t('activation.doppler.promo', 'Launch offer: use code LAUNCH20 for 20% off')}
                         </span>
                       </div>
@@ -239,10 +241,11 @@ export default function ActivationSection() {
                           href="https://apps.apple.com/at/app/doppler-vpn-fast-secure/id6757091773"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center rounded-full bg-gray-900 ps-5 pe-1 py-1 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-gray-800 hover:scale-[1.02] w-full sm:w-auto rtl-native-flex"
+                          className="inline-flex items-center rounded-full ps-5 pe-1 py-1 text-sm font-semibold shadow-sm transition-all duration-150 hover:scale-[1.02] hover:opacity-90 w-full sm:w-auto rtl-native-flex"
+                          style={{ backgroundColor: 'var(--cta-primary-bg)', color: 'var(--cta-primary-text)' }}
                         >
                           <span className="flex-1 text-center">{t('activation.doppler.appStore', 'App Store')}</span>
-                          <span className="ms-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-white/20 w-8 h-8">
+                          <span className="ms-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full w-8 h-8" style={{ backgroundColor: 'var(--cta-primary-circle-bg)' }}>
                             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <line x1="21" y1="17" x2="18" y2="17"/><line x1="20" y1="21" x2="14.29" y2="10.72"/><line x1="12" y1="6.6" x2="10" y2="3"/><line x1="14" y1="3" x2="4" y2="21"/><line x1="13" y1="17" x2="3" y2="17"/>
                             </svg>
@@ -252,11 +255,12 @@ export default function ActivationSection() {
                           href="https://dopplervpn.org/"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center rounded-full bg-white ps-5 pe-1 py-1 text-sm font-semibold text-gray-900 ring-1 ring-gray-200 shadow-sm transition-all duration-150 hover:bg-gray-50 hover:scale-[1.02] w-full sm:w-auto rtl-native-flex"
+                          className="inline-flex items-center rounded-full ps-5 pe-1 py-1 text-sm font-semibold shadow-sm transition-all duration-150 hover:scale-[1.02] hover:opacity-90 w-full sm:w-auto rtl-native-flex"
+                          style={{ backgroundColor: 'var(--cta-secondary-bg)', color: 'var(--cta-secondary-text)', border: '1px solid var(--cta-secondary-border)' }}
                         >
                           <span className="flex-1 text-center">{t('activation.doppler.learnMore', 'Learn More')}</span>
-                          <span className="ms-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-gray-100 w-8 h-8">
-                            <svg className="w-3.5 h-3.5 text-gray-900 rtl:-scale-x-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <span className="ms-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full w-8 h-8" style={{ backgroundColor: 'var(--cta-secondary-circle-bg)' }}>
+                            <svg className="w-3.5 h-3.5 rtl:-scale-x-100" style={{ color: 'var(--cta-secondary-circle-text)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <path d="M7 17 17 7"/><path d="M7 7h10v10"/>
                             </svg>
                           </span>
@@ -274,15 +278,15 @@ export default function ActivationSection() {
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
             <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              <p className="text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 mb-4 animate-fade-in-up text-start">
+              <p className="text-sm sm:text-base font-medium tracking-widest uppercase text-text-muted mb-4 animate-fade-in-up text-start">
                 {t('faq.title', 'Frequently Asked Questions')}
               </p>
-              <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-eerie-black max-w-5xl animate-fade-in-up animation-delay-100 text-start">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-text-primary max-w-5xl animate-fade-in-up animation-delay-100 text-start">
                 {t('faq.subtitle', 'Everything you need to know about eSIM')}
               </h2>
             </div>
           </div>
-          <div className="w-full h-px bg-gray-100" />
+          <div className="w-full h-px" style={{ backgroundColor: 'var(--divider)' }} />
         </div>
 
         {/* FAQ Accordion */}
@@ -295,20 +299,20 @@ export default function ActivationSection() {
                   return (
                     <div 
                       key={index} 
-                      className="group relative bg-white overflow-hidden border border-white transition-all duration-300"
+                      className="group relative overflow-hidden transition-all duration-300" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}
                     >
                       <button
                         onClick={() => toggleFaq(index)}
                         className="w-full p-5 lg:p-6 flex items-start justify-between gap-4 text-start rtl-native-flex"
                         aria-expanded={isOpen}
                       >
-                        <span className="font-medium text-eerie-black text-sm lg:text-base leading-relaxed text-start">
+                        <span className="font-medium text-text-primary text-sm lg:text-base leading-relaxed">
                           {faq.question}
                         </span>
                         {isOpen ? (
                           <ChevronUpIcon className="w-5 h-5 text-tufts-blue flex-shrink-0 mt-0.5" />
                         ) : (
-                          <ChevronDownIcon className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
+                          <ChevronDownIcon className="w-5 h-5 text-text-muted flex-shrink-0 mt-0.5" />
                         )}
                       </button>
                       
@@ -319,7 +323,7 @@ export default function ActivationSection() {
                         }`}
                       >
                         <div className="px-5 pb-5 lg:px-6 lg:pb-6">
-                          <p className="text-gray-600 text-sm leading-relaxed text-start">
+                          <p className="text-text-muted text-sm leading-relaxed text-start">
                             {faq.answer}
                           </p>
                         </div>

@@ -91,7 +91,7 @@ const PlansSearchBar = ({ searchTerm, onSearchChange, onCountrySelect }) => {
   return (
     <div className="flex flex-col md:flex-row gap-3 lg:gap-4 mb-6 lg:mb-8 max-w-4xl mx-auto">
       <div className="flex-1 relative">
-        <Search className="absolute start-4 top-4 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 z-10" />
+        <Search className="absolute start-4 top-4 w-4 h-4 sm:w-5 sm:h-5 text-text-muted z-10" />
         <input
           ref={inputRef}
           type="text"
@@ -103,12 +103,13 @@ const PlansSearchBar = ({ searchTerm, onSearchChange, onCountrySelect }) => {
               setShowDropdown(true);
             }
           }}
-          className="w-full ps-10 pe-10 py-2 lg:py-3 border-0 shadow-lg rounded-full border-4 border-gray-200/40 focus:ring-2 focus:ring-blue-200/20 focus:border-transparent"
+          className="w-full ps-10 pe-10 py-2 lg:py-3 rounded-full shadow-lg text-text-primary placeholder:text-text-muted focus:ring-2 focus:ring-tufts-blue/20 focus:border-transparent"
+          style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--card-border)' }}
         />
         {searchTerm && (
           <button
             onClick={handleClearSearch}
-            className="absolute end-4 top-4 text-gray-400 hover:text-gray-600 z-10"
+            className="absolute end-4 top-4 text-text-muted hover:text-text-primary z-10"
             aria-label="Clear search"
           >
             <X className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -119,9 +120,11 @@ const PlansSearchBar = ({ searchTerm, onSearchChange, onCountrySelect }) => {
         {canShowDropdown && (
           <div
             ref={dropdownRef}
-            className="absolute inset-x-0 top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-2xl max-h-80 overflow-y-auto z-[100]"
-            style={{ 
-              boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)' 
+            className="absolute inset-x-0 top-full mt-2 rounded-lg max-h-80 overflow-y-auto z-[100]"
+            style={{
+              backgroundColor: 'var(--bg-secondary)',
+              border: '1px solid var(--card-border)',
+              boxShadow: '0 20px 25px -5px var(--shadow-color), 0 8px 10px -6px var(--shadow-color)'
             }}
           >
             {filteredCountries.map((country) => (
@@ -129,10 +132,13 @@ const PlansSearchBar = ({ searchTerm, onSearchChange, onCountrySelect }) => {
                 key={country.code}
                 type="button"
                 onClick={() => handleCountryClick(country)}
-                className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-start border-b border-gray-100 last:border-b-0 first:rounded-t-lg last:rounded-b-lg"
+                className="w-full px-4 py-3 flex items-center gap-3 transition-colors text-start last:border-b-0 first:rounded-t-lg last:rounded-b-lg"
+                style={{ borderBottom: '1px solid var(--subtle-border)' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--hover-bg)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
                 {/* Country Image - 4:3 aspect ratio */}
-                <div className="flex-shrink-0 w-12 aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg flex items-center justify-center border border-gray-200 overflow-hidden">
+                <div className="flex-shrink-0 w-12 aspect-[4/3] rounded-lg flex items-center justify-center overflow-hidden" style={{ backgroundColor: 'var(--subtle-bg)', border: '1px solid var(--subtle-border)' }}>
                   {country.image?.url && (
                     <div className="relative w-full h-full">
                       <Image
@@ -148,10 +154,10 @@ const PlansSearchBar = ({ searchTerm, onSearchChange, onCountrySelect }) => {
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-gray-900">
+                  <div className="text-sm font-medium text-text-primary">
                     {country.displayName}
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-text-muted">
                     {country.code}
                     {country.minPrice && (
                       <span className="ms-2">
@@ -160,7 +166,7 @@ const PlansSearchBar = ({ searchTerm, onSearchChange, onCountrySelect }) => {
                     )}
                   </div>
                 </div>
-                <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                <MapPin className="w-4 h-4 text-text-muted flex-shrink-0" />
               </button>
             ))}
           </div>

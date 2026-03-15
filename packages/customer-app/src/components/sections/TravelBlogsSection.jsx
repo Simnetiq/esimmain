@@ -25,7 +25,7 @@ const getCategoryStyle = (category) => {
     'News': 'bg-orange-100/60 text-orange-800',
     'Tips': 'bg-teal-100/60 text-teal-800',
     'Tutorial': 'bg-indigo-100/60 text-indigo-800',
-    'default': 'bg-gray-100/60 text-gray-800'
+    'default': 'bg-white/10 text-text-muted'
   };
   return styles[category] || styles.default;
 };
@@ -67,10 +67,10 @@ const BlogCard = ({ post, language, isRTL }) => {
             <span className="uppercase tracking-wide">{post.category}</span>
           </span>
         </div>
-        <h3 className={`line-clamp-2 pb-2 text-base md:text-lg leading-snug font-semibold text-balance text-text-primary group-hover/article-preview:underline decoration-1 underline-offset-2 ${isRTL ? 'text-right' : 'text-left'}`}>
+        <h3 className={`line-clamp-2 pb-2 text-base md:text-lg leading-snug font-semibold text-balance text-text-primary group-hover/article-preview:underline decoration-1 underline-offset-2 text-start`}>
           {post.title}
         </h3>
-        <p className={`line-clamp-2 text-sm text-text-muted leading-relaxed mb-2 ${isRTL ? 'text-right' : 'text-left'}`}>
+        <p className={`line-clamp-2 text-sm text-text-muted leading-relaxed mb-2 text-start`}>
           {post.excerpt || post.metaDescription}
         </p>
         <div className="text-xs text-text-muted/70">
@@ -145,11 +145,11 @@ export default function TravelBlogsSection() {
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
             <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              <p className={`text-sm sm:text-base font-medium tracking-widest uppercase text-text-muted mb-4 animate-fade-in-up ${isRTL ? 'text-right' : 'text-left'}`}>
+              <p className={`text-sm sm:text-base font-medium tracking-widest uppercase text-text-muted mb-4 animate-fade-in-up text-start`}>
                 {t('travelBlogs.title', 'Travel Tips & Guides')}
               </p>
               <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 `}>
-                <h2 className={`text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-text-primary max-w-3xl animate-fade-in-up animation-delay-100 ${isRTL ? 'text-right' : 'text-left'}`}>
+                <h2 className={`text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-text-primary max-w-3xl animate-fade-in-up animation-delay-100 text-start`}>
                   {t('travelBlogs.subtitle', 'Latest travel insights for digital nomads')}
                 </h2>
                 <Link
@@ -162,7 +162,7 @@ export default function TravelBlogsSection() {
               </div>
             </div>
           </div>
-          <div className="w-full h-px bg-white/5" />
+          <div className="w-full h-px" style={{ backgroundColor: 'var(--divider)' }} />
         </div>
 
         {/* Blog Cards Grid */}

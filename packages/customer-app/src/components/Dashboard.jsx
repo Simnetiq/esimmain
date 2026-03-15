@@ -34,29 +34,29 @@ const ReferralBottomSheet = dynamic(() => import('./ReferralBottomSheet'), {
 
 // Dashboard Skeleton Component - matches exact DashboardHeader + RecentOrders layout
 const DashboardSkeleton = () => (
-  <div className="min-h-screen bg-white flex flex-col relative overflow-hidden">
+  <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col relative overflow-hidden">
     <div className="relative isolate flex-1 flex flex-col">
       {/* Horizontal Lines */}
-      <div className="hidden sm:block absolute top-0 left-0 right-0 h-px bg-gray-200/70" />
-      <div className="hidden sm:block absolute bottom-0 left-0 right-0 h-px bg-gray-200/70" />
+      <div className="hidden sm:block absolute top-0 left-0 right-0 h-px bg-[var(--divider)]" />
+      <div className="hidden sm:block absolute bottom-0 left-0 right-0 h-px bg-[var(--divider)]" />
 
       {/* Header Section Skeleton — matches DashboardHeader */}
-      <div className="bg-white">
+      <div className="bg-[var(--bg-primary)]">
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
             <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
               {/* Subtitle — matches text-sm/text-base tracking-widest uppercase */}
-              <div className="h-4 sm:h-5 w-80 max-w-full bg-gray-200 rounded animate-pulse mb-4" />
+              <div className="h-4 sm:h-5 w-80 max-w-full bg-[var(--card-border)] rounded animate-pulse mb-4" />
               {/* Title — matches text-xl sm:text-2xl lg:text-3xl xl:text-4xl */}
-              <div className="h-7 sm:h-8 lg:h-10 xl:h-12 w-96 max-w-full bg-gray-200 rounded animate-pulse" />
+              <div className="h-7 sm:h-8 lg:h-10 xl:h-12 w-96 max-w-full bg-[var(--card-border)] rounded animate-pulse" />
             </div>
           </div>
         </div>
-        <div className="w-full h-px bg-gray-100" />
+        <div className="w-full h-px" style={{ backgroundColor: 'var(--divider)' }} />
       </div>
 
       {/* Stats + Actions Skeleton — matches DashboardHeader grid */}
-      <div className="bg-white">
+      <div className="bg-[var(--bg-primary)]">
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl">
             <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
@@ -64,11 +64,11 @@ const DashboardSkeleton = () => (
               {/* Stats Cards — 3-col grid matching real layout */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                 {[0, 1, 2].map((i) => (
-                  <div key={i} className="relative bg-gray-50 overflow-hidden p-5">
-                    <span className="absolute top-3 right-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-400/10 select-none pointer-events-none" aria-hidden="true">--</span>
+                  <div key={i} className="relative bg-[var(--bg-secondary)] overflow-hidden p-5">
+                    <span className="absolute top-3 right-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-text-primary/5 select-none pointer-events-none" aria-hidden="true">--</span>
                     <div className="relative">
-                      <div className="w-11 h-11 rounded-lg bg-gray-200 animate-pulse mb-4" />
-                      <div className="h-3 w-24 bg-gray-200 rounded animate-pulse" />
+                      <div className="w-11 h-11 rounded-lg bg-[var(--card-border)] animate-pulse mb-4" />
+                      <div className="h-3 w-24 bg-[var(--card-border)] rounded animate-pulse" />
                     </div>
                   </div>
                 ))}
@@ -76,8 +76,8 @@ const DashboardSkeleton = () => (
 
               {/* Quick Actions */}
               <div className="flex flex-wrap gap-3">
-                <div className="h-12 w-40 bg-gray-200 rounded-full animate-pulse" />
-                <div className="h-12 w-44 bg-gray-100 rounded-full animate-pulse" />
+                <div className="h-12 w-40 bg-[var(--card-border)] rounded-full animate-pulse" />
+                <div className="h-12 w-44 bg-[var(--subtle-bg)] rounded-full animate-pulse" />
               </div>
             </div>
           </div>
@@ -85,12 +85,12 @@ const DashboardSkeleton = () => (
       </div>
 
       {/* Recent Orders Section Skeleton — spinner only */}
-      <div className="bg-white flex-1">
+      <div className="bg-[var(--bg-primary)] flex-1">
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl">
             <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
               {/* Section title */}
-              <div className="h-7 sm:h-8 w-44 bg-gray-200 rounded animate-pulse mb-6" />
+              <div className="h-7 sm:h-8 w-44 bg-[var(--card-border)] rounded animate-pulse mb-6" />
 
               {/* Loading indicator */}
               <div className="flex justify-center items-center py-12">
@@ -997,13 +997,6 @@ const Dashboard = () => {
   const handleDeleteOrder = async (order) => {
     if (!currentUser || !order) return;
 
-    // Confirmation dialog
-    const confirmed = window.confirm(
-      t('dashboard.confirmDelete', 'Are you sure you want to delete this eSIM? This action cannot be undone.')
-    );
-
-    if (!confirmed) return;
-
     try {
       // Soft delete via API route (service_role required — RLS blocks direct client updates)
       const deleteResponse = await fetch('/api/orders/delete', {
@@ -1128,14 +1121,14 @@ const Dashboard = () => {
 
 
   return (
-    <div className="min-h-screen bg-white flex flex-col transition-opacity duration-150 opacity-100" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col transition-opacity duration-150 opacity-100" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Access Denied Alert */}
       <AccessDeniedAlert show={searchParams.get('error') === 'access_denied'} />
 
       <div className="relative isolate flex-1 flex flex-col">
         {/* Horizontal Lines */}
-        <div className="hidden sm:block absolute top-0 left-0 right-0 h-px bg-gray-200/70"></div>
-        <div className="hidden sm:block absolute bottom-0 left-0 right-0 h-px bg-gray-200/70"></div>
+        <div className="hidden sm:block absolute top-0 left-0 right-0 h-px" style={{ backgroundColor: 'var(--divider)' }}></div>
+        <div className="hidden sm:block absolute bottom-0 left-0 right-0 h-px" style={{ backgroundColor: 'var(--divider)' }}></div>
 
         {/* Header Section */}
         <DashboardHeader

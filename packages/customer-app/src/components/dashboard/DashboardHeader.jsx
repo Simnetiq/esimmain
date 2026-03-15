@@ -75,12 +75,12 @@ const DashboardHeader = ({ currentUser, orders = [] }) => {
   ];
 
   return (
-    <div className="bg-white">
+    <div className="bg-[var(--bg-primary)]">
       {/* Page Header */}
       <div className="mx-auto w-full max-w-9xl">
         <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
           <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl text-start">
-            <p className="text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 mb-4 text-start">
+            <p className="text-sm sm:text-base font-medium tracking-widest uppercase text-text-muted mb-4 text-start">
               {t('dashboard.manageOrders', 'Manage your eSIM orders and account settings')}
             </p>
             <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-eerie-black max-w-5xl text-start">
@@ -88,7 +88,7 @@ const DashboardHeader = ({ currentUser, orders = [] }) => {
             </h2>
           </div>
         </div>
-        <div className="w-full h-px bg-gray-100" />
+        <div className="w-full h-px" style={{ backgroundColor: 'var(--divider)' }} />
       </div>
 
       {/* Stats + Actions */}
@@ -101,11 +101,11 @@ const DashboardHeader = ({ currentUser, orders = [] }) => {
               {stats.map((stat, i) => (
                 <div
                   key={i}
-                  className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 p-5"
+                  className="group relative bg-[var(--bg-secondary)] overflow-hidden hover:bg-[var(--bg-primary)] transition-all duration-500 p-5"
                 >
                   {/* Actual value as faded watermark — zero-padded if <10 */}
                   <span
-                    className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-200 select-none pointer-events-none"
+                    className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-text-primary/10 select-none pointer-events-none"
                     aria-hidden="true"
                   >
                     {typeof stat.value === 'number' && stat.value < 10 ? `0${stat.value}` : stat.value}
@@ -127,17 +127,17 @@ const DashboardHeader = ({ currentUser, orders = [] }) => {
             <div className="flex flex-wrap gap-3 rtl-native-flex">
               <Link
                 href={getLocalizedUrl('/esim-plans')}
-                className="relative inline-flex items-center justify-center ps-5 pe-12 py-3 bg-eerie-black text-white text-sm font-medium rounded-full hover:bg-gray-800 transition-colors rtl-native-flex"
+                className="relative inline-flex items-center justify-center ps-5 pe-12 py-3 bg-[var(--login-bg)] text-[var(--login-text)] text-sm font-medium rounded-full hover:opacity-90 transition-colors rtl-native-flex"
               >
                 <span>{t('dashboard.browseEsims', 'Browse eSIMs')}</span>
-                <span className="absolute top-1/2 -translate-y-1/2 end-3 w-6 h-6 rounded-full bg-white flex items-center justify-center">
-                  <ArrowUpRightIcon className="w-3.5 h-3.5 text-eerie-black rtl:-scale-x-100" />
+                <span className="absolute top-1/2 -translate-y-1/2 end-3 w-6 h-6 rounded-full bg-[var(--login-text)] flex items-center justify-center">
+                  <ArrowUpRightIcon className="w-3.5 h-3.5 text-[var(--login-bg)] rtl:-scale-x-100" />
                 </span>
               </Link>
 
               <Link
                 href={getLocalizedUrl('/settings')}
-                className="inline-flex items-center gap-2 px-5 py-3 bg-gray-100 text-gray-700 text-sm font-medium rounded-full hover:bg-gray-200 transition-colors rtl-native-flex"
+                className="inline-flex items-center gap-2 px-5 py-3 bg-[var(--subtle-bg)] text-text-muted text-sm font-medium rounded-full hover:bg-[var(--hover-bg)] transition-colors rtl-native-flex"
               >
                 <SettingsIcon className="w-4 h-4" />
                 <span>{t('dashboard.accountSettings', 'Account Settings')}</span>

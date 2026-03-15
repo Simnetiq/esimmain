@@ -88,9 +88,9 @@ const PrivacyPolicy = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white py-24">
+    <div className="min-h-screen bg-[var(--bg-primary)] py-24">
       {/* Header Section */}
-      <section className="bg-white">
+      <section className="bg-[var(--bg-primary)]">
         <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
           <div className="text-center">
             <h2 className="text-center text-xl font-semibold text-tufts-blue">
@@ -116,12 +116,12 @@ const PrivacyPolicy = () => {
       </section>
 
       {/* Content Section */}
-      <section className="bg-white">
+      <section className="bg-[var(--bg-primary)]">
         <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8 mt-6">
           
           {/* Introduction */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Introduction</h2>
@@ -158,7 +158,7 @@ const PrivacyPolicy = () => {
                   key={index}
                   className="relative"
                 >
-                  <div className="absolute inset-px rounded-xl bg-white"></div>
+                  <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
                   <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
                     <div className="px-8 pt-8 pb-8">
                       <div className="flex items-center mb-6">
@@ -185,7 +185,7 @@ const PrivacyPolicy = () => {
 
           {/* Legal Basis for Processing */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Legal Basis for Processing (GDPR Art. 6)</h2>
@@ -226,7 +226,7 @@ const PrivacyPolicy = () => {
 
           {/* Third-Party Service Providers */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <div className="flex items-center mb-4">
@@ -241,7 +241,7 @@ const PrivacyPolicy = () => {
                 {/* Airalo */}
                 <div className="mb-6">
                   <h3 className="text-xl font-semibold text-eerie-black mb-3">Airalo API (eSIM Services)</h3>
-                  <div className="bg-gray-50 p-4 rounded-lg space-y-2 text-cool-black">
+                  <div className="bg-[var(--bg-secondary)] p-4 rounded-lg space-y-2 text-cool-black">
                     <p><strong>Role:</strong> Data Processor</p>
                     <p><strong>Location:</strong> Singapore</p>
                     <p><strong>Data Shared:</strong> User profiles, purchase details, contact information, device information</p>
@@ -259,7 +259,7 @@ const PrivacyPolicy = () => {
                 {/* Stripe */}
                 <div className="mb-6">
                   <h3 className="text-xl font-semibold text-eerie-black mb-3">Stripe (Payment Processing)</h3>
-                  <div className="bg-gray-50 p-4 rounded-lg space-y-2 text-cool-black">
+                  <div className="bg-[var(--bg-secondary)] p-4 rounded-lg space-y-2 text-cool-black">
                     <p><strong>Role:</strong> Data Processor (we are the Controller)</p>
                     <p><strong>Location:</strong> United States (with EU entities)</p>
                     <p><strong>Data Processed:</strong> Payment card details, billing information, IP addresses, transaction data</p>
@@ -284,7 +284,7 @@ const PrivacyPolicy = () => {
                 {/* Meta Pixel */}
                 <div className="mb-6">
                   <h3 className="text-xl font-semibold text-eerie-black mb-3">Meta Pixel (Facebook/Instagram)</h3>
-                  <div className="bg-gray-50 p-4 rounded-lg space-y-2 text-cool-black">
+                  <div className="bg-[var(--bg-secondary)] p-4 rounded-lg space-y-2 text-cool-black">
                     <p><strong>Role:</strong> Data Controller (joint with us for some data)</p>
                     <p><strong>Location:</strong> Ireland (EU) and United States</p>
                     <p><strong>Data Collected:</strong> Page views, purchases, events, device information, IP addresses, cookie IDs</p>
@@ -306,7 +306,7 @@ const PrivacyPolicy = () => {
                 {/* Google Tags */}
                 <div className="mb-6">
                   <h3 className="text-xl font-semibold text-eerie-black mb-3">Google Tags (Analytics/Tag Manager)</h3>
-                  <div className="bg-gray-50 p-4 rounded-lg space-y-2 text-cool-black">
+                  <div className="bg-[var(--bg-secondary)] p-4 rounded-lg space-y-2 text-cool-black">
                     <p><strong>Role:</strong> Data Processor</p>
                     <p><strong>Location:</strong> United States (with EU entities)</p>
                     <p><strong>Data Collected:</strong> IP addresses (anonymized), device IDs, user behavior, page views, events, cookies</p>
@@ -343,7 +343,7 @@ const PrivacyPolicy = () => {
 
           {/* Data Sharing */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Data Sharing and Disclosure</h2>
@@ -391,7 +391,7 @@ const PrivacyPolicy = () => {
 
           {/* Data Retention */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Data Retention</h2>
@@ -419,7 +419,7 @@ const PrivacyPolicy = () => {
 
           {/* Data Breach Notification */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <div className="flex items-center mb-4">
@@ -444,7 +444,7 @@ const PrivacyPolicy = () => {
 
           {/* Exercising Your Rights */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Exercising Your Data Subject Rights</h2>
@@ -452,7 +452,7 @@ const PrivacyPolicy = () => {
                   <p>
                     To exercise any of your rights under GDPR or other applicable privacy laws, please contact us at:
                   </p>
-                  <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="bg-[var(--bg-secondary)] p-4 rounded-lg">
                     <p><strong>Email:</strong> support@simnetiq.store</p>
                     <p><strong>Subject Line:</strong> &quot;Data Subject Rights Request&quot;</p>
                   </div>
@@ -473,7 +473,7 @@ const PrivacyPolicy = () => {
 
           {/* Cookie Management */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Cookie Management</h2>
@@ -497,7 +497,7 @@ const PrivacyPolicy = () => {
 
           {/* International Data Transfers */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">International Data Transfers</h2>
@@ -522,7 +522,7 @@ const PrivacyPolicy = () => {
 
           {/* Children's Privacy */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Children&apos;s Privacy</h2>
@@ -544,7 +544,7 @@ const PrivacyPolicy = () => {
 
           {/* Changes to Privacy Policy */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Changes to This Privacy Policy</h2>
@@ -569,7 +569,7 @@ const PrivacyPolicy = () => {
 
           {/* Contact Information */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Contact Us</h2>
@@ -578,7 +578,7 @@ const PrivacyPolicy = () => {
                     If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, 
                     please contact us:
                   </p>
-                  <div className="bg-gray-50 p-6 rounded-lg">
+                  <div className="bg-[var(--bg-secondary)] p-6 rounded-lg">
                     <div className="space-y-3">
                       <div>
                         <strong>Data Controller:</strong> Simnetiq Ltd<br />
@@ -606,7 +606,7 @@ const PrivacyPolicy = () => {
 
           {/* Related Policies */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Related Legal Documents</h2>
@@ -617,7 +617,7 @@ const PrivacyPolicy = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
                     <Link 
                       href="/terms-of-service"
-                      className="flex items-center space-x-3 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      className="flex items-center space-x-3 px-4 py-3 bg-[var(--subtle-bg)] text-text-primary rounded-lg hover:bg-[var(--hover-bg)] transition-colors"
                     >
                       <FileText className="w-5 h-5" />
                       <span>Terms of Service</span>
@@ -631,7 +631,7 @@ const PrivacyPolicy = () => {
                     </Link>
                     <Link 
                       href="/return-policy"
-                      className="flex items-center space-x-3 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      className="flex items-center space-x-3 px-4 py-3 bg-[var(--subtle-bg)] text-text-primary rounded-lg hover:bg-[var(--hover-bg)] transition-colors"
                     >
                       <FileText className="w-5 h-5" />
                       <span>Return Policy</span>
@@ -673,21 +673,21 @@ const PrivacyPolicy = () => {
                     className="w-full h-full object-contain"
                   />
                 </div>
-                <h2 className="text-2xl font-semibold tracking-tight text-balance text-gray-900 md:text-3xl">
+                <h2 className="text-2xl font-semibold tracking-tight text-balance text-text-primary md:text-3xl">
                   Doppler VPN
                 </h2>
                 
                 <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
                   <Link
                     href="/doppler-vpn-privacy-policy"
-                    className="group inline-flex items-center gap-3 rounded-full bg-gray-900 px-6 py-3 text-sm font-medium text-white shadow-lg transition-all duration-200 hover:bg-gray-800 hover:scale-105"
+                    className="group inline-flex items-center gap-3 rounded-full bg-[var(--login-bg)] px-6 py-3 text-sm font-medium text-[var(--login-text)] shadow-lg transition-all duration-200 hover:opacity-90 hover:scale-105"
                   >
                     <Shield className="h-5 w-5" />
                     <span className="text-base">VPN Privacy Policy</span>
                   </Link>
                   <Link
                     href="/doppler-vpn-terms-of-service"
-                    className="group inline-flex items-center gap-3 rounded-full bg-white px-6 py-3 text-sm font-medium text-gray-900 ring-1 ring-gray-200 shadow-sm transition-all duration-200 hover:bg-gray-50 hover:scale-105"
+                    className="group inline-flex items-center gap-3 rounded-full bg-[var(--bg-primary)] px-6 py-3 text-sm font-medium text-text-primary ring-1 ring-[var(--card-border)] shadow-sm transition-all duration-200 hover:bg-[var(--hover-bg)] hover:scale-105"
                   >
                     <FileText className="h-5 w-5" />
                     <span className="text-base">VPN Terms of Service</span>

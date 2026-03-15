@@ -108,26 +108,26 @@ const TopUpProcessing = ({ topupId }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 text-center">
+    <div className="min-h-screen bg-[var(--bg-secondary)] flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="w-full max-w-md bg-[var(--bg-primary)] rounded-2xl shadow-lg p-8 text-center">
         {status === 'loading' && (
           <>
             <div className="animate-spin rounded-full h-16 w-16 border-4 border-tufts-blue border-t-transparent mx-auto mb-6"></div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('topup.loading', 'Loading...')}</h2>
+            <h2 className="text-xl font-semibold text-text-primary mb-2">{t('topup.loading', 'Loading...')}</h2>
           </>
         )}
 
         {status === 'processing' && (
           <>
             <div className="animate-spin rounded-full h-16 w-16 border-4 border-tufts-blue border-t-transparent mx-auto mb-6"></div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('topup.processing', 'Processing Top-Up')}</h2>
-            <p className="text-gray-500">{t('topup.processingDesc', 'Your top-up is being applied to your eSIM. This usually takes a few seconds.')}</p>
+            <h2 className="text-xl font-semibold text-text-primary mb-2">{t('topup.processing', 'Processing Top-Up')}</h2>
+            <p className="text-text-muted">{t('topup.processingDesc', 'Your top-up is being applied to your eSIM. This usually takes a few seconds.')}</p>
             {topupData && (
-              <div className="mt-6 bg-gray-50 rounded-xl p-4 text-left">
-                <p className="text-sm text-gray-500">{t('topup.package', 'Package')}</p>
-                <p className="font-medium text-gray-900">{topupData.package_name}</p>
-                <p className="text-sm text-gray-500 mt-2">{t('topup.amount', 'Amount')}</p>
-                <p className="font-medium text-gray-900">${parseFloat(topupData.price).toFixed(2)}</p>
+              <div className="mt-6 bg-[var(--bg-secondary)] rounded-xl p-4 text-left">
+                <p className="text-sm text-text-muted">{t('topup.package', 'Package')}</p>
+                <p className="font-medium text-text-primary">{topupData.package_name}</p>
+                <p className="text-sm text-text-muted mt-2">{t('topup.amount', 'Amount')}</p>
+                <p className="font-medium text-text-primary">${parseFloat(topupData.price).toFixed(2)}</p>
               </div>
             )}
           </>
@@ -138,8 +138,8 @@ const TopUpProcessing = ({ topupId }) => {
             <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="w-10 h-10 text-emerald-500" />
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('topup.success', 'Top-Up Successful!')}</h2>
-            <p className="text-gray-500 mb-6">{t('topup.successDesc', 'Your data has been added to your eSIM.')}</p>
+            <h2 className="text-xl font-semibold text-text-primary mb-2">{t('topup.success', 'Top-Up Successful!')}</h2>
+            <p className="text-text-muted mb-6">{t('topup.successDesc', 'Your data has been added to your eSIM.')}</p>
             {topupData && (
               <div className="mb-6 bg-emerald-50 rounded-xl p-4 text-left border border-emerald-100">
                 <p className="font-medium text-emerald-800">{topupData.package_name}</p>
@@ -160,15 +160,15 @@ const TopUpProcessing = ({ topupId }) => {
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <AlertCircle className="w-10 h-10 text-red-500" />
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            <h2 className="text-xl font-semibold text-text-primary mb-2">
               {status === 'not_found'
                 ? t('topup.notFound', 'Top-Up Not Found')
                 : t('topup.failed', 'Top-Up Failed')}
             </h2>
-            <p className="text-gray-500 mb-6">{error || t('topup.failedDesc', 'Something went wrong. Please contact support.')}</p>
+            <p className="text-text-muted mb-6">{error || t('topup.failedDesc', 'Something went wrong. Please contact support.')}</p>
             <button
               onClick={() => router.push(getDashboardUrl())}
-              className="w-full py-3 bg-gray-900 text-white rounded-xl font-medium hover:bg-gray-800 transition-colors"
+              className="w-full py-3 bg-[var(--login-bg)] text-[var(--login-text)] rounded-xl font-medium hover:opacity-90 transition-colors"
             >
               {t('topup.backToDashboard', 'Back to Dashboard')}
             </button>

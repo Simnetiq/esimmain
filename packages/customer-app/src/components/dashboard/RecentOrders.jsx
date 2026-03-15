@@ -32,7 +32,7 @@ const RecentOrders = ({ orders, loading, onViewQRCode, usageCache = {}, loadingU
   
 
   return (
-    <div className="bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="bg-[var(--bg-primary)]" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Recent Orders Section */}
       <div className="mx-auto w-full max-w-9xl">
         <div className="mx-auto w-full max-w-7xl">
@@ -47,8 +47,8 @@ const RecentOrders = ({ orders, loading, onViewQRCode, usageCache = {}, loadingU
               </div>
             ) : orders.length === 0 ? (
               <div className="text-center py-12">
-                <GlobeIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500 text-lg">{t('dashboard.noOrders', 'No orders yet')}</p>
+                <GlobeIcon className="w-16 h-16 text-text-muted mx-auto mb-4" />
+                <p className="text-text-muted text-lg">{t('dashboard.noOrders', 'No orders yet')}</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

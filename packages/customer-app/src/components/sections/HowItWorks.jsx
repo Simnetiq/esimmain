@@ -66,14 +66,14 @@ export default function HowItWorks() {
 
   return (
     <section
-      className="bg-bg-primary"
+      className="relative"
       aria-labelledby="how-it-works-heading"
       id="how-it-works"
     >
       <div className="max-w-7xl mx-auto px-4 py-16 lg:py-24">
 
         {/* Section header */}
-        <div className="mb-14 text-center">
+        <div className="mb-14 text-start">
           <Reveal>
             <p className="text-xs font-semibold tracking-widest uppercase text-text-muted mb-3">
               {t('howItWorks.label', 'Three simple steps')}
@@ -84,7 +84,7 @@ export default function HowItWorks() {
             >
               {t('howItWorks.title', 'Up and running in minutes')}
             </h2>
-            <p className="text-text-muted mt-3 max-w-lg mx-auto text-base">
+            <p className="text-text-muted mt-3 max-w-lg text-base">
               {t('howItWorks.subtitle', 'No queues, no contracts, no physical cards. Just fast, reliable data wherever you go.')}
             </p>
           </Reveal>

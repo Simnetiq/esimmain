@@ -60,7 +60,7 @@ export async function POST(request) {
             maxTokens: configData.max_tokens || 150,
             temperature: configData.temperature || 0.7,
             siteName: configData.site_name || 'Simnetiq',
-            siteUrl: configData.site_url || 'https://esim.Simnetiq.net'
+            siteUrl: configData.site_url || 'https://www.simnetiq.store'
           };
         }
       } catch { /* ignore */ }
@@ -74,7 +74,7 @@ export async function POST(request) {
           maxTokens: parseInt(process.env.OPENROUTER_MAX_TOKENS) || 150,
           temperature: parseFloat(process.env.OPENROUTER_TEMPERATURE) || 0.7,
           siteName: process.env.OPENROUTER_SITE_NAME || 'Simnetiq',
-          siteUrl: process.env.OPENROUTER_SITE_URL || 'https://esim.Simnetiq.net'
+          siteUrl: process.env.OPENROUTER_SITE_URL || 'https://www.simnetiq.store'
         };
       }
     }

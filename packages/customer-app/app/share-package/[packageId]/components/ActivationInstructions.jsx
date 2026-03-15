@@ -16,15 +16,15 @@ const ActivationInstructions = ({ isRTL, t }) => {
       <div className="mx-auto w-full max-w-9xl">
         <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
           <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-            <p className={`text-sm max-w-2xl sm:text-base font-medium tracking-widest uppercase text-gray-500 ${isRTL ? 'text-right' : 'text-left'}`}>
+            <p className={`text-sm max-w-2xl sm:text-base font-medium tracking-widest uppercase text-text-muted ${isRTL ? 'text-right' : 'text-left'}`}>
               {t('sharePackage.howToUse', 'How to Use')}
             </p>
-            <h3 className={`mt-4 text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-pretty text-eerie-black max-w-5xl ${isRTL ? 'text-right' : 'text-left'}`}>
+            <h3 className={`mt-4 text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-pretty text-text-primary max-w-5xl ${isRTL ? 'text-right' : 'text-left'}`}>
               {t('sharePackage.activationSteps', 'Activate Your eSIM in Minutes')}
             </h3>
           </div>
         </div>
-        <div className="w-full h-px bg-gray-100" />
+        <div className="w-full h-px" style={{ backgroundColor: 'var(--divider)' }} />
       </div>
 
       {/* Activation Guide Card */}
@@ -33,7 +33,8 @@ const ActivationInstructions = ({ isRTL, t }) => {
           <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
             <Link
               href="/help/install-esim"
-              className="group relative block bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500"
+              className="group relative block overflow-hidden transition-all duration-500"
+              style={{ backgroundColor: 'var(--card-bg)' }}
             >
               <div className="relative p-6 lg:p-10">
                 <div className="relative">
@@ -46,10 +47,10 @@ const ActivationInstructions = ({ isRTL, t }) => {
                   <p className={`text-xs font-medium tracking-widest uppercase text-tufts-blue mb-2 ${isRTL ? 'text-right' : 'text-left'}`}>
                     {t('activation.howToActivateTag', 'HOW TO ACTIVATE')}
                   </p>
-                  <h3 className={`text-xl lg:text-2xl font-semibold text-eerie-black mb-3 tracking-tight ${isRTL ? 'text-right' : 'text-left'}`}>
+                  <h3 className={`text-xl lg:text-2xl font-semibold text-text-primary mb-3 tracking-tight ${isRTL ? 'text-right' : 'text-left'}`}>
                     {t('activation.activateTitle', 'Activate your eSIM in minutes')}
                   </h3>
-                  <p className={`text-gray-500 text-sm sm:text-base leading-relaxed max-w-lg ${isRTL ? 'text-right' : 'text-left'}`}>
+                  <p className={`text-text-muted text-sm sm:text-base leading-relaxed max-w-lg ${isRTL ? 'text-right' : 'text-left'}`}>
                     {t('activation.activateDesc', 'Step-by-step guide for iPhone & Android — scan a QR code and get connected instantly.')}
                   </p>
 
@@ -62,7 +63,7 @@ const ActivationInstructions = ({ isRTL, t }) => {
             </Link>
           </div>
         </div>
-        <div className="w-full h-px bg-gray-100" />
+        <div className="w-full h-px" style={{ backgroundColor: 'var(--divider)' }} />
       </div>
     </>
   );

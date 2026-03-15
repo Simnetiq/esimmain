@@ -138,13 +138,13 @@ const FraudBlockedModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className={`relative w-full max-w-md bg-white rounded-xl shadow-2xl overflow-hidden ${style.borderColor} border-2`}>
+      <div className={`relative w-full max-w-md bg-[var(--bg-primary)] rounded-xl shadow-2xl overflow-hidden ${style.borderColor} border-2`}>
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-100 transition-colors z-10"
+          className="absolute top-4 right-4 p-1 rounded-full hover:bg-[var(--hover-bg)] transition-colors z-10"
         >
-          <X className="w-5 h-5 text-gray-500" />
+          <X className="w-5 h-5 text-text-muted" />
         </button>
 
         {/* Header with icon */}
@@ -166,7 +166,7 @@ const FraudBlockedModal = ({
         {/* Content */}
         <div className="p-6">
           {/* Message */}
-          <p className="text-gray-700 text-center mb-6">
+          <p className="text-text-primary text-center mb-6">
             {message || (isTemporary 
               ? t('fraudBlock.temporaryMessage', 'Your account has been temporarily restricted due to suspicious payment activity.')
               : t('fraudBlock.permanentMessage', 'Your account has been restricted due to suspicious activity. Please contact support.')
@@ -175,8 +175,8 @@ const FraudBlockedModal = ({
 
           {/* Countdown Timer for Temporary Blocks */}
           {isTemporary && (
-            <div className="bg-gray-50 rounded-lg p-4 mb-6">
-              <p className="text-sm text-gray-600 text-center mb-3">
+            <div className="bg-[var(--bg-secondary)] rounded-lg p-4 mb-6">
+              <p className="text-sm text-text-muted text-center mb-3">
                 {t('fraudBlock.restrictionEndsIn', 'Restriction ends in:')}
               </p>
               <div className="flex justify-center gap-3">
@@ -184,21 +184,21 @@ const FraudBlockedModal = ({
                   <div className="bg-gray-800 text-white rounded-lg px-4 py-2 text-2xl font-mono font-bold min-w-[60px]">
                     {String(countdown.hours).padStart(2, '0')}
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">{t('fraudBlock.hours', 'Hours')}</p>
+                  <p className="text-xs text-text-muted mt-1">{t('fraudBlock.hours', 'Hours')}</p>
                 </div>
-                <div className="text-2xl font-bold text-gray-400 self-start pt-2">:</div>
+                <div className="text-2xl font-bold text-text-muted self-start pt-2">:</div>
                 <div className="text-center">
                   <div className="bg-gray-800 text-white rounded-lg px-4 py-2 text-2xl font-mono font-bold min-w-[60px]">
                     {String(countdown.minutes).padStart(2, '0')}
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">{t('fraudBlock.minutes', 'Minutes')}</p>
+                  <p className="text-xs text-text-muted mt-1">{t('fraudBlock.minutes', 'Minutes')}</p>
                 </div>
-                <div className="text-2xl font-bold text-gray-400 self-start pt-2">:</div>
+                <div className="text-2xl font-bold text-text-muted self-start pt-2">:</div>
                 <div className="text-center">
                   <div className="bg-gray-800 text-white rounded-lg px-4 py-2 text-2xl font-mono font-bold min-w-[60px]">
                     {String(countdown.seconds).padStart(2, '0')}
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">{t('fraudBlock.seconds', 'Seconds')}</p>
+                  <p className="text-xs text-text-muted mt-1">{t('fraudBlock.seconds', 'Seconds')}</p>
                 </div>
               </div>
             </div>
@@ -225,7 +225,7 @@ const FraudBlockedModal = ({
           {showAppealForm && !appealSubmitted && (
             <div className="space-y-4 mb-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-text-primary mb-1">
                   {t('fraudBlock.contactEmail', 'Contact Email')}
                 </label>
                 <input
@@ -233,11 +233,11 @@ const FraudBlockedModal = ({
                   value={contactEmail}
                   onChange={(e) => setContactEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-tufts-blue focus:border-transparent"
+                  className="w-full px-4 py-2 border border-[var(--card-border)] rounded-lg focus:ring-2 focus:ring-tufts-blue focus:border-transparent"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-text-primary mb-1">
                   {t('fraudBlock.appealReason', 'Why should we review your account?')}
                 </label>
                 <textarea
@@ -245,7 +245,7 @@ const FraudBlockedModal = ({
                   onChange={(e) => setAppealReason(e.target.value)}
                   placeholder={t('fraudBlock.appealPlaceholder', 'Please explain why you believe this is a mistake...')}
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-tufts-blue focus:border-transparent resize-none"
+                  className="w-full px-4 py-2 border border-[var(--card-border)] rounded-lg focus:ring-2 focus:ring-tufts-blue focus:border-transparent resize-none"
                 />
               </div>
               <button
@@ -272,7 +272,7 @@ const FraudBlockedModal = ({
           {canContactSupport && !showAppealForm && !appealSubmitted && (
             <button
               onClick={() => setShowAppealForm(true)}
-              className="w-full flex items-center justify-center gap-2 bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 transition-colors"
+              className="w-full flex items-center justify-center gap-2 bg-[var(--subtle-bg)] text-text-primary py-3 rounded-lg hover:bg-[var(--hover-bg)] transition-colors"
             >
               <Mail className="w-4 h-4" />
               {t('fraudBlock.contactSupport', 'Contact Support')}
@@ -281,7 +281,7 @@ const FraudBlockedModal = ({
 
           {/* Warning note */}
           {!appealSubmitted && (
-            <div className="mt-6 flex items-start gap-2 text-xs text-gray-500">
+            <div className="mt-6 flex items-start gap-2 text-xs text-text-muted">
               <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
               <p>
                 {t('fraudBlock.warningNote', 'This restriction was applied to protect our platform from fraudulent transactions. If you believe this is an error, please contact our support team.')}

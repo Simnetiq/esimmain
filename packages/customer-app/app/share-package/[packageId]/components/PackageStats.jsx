@@ -107,7 +107,7 @@ const PackageStats = ({
 
           {/* Operator Branding Card - Main feature */}
           {hasOperatorBranding && (
-            <div className="p-4 rounded-xl overflow-hidden bg-gray-50 border border-gray-100">
+            <div className="p-4 rounded-xl overflow-hidden" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
               <div className={`flex items-center gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
                 {/* Operator Logo - pure image, fixed height */}
                 {operatorLogo ? (
@@ -120,13 +120,13 @@ const PackageStats = ({
                     quality={85}
                   />
                 ) : (
-                  <div className="flex-shrink-0 h-12 sm:h-14 aspect-square flex items-center justify-center bg-gray-100 text-gray-600 text-lg font-bold rounded-lg">
+                  <div className="flex-shrink-0 h-12 sm:h-14 aspect-square flex items-center justify-center text-text-muted text-lg font-bold rounded-lg" style={{ backgroundColor: 'var(--subtle-bg)' }}>
                     {operatorName.charAt(0).toUpperCase()}
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
                   <p className="text-base sm:text-lg">
-                    <span className="text-gray-900">{t('sharePackage.poweredBy', 'Powered by')} </span>
+                    <span className="text-text-primary">{t('sharePackage.poweredBy', 'Powered by')} </span>
                     <span
                       className="font-semibold"
                       style={{
@@ -141,7 +141,7 @@ const PackageStats = ({
                       {operatorName}
                     </span>
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-text-muted">
                     {formatActivationPolicy(activationPolicy)}
                   </p>
                 </div>
@@ -153,9 +153,9 @@ const PackageStats = ({
           {hasVoiceOrSms && (
             <div className={`grid ${hasVoice && hasSms ? 'grid-cols-2' : 'grid-cols-1'} gap-3`}>
               {hasVoice && (
-                <div className="bg-green-50 p-4 rounded-xl border border-green-100">
+                <div className="p-4 rounded-xl" style={{ backgroundColor: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.15)' }}>
                   <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                    <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(34, 197, 94, 0.15)' }}>
                       <Phone className="w-5 h-5 text-green-600" />
                     </div>
                     <div>
@@ -168,9 +168,9 @@ const PackageStats = ({
                 </div>
               )}
               {hasSms && (
-                <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                <div className="p-4 rounded-xl" style={{ backgroundColor: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.15)' }}>
                   <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                    <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(59, 130, 246, 0.15)' }}>
                       <MessageSquare className="w-5 h-5 text-blue-600" />
                     </div>
                     <div>
@@ -187,11 +187,11 @@ const PackageStats = ({
 
           {/* Coverage Row (for regional/global plans) - Collapsible */}
           {hasCoverage && (
-            <div className="rounded-xl overflow-hidden bg-gray-50 border border-gray-100">
+            <div className="rounded-xl overflow-hidden" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
               {/* Clickable Header */}
               <button
                 onClick={() => setShowCoverage(!showCoverage)}
-                className={`w-full p-4 flex items-center gap-4 ${isRTL ? 'flex-row-reverse' : ''} hover:bg-gray-100/50 transition-colors`}
+                className={`w-full p-4 flex items-center gap-4 ${isRTL ? 'flex-row-reverse' : ''} theme-hover transition-colors`}
               >
                 {/* Stacked Country Flags - Avatar Style */}
                 <div className="flex-shrink-0 flex items-center">
@@ -207,7 +207,8 @@ const PackageStats = ({
                     ))}
                     {coveredCountryCount > 4 && (
                       <div
-                        className="w-10 h-10 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center text-xs font-semibold text-gray-600 shadow-md"
+                        className="w-10 h-10 rounded-full border-2 flex items-center justify-center text-xs font-semibold text-text-muted shadow-md"
+                        style={{ backgroundColor: 'var(--subtle-bg)', borderColor: 'var(--bg-primary)' }}
                         style={{ zIndex: 0 }}
                       >
                         +{coveredCountryCount - 4}
@@ -218,7 +219,7 @@ const PackageStats = ({
 
                 <div className={`flex-1 min-w-0 ${isRTL ? 'text-right' : 'text-left'}`}>
                   <p className="text-base sm:text-lg">
-                    <span className="text-gray-900">{t('sharePackage.coverageIn', 'Coverage in')} </span>
+                    <span className="text-text-primary">{t('sharePackage.coverageIn', 'Coverage in')} </span>
                     <span
                       className="font-semibold"
                       style={{
@@ -233,26 +234,27 @@ const PackageStats = ({
                         : t('sharePackage.countries', 'countries')}
                     </span>
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-text-muted">
                     {t('sharePackage.tapToView', 'Tap to view all countries')}
                   </p>
                 </div>
                 <ChevronDown
-                  className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${showCoverage ? 'rotate-180' : ''}`}
+                  className={`w-5 h-5 text-text-muted transition-transform duration-200 ${showCoverage ? 'rotate-180' : ''}`}
                 />
               </button>
 
               {/* Expandable Countries List */}
               {showCoverage && coveredCountries.length > 0 && (
-                <div className="px-4 pb-4 border-t border-gray-100">
+                <div className="px-4 pb-4" style={{ borderTop: '1px solid var(--subtle-border)' }}>
                   <div className="pt-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                     {coveredCountries.map((country, index) => (
                       <div
                         key={country.code || index}
-                        className={`flex items-center gap-2 py-2 px-3 bg-white rounded-lg border border-gray-100 ${isRTL ? 'flex-row-reverse' : ''}`}
+                        className={`flex items-center gap-2 py-2 px-3 rounded-lg ${isRTL ? 'flex-row-reverse' : ''}`}
+                        style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--subtle-border)' }}
                       >
                         <span className="text-lg">{country.flag}</span>
-                        <span className="text-sm text-gray-700 truncate">{country.name}</span>
+                        <span className="text-sm text-text-primary truncate">{country.name}</span>
                       </div>
                     ))}
                   </div>
@@ -263,9 +265,9 @@ const PackageStats = ({
 
           {/* Fair Usage Policy (for unlimited plans) */}
           {fairUsagePolicy && (
-            <div className="bg-amber-50 p-4 rounded-xl border border-amber-200">
+            <div className="p-4 rounded-xl" style={{ backgroundColor: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
               <div className={`flex items-start gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                <div className="flex-shrink-0 w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(245, 158, 11, 0.15)' }}>
                   <AlertTriangle className="w-5 h-5 text-amber-600" />
                 </div>
                 <div>
@@ -281,7 +283,7 @@ const PackageStats = ({
           )}
         </div>
       </div>
-      <div className="w-full h-px bg-gray-100"></div>
+      <div className="w-full h-px" style={{ backgroundColor: 'var(--divider)' }}></div>
     </div>
   );
 };

@@ -101,7 +101,7 @@ export default function AppDownload() {
 
           {/* Right: phone mockup */}
           <div className="lg:w-64 xl:w-80 flex-shrink-0">
-            <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden">
+            <div className="relative w-full aspect-[3/4] overflow-hidden">
               <Image
                 src="/images/blog.avif"
                 alt="Simnetiq app"

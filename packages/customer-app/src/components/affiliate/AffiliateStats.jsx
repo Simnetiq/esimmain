@@ -55,11 +55,11 @@ const AffiliateStats = ({ referralStats, loadingReferralStats, onEarningsClick }
   };
 
   return (
-    <section className="bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
+    <section className="bg-[var(--bg-primary)]" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
         <div className="relative">
-          <div className="absolute inset-px rounded-xl bg-white"></div>
-          <div className="relative flex h-full flex-col overflow-hidden rounded-xl border-2 border-gray-200/50 shadow-xl shadow-gray-200/50">
+          <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
+          <div className="relative flex h-full flex-col overflow-hidden rounded-xl border-2 border-[var(--card-border)]/50 shadow-xl shadow-[var(--card-border)]/50">
             <div className="px-4 pt-4 pb-4 sm:px-6 sm:pt-6 sm:pb-6 md:px-8 md:pt-8 md:pb-8">
               <div className={`mb-6 sm:mb-8 ${isRTL ? 'text-right' : 'text-left'}`}>
                 <h3 className="text-lg sm:text-xl lg:text-2xl font-medium tracking-tight text-eerie-black mb-2">{t('affiliate.yourPerformance', 'Your Performance')}</h3>
@@ -95,7 +95,7 @@ const AffiliateStats = ({ referralStats, loadingReferralStats, onEarningsClick }
                       <button
                         onClick={shareReferralCode}
                         disabled={!referralStats.referralCode}
-                        className="flex-1 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed px-3 py-2 rounded-full text-sm sm:text-base lg:text-lg font-medium transition-colors text-cool-black border border-gray-200"
+                        className="flex-1 bg-[var(--subtle-bg)] hover:bg-[var(--hover-bg)] disabled:opacity-50 disabled:cursor-not-allowed px-3 py-2 rounded-full text-sm sm:text-base lg:text-lg font-medium transition-colors text-cool-black border border-[var(--card-border)]"
                       >
                         <Share2 className={`w-3 h-3 sm:w-4 sm:h-4 inline ${isRTL ? 'ml-2' : 'mr-2'}`} />
                         {t('affiliate.share', 'Share')}

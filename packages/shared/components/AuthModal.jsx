@@ -69,49 +69,61 @@ const AuthModal = ({ isOpen, onClose, onAuthenticated }) => {
             />
 
             {/* Modal */}
-            <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="relative rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+                style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--card-border)' }}>
                 <div className="p-6 sm:p-8">
                     <div className="text-center mb-8">
-                        <div className="mx-auto w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mb-4">
+                        <div className="mx-auto w-12 h-12 rounded-full flex items-center justify-center mb-4"
+                            style={{ backgroundColor: 'rgba(73, 117, 212, 0.1)' }}>
                             <UserIcon className="w-6 h-6 text-tufts-blue" />
                         </div>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                        <h2 className="text-2xl font-bold text-text-primary mb-2">
                             {t('auth.modal.title', 'Quick Checkout')}
                         </h2>
-
                     </div>
 
                     <div className="space-y-3">
-
-
                         <div className="relative py-3">
                             <div className="flex justify-center text-sm">
-                                <span className="px-2 bg-white text-gray-400">{t('auth.modal.subtitle', 'Choose how you want to continue')}</span>
+                                <span className="px-2 text-text-muted" style={{ backgroundColor: 'var(--bg-primary)' }}>
+                                    {t('auth.modal.subtitle', 'Choose how you want to continue')}
+                                </span>
                             </div>
                         </div>
-
 
                         <div className="grid grid-cols-2 gap-3">
                             <button
                                 onClick={handleGoogleLogin}
                                 disabled={loading}
-                                className="flex items-center justify-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50"
+                                className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-colors disabled:opacity-50"
+                                style={{
+                                    backgroundColor: 'var(--bg-primary)',
+                                    border: '1px solid var(--card-border)',
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--hover-bg)'}
+                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-primary)'}
                             >
                                 <GoogleIcon />
-                                <span className="text-sm font-medium text-gray-700">Google</span>
+                                <span className="text-sm font-medium text-text-primary">Google</span>
                             </button>
                             <button
                                 onClick={handleAppleLogin}
                                 disabled={loading}
-                                className="flex items-center justify-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50"
+                                className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-colors disabled:opacity-50"
+                                style={{
+                                    backgroundColor: 'var(--bg-primary)',
+                                    border: '1px solid var(--card-border)',
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--hover-bg)'}
+                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-primary)'}
                             >
                                 <AppleIcon />
-                                <span className="text-sm font-medium text-gray-700">Apple</span>
+                                <span className="text-sm font-medium text-text-primary">Apple</span>
                             </button>
                         </div>
                     </div>
 
-                    <p className="mt-6 text-center text-xs text-gray-400">
+                    <p className="mt-6 text-center text-xs text-text-muted">
                         {t('auth.modal.disclaimer', 'By continuing, you verify that you are at least 18 years old and agree to our Terms of Service.')}
                     </p>
                 </div>

@@ -68,7 +68,8 @@ const CountryCard = ({
   return (
     <div
       onClick={onClick}
-      className="group relative bg-gray-50 overflow-hidden transition-all duration-500 hover:bg-white cursor-pointer"
+      className="group relative overflow-hidden transition-all duration-500 cursor-pointer"
+      style={{ backgroundColor: 'var(--card-bg)' }}
       title={fullName}
       data-country-name={fullName}
       data-country-code={countryCode}
@@ -77,7 +78,8 @@ const CountryCard = ({
     >
       {/* Country code watermark */}
       <span
-        className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-300/10 select-none pointer-events-none"
+        className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none select-none pointer-events-none"
+        style={{ color: 'var(--subtle-border)' }}
         aria-hidden="true"
       >
         {countryCode}
@@ -86,7 +88,7 @@ const CountryCard = ({
       <div className="relative p-4">
         {/* Country image + name */}
         <div className="flex items-center gap-3 rtl-native-flex">
-          <div className="flex-shrink-0 w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-300">
+          <div className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-300" style={{ backgroundColor: 'var(--subtle-bg)' }}>
             {(country.imageUrl || country.image?.url) ? (
               <Image
                 src={country.imageUrl || country.image?.url}
@@ -102,10 +104,10 @@ const CountryCard = ({
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-sm sm:text-base font-semibold text-eerie-black truncate leading-tight">
+            <h3 className="text-sm sm:text-base font-semibold text-text-primary truncate leading-tight">
               {displayName}
             </h3>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-text-muted mt-0.5">
               {planCount > 0
                 ? `${planCount} ${planCount === 1 ? t('plans.plan', 'plan') : t('plans.plans', 'plans')}`
                 : t('plans.noPlansAvailable', 'No plans')
@@ -127,7 +129,7 @@ const CountryCard = ({
         {/* Most Popular badge — below the flag row */}
         {isPromoted && (
           <div className="mt-2 text-start">
-            <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold px-1.5 py-0.5">
+            <span className="inline-flex items-center gap-1 text-emerald-700 text-[10px] font-bold px-1.5 py-0.5" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)' }}>
               {t('plans.topChoice', 'Most Popular')}
             </span>
           </div>
@@ -137,19 +139,19 @@ const CountryCard = ({
         {!isPromoted && <div className="mt-2" />}
 
         {/* Price + arrow */}
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100/60 rtl-native-flex">
+        <div className="flex items-center justify-between pt-3 rtl-native-flex" style={{ borderTop: '1px solid var(--subtle-border)' }}>
           {minPrice ? (
             <div className="flex items-baseline gap-1.5 rtl-native-flex">
-              <span className="text-xs text-gray-500">{t('plans.from', 'From')}</span>
-              <span className="text-base font-bold text-eerie-black">
+              <span className="text-xs text-text-muted">{t('plans.from', 'From')}</span>
+              <span className="text-base font-bold text-text-primary">
                 {formatPrice(minPrice)}
               </span>
             </div>
           ) : (
-            <span className="text-xs text-gray-400">{t('plans.priceNotAvailable', 'Price N/A')}</span>
+            <span className="text-xs text-text-muted">{t('plans.priceNotAvailable', 'Price N/A')}</span>
           )}
-          <span className="w-7 h-7 rounded-full bg-eerie-black flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-            <ArrowUpRightIcon className="w-3.5 h-3.5 text-white rtl:-scale-x-100" />
+          <span className="w-7 h-7 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300" style={{ backgroundColor: 'var(--cta-primary-bg)' }}>
+            <ArrowUpRightIcon className="w-3.5 h-3.5 rtl:-scale-x-100" style={{ color: 'var(--cta-primary-text)' }} />
           </span>
         </div>
       </div>

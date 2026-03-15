@@ -5,7 +5,7 @@ import React from 'react';
 /* ── Primitive skeleton blocks ── */
 
 const Block = ({ className = '' }) => (
-  <div className={`bg-gray-100 rounded-lg animate-pulse ${className}`} />
+  <div className={`bg-[var(--subtle-bg)] rounded-lg animate-pulse ${className}`} />
 );
 
 const TextLine = ({ width = 'w-full', className = '' }) => (
@@ -22,7 +22,7 @@ const Heading = ({ width = 'w-48', className = '' }) => (
 export const AccordionSkeleton = ({ count = 3 }) => (
   <div className="space-y-4">
     {Array.from({ length: count }, (_, i) => (
-      <div key={i} className="rounded-xl border border-gray-200 p-5">
+      <div key={i} className="rounded-xl border border-[var(--card-border)] p-5">
         <div className="flex items-center gap-3">
           <Block className="w-9 h-9 rounded-lg" />
           <TextLine width="w-40" />
@@ -34,7 +34,7 @@ export const AccordionSkeleton = ({ count = 3 }) => (
 
 /** Section skeleton with heading and body lines */
 export const SectionSkeleton = ({ lines = 3 }) => (
-  <div className="rounded-xl border border-gray-200 p-5 space-y-4">
+  <div className="rounded-xl border border-[var(--card-border)] p-5 space-y-4">
     <div className="flex items-center gap-3">
       <Block className="w-9 h-9 rounded-lg" />
       <Heading width="w-36" />
@@ -108,8 +108,8 @@ export const FormFieldSkeleton = () => (
 
 /** Settings card skeleton — flat bg-gray-50 card with icon pill and watermark */
 const SettingsCardSkeleton = ({ children }) => (
-  <div className="relative bg-gray-50 overflow-hidden p-5">
-    <div className="absolute top-3 right-4 w-16 h-20 bg-gray-100/50 rounded animate-pulse" />
+  <div className="relative bg-[var(--bg-secondary)] overflow-hidden p-5">
+    <div className="absolute top-3 right-4 w-16 h-20 bg-[var(--subtle-bg)]/50 rounded animate-pulse" />
     <div className="relative">
       <div className="flex items-center gap-3 mb-4">
         <Block className="w-11 h-11 rounded-lg" />

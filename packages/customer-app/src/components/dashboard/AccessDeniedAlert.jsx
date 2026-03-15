@@ -8,7 +8,7 @@ const AccessDeniedAlert = ({ show }) => {
   if (!show) return null;
 
   return (
-    <section className="bg-white">
+    <section className="bg-[var(--bg-primary)]">
       <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8 mb-8">
         <div className="relative">
           <div className="absolute inset-px rounded-xl bg-red-50"></div>

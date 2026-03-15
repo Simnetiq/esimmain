@@ -56,8 +56,8 @@ const CurrencyToggle = () => {
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className="absolute end-0 mt-2 w-52 bg-white border border-gray-200 shadow-xl shadow-gray-100/30 z-50">
-            <ul className="p-2 text-sm font-medium text-gray-700">
+          <div className="absolute end-0 mt-2 w-52 bg-[var(--bg-primary)] border border-[var(--card-border)] shadow-xl shadow-gray-100/30 z-50">
+            <ul className="p-2 text-sm font-medium text-text-primary">
               {SUPPORTED_CURRENCIES.map((c) => (
                 <li key={c.code}>
                   <button
@@ -65,7 +65,7 @@ const CurrencyToggle = () => {
                       setCurrency(c.code);
                       setIsOpen(false);
                     }}
-                    className={`inline-flex rtl-native-flex items-center justify-between w-full p-2 rounded hover:bg-gray-100 hover:text-eerie-black transition-colors ${
+                    className={`inline-flex rtl-native-flex items-center justify-between w-full p-2 rounded hover:bg-[var(--hover-bg)] hover:text-eerie-black transition-colors ${
                       c.code === currency ? 'bg-tufts-blue/10 text-tufts-blue' : ''
                     }`}
                   >

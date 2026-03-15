@@ -234,7 +234,7 @@ const CookieConsent = () => {
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       <div className="mx-auto max-w-3xl">
-        <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+        <div className="bg-[var(--bg-primary)] rounded-2xl shadow-2xl border border-[var(--card-border)] overflow-hidden">
           {/* Main Banner */}
           {!showCustomize ? (
             <div className="p-5 lg:p-6">
@@ -247,13 +247,13 @@ const CookieConsent = () => {
                   <h3 className={`text-lg font-semibold text-eerie-black mb-1 ${isRTL ? 'text-right' : 'text-left'}`}>
                     {t('title')}
                   </h3>
-                  <p className={`text-sm text-gray-600 leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
+                  <p className={`text-sm text-text-muted leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
                     {t('description')}
                   </p>
                 </div>
                 <button
                   onClick={() => setShowBanner(false)}
-                  className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors rounded-lg hover:bg-gray-100 flex-shrink-0"
+                  className="p-1.5 text-text-muted hover:text-text-primary transition-colors rounded-lg hover:bg-[var(--hover-bg)] flex-shrink-0"
                   aria-label="Close"
                 >
                   <XIcon className="w-5 h-5" />
@@ -280,13 +280,13 @@ const CookieConsent = () => {
               <div className={`flex flex-col sm:flex-row gap-3 ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
                 <button
                   onClick={handleRejectAll}
-                  className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors"
+                  className="px-5 py-2.5 text-sm font-medium text-text-primary bg-[var(--subtle-bg)] rounded-xl hover:bg-[var(--hover-bg)] transition-colors"
                 >
                   {t('rejectAll')}
                 </button>
                 <button
                   onClick={() => setShowCustomize(true)}
-                  className={`px-5 py-2.5 text-sm font-medium text-gray-700 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors inline-flex items-center justify-center gap-2 `}
+                  className={`px-5 py-2.5 text-sm font-medium text-text-primary border border-[var(--card-border)] rounded-xl hover:bg-[var(--hover-bg)] transition-colors inline-flex items-center justify-center gap-2 `}
                 >
                   <SettingsIcon className="w-4 h-4" />
                   {t('customize')}
@@ -309,7 +309,7 @@ const CookieConsent = () => {
                 </h3>
                 <button
                   onClick={() => setShowCustomize(false)}
-                  className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors rounded-lg hover:bg-gray-100"
+                  className="p-1.5 text-text-muted hover:text-text-primary transition-colors rounded-lg hover:bg-[var(--hover-bg)]"
                 >
                   <XIcon className="w-5 h-5" />
                 </button>
@@ -318,23 +318,23 @@ const CookieConsent = () => {
               {/* Cookie Categories */}
               <div className="space-y-3 mb-5">
                 {/* Essential */}
-                <div className={`flex items-center justify-between p-3 bg-gray-50 rounded-lg `}>
+                <div className={`flex items-center justify-between p-3 bg-[var(--bg-secondary)] rounded-lg`}>
                   <span className="text-sm font-medium text-eerie-black">{t('essential')}</span>
-                  <span className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded-full">
+                  <span className="text-xs text-text-muted bg-[var(--card-border)] px-2 py-1 rounded-full">
                     {t('alwaysActive')}
                   </span>
                 </div>
 
                 {/* Analytics */}
-                <div className={`flex items-center justify-between p-3 bg-gray-50 rounded-lg `}>
+                <div className={`flex items-center justify-between p-3 bg-[var(--bg-secondary)] rounded-lg`}>
                   <span className="text-sm font-medium text-eerie-black">{t('analytics')}</span>
                   <button
                     onClick={() => togglePreference('analytics')}
                     className={`w-11 h-6 rounded-full transition-colors ${
-                      preferences.analytics ? 'bg-tufts-blue' : 'bg-gray-300'
+                      preferences.analytics ? 'bg-tufts-blue' : 'bg-[var(--card-border)]'
                     }`}
                   >
-                    <div className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${
+                    <div className={`w-5 h-5 bg-[var(--bg-primary)] rounded-full shadow transform transition-transform ${
                       preferences.analytics 
                         ? (isRTL ? '-translate-x-5' : 'translate-x-5') 
                         : (isRTL ? '-translate-x-0.5' : 'translate-x-0.5')
@@ -343,15 +343,15 @@ const CookieConsent = () => {
                 </div>
 
                 {/* Functional */}
-                <div className={`flex items-center justify-between p-3 bg-gray-50 rounded-lg `}>
+                <div className={`flex items-center justify-between p-3 bg-[var(--bg-secondary)] rounded-lg`}>
                   <span className="text-sm font-medium text-eerie-black">{t('functional')}</span>
                   <button
                     onClick={() => togglePreference('functional')}
                     className={`w-11 h-6 rounded-full transition-colors ${
-                      preferences.functional ? 'bg-tufts-blue' : 'bg-gray-300'
+                      preferences.functional ? 'bg-tufts-blue' : 'bg-[var(--card-border)]'
                     }`}
                   >
-                    <div className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${
+                    <div className={`w-5 h-5 bg-[var(--bg-primary)] rounded-full shadow transform transition-transform ${
                       preferences.functional 
                         ? (isRTL ? '-translate-x-5' : 'translate-x-5') 
                         : (isRTL ? '-translate-x-0.5' : 'translate-x-0.5')
@@ -360,15 +360,15 @@ const CookieConsent = () => {
                 </div>
 
                 {/* Marketing */}
-                <div className={`flex items-center justify-between p-3 bg-gray-50 rounded-lg `}>
+                <div className={`flex items-center justify-between p-3 bg-[var(--bg-secondary)] rounded-lg`}>
                   <span className="text-sm font-medium text-eerie-black">{t('marketing')}</span>
                   <button
                     onClick={() => togglePreference('marketing')}
                     className={`w-11 h-6 rounded-full transition-colors ${
-                      preferences.marketing ? 'bg-tufts-blue' : 'bg-gray-300'
+                      preferences.marketing ? 'bg-tufts-blue' : 'bg-[var(--card-border)]'
                     }`}
                   >
-                    <div className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform ${
+                    <div className={`w-5 h-5 bg-[var(--bg-primary)] rounded-full shadow transform transition-transform ${
                       preferences.marketing 
                         ? (isRTL ? '-translate-x-5' : 'translate-x-5') 
                         : (isRTL ? '-translate-x-0.5' : 'translate-x-0.5')

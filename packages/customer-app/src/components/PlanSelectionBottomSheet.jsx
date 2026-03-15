@@ -127,9 +127,9 @@ const usePlanData = (plan, badge) => {
   const currency = plan.currency || 'USD';
 
   const badgeConfig = {
-    cheapest: { bg: 'bg-green-50', text: 'text-green-700', label: t('deals.bestPrice', 'Best Price') },
-    bestDeal: { bg: 'bg-amber-50', text: 'text-amber-700', label: t('deals.bestValue', 'Best Value') },
-    unlimited: { bg: 'bg-purple-50', text: 'text-purple-700', label: t('deals.unlimitedData', 'Unlimited data') }
+    cheapest: { style: { backgroundColor: 'rgba(34, 197, 94, 0.1)' }, text: 'text-green-700 dark:text-green-400', label: t('deals.bestPrice', 'Best Price') },
+    bestDeal: { style: { backgroundColor: 'rgba(245, 158, 11, 0.1)' }, text: 'text-amber-700 dark:text-amber-400', label: t('deals.bestValue', 'Best Value') },
+    unlimited: { style: { backgroundColor: 'rgba(168, 85, 247, 0.1)' }, text: 'text-purple-700 dark:text-purple-400', label: t('deals.unlimitedData', 'Unlimited data') }
   };
   const currentBadge = badge ? badgeConfig[badge] : null;
 
@@ -144,35 +144,39 @@ const PlanCard = ({ plan, badge, isSelected, onSelect }) => {
     <button
       className={`w-full text-start p-4 border transition-all duration-150 ${
         isSelected
-          ? 'border-tufts-blue bg-tufts-blue/5 border-s-4'
-          : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50/50'
+          ? 'border-tufts-blue border-s-4'
+          : ''
       }`}
+      style={{
+        borderColor: isSelected ? undefined : 'var(--card-border)',
+        backgroundColor: isSelected ? 'rgba(73, 117, 212, 0.05)' : 'var(--bg-primary)'
+      }}
       onClick={onSelect}
     >
       <div className="flex items-center gap-3">
         <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
-          isSelected ? 'border-tufts-blue bg-tufts-blue' : 'border-gray-300'
-        }`}>
+          isSelected ? 'border-tufts-blue bg-tufts-blue' : ''
+        }`} style={!isSelected ? { borderColor: 'var(--card-border)' } : undefined}>
           {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
         </div>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-base font-bold text-eerie-black">{dataDisplay}</span>
+            <span className="text-base font-bold text-text-primary">{dataDisplay}</span>
             {validityDays > 0 && (
               <>
-                <span className="text-gray-300">·</span>
-                <span className="text-sm text-gray-500">{validityDays} {t('planSelection.days', 'days')}</span>
+                <span className="text-text-muted">·</span>
+                <span className="text-sm text-text-muted">{validityDays} {t('planSelection.days', 'days')}</span>
               </>
             )}
             {currentBadge && (
-              <span className={`${currentBadge.bg} ${currentBadge.text} text-xs font-semibold px-2 py-0.5 rounded-full`}>
+              <span className={`${currentBadge.text} text-xs font-semibold px-2 py-0.5 rounded-full`} style={currentBadge.style}>
                 {currentBadge.label}
               </span>
             )}
           </div>
           {(hasSms || hasVoice) && (
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-text-muted mt-0.5">
               {hasVoice && <span>{plan.voice || plan.calls} {t('plan.minutes', 'min')}</span>}
               {hasVoice && hasSms && <span> · </span>}
               {hasSms && <span>{plan.sms} SMS</span>}
@@ -185,10 +189,10 @@ const PlanCard = ({ plan, badge, isSelected, onSelect }) => {
                   <Image src={operatorLogo} alt={operatorName} fill sizes="14px" className="object-contain" quality={75} loading="lazy" />
                 </div>
               )}
-              <span className="text-xs text-gray-400">{operatorName}</span>
+              <span className="text-xs text-text-muted">{operatorName}</span>
               {(isRegional || isGlobal) && coveredCountryCount > 0 && (
                 <>
-                  <span className="text-gray-300 mx-0.5">·</span>
+                  <span className="text-text-muted mx-0.5">·</span>
                   <span className="text-xs text-tufts-blue">{coveredCountryCount} {t('deals.countries', 'countries')}</span>
                 </>
               )}
@@ -197,8 +201,8 @@ const PlanCard = ({ plan, badge, isSelected, onSelect }) => {
         </div>
 
         <div className="flex-shrink-0 text-end">
-          <span className="text-lg font-bold text-eerie-black">{formatPrice(originalPrice)}</span>
-          {currency !== 'USD' && <p className="text-xs text-gray-400">{currency}</p>}
+          <span className="text-lg font-bold text-text-primary">{formatPrice(originalPrice)}</span>
+          {currency !== 'USD' && <p className="text-xs text-text-muted">{currency}</p>}
         </div>
       </div>
     </button>
@@ -214,25 +218,25 @@ const PlanTableRow = ({ plan, badge, isSelected, onSelect, regionColor }) => {
       className={`cursor-pointer transition-all duration-150 ${
         isSelected
           ? 'bg-tufts-blue/[0.07] shadow-[inset_0_1px_0_0_rgba(73,117,212,0.15),inset_0_-1px_0_0_rgba(73,117,212,0.15)]'
-          : 'hover:bg-gray-50'
+          : 'theme-hover'
       }`}
       onClick={onSelect}
     >
       {/* Radio */}
       <td className={`ps-5 py-4 w-12 ${isSelected ? 'border-s-4 border-s-tufts-blue' : 'border-s-4 border-s-transparent'}`}>
         <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-          isSelected ? 'border-tufts-blue bg-tufts-blue' : 'border-gray-300'
-        }`}>
+          isSelected ? 'border-tufts-blue bg-tufts-blue' : ''
+        }`} style={!isSelected ? { borderColor: 'var(--card-border)' } : undefined}>
           {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
         </div>
       </td>
       {/* Data */}
       <td className="py-4 pe-4">
-        <span className={`text-base font-bold ${isSelected ? 'text-tufts-blue' : 'text-eerie-black'}`}>{dataDisplay}</span>
+        <span className={`text-base font-bold ${isSelected ? 'text-tufts-blue' : 'text-text-primary'}`}>{dataDisplay}</span>
       </td>
       {/* Days */}
       <td className="py-4 pe-4">
-        <span className={`text-sm ${isSelected ? 'text-gray-700 font-medium' : 'text-gray-600'}`}>{validityDays > 0 ? `${validityDays} days` : '—'}</span>
+        <span className={`text-sm ${isSelected ? 'text-text-primary font-medium' : 'text-text-muted'}`}>{validityDays > 0 ? `${validityDays} days` : '—'}</span>
       </td>
       {/* Operator */}
       <td className="py-4 pe-4">
@@ -245,7 +249,7 @@ const PlanTableRow = ({ plan, badge, isSelected, onSelect, regionColor }) => {
               <Image src={operatorLogo} alt={operatorName || ''} fill sizes="20px" className="object-contain" quality={75} loading="lazy" />
             </div>
           )}
-          <span className="text-sm text-gray-600 truncate max-w-[140px]">{operatorName || '—'}</span>
+          <span className="text-sm text-text-muted truncate max-w-[140px]">{operatorName || '—'}</span>
           {(isRegional || isGlobal) && coveredCountryCount > 0 && (
             <span className="text-xs text-tufts-blue whitespace-nowrap ms-1">{coveredCountryCount} {t('deals.countries', 'countries')}</span>
           )}
@@ -254,15 +258,15 @@ const PlanTableRow = ({ plan, badge, isSelected, onSelect, regionColor }) => {
       {/* Badge */}
       <td className="py-4 pe-4">
         {currentBadge && (
-          <span className={`${currentBadge.bg} ${currentBadge.text} text-xs font-semibold px-2.5 py-1 rounded-full inline-block w-fit`}>
+          <span className={`${currentBadge.text} text-xs font-semibold px-2.5 py-1 rounded-full inline-block w-fit`} style={currentBadge.style}>
             {currentBadge.label}
           </span>
         )}
       </td>
       {/* Price */}
       <td className="py-4 pe-5 text-end">
-        <span className={`text-lg font-bold ${isSelected ? 'text-tufts-blue' : 'text-eerie-black'}`}>{formatPrice(originalPrice)}</span>
-        {currency !== 'USD' && <span className="text-xs text-gray-400 ms-1">{currency}</span>}
+        <span className={`text-lg font-bold ${isSelected ? 'text-tufts-blue' : 'text-text-primary'}`}>{formatPrice(originalPrice)}</span>
+        {currency !== 'USD' && <span className="text-xs text-text-muted ms-1">{currency}</span>}
       </td>
     </tr>
   );
@@ -715,7 +719,7 @@ const PlanSelectionBottomSheet = ({
         countryInfo ? (
           <div className="flex items-center gap-x-3 py-1">
             {/* Country/Global/Regional Image */}
-            <div className="flex-shrink-0 w-12 aspect-[4/3] flex items-center justify-center border border-gray-200 overflow-hidden rounded bg-gray-50">
+            <div className="flex-shrink-0 w-12 aspect-[4/3] flex items-center justify-center overflow-hidden rounded" style={{ border: '1px solid var(--card-border)', backgroundColor: 'var(--subtle-bg)' }}>
               {countryInfo.imageUrl ? (
                 <div className="relative w-full h-full">
                   <Image
@@ -733,7 +737,7 @@ const PlanSelectionBottomSheet = ({
               ) : null}
             </div>
             {/* Country/Region Name */}
-            <span className="font-light text-2xl text-gray-900">{countryInfo.name}</span>
+            <span className="font-light text-2xl text-text-primary">{countryInfo.name}</span>
 
           </div>
         ) : (
@@ -750,24 +754,24 @@ const PlanSelectionBottomSheet = ({
           <div className="py-8">
             <div className="grid grid-cols-2 gap-3">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="bg-gray-50 p-4 animate-pulse">
-                  <div className="h-5 bg-gray-200 w-3/4 mb-3" />
-                  <div className="h-4 bg-gray-200 w-1/2 mb-3" />
-                  <div className="h-6 bg-gray-200 w-1/3" />
+                <div key={i} className="p-4 animate-pulse" style={{ backgroundColor: 'var(--subtle-bg)' }}>
+                  <div className="h-5 w-3/4 mb-3" style={{ backgroundColor: 'var(--card-border)' }} />
+                  <div className="h-4 w-1/2 mb-3" style={{ backgroundColor: 'var(--card-border)' }} />
+                  <div className="h-6 w-1/3" style={{ backgroundColor: 'var(--card-border)' }} />
                 </div>
               ))}
             </div>
-            <p className="text-center text-sm text-gray-500 mt-4">{t('planSelection.loadingPlans', 'Loading available plans...')}</p>
+            <p className="text-center text-sm text-text-muted mt-4">{t('planSelection.loadingPlans', 'Loading available plans...')}</p>
           </div>
         ) : availablePlans && availablePlans.length > 0 ? (
           <div className="space-y-4">
             {/* Sort Control */}
             <div className="flex items-center justify-between gap-2">
-              <p className="text-sm text-gray-500 flex-shrink-0">
+              <p className="text-sm text-text-muted flex-shrink-0">
                 {t('planSelection.selectPlan', 'Select a plan')}
               </p>
               {/* Mobile: pill segments */}
-              <div className="md:hidden inline-flex bg-gray-100 p-0.5">
+              <div className="md:hidden inline-flex p-0.5" style={{ backgroundColor: 'var(--subtle-bg)' }}>
                 {[
                   { value: 'price', label: t('planSort.price', 'Price ↑') },
                   { value: 'data', label: t('planSort.data', 'Data ↓') },
@@ -778,9 +782,10 @@ const PlanSelectionBottomSheet = ({
                     onClick={() => setSortBy(opt.value)}
                     className={`px-3 py-1 text-xs font-medium transition-all duration-150 ${
                       sortBy === opt.value
-                        ? 'bg-white text-tufts-blue'
-                        : 'text-gray-500 hover:text-gray-700'
+                        ? 'text-tufts-blue'
+                        : 'text-text-muted'
                     }`}
+                    style={sortBy === opt.value ? { backgroundColor: 'var(--bg-primary)' } : undefined}
                   >
                     {opt.label}
                   </button>
@@ -794,7 +799,7 @@ const PlanSelectionBottomSheet = ({
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 mb-2">
                     <WifiIcon className="w-4 h-4 text-tufts-blue" />
-                    <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    <h4 className="text-xs font-bold text-text-muted uppercase tracking-wider">
                       {t('planSelection.dataOnlyPlans', 'Data Only')}
                     </h4>
                   </div>
@@ -806,10 +811,10 @@ const PlanSelectionBottomSheet = ({
 
               {plansWithFeatures.length > 0 && (
                 <div className="space-y-1">
-                  {dataOnlyPlans.length > 0 && <div className="w-full h-px bg-gray-200 my-3" />}
+                  {dataOnlyPlans.length > 0 && <div className="w-full h-px my-3" style={{ backgroundColor: 'var(--divider)' }} />}
                   <div className="flex items-center gap-2 mb-2">
                     <PhoneCallIcon className="w-4 h-4 text-green-600" />
-                    <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    <h4 className="text-xs font-bold text-text-muted uppercase tracking-wider">
                       {t('planSelection.plansWithCallsSms', 'With Calls & SMS')}
                     </h4>
                   </div>
@@ -826,31 +831,31 @@ const PlanSelectionBottomSheet = ({
                 <div className="mb-6">
                   <div className="flex items-center gap-2 mb-3">
                     <WifiIcon className="w-4 h-4 text-tufts-blue" />
-                    <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    <h4 className="text-xs font-bold text-text-muted uppercase tracking-wider">
                       {t('planSelection.dataOnlyPlans', 'Data Only')}
                     </h4>
-                    <span className="text-xs text-gray-400 ms-auto">{dataOnlyPlans.length} {t('planSelection.plans', 'plans')}</span>
+                    <span className="text-xs text-text-muted ms-auto">{dataOnlyPlans.length} {t('planSelection.plans', 'plans')}</span>
                   </div>
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-gray-200">
+                      <tr style={{ borderBottom: '1px solid var(--card-border)' }}>
                         <th className="ps-5 py-3 w-12" />
-                        <th className="py-3 pe-4 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-600" onClick={() => setSortBy('data')}>
+                        <th className="py-3 pe-4 text-start text-xs font-semibold text-text-muted uppercase tracking-wider cursor-pointer hover:text-text-primary" onClick={() => setSortBy('data')}>
                           {t('planSort.dataLabel', 'Data')} {sortBy === 'data' && '↓'}
                         </th>
-                        <th className="py-3 pe-4 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-600" onClick={() => setSortBy('days')}>
+                        <th className="py-3 pe-4 text-start text-xs font-semibold text-text-muted uppercase tracking-wider cursor-pointer hover:text-text-primary" onClick={() => setSortBy('days')}>
                           {t('planSort.daysLabel', 'Days')} {sortBy === 'days' && '↓'}
                         </th>
-                        <th className="py-3 pe-4 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        <th className="py-3 pe-4 text-start text-xs font-semibold text-text-muted uppercase tracking-wider">
                           {t('planSort.operatorLabel', 'Operator')}
                         </th>
-                        <th className="py-3 pe-4 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider" />
-                        <th className="py-3 pe-5 text-end text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-600" onClick={() => setSortBy('price')}>
+                        <th className="py-3 pe-4 text-start text-xs font-semibold text-text-muted uppercase tracking-wider" />
+                        <th className="py-3 pe-5 text-end text-xs font-semibold text-text-muted uppercase tracking-wider cursor-pointer hover:text-text-primary" onClick={() => setSortBy('price')}>
                           {t('planSort.priceLabel', 'Price')} {sortBy === 'price' && '↑'}
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y" style={{ borderColor: 'var(--subtle-border)' }}>
                       {dataOnlyPlans.map((plan) => (
                         <PlanTableRow key={plan.id} plan={plan} badge={plan.badge} isSelected={selectedPlanId === plan.id} onSelect={() => setSelectedPlanId(plan.id)} regionColor={regionColors[plan.region]} />
                       ))}
@@ -861,26 +866,26 @@ const PlanSelectionBottomSheet = ({
 
               {plansWithFeatures.length > 0 && (
                 <div>
-                  {dataOnlyPlans.length > 0 && <div className="w-full h-px bg-gray-200 my-4" />}
+                  {dataOnlyPlans.length > 0 && <div className="w-full h-px my-4" style={{ backgroundColor: 'var(--divider)' }} />}
                   <div className="flex items-center gap-2 mb-3">
                     <PhoneCallIcon className="w-4 h-4 text-green-600" />
-                    <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    <h4 className="text-xs font-bold text-text-muted uppercase tracking-wider">
                       {t('planSelection.plansWithCallsSms', 'With Calls & SMS')}
                     </h4>
-                    <span className="text-xs text-gray-400 ms-auto">{plansWithFeatures.length} {t('planSelection.plans', 'plans')}</span>
+                    <span className="text-xs text-text-muted ms-auto">{plansWithFeatures.length} {t('planSelection.plans', 'plans')}</span>
                   </div>
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-gray-200">
+                      <tr style={{ borderBottom: '1px solid var(--card-border)' }}>
                         <th className="ps-5 py-3 w-12" />
-                        <th className="py-3 pe-4 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('planSort.dataLabel', 'Data')}</th>
-                        <th className="py-3 pe-4 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('planSort.daysLabel', 'Days')}</th>
-                        <th className="py-3 pe-4 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('planSort.operatorLabel', 'Operator')}</th>
-                        <th className="py-3 pe-4 text-start text-xs font-semibold text-gray-400 uppercase tracking-wider" />
-                        <th className="py-3 pe-5 text-end text-xs font-semibold text-gray-400 uppercase tracking-wider">{t('planSort.priceLabel', 'Price')}</th>
+                        <th className="py-3 pe-4 text-start text-xs font-semibold text-text-muted uppercase tracking-wider">{t('planSort.dataLabel', 'Data')}</th>
+                        <th className="py-3 pe-4 text-start text-xs font-semibold text-text-muted uppercase tracking-wider">{t('planSort.daysLabel', 'Days')}</th>
+                        <th className="py-3 pe-4 text-start text-xs font-semibold text-text-muted uppercase tracking-wider">{t('planSort.operatorLabel', 'Operator')}</th>
+                        <th className="py-3 pe-4 text-start text-xs font-semibold text-text-muted uppercase tracking-wider" />
+                        <th className="py-3 pe-5 text-end text-xs font-semibold text-text-muted uppercase tracking-wider">{t('planSort.priceLabel', 'Price')}</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y" style={{ borderColor: 'var(--subtle-border)' }}>
                       {plansWithFeatures.map((plan) => (
                         <PlanTableRow key={plan.id} plan={plan} badge={plan.badge} isSelected={selectedPlanId === plan.id} onSelect={() => setSelectedPlanId(plan.id)} regionColor={regionColors[plan.region]} />
                       ))}
@@ -891,19 +896,23 @@ const PlanSelectionBottomSheet = ({
             </div>
 
             {/* Continue Button — sticky, sharp */}
-            <div className="sticky bottom-0 pt-4 pb-2 bg-white border-t border-gray-100 -mx-4 px-4 lg:-mx-6 lg:px-6 mt-6">
+            <div className="sticky bottom-0 pt-4 pb-2 -mx-4 px-4 lg:-mx-6 lg:px-6 mt-6" style={{ backgroundColor: 'var(--bg-primary)', borderTop: '1px solid var(--subtle-border)' }}>
               <button
                 onClick={() => selectedPlan && handlePlanSelect(selectedPlan)}
                 disabled={!selectedPlan}
-                className="relative w-full py-3.5 bg-eerie-black text-white text-sm font-semibold rounded-full hover:bg-gray-800 active:scale-[0.99] transition-all duration-150 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+                className="relative w-full py-3.5 text-sm font-semibold rounded-full active:scale-[0.99] transition-all duration-150 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: selectedPlan ? 'var(--cta-primary-bg)' : 'var(--subtle-bg)',
+                  color: selectedPlan ? 'var(--cta-primary-text)' : 'var(--text-muted)'
+                }}
               >
                 {selectedPlan ? (
                   <>
                     <span className="block text-center">
                       {t('planSelection.continue', 'Continue')} · {formatPrice(parsePrice(selectedPlan.price))}
                     </span>
-                    <span className="absolute end-4 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white flex items-center justify-center">
-                      <svg className="w-3 h-3 text-eerie-black rtl:-scale-x-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <span className="absolute end-4 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--cta-primary-circle-bg)' }}>
+                      <svg className="w-3 h-3 rtl:-scale-x-100" style={{ color: 'var(--cta-primary-circle-text)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M7 17L17 7M17 7H7M17 7V17" />
                       </svg>
                     </span>
@@ -921,11 +930,11 @@ const PlanSelectionBottomSheet = ({
                 <div className="w-8 h-8 rounded-lg bg-tufts-blue/10 flex items-center justify-center">
                   <GlobeIcon className="w-4 h-4 text-tufts-blue" />
                 </div>
-                <h4 className="font-semibold text-eerie-black text-sm sm:text-base">
+                <h4 className="font-semibold text-text-primary text-sm sm:text-base">
                   {t('planSelection.availablePlans', 'Available Plans')}
                 </h4>
               </div>
-              <span className="text-xs text-gray-400">{t('planSelection.sortedByCheapest', 'Cheapest first')}</span>
+              <span className="text-xs text-text-muted">{t('planSelection.sortedByCheapest', 'Cheapest first')}</span>
             </div>
 
             {/* Auto-grouped Display by Days */}
@@ -941,14 +950,14 @@ const PlanSelectionBottomSheet = ({
                   <div key={days} className="space-y-4">
                     {/* Divider and Header */}
                     {groupIndex > 0 && (
-                      <div className="w-full h-px bg-gray-100 my-4" />
+                      <div className="w-full h-px my-4" style={{ backgroundColor: 'var(--divider)' }} />
                     )}
 
                     <div className="flex items-center justify-between">
-                      <h5 className="text-sm font-semibold text-eerie-black">
+                      <h5 className="text-sm font-semibold text-text-primary">
                         {t('planSelection.dayPlans', '{{days}} Day{{plural}} Plans', { days, plural: days !== 1 ? 's' : '' })}
                       </h5>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-text-muted">
                         {countries.length} {countries.length === 1 ? 'option' : 'options'}
                       </span>
                     </div>
@@ -971,7 +980,8 @@ const PlanSelectionBottomSheet = ({
                         return (
                           <button
                             key={`${days}-${country.id}`}
-                            className="group w-full relative bg-gray-50 hover:bg-white rounded-lg transition-all duration-300 text-start overflow-hidden"
+                            className="group w-full relative transition-all duration-300 text-start overflow-hidden"
+                            style={{ backgroundColor: 'var(--card-bg)' }}
                             onClick={() => {
                               // Navigate to plan or country
                             }}
@@ -979,7 +989,7 @@ const PlanSelectionBottomSheet = ({
                             <div className="p-4 space-y-3">
                               {/* Row 1: Image + Country Name */}
                               <div className="flex items-center gap-2">
-                                <div className="flex-shrink-0 w-8 h-6 overflow-hidden rounded bg-white">
+                                <div className="flex-shrink-0 w-8 h-6 overflow-hidden rounded" style={{ backgroundColor: 'var(--bg-primary)' }}>
                                   {country.image?.url && (
                                     <div className="relative w-full h-full">
                                       <Image
@@ -994,14 +1004,14 @@ const PlanSelectionBottomSheet = ({
                                     </div>
                                   )}
                                 </div>
-                                <h3 className="text-sm font-semibold text-eerie-black truncate flex-1">
+                                <h3 className="text-sm font-semibold text-text-primary truncate flex-1">
                                   {countryName}
                                 </h3>
                               </div>
 
                               {/* Row 2: Data + Price */}
                               <div className="flex items-center justify-between gap-2">
-                                <div className="text-base font-bold text-eerie-black">
+                                <div className="text-base font-bold text-text-primary">
                                   {cheapestPlan.data}
                                 </div>
                                 <div className="text-base font-bold text-tufts-blue">
@@ -1011,7 +1021,7 @@ const PlanSelectionBottomSheet = ({
 
                               {/* Row 3: Duration + Region */}
                               <div className="flex items-center justify-between">
-                                <span className="text-xs text-gray-400">
+                                <span className="text-xs text-text-muted">
                                   {days} {t('planSelection.days', 'days')}
                                 </span>
                                 {region && (
@@ -1038,14 +1048,14 @@ const PlanSelectionBottomSheet = ({
           </div>
         ) : (
           <div className="text-center py-8">
-            <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <GlobeIcon className="w-6 h-6 text-gray-400" />
+            <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'var(--subtle-bg)' }}>
+              <GlobeIcon className="w-6 h-6 text-text-muted" />
             </div>
-            <h3 className="text-base font-semibold text-eerie-black mb-2">{t('planSelection.noPlansAvailable', 'No Plans Available')}</h3>
-            <p className="text-sm text-gray-500 mb-2">
+            <h3 className="text-base font-semibold text-text-primary mb-2">{t('planSelection.noPlansAvailable', 'No Plans Available')}</h3>
+            <p className="text-sm text-text-muted mb-2">
               {t('planSelection.couldNotFind', 'We couldn\'t find any plans for your current selection')}
             </p>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-text-muted">
               {t('planSelection.tryAdjusting', 'Try adjusting your filters or selecting a different country')}
             </p>
           </div>

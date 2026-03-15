@@ -55,13 +55,13 @@ export default function ComparisonTable() {
 
   return (
     <section
-      className="bg-bg-primary"
+      className="relative"
       aria-labelledby="comparison-heading"
     >
       <div className="max-w-7xl mx-auto px-4 py-16 lg:py-24">
 
         {/* Section header */}
-        <div className="mb-12 text-center">
+        <div className="mb-12 text-start">
           <Reveal>
             <p className="text-xs font-semibold tracking-widest uppercase text-text-muted mb-3">
               {t('comparison.label', 'The smart choice')}
@@ -72,7 +72,7 @@ export default function ComparisonTable() {
             >
               {t('comparison.title', 'eSIM vs. Physical SIM')}
             </h2>
-            <p className="text-text-muted mt-3 max-w-lg mx-auto text-base">
+            <p className="text-text-muted mt-3 max-w-lg text-base">
               {t('comparison.subtitle', 'See exactly why millions of travellers are switching to eSIM.')}
             </p>
           </Reveal>

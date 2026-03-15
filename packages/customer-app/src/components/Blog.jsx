@@ -32,7 +32,7 @@ const CATEGORY_STYLES = {
   'News': 'bg-orange-100/60 text-orange-800',
   'Tips': 'bg-teal-100/60 text-teal-800',
   'Tutorial': 'bg-indigo-100/60 text-indigo-800',
-  'default': 'bg-gray-100/60 text-gray-800'
+  'default': 'bg-[var(--subtle-bg)] text-text-primary'
 };
 
 const getCategoryStyle = (category) => CATEGORY_STYLES[category] || CATEGORY_STYLES.default;
@@ -47,7 +47,7 @@ const LargeFeaturedCard = memo(({ post, language, isRTL, onPostClick }) => {
       onClick={() => onPostClick(post, 0)}
       className="group/article-preview flex flex-col h-full"
     >
-      <div className="flex-1 w-full shadow-lg shadow-gray-100 min-h-[200px]">
+      <div className="flex-1 w-full shadow-lg shadow-[var(--card-border)] min-h-[200px]">
         <div className="relative w-full h-full min-h-[200px] lg:min-h-[300px]">
           {post.featuredImage ? (
             <Image
@@ -61,8 +61,8 @@ const LargeFeaturedCard = memo(({ post, language, isRTL, onPostClick }) => {
               fetchPriority="high"
             />
           ) : (
-            <div className="absolute inset-0 size-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-              <span className="text-gray-400 text-lg">eSIM</span>
+            <div className="absolute inset-0 size-full bg-gradient-to-br from-[var(--subtle-bg)] to-[var(--card-border)] flex items-center justify-center">
+              <span className="text-text-muted text-lg">eSIM</span>
             </div>
           )}
         </div>
@@ -76,7 +76,7 @@ const LargeFeaturedCard = memo(({ post, language, isRTL, onPostClick }) => {
         <h3 className={`line-clamp-2 pb-1 text-lg lg:text-xl leading-snug font-semibold text-balance group-hover/article-preview:underline decoration-1 underline-offset-2 ${isRTL ? 'text-right' : 'text-left'}`}>
           {post.title}
         </h3>
-        <div className="pt-2 text-xs text-gray-500">
+        <div className="pt-2 text-xs text-text-muted">
           {formatBlogDate(post.publishedAt, language)}
         </div>
       </div>
@@ -95,7 +95,7 @@ const SmallFeaturedCard = memo(({ post, language, isRTL, onPostClick, index }) =
       onClick={() => onPostClick(post, index)}
       className="group/article-preview flex flex-row gap-4 items-start"
     >
-      <div className="w-1/3 shrink-0 shadow-lg shadow-gray-100">
+      <div className="w-1/3 shrink-0 shadow-lg shadow-[var(--card-border)]">
         <div className="relative h-0 w-full overflow-hidden pb-[100%]">
           {post.featuredImage ? (
             <Image
@@ -108,8 +108,8 @@ const SmallFeaturedCard = memo(({ post, language, isRTL, onPostClick, index }) =
               loading="lazy"
             />
           ) : (
-            <div className="absolute inset-0 size-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-              <span className="text-gray-400 text-sm">eSIM</span>
+            <div className="absolute inset-0 size-full bg-gradient-to-br from-[var(--subtle-bg)] to-[var(--card-border)] flex items-center justify-center">
+              <span className="text-text-muted text-sm">eSIM</span>
             </div>
           )}
         </div>
@@ -123,7 +123,7 @@ const SmallFeaturedCard = memo(({ post, language, isRTL, onPostClick, index }) =
         <h3 className={`line-clamp-2 text-base leading-snug font-medium text-balance group-hover/article-preview:underline decoration-1 underline-offset-2 ${isRTL ? 'text-right' : 'text-left'}`}>
           {post.title}
         </h3>
-        <div className="pt-1.5 text-xs text-gray-500">
+        <div className="pt-1.5 text-xs text-text-muted">
           {formatBlogDate(post.publishedAt, language)}
         </div>
       </div>
@@ -142,7 +142,7 @@ const GridArticleCard = memo(({ post, language, isRTL, onPostClick, index }) => 
       onClick={() => onPostClick(post, index)}
       className="group/article-preview flex shrink-0 flex-row items-center gap-3 md:flex-col"
     >
-      <div className="w-1/4 shrink-0 grow-0 md:w-full shadow-lg shadow-gray-100">
+      <div className="w-1/4 shrink-0 grow-0 md:w-full shadow-lg shadow-[var(--card-border)]">
         <div className="relative h-0 w-full overflow-hidden pb-[100%]">
           {post.featuredImage ? (
             <Image
@@ -155,8 +155,8 @@ const GridArticleCard = memo(({ post, language, isRTL, onPostClick, index }) => 
               loading="lazy"
             />
           ) : (
-            <div className="absolute inset-0 size-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-              <span className="text-gray-400 text-sm">eSIM</span>
+            <div className="absolute inset-0 size-full bg-gradient-to-br from-[var(--subtle-bg)] to-[var(--card-border)] flex items-center justify-center">
+              <span className="text-text-muted text-sm">eSIM</span>
             </div>
           )}
         </div>
@@ -170,7 +170,7 @@ const GridArticleCard = memo(({ post, language, isRTL, onPostClick, index }) => 
         <h3 className={`line-clamp-3 pb-1 text-base md:text-lg leading-snug font-medium text-balance group-hover/article-preview:underline decoration-1 underline-offset-2 ${isRTL ? 'text-right' : 'text-left'}`}>
           {post.title}
         </h3>
-        <div className="pt-1.5 text-xs text-gray-500">
+        <div className="pt-1.5 text-xs text-text-muted">
           {formatBlogDate(post.publishedAt, language)}
         </div>
       </div>
@@ -186,8 +186,8 @@ const CategoryButton = memo(({ category, isSelected, onClick }) => (
     onClick={onClick}
     className={`flex h-8 w-fit shrink-0 cursor-pointer items-center rounded-full px-3 transition-colors duration-150 ease-out ${
       isSelected
-        ? 'bg-gray-900 text-white shadow-sm'
-        : 'shadow-[inset_0_0_0_1px_rgba(0,0,0,0.15)] hover:bg-gray-100 text-gray-700'
+        ? 'bg-[var(--login-bg)] text-[var(--login-text)] shadow-sm'
+        : 'shadow-[inset_0_0_0_1px_rgba(0,0,0,0.15)] hover:bg-[var(--hover-bg)] text-text-primary'
     }`}
   >
     <span className="font-medium text-sm tracking-wide">{category}</span>
@@ -201,8 +201,8 @@ const PaginationButton = memo(({ page, currentPage, onClick }) => (
     onClick={() => onClick(page)}
     className={`w-10 h-10 text-sm font-medium rounded-full transition-colors duration-150 ease-out ${
       currentPage === page
-        ? 'bg-gray-900 text-white'
-        : 'text-gray-700 hover:bg-gray-100'
+        ? 'bg-[var(--login-bg)] text-[var(--login-text)]'
+        : 'text-text-primary hover:bg-[var(--hover-bg)]'
     }`}
   >
     {page}
@@ -317,7 +317,7 @@ const Blog = () => {
       <div className="relative mx-auto w-full max-w-9xl">
         <div className="mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl w-full lg:mt-20 mt-10">
           <div className="px-4 pt-6 lg:pt-0 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-            <p className="font-mono text-sm max-w-2xl sm:text-base font-medium tracking-widest uppercase text-gray-500 rtl:font-bold rtl:tracking-tight">
+            <p className="font-mono text-sm max-w-2xl sm:text-base font-medium tracking-widest uppercase text-text-muted rtl:font-bold rtl:tracking-tight">
               {t('blog.title', 'Blog')}
             </p>
             <h2 className="my-4 text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-pretty text-eerie-black max-w-5xl">
@@ -358,7 +358,7 @@ const Blog = () => {
               </div>
             ) : filteredPosts.length === 0 ? (
               <div className="flex items-center justify-center py-20">
-                <p className="text-gray-500 text-base">
+                <p className="text-text-muted text-base">
                   {selectedCategory !== 'all'
                     ? t('blog.noPostsFound', 'No blog posts found matching your criteria')
                     : t('blog.noPostsAvailable', 'No blog posts available yet')
@@ -376,7 +376,7 @@ const Blog = () => {
                       </h3>
                     </div>
 
-                    <div className="grid gap-6 md:gap-8 lg:grid-cols-2 mb-12 md:mb-16 pb-10 md:pb-14 border-b border-gray-200">
+                    <div className="grid gap-6 md:gap-8 lg:grid-cols-2 mb-12 md:mb-16 pb-10 md:pb-14 border-b border-[var(--card-border)]">
                       <LargeFeaturedCard
                         post={featuredPost}
                         language={detectedLanguage}
@@ -435,8 +435,8 @@ const Blog = () => {
                       disabled={currentPage === 1}
                       className={`px-4 py-2 text-sm font-medium rounded-full transition-colors duration-150 ease-out ${
                         currentPage === 1
-                          ? 'text-gray-300 cursor-not-allowed'
-                          : 'text-gray-700 hover:bg-gray-100'
+                          ? 'text-text-muted cursor-not-allowed'
+                          : 'text-text-primary hover:bg-[var(--hover-bg)]'
                       }`}
                     >
                       {t('blog.pagination.previous', 'Previous')}
@@ -458,8 +458,8 @@ const Blog = () => {
                       disabled={currentPage === totalPages}
                       className={`px-4 py-2 text-sm font-medium rounded-full transition-colors duration-150 ease-out ${
                         currentPage === totalPages
-                          ? 'text-gray-300 cursor-not-allowed'
-                          : 'text-gray-700 hover:bg-gray-100'
+                          ? 'text-text-muted cursor-not-allowed'
+                          : 'text-text-primary hover:bg-[var(--hover-bg)]'
                       }`}
                     >
                       {t('blog.pagination.next', 'Next')}

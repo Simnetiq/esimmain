@@ -88,9 +88,9 @@ const DopplerVPNPrivacyPolicy = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white py-24">
+    <div className="min-h-screen bg-[var(--bg-primary)] py-24">
       {/* Header Section */}
-      <section className="bg-white">
+      <section className="bg-[var(--bg-primary)]">
         <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
           <div className="text-center">
             <h2 className="text-center text-xl font-semibold text-tufts-blue">
@@ -116,12 +116,12 @@ const DopplerVPNPrivacyPolicy = () => {
       </section>
 
       {/* Content Section */}
-      <section className="bg-white">
+      <section className="bg-[var(--bg-primary)]">
         <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8 mt-6">
 
           {/* Introduction */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Privacy Commitment</h2>
@@ -152,7 +152,7 @@ const DopplerVPNPrivacyPolicy = () => {
 
           {/* Data Collection Summary */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Data Collection Summary</h2>
@@ -216,7 +216,7 @@ const DopplerVPNPrivacyPolicy = () => {
                   key={index}
                   className="relative"
                 >
-                  <div className="absolute inset-px rounded-xl bg-white"></div>
+                  <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
                   <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
                     <div className="px-8 pt-8 pb-8">
                       <div className="flex items-center mb-6">
@@ -243,7 +243,7 @@ const DopplerVPNPrivacyPolicy = () => {
 
           {/* Data Retention */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <div className="flex items-center mb-4">
@@ -278,7 +278,7 @@ const DopplerVPNPrivacyPolicy = () => {
 
           {/* Data Security */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <div className="flex items-center mb-4">
@@ -307,7 +307,7 @@ const DopplerVPNPrivacyPolicy = () => {
 
           {/* International Data Transfers */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <div className="flex items-center mb-4">
@@ -339,7 +339,7 @@ const DopplerVPNPrivacyPolicy = () => {
 
           {/* Children's Privacy */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Children&apos;s Privacy</h2>
@@ -361,7 +361,7 @@ const DopplerVPNPrivacyPolicy = () => {
 
           {/* Legal Basis (GDPR) */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Legal Basis for Processing (GDPR)</h2>
@@ -388,7 +388,7 @@ const DopplerVPNPrivacyPolicy = () => {
 
           {/* Changes to Privacy Policy */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Changes to This Privacy Policy</h2>
@@ -414,7 +414,7 @@ const DopplerVPNPrivacyPolicy = () => {
 
           {/* Contact Information */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Contact Us</h2>
@@ -423,7 +423,7 @@ const DopplerVPNPrivacyPolicy = () => {
                     If you have any questions about this Privacy Policy or wish to exercise your data rights,
                     please contact us:
                   </p>
-                  <div className="bg-gray-50 p-6 rounded-lg">
+                  <div className="bg-[var(--bg-secondary)] p-6 rounded-lg">
                     <div className="space-y-3">
                       <div>
                         <strong>Data Controller:</strong> Simnetiq Ltd<br />
@@ -454,7 +454,7 @@ const DopplerVPNPrivacyPolicy = () => {
 
           {/* Related Documents */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Related Legal Documents</h2>
@@ -472,14 +472,14 @@ const DopplerVPNPrivacyPolicy = () => {
                     </Link>
                     <Link
                       href="/terms-of-service"
-                      className="flex items-center space-x-3 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      className="flex items-center space-x-3 px-4 py-3 bg-[var(--subtle-bg)] text-text-primary rounded-lg hover:bg-[var(--hover-bg)] transition-colors"
                     >
                       <FileText className="w-5 h-5" />
                       <span>Simnetiq Terms</span>
                     </Link>
                     <Link
                       href="/privacy-policy"
-                      className="flex items-center space-x-3 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      className="flex items-center space-x-3 px-4 py-3 bg-[var(--subtle-bg)] text-text-primary rounded-lg hover:bg-[var(--hover-bg)] transition-colors"
                     >
                       <Shield className="w-5 h-5" />
                       <span>Simnetiq Privacy</span>

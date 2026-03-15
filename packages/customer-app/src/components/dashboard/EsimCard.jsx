@@ -255,7 +255,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
 
   return (
     <div
-      className={`group relative w-full bg-gray-50 overflow-hidden cursor-pointer transition-all duration-500 hover:bg-white ${
+      className={`group relative w-full bg-[var(--bg-secondary)] overflow-hidden cursor-pointer transition-all duration-500 hover:bg-[var(--bg-primary)] ${
         isExpired ? 'opacity-75 hover:opacity-100' : ''
       }`}
       onClick={() => onViewQRCode(order)}
@@ -263,7 +263,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
     >
       {/* Faded data watermark */}
       <span
-        className="absolute top-4 end-4 hidden sm:block text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-200 select-none pointer-events-none"
+        className="absolute top-4 end-4 hidden sm:block text-[5rem] lg:text-[6rem] font-semibold leading-none text-text-primary/10 select-none pointer-events-none"
         aria-hidden="true"
       >
         {watermarkText}
@@ -274,11 +274,11 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
 
         {/* Header Section */}
         <div className="flex items-center gap-3 mb-4 rtl-native-flex">
-          <div className="w-12 h-12 bg-gray-100 flex items-center justify-center rounded-full overflow-hidden flex-shrink-0 relative">
+          <div className="w-12 h-12 bg-[var(--subtle-bg)] flex items-center justify-center rounded-full overflow-hidden flex-shrink-0 relative">
             {countryImage ? (
               <>
                 {!imageLoaded && (
-                  <div className="absolute inset-0 bg-gray-200 rounded-full animate-pulse" />
+                  <div className="absolute inset-0 bg-[var(--card-border)] rounded-full animate-pulse" />
                 )}
                 <Image
                   src={countryImage}
@@ -291,16 +291,16 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
                 />
               </>
             ) : !imageFetchDone ? (
-              <div className="absolute inset-0 bg-gray-200 rounded-full animate-pulse" />
+              <div className="absolute inset-0 bg-[var(--card-border)] rounded-full animate-pulse" />
             ) : (
-              <GlobeIcon className="w-6 h-6 text-gray-500" />
+              <GlobeIcon className="w-6 h-6 text-text-muted" />
             )}
           </div>
           <div>
             <h5 className="text-lg font-semibold text-eerie-black leading-tight">
               {fullName || t('dashboard.unknownRegion', 'Unknown')}
             </h5>
-            <p className="text-sm text-gray-500 truncate max-w-[180px]">
+            <p className="text-sm text-text-muted truncate max-w-[180px]">
               {order.planName || t('dashboard.unknownPlan', 'Unknown Plan')}
             </p>
           </div>
@@ -308,14 +308,14 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
 
         {/* Data Remaining */}
         <div className="mb-4">
-          <p className="text-gray-500 text-xs font-normal mb-1 flex items-center gap-1 rtl-native-flex">
+          <p className="text-text-muted text-xs font-normal mb-1 flex items-center gap-1 rtl-native-flex">
             <WifiIcon className="w-3.5 h-3.5" />
             {t('dashboard.dataRemaining', 'Data Remaining')}
           </p>
           {loadingUsage ? (
-            <div className="h-6 w-20 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-6 w-20 bg-[var(--card-border)] rounded animate-pulse"></div>
           ) : (
-            <p className={`text-base font-semibold ${isExpired ? 'text-gray-500' : 'text-gray-700'}`}>
+            <p className={`text-base font-semibold ${isExpired ? 'text-text-muted' : 'text-text-primary'}`}>
               {usage ? `${usage.text} / ${usage.totalText}` : dataDisplay}
             </p>
           )}
@@ -351,7 +351,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
 
         {/* Operator Branding - from Supabase */}
         {planMetadata?.operatorName && (
-          <div className="flex items-center gap-2 mb-4 p-2 bg-gray-100/50 rtl-native-flex">
+          <div className="flex items-center gap-2 mb-4 p-2 bg-[var(--subtle-bg)] rtl-native-flex">
             {planMetadata.operatorLogo ? (
               <Image
                 src={planMetadata.operatorLogo}
@@ -362,7 +362,7 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
                 unoptimized
               />
             ) : null}
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-text-muted">
               {t('dashboard.poweredBy', 'Powered by')}{' '}
               <span
                 className="font-medium"
@@ -382,9 +382,9 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
         )}
 
         {/* Footer — Price + Status */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100/60 rtl-native-flex">
+        <div className="flex items-center justify-between pt-4 border-t border-[var(--divider)] rtl-native-flex">
           <div>
-            <span className="text-xs text-gray-500">{t('dashboard.price', 'Price')}</span>
+            <span className="text-xs text-text-muted">{t('dashboard.price', 'Price')}</span>
             <p className="text-lg font-bold text-eerie-black">{formatPrice(order.amount || 0)}</p>
           </div>
           <span className={`inline-flex items-center ${statusInfo.bgColor} border ${statusInfo.borderColor} ${statusInfo.textColor} text-xs font-medium px-2 py-1 rounded-lg`}>
@@ -399,11 +399,11 @@ const EsimCard = ({ order, usageData, loadingUsage, onViewQRCode, planMetadata, 
             e.stopPropagation();
             onViewQRCode(order);
           }}
-          className={`relative w-full mt-4 flex items-center justify-center py-3 bg-eerie-black text-white text-sm font-medium rounded-full transition-colors duration-300 hover:bg-gray-800`}
+          className={`relative w-full mt-4 flex items-center justify-center py-3 bg-[var(--login-bg)] text-[var(--login-text)] text-sm font-medium rounded-full transition-opacity duration-300 hover:opacity-90`}
         >
           <span>{t('dashboard.viewDetails', 'View Details')}</span>
-          <span className="absolute top-1/2 -translate-y-1/2 end-3 w-6 h-6 rounded-full bg-white flex items-center justify-center">
-            <ArrowUpRightIcon className="w-3.5 h-3.5 text-eerie-black rtl:-scale-x-100" />
+          <span className="absolute top-1/2 -translate-y-1/2 end-3 w-6 h-6 rounded-full bg-[var(--login-text)] flex items-center justify-center">
+            <ArrowUpRightIcon className="w-3.5 h-3.5 text-[var(--login-bg)] rtl:-scale-x-100" />
           </span>
         </button>
 

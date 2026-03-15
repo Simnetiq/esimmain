@@ -81,17 +81,17 @@ const BookOpenIcon = ({ className }) => (
 
 // FAQ Item Component
 const FAQItem = ({ question, answer, isOpen, onToggle, steps }) => (
-  <div className="border-b border-gray-100 last:border-b-0">
+  <div className="border-b border-[var(--card-border)] last:border-b-0">
     <button
       onClick={onToggle}
-      className="w-full px-5 py-4 flex items-center justify-between gap-4 hover:bg-gray-50/50 transition-colors duration-150 ease-out text-start rtl-native-flex"
+      className="w-full px-5 py-4 flex items-center justify-between gap-4 hover:bg-[var(--hover-bg)] transition-colors duration-150 ease-out text-start rtl-native-flex"
     >
-      <span className="font-medium text-gray-900 text-sm sm:text-base">{question}</span>
-      <ChevronDownIcon className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+      <span className="font-medium text-text-primary text-sm sm:text-base">{question}</span>
+      <ChevronDownIcon className={`w-5 h-5 text-text-muted flex-shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
     </button>
     {isOpen && (
       <div className="px-5 pb-4 text-start">
-        <p className="text-gray-500 leading-relaxed text-sm mb-3">{answer}</p>
+        <p className="text-text-muted leading-relaxed text-sm mb-3">{answer}</p>
         {steps && steps.length > 0 && (
           <div className="mt-3 space-y-2.5">
             {steps.map((step, idx) => (
@@ -99,7 +99,7 @@ const FAQItem = ({ question, answer, isOpen, onToggle, steps }) => (
                 <span className="flex-shrink-0 w-7 h-7 rounded-full bg-tufts-blue/10 text-tufts-blue flex items-center justify-center text-xs font-semibold mt-0.5">
                   {idx + 1}
                 </span>
-                <p className="text-sm text-gray-700 leading-relaxed pt-1">{step}</p>
+                <p className="text-sm text-text-primary leading-relaxed pt-1">{step}</p>
               </div>
             ))}
           </div>
@@ -114,7 +114,7 @@ const FAQ_NUMBERS = ['01', '02', '03', '04'];
 
 // FAQ Category Component
 const FAQCategory = ({ icon: Icon, title, faqs, openFaq, onToggle, categoryIndex }) => (
-  <div className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500">
+  <div className="group relative bg-[var(--bg-secondary)] overflow-hidden hover:bg-[var(--bg-primary)] transition-all duration-500">
     <span
       className="absolute top-4 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-eerie-black/[0.04] select-none pointer-events-none"
       aria-hidden="true"
@@ -354,31 +354,31 @@ const Contact = () => {
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-tufts-blue" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[var(--bg-primary)]">
 
       {/* Page Header */}
       <div className="mx-auto w-full max-w-9xl">
         <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
           <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-            <p className="text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 mb-4 text-start">
+            <p className="text-sm sm:text-base font-medium tracking-widest uppercase text-text-muted mb-4 text-start">
               {t('contact.title', 'Help Center')}
             </p>
             <h1 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-eerie-black text-start">
               {t('contact.subtitle', "We're here to help with all your needs")}
             </h1>
-            <p className="mt-2 text-gray-500 text-sm leading-relaxed text-start">
+            <p className="mt-2 text-text-muted text-sm leading-relaxed text-start">
               {t('contact.description', 'Find answers to common questions or send us a message. Our support team typically responds within a few hours.')}
             </p>
           </div>
         </div>
-        <div className="w-full h-px bg-gray-100" />
+        <div className="w-full h-px bg-[var(--subtle-bg)]" />
       </div>
 
       {/* Main Content */}
@@ -390,7 +390,7 @@ const Contact = () => {
               {/* Contact Form Card — 01 */}
               <div className="lg:col-span-1">
                 <div className="lg:sticky lg:top-24">
-                  <div className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 p-5 sm:p-6">
+                  <div className="group relative bg-[var(--bg-secondary)] overflow-hidden hover:bg-[var(--bg-primary)] transition-all duration-500 p-5 sm:p-6">
 
                     <div className="relative mb-6">
                       <div className="w-11 h-11 rounded-lg bg-tufts-blue/10 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
@@ -404,12 +404,12 @@ const Contact = () => {
                       </h2>
                     </div>
 
-                    <div className="flex border-b border-gray-100 mb-6">
+                    <div className="flex border-b border-[var(--card-border)] mb-6">
                       <button
                         type="button"
                         onClick={() => handleRequestTypeChange('contact')}
                         className={`flex-1 pb-3 text-sm font-medium transition-colors relative ${
-                          requestType === 'contact' ? 'text-tufts-blue' : 'text-gray-500 hover:text-gray-700'
+                          requestType === 'contact' ? 'text-tufts-blue' : 'text-text-muted hover:text-text-primary'
                         }`}
                       >
                         {t('contact.generalInquiry', 'General Inquiry')}
@@ -421,7 +421,7 @@ const Contact = () => {
                         type="button"
                         onClick={() => handleRequestTypeChange('deletion_request')}
                         className={`flex-1 pb-3 text-sm font-medium transition-colors relative ${
-                          requestType === 'deletion_request' ? 'text-tufts-blue' : 'text-gray-500 hover:text-gray-700'
+                          requestType === 'deletion_request' ? 'text-tufts-blue' : 'text-text-muted hover:text-text-primary'
                         }`}
                       >
                         {t('contact.deletionRequest', 'Delete Account')}
@@ -433,11 +433,11 @@ const Contact = () => {
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                       <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2 text-start">
+                        <label htmlFor="name" className="block text-sm font-medium text-text-primary mb-2 text-start">
                           {t('contact.fullName', 'Full Name')}
                         </label>
                         <div className="relative">
-                          <UserIcon className="absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 start-3" />
+                          <UserIcon className="absolute top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted start-3" />
                           <input
                             type="text"
                             id="name"
@@ -445,18 +445,18 @@ const Contact = () => {
                             value={formData.name}
                             onChange={handleInputChange}
                             required
-                            className="w-full px-10 py-3 border border-gray-200 rounded-lg bg-white focus:ring-2 focus:ring-tufts-blue/20 focus:border-tufts-blue transition-colors text-start"
+                            className="w-full px-10 py-3 border border-[var(--card-border)] rounded-lg bg-[var(--bg-primary)] focus:ring-2 focus:ring-tufts-blue/20 focus:border-tufts-blue transition-colors text-start"
                             placeholder={t('contact.fullNamePlaceholder', 'Enter your name')}
                           />
                         </div>
                       </div>
 
                       <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2 text-start">
+                        <label htmlFor="email" className="block text-sm font-medium text-text-primary mb-2 text-start">
                           {t('contact.emailAddress', 'Email Address')}
                         </label>
                         <div className="relative">
-                          <MailIcon className="absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 start-3" />
+                          <MailIcon className="absolute top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted start-3" />
                           <input
                             type="email"
                             id="email"
@@ -465,7 +465,7 @@ const Contact = () => {
                             value={formData.email}
                             onChange={handleInputChange}
                             required
-                            className="w-full px-10 py-3 border border-gray-200 rounded-lg bg-white focus:ring-2 focus:ring-tufts-blue/20 focus:border-tufts-blue transition-colors text-start"
+                            className="w-full px-10 py-3 border border-[var(--card-border)] rounded-lg bg-[var(--bg-primary)] focus:ring-2 focus:ring-tufts-blue/20 focus:border-tufts-blue transition-colors text-start"
                             placeholder={t('contact.emailPlaceholder', 'your@email.com')}
                           />
                         </div>
@@ -473,7 +473,7 @@ const Contact = () => {
 
                       {requestType === 'contact' ? (
                         <div>
-                          <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2 text-start">
+                          <label htmlFor="message" className="block text-sm font-medium text-text-primary mb-2 text-start">
                             {t('contact.message', 'Message')}
                           </label>
                           <textarea
@@ -483,7 +483,7 @@ const Contact = () => {
                             onChange={handleInputChange}
                             required
                             rows={4}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-white focus:ring-2 focus:ring-tufts-blue/20 focus:border-tufts-blue transition-colors resize-none text-start"
+                            className="w-full px-4 py-3 border border-[var(--card-border)] rounded-lg bg-[var(--bg-primary)] focus:ring-2 focus:ring-tufts-blue/20 focus:border-tufts-blue transition-colors resize-none text-start"
                             placeholder={t('contact.messagePlaceholder', 'How can we help you?')}
                           />
                         </div>
@@ -506,10 +506,10 @@ const Contact = () => {
                                 checked={formData.agreementAccepted}
                                 onChange={handleInputChange}
                                 required
-                                className="h-4 w-4 text-tufts-blue focus:ring-tufts-blue border-gray-300 rounded"
+                                className="h-4 w-4 text-tufts-blue focus:ring-tufts-blue border-[var(--card-border)] rounded"
                               />
                             </div>
-                            <label htmlFor="agreementAccepted" className="font-medium text-gray-700 text-sm cursor-pointer select-none">
+                            <label htmlFor="agreementAccepted" className="font-medium text-text-primary text-sm cursor-pointer select-none">
                               {t('contact.confirmDeletion', 'I understand and agree to delete my account and data')}
                             </label>
                           </div>
@@ -519,7 +519,7 @@ const Contact = () => {
                       <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full py-3.5 px-6 bg-eerie-black text-white rounded-full font-medium flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed rtl-native-flex"
+                        className="w-full py-3.5 px-6 bg-[var(--login-bg)] text-[var(--login-text)] rounded-full font-medium flex items-center justify-center gap-2 hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed rtl-native-flex"
                       >
                         {isSubmitting ? (
                           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
@@ -532,15 +532,15 @@ const Contact = () => {
                       </button>
                     </form>
 
-                    <div className="mt-6 pt-6 border-t border-gray-100">
-                      <p className="text-sm text-gray-500 text-start">
+                    <div className="mt-6 pt-6 border-t border-[var(--card-border)]">
+                      <p className="text-sm text-text-muted text-start">
                         {t('contact.quickResponse', 'Or email us directly at')}
                       </p>
                       <a
-                        href="mailto:support@simnetiq.net"
+                        href="mailto:support@simnetiq.store"
                         className="text-tufts-blue font-medium hover:underline block text-start"
                       >
-                        support@simnetiq.net
+                        support@simnetiq.store
                       </a>
                     </div>
                   </div>
@@ -553,7 +553,7 @@ const Contact = () => {
                 {/* Installation Guide CTA */}
                 <Link
                   href={guideHref}
-                  className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 block p-5"
+                  className="group relative bg-[var(--bg-secondary)] overflow-hidden hover:bg-[var(--bg-primary)] transition-all duration-500 block p-5"
                 >
                   <div className="flex items-center gap-4 rtl-native-flex">
                     <div className="w-11 h-11 rounded-lg bg-tufts-blue/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
@@ -566,7 +566,7 @@ const Contact = () => {
                       <p className="text-lg lg:text-xl font-semibold text-eerie-black mb-1">
                         {t('contact.guideCard.title', 'eSIM Installation Guide')}
                       </p>
-                      <p className="text-gray-500 text-sm leading-relaxed">
+                      <p className="text-text-muted text-sm leading-relaxed">
                         {t('contact.guideCard.description', 'Step-by-step instructions for iPhone, Android, and manual installation')}
                       </p>
                     </div>

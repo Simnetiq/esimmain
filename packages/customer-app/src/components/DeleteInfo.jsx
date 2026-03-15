@@ -104,7 +104,7 @@ const DeleteInfo = () => {
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-tufts-blue" />
       </div>
     );
@@ -138,22 +138,22 @@ const DeleteInfo = () => {
       <BackgroundDecor />
 
       {/* Header */}
-      <div className="relative border-b border-gray-200">
+      <div className="relative border-b border-[var(--card-border)]">
         <div className="max-w-3xl mx-auto px-4 py-6 sm:px-6">
           <div className={`flex items-center gap-3 mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
             <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center flex-shrink-0">
               <TrashIcon className="w-5 h-5 text-red-500" />
             </div>
             <div>
-              <p className={`text-sm font-medium tracking-widest uppercase text-gray-500 ${isRTL ? 'text-right' : ''}`}>
+              <p className={`text-sm font-medium tracking-widest uppercase text-text-muted ${isRTL ? 'text-right' : ''}`}>
                 {t('deleteInfo.title', 'Data Deletion')}
               </p>
             </div>
           </div>
-          <h1 className={`text-2xl font-bold text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+          <h1 className={`text-2xl font-bold text-text-primary ${isRTL ? 'text-right' : ''}`}>
             {t('deleteInfo.heading', 'Request Account & Data Deletion')}
           </h1>
-          <p className={`mt-1.5 text-sm text-gray-500 ${isRTL ? 'text-right' : ''}`}>
+          <p className={`mt-1.5 text-sm text-text-muted ${isRTL ? 'text-right' : ''}`}>
             {t('deleteInfo.subtitle', 'Submit a request to permanently delete your Simnetiq account and all associated personal data.')}
           </p>
         </div>
@@ -163,36 +163,36 @@ const DeleteInfo = () => {
       <div className="relative max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-6">
 
         {/* What gets deleted */}
-        <div className="rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm p-5 sm:p-6">
-          <h2 className={`text-base font-semibold text-gray-900 mb-4 ${isRTL ? 'text-right' : ''}`}>
+        <div className="rounded-xl border border-[var(--card-border)] bg-[var(--bg-primary)] backdrop-blur-sm p-5 sm:p-6">
+          <h2 className={`text-base font-semibold text-text-primary mb-4 ${isRTL ? 'text-right' : ''}`}>
             {t('deleteInfo.whatDeleted', 'What data will be deleted?')}
           </h2>
-          <p className={`text-sm text-gray-600 mb-4 ${isRTL ? 'text-right' : ''}`}>
+          <p className={`text-sm text-text-muted mb-4 ${isRTL ? 'text-right' : ''}`}>
             {t('deleteInfo.whatDeletedDesc', 'When you request account deletion, the following data will be permanently removed from our systems:')}
           </p>
           <ul className="space-y-3">
             {dataItems.map((item, idx) => (
               <li key={idx} className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                 <CheckCircleIcon className="w-5 h-5 text-red-400 flex-shrink-0" />
-                <span className="text-sm text-gray-700">{item.label}</span>
+                <span className="text-sm text-text-primary">{item.label}</span>
               </li>
             ))}
           </ul>
         </div>
 
         {/* Timeframe & process */}
-        <div className="rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm p-5 sm:p-6">
-          <h2 className={`text-base font-semibold text-gray-900 mb-4 ${isRTL ? 'text-right' : ''}`}>
+        <div className="rounded-xl border border-[var(--card-border)] bg-[var(--bg-primary)] backdrop-blur-sm p-5 sm:p-6">
+          <h2 className={`text-base font-semibold text-text-primary mb-4 ${isRTL ? 'text-right' : ''}`}>
             {t('deleteInfo.process', 'Deletion Process')}
           </h2>
           <div className="space-y-4">
             <div className={`flex gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
               <span className="flex-shrink-0 w-7 h-7 rounded-full bg-tufts-blue/10 text-tufts-blue flex items-center justify-center text-xs font-semibold mt-0.5">1</span>
               <div>
-                <p className={`text-sm font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                <p className={`text-sm font-medium text-text-primary ${isRTL ? 'text-right' : ''}`}>
                   {t('deleteInfo.step1Title', 'Submit your request')}
                 </p>
-                <p className={`text-sm text-gray-500 mt-0.5 ${isRTL ? 'text-right' : ''}`}>
+                <p className={`text-sm text-text-muted mt-0.5 ${isRTL ? 'text-right' : ''}`}>
                   {t('deleteInfo.step1Desc', 'Fill out the form below with the email associated with your account.')}
                 </p>
               </div>
@@ -200,10 +200,10 @@ const DeleteInfo = () => {
             <div className={`flex gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
               <span className="flex-shrink-0 w-7 h-7 rounded-full bg-tufts-blue/10 text-tufts-blue flex items-center justify-center text-xs font-semibold mt-0.5">2</span>
               <div>
-                <p className={`text-sm font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                <p className={`text-sm font-medium text-text-primary ${isRTL ? 'text-right' : ''}`}>
                   {t('deleteInfo.step2Title', 'Verification')}
                 </p>
-                <p className={`text-sm text-gray-500 mt-0.5 ${isRTL ? 'text-right' : ''}`}>
+                <p className={`text-sm text-text-muted mt-0.5 ${isRTL ? 'text-right' : ''}`}>
                   {t('deleteInfo.step2Desc', 'We verify your identity and confirm the request via email.')}
                 </p>
               </div>
@@ -211,10 +211,10 @@ const DeleteInfo = () => {
             <div className={`flex gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
               <span className="flex-shrink-0 w-7 h-7 rounded-full bg-tufts-blue/10 text-tufts-blue flex items-center justify-center text-xs font-semibold mt-0.5">3</span>
               <div>
-                <p className={`text-sm font-medium text-gray-900 ${isRTL ? 'text-right' : ''}`}>
+                <p className={`text-sm font-medium text-text-primary ${isRTL ? 'text-right' : ''}`}>
                   {t('deleteInfo.step3Title', 'Data removal')}
                 </p>
-                <p className={`text-sm text-gray-500 mt-0.5 ${isRTL ? 'text-right' : ''}`}>
+                <p className={`text-sm text-text-muted mt-0.5 ${isRTL ? 'text-right' : ''}`}>
                   {t('deleteInfo.step3Desc', 'Your data is permanently deleted within 30 days of the verified request.')}
                 </p>
               </div>
@@ -226,26 +226,26 @@ const DeleteInfo = () => {
         {submitted ? (
           <div className="rounded-xl border border-green-200 bg-green-50/80 backdrop-blur-sm p-5 sm:p-6 text-center">
             <CheckCircleIcon className="w-12 h-12 text-green-500 mx-auto mb-3" />
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">
+            <h2 className="text-lg font-semibold text-text-primary mb-2">
               {t('deleteInfo.successTitle', 'Request Submitted')}
             </h2>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-text-muted">
               {t('deleteInfo.successDesc', 'We have received your account deletion request. You will receive a confirmation email shortly. Your data will be deleted within 30 days.')}
             </p>
           </div>
         ) : (
-          <div className="rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm p-5 sm:p-6">
-            <h2 className={`text-base font-semibold text-gray-900 mb-4 ${isRTL ? 'text-right' : ''}`}>
+          <div className="rounded-xl border border-[var(--card-border)] bg-[var(--bg-primary)] backdrop-blur-sm p-5 sm:p-6">
+            <h2 className={`text-base font-semibold text-text-primary mb-4 ${isRTL ? 'text-right' : ''}`}>
               {t('deleteInfo.formTitle', 'Request Deletion')}
             </h2>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="name" className={`block text-sm font-medium text-gray-700 mb-2 ${isRTL ? 'text-right' : ''}`}>
+                <label htmlFor="name" className={`block text-sm font-medium text-text-primary mb-2 ${isRTL ? 'text-right' : ''}`}>
                   {t('contact.fullName', 'Full Name')}
                 </label>
                 <div className="relative">
-                  <UserIcon className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isRTL ? 'right-3' : 'left-3'}`} />
+                  <UserIcon className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted ${isRTL ? 'right-3' : 'left-3'}`} />
                   <input
                     type="text"
                     id="name"
@@ -253,7 +253,7 @@ const DeleteInfo = () => {
                     value={formData.name}
                     onChange={handleInputChange}
                     required
-                    className={`w-full px-10 py-3 border border-gray-200 focus:ring-2 focus:ring-tufts-blue/20 focus:border-tufts-blue transition-colors ${isRTL ? 'text-right' : ''}`}
+                    className={`w-full px-10 py-3 border border-[var(--card-border)] focus:ring-2 focus:ring-tufts-blue/20 focus:border-tufts-blue transition-colors ${isRTL ? 'text-right' : ''}`}
                     placeholder={t('contact.fullNamePlaceholder', 'Enter your name')}
                     dir={isRTL ? 'rtl' : 'ltr'}
                   />
@@ -261,11 +261,11 @@ const DeleteInfo = () => {
               </div>
 
               <div>
-                <label htmlFor="email" className={`block text-sm font-medium text-gray-700 mb-2 ${isRTL ? 'text-right' : ''}`}>
+                <label htmlFor="email" className={`block text-sm font-medium text-text-primary mb-2 ${isRTL ? 'text-right' : ''}`}>
                   {t('contact.emailAddress', 'Email Address')}
                 </label>
                 <div className="relative">
-                  <MailIcon className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isRTL ? 'right-3' : 'left-3'}`} />
+                  <MailIcon className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted ${isRTL ? 'right-3' : 'left-3'}`} />
                   <input
                     type="email"
                     id="email"
@@ -273,12 +273,12 @@ const DeleteInfo = () => {
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                    className={`w-full px-10 py-3 border border-gray-200 focus:ring-2 focus:ring-tufts-blue/20 focus:border-tufts-blue transition-colors ${isRTL ? 'text-right' : ''}`}
+                    className={`w-full px-10 py-3 border border-[var(--card-border)] focus:ring-2 focus:ring-tufts-blue/20 focus:border-tufts-blue transition-colors ${isRTL ? 'text-right' : ''}`}
                     placeholder={t('contact.emailPlaceholder', 'your@email.com')}
                     dir={isRTL ? 'rtl' : 'ltr'}
                   />
                 </div>
-                <p className={`mt-1.5 text-xs text-gray-400 ${isRTL ? 'text-right' : ''}`}>
+                <p className={`mt-1.5 text-xs text-text-muted ${isRTL ? 'text-right' : ''}`}>
                   {t('deleteInfo.emailHint', 'Use the email address associated with your Simnetiq account.')}
                 </p>
               </div>
@@ -301,10 +301,10 @@ const DeleteInfo = () => {
                     checked={formData.agreementAccepted}
                     onChange={handleInputChange}
                     required
-                    className="h-4 w-4 text-tufts-blue focus:ring-tufts-blue border-gray-300 rounded"
+                    className="h-4 w-4 text-tufts-blue focus:ring-tufts-blue border-[var(--card-border)] rounded"
                   />
                 </div>
-                <label htmlFor="agreementAccepted" className="font-medium text-gray-700 text-sm cursor-pointer select-none">
+                <label htmlFor="agreementAccepted" className="font-medium text-text-primary text-sm cursor-pointer select-none">
                   {t('contact.confirmDeletion', 'I understand and agree to delete my account and data')}
                 </label>
               </div>
@@ -326,15 +326,15 @@ const DeleteInfo = () => {
             </form>
 
             {/* Contact info */}
-            <div className="mt-6 pt-6 border-t border-gray-100">
-              <p className={`text-sm text-gray-500 ${isRTL ? 'text-right' : ''}`}>
+            <div className="mt-6 pt-6 border-t border-[var(--card-border)]">
+              <p className={`text-sm text-text-muted ${isRTL ? 'text-right' : ''}`}>
                 {t('deleteInfo.contactAlt', 'You can also request deletion by emailing')}
               </p>
               <a
-                href="mailto:support@simnetiq.net"
+                href="mailto:support@simnetiq.store"
                 className={`text-tufts-blue font-medium hover:underline ${isRTL ? 'block text-right' : ''}`}
               >
-                support@simnetiq.net
+                support@simnetiq.store
               </a>
             </div>
           </div>

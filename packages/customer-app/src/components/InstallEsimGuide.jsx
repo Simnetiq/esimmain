@@ -99,7 +99,7 @@ const StepNumber = ({ number }) => (
 // ─── Flat card (FeaturesSection style) ──────────────────────────────────────
 
 const Card = ({ children, className = '' }) => (
-  <div className={`group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 ${className}`}>
+  <div className={`group relative bg-[var(--bg-secondary)] overflow-hidden hover:bg-[var(--bg-primary)] transition-all duration-500 ${className}`}>
     {children}
   </div>
 );
@@ -123,8 +123,8 @@ const AccordionSection = ({ title, icon: Icon, stepNumber, defaultOpen = false, 
           <span className="text-lg lg:text-xl font-semibold text-eerie-black">{title}</span>
         </div>
         {isOpen
-          ? <ChevronUpIcon className="w-5 h-5 text-gray-400 flex-shrink-0" />
-          : <ChevronDownIcon className="w-5 h-5 text-gray-400 flex-shrink-0" />
+          ? <ChevronUpIcon className="w-5 h-5 text-text-muted flex-shrink-0" />
+          : <ChevronDownIcon className="w-5 h-5 text-text-muted flex-shrink-0" />
         }
       </button>
       <div
@@ -145,7 +145,7 @@ const StepList = ({ steps }) => (
         <span className="flex-shrink-0 w-7 h-7 bg-tufts-blue/10 text-tufts-blue text-sm font-semibold rounded-full flex items-center justify-center mt-0.5">
           {i + 1}
         </span>
-        <span className="text-sm text-gray-500 leading-relaxed pt-1">{step}</span>
+        <span className="text-sm text-text-muted leading-relaxed pt-1">{step}</span>
       </li>
     ))}
   </ol>
@@ -158,7 +158,7 @@ const CheckItem = ({ icon: Icon, text }) => (
     <div className="flex-shrink-0 w-11 h-11 rounded-lg bg-tufts-blue/10 flex items-center justify-center mt-0.5">
       <Icon className="w-5 h-5 text-tufts-blue" />
     </div>
-    <span className="text-sm text-gray-500 leading-relaxed pt-3">{text}</span>
+    <span className="text-sm text-text-muted leading-relaxed pt-3">{text}</span>
   </div>
 );
 
@@ -167,7 +167,7 @@ const CheckItem = ({ icon: Icon, text }) => (
 const TroubleshootItem = ({ question, answer }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <div className="border-b border-gray-100 last:border-b-0">
+    <div className="border-b border-[var(--card-border)] last:border-b-0">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
@@ -175,14 +175,14 @@ const TroubleshootItem = ({ question, answer }) => {
       >
         <span className="text-sm font-medium text-eerie-black">{question}</span>
         {isOpen
-          ? <ChevronUpIcon className="w-4 h-4 text-gray-400 flex-shrink-0 ms-3" />
-          : <ChevronDownIcon className="w-4 h-4 text-gray-400 flex-shrink-0 ms-3" />
+          ? <ChevronUpIcon className="w-4 h-4 text-text-muted flex-shrink-0 ms-3" />
+          : <ChevronDownIcon className="w-4 h-4 text-text-muted flex-shrink-0 ms-3" />
         }
       </button>
       <div
         className={`transition-opacity duration-150 ease-out ${isOpen ? 'opacity-100 pb-3.5' : 'opacity-0 h-0 overflow-hidden p-0'}`}
       >
-        <p className="text-sm text-gray-500 leading-relaxed text-start">{answer}</p>
+        <p className="text-sm text-text-muted leading-relaxed text-start">{answer}</p>
       </div>
     </div>
   );
@@ -233,7 +233,7 @@ const InstallEsimGuide = ({ lpaData, matchingId }) => {
   // Show skeleton until mounted and i18n ready
   if (!mounted || i18nLoading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-[var(--bg-primary)]">
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
             <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl space-y-4">
@@ -249,7 +249,7 @@ const InstallEsimGuide = ({ lpaData, matchingId }) => {
 
   return (
     <div
-      className={`min-h-screen bg-white transition-opacity duration-150 ease-out ${mounted ? 'opacity-100' : 'opacity-0'}`}
+      className={`min-h-screen bg-[var(--bg-primary)] transition-opacity duration-150 ease-out ${mounted ? 'opacity-100' : 'opacity-0'}`}
     >
 
       {/* Page Header */}
@@ -259,13 +259,13 @@ const InstallEsimGuide = ({ lpaData, matchingId }) => {
 
             <Link
               href="/contact"
-              className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-tufts-blue transition-colors duration-150 ease-out mb-6 rtl-native-flex"
+              className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-tufts-blue transition-colors duration-150 ease-out mb-6 rtl-native-flex"
             >
               <ArrowLeftIcon className="w-4 h-4 rtl:-scale-x-100" />
               {t('installGuide.backToHelp')}
             </Link>
 
-            <p className="text-xs font-medium tracking-widest uppercase text-gray-500 mb-4 text-start">
+            <p className="text-xs font-medium tracking-widest uppercase text-text-muted mb-4 text-start">
               {t('installGuide.sectionTag', 'ESIM GUIDE')}
             </p>
 
@@ -273,12 +273,12 @@ const InstallEsimGuide = ({ lpaData, matchingId }) => {
               {t('installGuide.pageTitle')}
             </h1>
 
-            <p className="mt-2 text-gray-500 text-sm leading-relaxed text-start">
+            <p className="mt-2 text-text-muted text-sm leading-relaxed text-start">
               {t('installGuide.pageSubtitle')}
             </p>
           </div>
         </div>
-        <div className="w-full h-px bg-gray-100" />
+        <div className="w-full h-px bg-[var(--card-border)]" />
       </div>
 
       {/* Content */}
@@ -300,9 +300,9 @@ const InstallEsimGuide = ({ lpaData, matchingId }) => {
                   {t('installGuide.intro.title')}
                 </h2>
                 <div className="space-y-3 text-start">
-                  <p className="text-gray-500 text-sm leading-relaxed">{t('installGuide.intro.p1')}</p>
-                  <p className="text-gray-500 text-sm leading-relaxed">{t('installGuide.intro.p2')}</p>
-                  <p className="text-gray-500 text-sm leading-relaxed">{t('installGuide.intro.p3')}</p>
+                  <p className="text-text-muted text-sm leading-relaxed">{t('installGuide.intro.p1')}</p>
+                  <p className="text-text-muted text-sm leading-relaxed">{t('installGuide.intro.p2')}</p>
+                  <p className="text-text-muted text-sm leading-relaxed">{t('installGuide.intro.p3')}</p>
                 </div>
               </div>
             </Card>
@@ -366,28 +366,28 @@ const InstallEsimGuide = ({ lpaData, matchingId }) => {
                 {t('installGuide.manual.tag', 'MANUAL ENTRY')}
               </p>
               <div className="space-y-4 text-start">
-                <p className="text-sm text-gray-500 leading-relaxed">
+                <p className="text-sm text-text-muted leading-relaxed">
                   {t('installGuide.manual.description')}
                 </p>
                 {parsedLpa && (
                   <div className="space-y-3">
-                    <div className="bg-gray-100 p-3">
-                      <span className="text-xs text-gray-400 block mb-1">{t('installGuide.manual.smdpLabel')}</span>
+                    <div className="bg-[var(--subtle-bg)] p-3">
+                      <span className="text-xs text-text-muted block mb-1">{t('installGuide.manual.smdpLabel')}</span>
                       <p className="text-sm font-mono text-eerie-black break-all" dir="ltr">{parsedLpa.smdp}</p>
                     </div>
-                    <div className="bg-gray-100 p-3">
-                      <span className="text-xs text-gray-400 block mb-1">{t('installGuide.manual.activationCodeLabel')}</span>
+                    <div className="bg-[var(--subtle-bg)] p-3">
+                      <span className="text-xs text-text-muted block mb-1">{t('installGuide.manual.activationCodeLabel')}</span>
                       <p className="text-sm font-mono text-eerie-black break-all" dir="ltr">{parsedLpa.activationCode}</p>
                     </div>
                     {matchingId && (
-                      <div className="bg-gray-100 p-3">
-                        <span className="text-xs text-gray-400 block mb-1">{t('installGuide.manual.matchingIdLabel')}</span>
+                      <div className="bg-[var(--subtle-bg)] p-3">
+                        <span className="text-xs text-text-muted block mb-1">{t('installGuide.manual.matchingIdLabel')}</span>
                         <p className="text-sm font-mono text-eerie-black break-all" dir="ltr">{matchingId}</p>
                       </div>
                     )}
                   </div>
                 )}
-                <p className="text-sm text-gray-500 leading-relaxed">
+                <p className="text-sm text-text-muted leading-relaxed">
                   {t('installGuide.manual.howTo')}
                 </p>
               </div>
@@ -407,8 +407,8 @@ const InstallEsimGuide = ({ lpaData, matchingId }) => {
                   {t('installGuide.activation.title')}
                 </h2>
                 <div className="space-y-3 text-start">
-                  <p className="text-sm text-gray-500 leading-relaxed">{t('installGuide.activation.p1')}</p>
-                  <p className="text-sm text-gray-500 leading-relaxed">{t('installGuide.activation.p2')}</p>
+                  <p className="text-sm text-text-muted leading-relaxed">{t('installGuide.activation.p1')}</p>
+                  <p className="text-sm text-text-muted leading-relaxed">{t('installGuide.activation.p2')}</p>
                   <div className="mt-4 bg-amber-50 border border-amber-100 p-4">
                     <p className="text-sm font-medium text-amber-800 mb-2">
                       {t('installGuide.activation.notActivating')}
@@ -466,7 +466,7 @@ const InstallEsimGuide = ({ lpaData, matchingId }) => {
                 <h2 className="text-lg lg:text-xl font-semibold text-eerie-black mb-2 text-start">
                   {t('installGuide.support.title')}
                 </h2>
-                <p className="text-sm text-gray-500 mb-5 leading-relaxed text-start">
+                <p className="text-sm text-text-muted mb-5 leading-relaxed text-start">
                   {t('installGuide.support.description')}
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -483,19 +483,19 @@ const InstallEsimGuide = ({ lpaData, matchingId }) => {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-eerie-black">{t('installGuide.support.telegram')}</p>
-                      <p className="text-xs text-gray-400">@SimnetiqSupportBot</p>
+                      <p className="text-xs text-text-muted">@SimnetiqSupportBot</p>
                     </div>
                   </a>
                   <Link
                     href="/contact"
-                    className="flex items-center gap-3 p-3.5 bg-gray-100 hover:bg-gray-200 transition-colors duration-150 ease-out rtl-native-flex"
+                    className="flex items-center gap-3 p-3.5 bg-[var(--subtle-bg)] hover:bg-[var(--hover-bg)] transition-colors duration-150 ease-out rtl-native-flex"
                   >
-                    <div className="w-10 h-10 bg-gray-200 flex items-center justify-center flex-shrink-0">
-                      <MessageCircleIcon className="w-5 h-5 text-gray-600" />
+                    <div className="w-10 h-10 bg-[var(--card-border)] flex items-center justify-center flex-shrink-0">
+                      <MessageCircleIcon className="w-5 h-5 text-text-muted" />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-eerie-black">{t('installGuide.support.contactSupport')}</p>
-                      <p className="text-xs text-gray-400">{t('installGuide.support.helpCenter')}</p>
+                      <p className="text-xs text-text-muted">{t('installGuide.support.helpCenter')}</p>
                     </div>
                   </Link>
                 </div>

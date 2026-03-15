@@ -186,25 +186,26 @@
   }
 
   .btn-secondary {
-    color: var(--cool-black);
+    color: var(--text-primary);
     font-weight: 600;
-    background: white;
+    background: var(--bg-primary);
+    border: 1px solid var(--card-border);
     border-radius: 4px;
     box-shadow: 0 4px 8px var(--shadow-secondary);
     padding: 4px 8px;
     transition: all 0.2s ease;
   }
   .btn-secondary:hover {
-    background: var(--alice-blue);
+    background: var(--hover-bg);
   }
 
   /* Card */
   .card {
-    background: white;
+    background: var(--bg-primary);
     border-radius: 4px;
     padding: 24px;
-    box-shadow: 0 2px 4px var(--shadow-primary), 0 4px 8px var(--shadow-primary);
-    border: 1px solid rgba(147, 191, 238, 0.2);
+    box-shadow: 0 2px 4px var(--shadow-color), 0 4px 8px var(--shadow-color);
+    border: 1px solid var(--card-border);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
   .card:hover {
@@ -216,18 +217,19 @@
   /* Form inputs - simplified */
   .input-field, .form-input {
     width: 100%;
-    background-color: var(--white);
-    border: 1px solid #e5e7eb;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--card-border);
     border-radius: 4px;
     padding: 0.5rem 1rem;
     outline: none;
+    color: var(--text-primary);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
   .input-field:focus, .form-input:focus {
     border-color: var(--tufts-blue);
     box-shadow: 0 2px 8px #c1cfeba0;
   }
-  .input-field::placeholder { color: #6b7280; opacity: 0.7; }
+  .input-field::placeholder { color: var(--text-muted); opacity: 0.7; }
 
   .form-label {
     display: block;
@@ -259,13 +261,42 @@
   .glass-card {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
-    border-radius: 16px;
+    border-radius: 0;
     padding: 24px;
     transition: border-color 0.3s ease, transform 0.3s ease;
   }
   .glass-card:hover {
     border-color: rgba(73, 117, 212, 0.3);
     transform: translateY(-2px);
+  }
+
+  /* Section background with decorative orbs — pure CSS, zero TBT */
+  .section-bg {
+    position: relative;
+    overflow: hidden;
+  }
+  .section-bg::before,
+  .section-bg::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .section-bg::before {
+    top: -8rem;
+    inset-inline-start: -6rem;
+    width: 24rem;
+    height: 24rem;
+    background-color: rgba(73, 117, 212, 0.08);
+  }
+  .section-bg::after {
+    bottom: -10rem;
+    inset-inline-end: -6rem;
+    width: 28rem;
+    height: 28rem;
+    background-color: rgba(73, 117, 212, 0.05);
   }
 }
 
@@ -276,7 +307,9 @@
   .text-alice-blue { color: var(--alice-blue); }
   .text-cobalt-blue { color: var(--cobalt-blue); }
   .text-cool-black { color: var(--cool-black); }
+  :is(.dark) .text-cool-black { color: #d4d4d4; }
   .text-eerie-black { color: var(--eerie-black); }
+  :is(.dark) .text-eerie-black { color: #f5f5f5; }
   
   .bg-jordy-blue { background-color: var(--jordy-blue); }
   .bg-tufts-blue { background-color: var(--tufts-blue); }

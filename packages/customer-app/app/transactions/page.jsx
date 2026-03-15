@@ -98,7 +98,7 @@ const TransactionsPage = () => {
       case 'failed':
         return 'text-red-600 bg-red-100';
       default:
-        return 'text-gray-600 bg-gray-100';
+        return 'text-text-muted bg-[var(--subtle-bg)]';
     }
   };
 
@@ -128,28 +128,28 @@ const TransactionsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[var(--bg-secondary)]">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-[var(--bg-primary)] shadow-sm border-b border-[var(--card-border)]">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => router.back()}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 hover:bg-[var(--hover-bg)] rounded-full transition-colors"
               >
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
+                <ArrowLeft className="w-5 h-5 text-text-muted" />
               </button>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Transactions</h1>
-                <p className="text-sm text-gray-600">View your affiliate earnings and withdrawals</p>
+                <h1 className="text-xl font-bold text-text-primary">Transactions</h1>
+                <p className="text-sm text-text-muted">View your affiliate earnings and withdrawals</p>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <button
                 onClick={exportTransactions}
-                className="flex items-center space-x-2 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                className="flex items-center space-x-2 px-4 py-2 text-text-primary bg-[var(--subtle-bg)] hover:bg-[var(--hover-bg)] rounded-lg transition-colors"
               >
                 <Download className="w-4 h-4" />
                 <span>Export</span>
@@ -169,8 +169,8 @@ const TransactionsPage = () => {
       {/* Content */}
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Filter Tabs */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
+        <div className="bg-[var(--bg-primary)] rounded-xl shadow-lg p-6 mb-6">
+          <div className="flex items-center space-x-1 bg-[var(--subtle-bg)] rounded-lg p-1">
             {[
               { key: 'earnings', label: 'Earnings' },
               { key: 'withdrawals', label: 'Withdrawals' }
@@ -180,8 +180,8 @@ const TransactionsPage = () => {
                 onClick={() => setFilter(tab.key)}
                 className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   filter === tab.key
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-[var(--bg-primary)] text-blue-600 shadow-sm'
+                    : 'text-text-muted hover:text-text-primary'
                 }`}
               >
                 {tab.label}
@@ -194,7 +194,7 @@ const TransactionsPage = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-xl shadow-lg overflow-hidden"
+          className="bg-[var(--bg-primary)] rounded-xl shadow-lg overflow-hidden"
         >
           {loading ? (
             <div className="flex justify-center items-center py-12">
@@ -202,9 +202,9 @@ const TransactionsPage = () => {
             </div>
           ) : transactions.length === 0 ? (
             <div className="text-center py-12">
-              <DollarSign className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Transactions Yet</h3>
-              <p className="text-gray-600">
+              <DollarSign className="w-12 h-12 text-text-muted mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-text-primary mb-2">No Transactions Yet</h3>
+              <p className="text-text-muted">
                 {filter === 'earnings' 
                   ? "You don't have any earnings yet. Start referring friends to earn!"
                   : "No withdrawals found."
@@ -212,14 +212,14 @@ const TransactionsPage = () => {
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-200">
+            <div className="divide-y divide-[var(--card-border)]">
               {transactions.map((transaction, index) => (
                 <motion.div
                   key={transaction.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="p-6 hover:bg-gray-50 transition-colors"
+                  className="p-6 hover:bg-[var(--hover-bg)] transition-colors"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
@@ -230,14 +230,14 @@ const TransactionsPage = () => {
                       </div>
                       
                       <div>
-                        <h3 className="font-semibold text-gray-900">
+                        <h3 className="font-semibold text-text-primary">
                           {transaction.type === 'deposit' ? 'Referral Earnings' : 'Withdrawal Request'}
                         </h3>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-text-muted">
                           {transaction.description || 'No description available'}
                         </p>
                         <div className="flex items-center space-x-4 mt-1">
-                          <div className="flex items-center space-x-1 text-sm text-gray-500">
+                          <div className="flex items-center space-x-1 text-sm text-text-muted">
                             <Calendar className="w-4 h-4" />
                             <span>{formatDate(transaction.createdAt)}</span>
                           </div>
@@ -255,7 +255,7 @@ const TransactionsPage = () => {
                         {formatAmount(transaction.amount, transaction.type)}
                       </p>
                       {transaction.type === 'purchase' && transaction.method === 'withdrawal' && transaction.bankAccount && (
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-text-muted">
                           ****{transaction.bankAccount.accountNumber.slice(-4)}
                         </p>
                       )}
@@ -268,7 +268,7 @@ const TransactionsPage = () => {
 
           {/* Load More Button */}
           {hasMore && transactions.length > 0 && (
-            <div className="p-6 border-t border-gray-200">
+            <div className="p-6 border-t border-[var(--card-border)]">
               <button
                 onClick={() => loadTransactions(true)}
                 disabled={loading}

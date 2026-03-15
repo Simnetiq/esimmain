@@ -111,14 +111,14 @@ const AddBankAccountPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[var(--bg-primary)]">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-[var(--bg-primary)] shadow-sm border-b border-[var(--card-border)]">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center space-x-4">
             <button
               onClick={() => router.back()}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2 hover:bg-[var(--hover-bg)] rounded-full transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-cool-black" />
             </button>
@@ -135,7 +135,7 @@ const AddBankAccountPage = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-xl shadow-lg p-6"
+          className="bg-[var(--bg-primary)] rounded-xl shadow-lg p-6"
         >
           {loading ? (
             <div className="flex justify-center items-center py-12">
@@ -155,7 +155,7 @@ const AddBankAccountPage = () => {
                   name="accountHolderName"
                   value={formData.accountHolderName}
                   onChange={handleInputChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 border border-[var(--card-border)] rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                   placeholder="Enter full name as it appears on bank account"
                   required
                 />
@@ -174,7 +174,7 @@ const AddBankAccountPage = () => {
                   name="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleInputChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 border border-[var(--card-border)] rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                   placeholder="Enter phone number"
                   required
                 />
@@ -193,7 +193,7 @@ const AddBankAccountPage = () => {
                   name="bankName"
                   value={formData.bankName}
                   onChange={handleInputChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 border border-[var(--card-border)] rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                   placeholder="Enter bank name"
                   required
                 />
@@ -213,7 +213,7 @@ const AddBankAccountPage = () => {
                     name="accountNumber"
                     value={formData.accountNumber}
                     onChange={handleInputChange}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 border border-[var(--card-border)] rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                     placeholder="Enter account number"
                     required
                   />
@@ -229,7 +229,7 @@ const AddBankAccountPage = () => {
                   name="routingNumber"
                   value={formData.routingNumber}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-[var(--card-border)] rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                   placeholder="Enter routing number"
                   required
                 />
@@ -244,7 +244,7 @@ const AddBankAccountPage = () => {
                   name="branchNumber"
                   value={formData.branchNumber}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-[var(--card-border)] rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                   placeholder="Enter branch number"
                   required
                 />
@@ -261,7 +261,7 @@ const AddBankAccountPage = () => {
                 name="country"
                 value={formData.country}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-[var(--card-border)] rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                 required
               >
                 <option value="US">United States</option>
@@ -412,11 +412,11 @@ const AddBankAccountPage = () => {
             </div>
 
             {/* Submit Button */}
-            <div className="flex justify-end space-x-4 pt-6 border-t">
+            <div className="flex justify-end space-x-4 pt-6 border-t border-[var(--card-border)]">
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="px-6 py-3 text-cool-black bg-gray-100 hover:bg-gray-200 rounded-full font-medium transition-colors"
+                className="px-6 py-3 text-cool-black bg-[var(--subtle-bg)] hover:bg-[var(--hover-bg)] rounded-full font-medium transition-colors"
               >
                 Cancel
               </button>

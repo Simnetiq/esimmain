@@ -82,7 +82,7 @@ const EsimQrCode = ({ qrCodeData, orderDetails, onClose }) => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md max-h-[90vh] overflow-hidden bg-white rounded-md shadow-xl"
+        className="w-full max-w-md max-h-[90vh] overflow-hidden bg-[var(--bg-primary)] rounded-md shadow-xl"
       >
         {/* Header */}
         <div className="bg-gradient-to-r from-emerald-500 to-teal-500 px-5 py-4">
@@ -115,26 +115,26 @@ const EsimQrCode = ({ qrCodeData, orderDetails, onClose }) => {
         <div className="overflow-y-auto max-h-[calc(90vh-80px)] p-5 space-y-4">
           {/* Order Details */}
           {orderDetails && (
-            <div className="bg-gray-50 border border-gray-100 rounded p-4">
+            <div className="bg-[var(--bg-secondary)] border border-[var(--card-border)] rounded p-4">
               <div className="flex items-center gap-2 mb-3">
-                <Globe className="w-4 h-4 text-gray-500" />
-                <h3 className="font-medium text-gray-900 text-sm">{t('esimQr.orderDetails', 'Order Details')}</h3>
+                <Globe className="w-4 h-4 text-text-muted" />
+                <h3 className="font-medium text-text-primary text-sm">{t('esimQr.orderDetails', 'Order Details')}</h3>
               </div>
               <div className="space-y-0">
-                <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <span className="text-sm text-gray-500">{t('esimQr.orderId', 'Order ID')}</span>
-                  <span className="text-sm font-mono text-gray-900">{orderDetails.orderId}</span>
+                <div className="flex items-center justify-between py-2 border-b border-[var(--card-border)]">
+                  <span className="text-sm text-text-muted">{t('esimQr.orderId', 'Order ID')}</span>
+                  <span className="text-sm font-mono text-text-primary">{orderDetails.orderId}</span>
                 </div>
-                <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <span className="text-sm text-gray-500">{t('esimQr.plan', 'Plan')}</span>
-                  <span className="text-sm font-medium text-gray-900">{orderDetails.planName}</span>
+                <div className="flex items-center justify-between py-2 border-b border-[var(--card-border)]">
+                  <span className="text-sm text-text-muted">{t('esimQr.plan', 'Plan')}</span>
+                  <span className="text-sm font-medium text-text-primary">{orderDetails.planName}</span>
                 </div>
-                <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <span className="text-sm text-gray-500">{t('esimQr.amount', 'Amount')}</span>
+                <div className="flex items-center justify-between py-2 border-b border-[var(--card-border)]">
+                  <span className="text-sm text-text-muted">{t('esimQr.amount', 'Amount')}</span>
                   <span className="text-sm font-semibold text-tufts-blue">{formatPrice(orderDetails.amount || 0)}</span>
                 </div>
                 <div className="flex items-center justify-between py-2">
-                  <span className="text-sm text-gray-500">{t('esimQr.status', 'Status')}</span>
+                  <span className="text-sm text-text-muted">{t('esimQr.status', 'Status')}</span>
                   <span className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-600">
                     <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
                     {t('esimQr.active', 'Active')}
@@ -146,7 +146,7 @@ const EsimQrCode = ({ qrCodeData, orderDetails, onClose }) => {
 
           {/* QR Code */}
           <div className="flex justify-center">
-            <div className="bg-white p-4 rounded border-2 border-gray-200 shadow-sm">
+            <div className="bg-white p-4 rounded border-2 border-[var(--card-border)] shadow-sm">
               <QRCode
                 value={qrCodeData.qr_code_url || qrCodeData.qr_code}
                 size={180}
@@ -201,7 +201,7 @@ const EsimQrCode = ({ qrCodeData, orderDetails, onClose }) => {
             </button>
             <button
               onClick={handleCopy}
-              className="flex flex-col items-center justify-center gap-1.5 px-3 py-3 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+              className="flex flex-col items-center justify-center gap-1.5 px-3 py-3 bg-[var(--subtle-bg)] text-text-primary rounded hover:bg-[var(--hover-bg)] transition-colors"
             >
               <Copy className="w-4 h-4" />
               <span className="text-xs font-medium">{t('esimQr.copy', 'Copy')}</span>
@@ -209,9 +209,9 @@ const EsimQrCode = ({ qrCodeData, orderDetails, onClose }) => {
           </div>
 
           {/* Validity Info */}
-          <div className="flex items-center justify-center gap-2 py-3 bg-gray-50 border border-gray-100 rounded">
-            <Clock className="w-4 h-4 text-gray-400" />
-            <p className="text-xs text-gray-500">
+          <div className="flex items-center justify-center gap-2 py-3 bg-[var(--bg-secondary)] border border-[var(--card-border)] rounded">
+            <Clock className="w-4 h-4 text-text-muted" />
+            <p className="text-xs text-text-muted">
               {t('esimQr.validity', 'Your eSIM will be valid for {{days}} days from activation', { days: orderDetails?.validity || '30' })}
             </p>
           </div>

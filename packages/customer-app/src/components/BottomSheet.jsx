@@ -93,17 +93,19 @@ const BottomSheet = ({
                   damping: 25, 
                   stiffness: 300
                 }}
-                className="w-full max-w-4xl bg-white shadow-2xl max-h-[85vh] flex flex-col pointer-events-auto overflow-hidden"
+                className="w-full max-w-4xl shadow-2xl max-h-[85vh] flex flex-col pointer-events-auto overflow-hidden"
+                style={{ backgroundColor: 'var(--bg-primary)' }}
               >
                 {/* Header */}
-                <div className="px-5 py-4 border-b border-gray-100 flex-shrink-0 bg-gray-50" dir={isRTL ? 'rtl' : 'ltr'}>
+                <div className="px-5 py-4 flex-shrink-0" style={{ borderBottom: '1px solid var(--subtle-border)', backgroundColor: 'var(--bg-secondary)' }} dir={isRTL ? 'rtl' : 'ltr'}>
                   <div className={`flex items-center justify-between `}>
-                    <h2 className={`text-lg font-semibold text-eerie-black tracking-tight ${isRTL ? 'text-right' : 'text-left'}`}>
+                    <h2 className={`text-lg font-semibold text-text-primary tracking-tight ${isRTL ? 'text-right' : 'text-left'}`}>
                       {title}
                     </h2>
                     <button
                       onClick={onClose}
-                      className="w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:text-eerie-black bg-white hover:bg-gray-100 transition-all duration-200 border border-gray-200"
+                      className="w-9 h-9 rounded-full flex items-center justify-center text-text-muted transition-all duration-200"
+                    style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--card-border)' }}
                     >
                       <X size={18} />
                     </button>
@@ -112,7 +114,8 @@ const BottomSheet = ({
 
                 {/* Content */}
                 <div
-                  className="overflow-y-auto flex-1 bg-white"
+                  className="overflow-y-auto flex-1"
+                style={{ backgroundColor: 'var(--bg-primary)' }}
                   dir={isRTL ? 'rtl' : 'ltr'}
                 >
                   {children}
@@ -135,23 +138,24 @@ const BottomSheet = ({
               dragConstraints={{ top: 0, bottom: 0 }}
               dragElastic={0.1}
               onDragEnd={handleDragEnd}
-              className="fixed bottom-0 left-0 right-0 z-[9999] bg-white shadow-2xl overflow-hidden"
-              style={{ maxHeight }}
+              className="fixed bottom-0 left-0 right-0 z-[9999] shadow-2xl overflow-hidden"
+              style={{ maxHeight, backgroundColor: 'var(--bg-primary)' }}
             >
               {/* Drag Handle */}
-              <div className="flex justify-center pt-3 pb-2 bg-gray-50">
-                <div className="w-10 h-1 bg-gray-300" />
+              <div className="flex justify-center pt-3 pb-2" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+                <div className="w-10 h-1" style={{ backgroundColor: 'var(--card-border)' }} />
               </div>
 
               {/* Header */}
-              <div className="px-5 pb-4 pt-2 border-b border-gray-100 bg-gray-50" dir={isRTL ? 'rtl' : 'ltr'}>
+              <div className="px-5 pb-4 pt-2" style={{ borderBottom: '1px solid var(--subtle-border)', backgroundColor: 'var(--bg-secondary)' }} dir={isRTL ? 'rtl' : 'ltr'}>
                 <div className={`flex items-center justify-between `}>
-                  <h2 className={`text-lg font-semibold text-eerie-black tracking-tight ${isRTL ? 'text-right' : 'text-left'}`}>
+                  <h2 className={`text-lg font-semibold text-text-primary tracking-tight ${isRTL ? 'text-right' : 'text-left'}`}>
                     {title}
                   </h2>
                   <button
                     onClick={onClose}
-                    className="w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:text-eerie-black bg-white hover:bg-gray-100 transition-all duration-200 border border-gray-200"
+                    className="w-9 h-9 rounded-full flex items-center justify-center text-text-muted transition-all duration-200"
+                    style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--card-border)' }}
                   >
                     <X size={18} />
                   </button>
@@ -160,8 +164,8 @@ const BottomSheet = ({
 
               {/* Content */}
               <div
-                className="overflow-y-auto bg-white" 
-                style={{ maxHeight: `calc(${maxHeight} - 100px)` }}
+                className="overflow-y-auto"
+                style={{ maxHeight: `calc(${maxHeight} - 100px)`, backgroundColor: 'var(--bg-primary)' }}
                 dir={isRTL ? 'rtl' : 'ltr'}
               >
                 {children}

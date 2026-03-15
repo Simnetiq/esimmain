@@ -1,9 +1,15 @@
 import { NextResponse } from 'next/server';
 
-const RECAPTCHA_SECRET_KEY = '6LewH_ArAAAAAKRY_pobWDhBXp7t5b8ZkCbWN0y5';
-
 export async function POST(request) {
   try {
+    const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
+    if (!RECAPTCHA_SECRET_KEY) {
+      return NextResponse.json(
+        { success: false, error: 'Server misconfiguration: RECAPTCHA_SECRET_KEY not set' },
+        { status: 503 }
+      );
+    }
+
     const { token } = await request.json();
 
     if (!token) {

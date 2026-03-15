@@ -4,7 +4,9 @@ import { Wifi, Phone, MessageSquare, Clock, Signal, X, AlertCircle, CheckCircle 
 
 const EsimUsageModal = ({ esimUsage, onClose }) => {
   const { t } = useI18n();
-  
+
+  if (!esimUsage) return null;
+
   // Calculate usage percentages with safety checks - clamp between 0 and 100
   const getUsagePercentage = (used, total) => {
     if (!total || total === 0 || isNaN(used) || isNaN(total)) return 0;
@@ -95,14 +97,12 @@ const EsimUsageModal = ({ esimUsage, onClose }) => {
     }
   };
 
-  if (!esimUsage) return null;
-
   const statusInfo = getStatusInfo(esimUsage.status);
   const StatusIcon = statusInfo.icon;
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in" onClick={onClose}>
-      <div className="w-full max-w-md max-h-[90vh] overflow-hidden bg-white rounded-lg shadow-xl animate-scale-in" onClick={(e) => e.stopPropagation()}>
+      <div className="w-full max-w-md max-h-[90vh] overflow-hidden bg-[var(--bg-primary)] rounded-lg shadow-xl animate-scale-in" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="bg-gradient-to-r from-tufts-blue to-blue-600 px-6 py-4">
           <div className="flex items-center justify-between">
@@ -131,31 +131,31 @@ const EsimUsageModal = ({ esimUsage, onClose }) => {
             <div className="flex items-center gap-3">
               <StatusIcon className={`w-5 h-5 ${statusInfo.textColor}`} />
               <div>
-                <p className="text-sm text-gray-500">{t('dashboard.status', 'Status')}</p>
+                <p className="text-sm text-text-muted">{t('dashboard.status', 'Status')}</p>
                 <p className={`font-semibold ${statusInfo.textColor}`}>{statusInfo.label}</p>
               </div>
             </div>
             {esimUsage.expired_at && (
               <div className="text-right">
-                <p className="text-sm text-gray-500">{t('dashboard.expiresAt', 'Expires')}</p>
-                <p className="text-sm font-medium text-gray-700">{new Date(esimUsage.expired_at).toLocaleDateString()}</p>
+                <p className="text-sm text-text-muted">{t('dashboard.expiresAt', 'Expires')}</p>
+                <p className="text-sm font-medium text-text-primary">{new Date(esimUsage.expired_at).toLocaleDateString()}</p>
               </div>
             )}
           </div>
 
           {/* Data Usage */}
-          <div className="bg-gray-50 border border-gray-100 rounded-lg p-4">
+          <div className="bg-[var(--bg-secondary)] border border-[var(--card-border)] rounded-lg p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-tufts-blue/10 rounded-lg flex items-center justify-center">
                   <Wifi className="w-4 h-4 text-tufts-blue" />
                 </div>
-                <span className="font-medium text-gray-900">{t('dashboard.dataUsage', 'Data Usage')}</span>
+                <span className="font-medium text-text-primary">{t('dashboard.dataUsage', 'Data Usage')}</span>
               </div>
               {esimUsage.is_unlimited ? (
                 <span className="text-sm font-semibold text-tufts-blue">{t('dashboard.unlimited', 'Unlimited')}</span>
               ) : (
-                <span className="text-sm font-semibold text-gray-900">
+                <span className="text-sm font-semibold text-text-primary">
                   {formatData(remaining)} / {formatData(total)}
                 </span>
               )}
@@ -163,13 +163,13 @@ const EsimUsageModal = ({ esimUsage, onClose }) => {
             
             {!esimUsage.is_unlimited && total > 0 && (
               <>
-                <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
-                  <div 
+                <div className="h-2.5 bg-[var(--card-border)] rounded-full overflow-hidden">
+                  <div
                     className="h-full bg-gradient-to-r from-tufts-blue to-blue-500 rounded-full transition-all duration-500"
                     style={{ width: `${100 - dataPercentage}%` }}
                   />
                 </div>
-                <div className="flex justify-between mt-2 text-xs text-gray-500">
+                <div className="flex justify-between mt-2 text-xs text-text-muted">
                   <span>{formatData(dataUsed)} {t('dashboard.used', 'used')}</span>
                   <span>{dataPercentage}%</span>
                 </div>
@@ -179,26 +179,26 @@ const EsimUsageModal = ({ esimUsage, onClose }) => {
 
           {/* Voice Usage */}
           {totalVoice > 0 && (
-            <div className="bg-gray-50 border border-gray-100 rounded-lg p-4">
+            <div className="bg-[var(--bg-secondary)] border border-[var(--card-border)] rounded-lg p-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
                     <Phone className="w-4 h-4 text-purple-600" />
                   </div>
-                  <span className="font-medium text-gray-900">{t('dashboard.voiceUsage', 'Voice Usage')}</span>
+                  <span className="font-medium text-text-primary">{t('dashboard.voiceUsage', 'Voice Usage')}</span>
                 </div>
-                <span className="text-sm font-semibold text-gray-900">
+                <span className="text-sm font-semibold text-text-primary">
                   {remainingVoice} / {totalVoice} {t('dashboard.min', 'min')}
                 </span>
               </div>
               
-              <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
-                <div 
+              <div className="h-2.5 bg-[var(--card-border)] rounded-full overflow-hidden">
+                <div
                   className="h-full bg-gradient-to-r from-purple-500 to-purple-600 rounded-full transition-all duration-500"
                   style={{ width: `${100 - voicePercentage}%` }}
                 />
               </div>
-              <div className="flex justify-between mt-2 text-xs text-gray-500">
+              <div className="flex justify-between mt-2 text-xs text-text-muted">
                 <span>{voiceUsed} {t('dashboard.min', 'min')} {t('dashboard.used', 'used')}</span>
                 <span>{voicePercentage}%</span>
               </div>
@@ -207,26 +207,26 @@ const EsimUsageModal = ({ esimUsage, onClose }) => {
 
           {/* SMS Usage */}
           {totalText > 0 && (
-            <div className="bg-gray-50 border border-gray-100 rounded-lg p-4">
+            <div className="bg-[var(--bg-secondary)] border border-[var(--card-border)] rounded-lg p-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
                     <MessageSquare className="w-4 h-4 text-amber-600" />
                   </div>
-                  <span className="font-medium text-gray-900">{t('dashboard.textUsage', 'SMS Usage')}</span>
+                  <span className="font-medium text-text-primary">{t('dashboard.textUsage', 'SMS Usage')}</span>
                 </div>
-                <span className="text-sm font-semibold text-gray-900">
+                <span className="text-sm font-semibold text-text-primary">
                   {remainingText} / {totalText} SMS
                 </span>
               </div>
               
-              <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
-                <div 
+              <div className="h-2.5 bg-[var(--card-border)] rounded-full overflow-hidden">
+                <div
                   className="h-full bg-gradient-to-r from-amber-500 to-amber-600 rounded-full transition-all duration-500"
                   style={{ width: `${100 - textPercentage}%` }}
                 />
               </div>
-              <div className="flex justify-between mt-2 text-xs text-gray-500">
+              <div className="flex justify-between mt-2 text-xs text-text-muted">
                 <span>{textUsed} SMS {t('dashboard.used', 'used')}</span>
                 <span>{textPercentage}%</span>
               </div>
@@ -236,7 +236,7 @@ const EsimUsageModal = ({ esimUsage, onClose }) => {
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors"
+            className="w-full py-3 bg-[var(--subtle-bg)] hover:bg-[var(--hover-bg)] text-text-muted font-medium rounded-lg transition-colors"
           >
             {t('common.close', 'Close')}
           </button>

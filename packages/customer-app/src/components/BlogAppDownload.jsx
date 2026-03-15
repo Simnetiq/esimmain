@@ -112,10 +112,10 @@ const BlogAppDownload = ({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => handleDownloadClick('Android')}
-                className="group inline-flex items-center rounded-full bg-white ps-6 pe-1.5 py-1.5 text-base font-semibold text-gray-900 ring-1 ring-gray-200 shadow-sm transition-all duration-200 hover:bg-gray-50 hover:scale-[1.02] w-full sm:w-auto rtl-native-flex"
+                className="group inline-flex items-center rounded-full bg-white ps-6 pe-1.5 py-1.5 text-base font-semibold text-gray-900 ring-1 ring-[var(--card-border)] shadow-sm transition-all duration-200 hover:bg-[var(--hover-bg)] hover:scale-[1.02] w-full sm:w-auto rtl-native-flex"
               >
                 <span className="flex-1 text-center">{t('blogApp.getAndroidApp', 'Google Play')}</span>
-                <span className="ms-3 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-gray-100 w-9 h-9">
+                <span className="ms-3 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-[var(--subtle-bg)] w-9 h-9">
                   <svg className="w-5 h-5 text-gray-900" viewBox="0 0 24 24" fill="currentColor">
                     <path fillRule="evenodd" clipRule="evenodd" d="M2 3.65629C2 2.15127 3.59967 1.18549 4.93149 1.88645L20.7844 10.2301C22.2091 10.9799 22.2091 13.0199 20.7844 13.7698L4.9315 22.1134C3.59968 22.8144 2 21.8486 2 20.3436V3.65629ZM19.8529 11.9999L16.2682 10.1132L14.2243 11.9999L16.2682 13.8866L19.8529 11.9999ZM14.3903 14.875L12.75 13.3608L6.75782 18.8921L14.3903 14.875ZM12.75 10.639L14.3903 9.12488L6.75782 5.10777L12.75 10.639ZM4 5.28391L11.2757 11.9999L4 18.7159V5.28391Z"/>
                   </svg>
@@ -127,14 +127,14 @@ const BlogAppDownload = ({
       </div>
 
       {/* Newsletter Signup Section */}
-      <div className="bg-gray-50/80">
+      <div className="bg-[var(--bg-secondary)]">
         <div className="flex min-h-40 flex-col flex-wrap items-start justify-center gap-6 px-6 py-10 md:px-10 lg:flex-row lg:items-center">
           {/* Text Content */}
           <div className="max-w-md shrink grow">
-            <h3 className="text-lg font-semibold tracking-tight text-balance text-gray-900 md:text-xl text-start">
+            <h3 className="text-lg font-semibold tracking-tight text-balance text-text-primary md:text-xl text-start">
               {t('blogApp.newsletterTitle', 'Get travel tips & exclusive deals')}
             </h3>
-            <p className="mt-1 text-sm text-gray-600 text-start">
+            <p className="mt-1 text-sm text-text-muted text-start">
               {t('blogApp.newsletterDescription', 'Subscribe to our newsletter for the latest eSIM news, travel guides, and special offers.')}
             </p>
           </div>
@@ -159,12 +159,12 @@ const BlogAppDownload = ({
                   placeholder={t('blogApp.emailPlaceholder', 'Enter your email')}
                   required
                   disabled={isSubmitting}
-                  className="h-14 w-full rounded-xl bg-white pe-28 ps-4 text-gray-900 shadow-sm ring-1 ring-gray-200 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60 text-start"
+                  className="h-14 w-full rounded-xl bg-[var(--bg-primary)] pe-28 ps-4 text-text-primary shadow-sm ring-1 ring-[var(--card-border)] placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60 text-start"
                 />
                 <button
                   type="submit"
                   disabled={isSubmitting || !email}
-                  className="absolute top-1/2 end-2 h-10 -translate-y-1/2 rounded-lg bg-gray-900 px-4 text-sm font-medium text-white transition-all duration-200 hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="absolute top-1/2 end-2 h-10 -translate-y-1/2 rounded-lg bg-[var(--login-bg)] px-4 text-sm font-medium text-[var(--login-text)] transition-all duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isSubmitting ? t('blogApp.subscribing', 'Subscribing...') : t('blogApp.subscribe', 'Subscribe')}
                 </button>

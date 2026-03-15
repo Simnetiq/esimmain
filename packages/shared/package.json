@@ -62,6 +62,7 @@
     "./components/Providers": "./components/Providers.jsx",
     "./components/LightProviders": "./components/LightProviders.jsx",
     "./components/AuthModal": "./components/AuthModal.jsx",
+    "./components/FlagImage": "./components/FlagImage.jsx",
     "./config/currencies": "./config/currencies.js",
     "./lib/fcm": "./lib/fcm.js",
     "./lib/supabaseServiceClient": "./lib/supabaseServiceClient.js",

@@ -6,7 +6,8 @@ export async function POST(request) {
     const body = await request.json();
     const { orderId, adminKey } = body;
 
-    const expectedAdminKey = process.env.ADMIN_SECRET_KEY || 'change-me-in-production';
+    const expectedAdminKey = process.env.ADMIN_SECRET_KEY;
+    if (!expectedAdminKey) return NextResponse.json({ error: 'Server misconfiguration: ADMIN_SECRET_KEY not set' }, { status: 503 });
     if (adminKey !== expectedAdminKey) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     if (!orderId) return NextResponse.json({ error: 'Missing orderId' }, { status: 400 });
 

@@ -9,16 +9,22 @@ export async function POST(request) {
     const signature = request.headers.get('x-cc-webhook-signature');
     const rawBody = await request.text();
 
-    if (COINBASE_WEBHOOK_SECRET && signature) {
-      const crypto = await import('crypto');
-      const { createHmac } = crypto;
-      const computedSignature = createHmac('sha256', COINBASE_WEBHOOK_SECRET)
-        .update(rawBody)
-        .digest('hex');
+    if (!COINBASE_WEBHOOK_SECRET) {
+      return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 503 });
+    }
 
-      if (computedSignature !== signature) {
-        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
-      }
+    if (!signature) {
+      return NextResponse.json({ error: 'Missing signature' }, { status: 401 });
+    }
+
+    const crypto = await import('crypto');
+    const { createHmac } = crypto;
+    const computedSignature = createHmac('sha256', COINBASE_WEBHOOK_SECRET)
+      .update(rawBody)
+      .digest('hex');
+
+    if (computedSignature !== signature) {
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
 
     const event = JSON.parse(rawBody);

@@ -1,194 +1,116 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { createPortal } from 'react-dom';
 import { usePathname, useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
-import { useRegionsSupabase as useRegions } from '@esim/shared/hooks/useRegionsSupabase';
-import LanguageSelector from './LanguageSelector';
-import CurrencyToggle from './CurrencyToggle';
-import ThemeToggle from './ThemeToggle';
 import { detectLanguageFromPath, getLocalizedBlogListUrl, getLanguageDirection } from '@esim/shared/utils/languageUtils';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
-import PlatformDownloadCTA from './cta/PlatformDownloadCTA';
-// Inline SVG icons to avoid lucide-react bundle overhead on every page
-const ChevronDown = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="m6 9 6 6 6-6"/>
+import ThemeToggle from './ThemeToggle';
+import LanguageSelector from './LanguageSelector';
+
+/**
+ * Simnetiq logo — inline SVG from simnetiqlogo.svg.
+ * Rounded black card with "Sñ" text in light gray.
+ * Dark mode: inverted — white card with dark text.
+ */
+const SimnetiqLogo = ({ className = 'w-7 h-7' }) => (
+  <svg className={className} viewBox="0 0 665 831" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <g>
+      <path d="M137.5 133.5V689C289.804 689 527.5 689 527.5 689V267L405 133.5H137.5Z" className="fill-[#1F1F1F] dark:fill-white" />
+      <path d="M137.5 133.5V689C289.804 689 527.5 689 527.5 689V267L405 133.5H137.5Z" className="stroke-[#1F1F1F] dark:stroke-white" strokeWidth="131" strokeLinejoin="round" />
+    </g>
+    <path d="M242.302 649.7C226.102 649.7 211.802 646.8 199.402 641C187.002 635.2 177.302 626.9 170.302 616.1C163.302 605.3 159.802 592.3 159.802 577.1V568.7H198.802V577.1C198.802 589.7 202.702 599.2 210.502 605.6C218.302 611.8 228.902 614.9 242.302 614.9C255.902 614.9 266.002 612.2 272.602 606.8C279.402 601.4 282.802 594.5 282.802 586.1C282.802 580.3 281.102 575.6 277.702 572C274.502 568.4 269.702 565.5 263.302 563.3C257.102 560.9 249.502 558.7 240.502 556.7L233.602 555.2C219.202 552 206.802 548 196.402 543.2C186.202 538.2 178.302 531.7 172.702 523.7C167.302 515.7 164.602 505.3 164.602 492.5C164.602 479.7 167.602 468.8 173.602 459.8C179.802 450.6 188.402 443.6 199.402 438.8C210.602 433.8 223.702 431.3 238.702 431.3C253.702 431.3 267.002 433.9 278.602 439.1C290.402 444.1 299.602 451.7 306.202 461.9C313.002 471.9 316.402 484.5 316.402 499.7V508.7H277.402V499.7C277.402 491.7 275.802 485.3 272.602 480.5C269.602 475.5 265.202 471.9 259.402 469.7C253.602 467.3 246.702 466.1 238.702 466.1C226.702 466.1 217.802 468.4 212.002 473C206.402 477.4 203.602 483.5 203.602 491.3C203.602 496.5 204.902 500.9 207.502 504.5C210.302 508.1 214.402 511.1 219.802 513.5C225.202 515.9 232.102 518 240.502 519.8L247.402 521.3C262.402 524.5 275.402 528.6 286.402 533.6C297.602 538.6 306.302 545.2 312.502 553.4C318.702 561.6 321.802 572.1 321.802 584.9C321.802 597.7 318.502 609 311.902 618.8C305.502 628.4 296.302 636 284.302 641.6C272.502 647 258.502 649.7 242.302 649.7ZM352.535 645.5V496.7H389.735V516.2H395.135C397.535 511 402.035 506.1 408.635 501.5C415.235 496.7 425.235 494.3 438.635 494.3C450.235 494.3 460.335 497 468.935 502.4C477.735 507.6 484.535 514.9 489.335 524.3C494.135 533.5 496.535 544.3 496.535 556.7V645.5H458.735V559.7C458.735 548.5 455.935 540.1 450.335 534.5C444.935 528.9 437.135 526.1 426.935 526.1C415.335 526.1 406.335 530 399.935 537.8C393.535 545.4 390.335 556.1 390.335 569.9V645.5H352.535ZM399.635 479.9L421.835 435.5H464.435L432.635 479.9H399.635Z" className="fill-[#EDEDED] dark:fill-[#1F1F1F]" />
   </svg>
 );
 
-const SettingsIcon = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>
-  </svg>
-);
-
-const LogOut = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>
-  </svg>
-);
-
-const Headphones = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/>
-  </svg>
-);
-
-const Smartphone = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/>
-  </svg>
-);
-
-const Navbar = ({ hideLanguageSelector = false }) => {
+const Navbar = () => {
   const { t, locale, isLoading: i18nLoading } = useI18n();
   const { currentUser, logout } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isStoreDropdownOpen, setIsStoreDropdownOpen] = useState(false);
-  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const storeDropdownRef = useRef(null);
-  const userDropdownRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(true);
+  const [mounted, setMounted] = useState(false);
+  const lastScrollYRef = useRef(0);
+  const navRef = useRef(null);
 
-  // Get regions for store dropdown
-  const { regions } = useRegions(locale);
-
-  // Close dropdowns when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (storeDropdownRef.current && !storeDropdownRef.current.contains(event.target)) {
-        setIsStoreDropdownOpen(false);
-      }
-      if (userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
-        setIsUserDropdownOpen(false);
-      }
-    };
-
-    // Listen for custom close event from layout
-    const handleCloseDropdowns = () => {
-      setIsStoreDropdownOpen(false);
-      setIsUserDropdownOpen(false);
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    window.addEventListener('closeNavbarDropdowns', handleCloseDropdowns);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      window.removeEventListener('closeNavbarDropdowns', handleCloseDropdowns);
-    };
-  }, []);
-
-  // Language detection: always use pathname on server & initial hydration to avoid mismatch.
-  // localStorage is only read after mount to update the language.
+  // Language detection
   const pathnameLanguage = detectLanguageFromPath(pathname) || 'en';
   const ssrSafeLanguage = i18nLoading ? pathnameLanguage : (locale || 'en');
-
   const [currentLanguage, setCurrentLanguage] = useState(ssrSafeLanguage);
 
-  // After mount, sync with localStorage if i18n is still loading
   useEffect(() => {
     if (i18nLoading) {
-      const savedLanguage = localStorage.getItem('Simnetiq-language');
-      if (savedLanguage && savedLanguage !== currentLanguage) {
-        setCurrentLanguage(savedLanguage);
-      }
+      const saved = localStorage.getItem('Simnetiq-language');
+      if (saved && saved !== currentLanguage) setCurrentLanguage(saved);
     }
   }, [i18nLoading]);
 
-  // Keep in sync with i18n context once it finishes loading
   useEffect(() => {
-    if (!i18nLoading && locale) {
-      setCurrentLanguage(locale);
-    }
+    if (!i18nLoading && locale) setCurrentLanguage(locale);
   }, [i18nLoading, locale]);
 
   const direction = getLanguageDirection(currentLanguage);
 
-  // Generate localized URLs based on currentLanguage (SSR-safe on initial render)
-  const getLocalizedUrl = (path) => {
-    if (currentLanguage === 'en') {
-      return path;
-    }
-    return `/${currentLanguage}${path}`;
-  };
+  const getLocalizedUrl = useCallback((path) => {
+    return currentLanguage === 'en' ? path : `/${currentLanguage}${path}`;
+  }, [currentLanguage]);
 
-  const handleDownloadApp = () => {
-    // Track with Facebook Pixel
-    trackCustomFacebookEvent('DownloadAppClick', {
-      source: 'mobile_menu',
-      content_type: 'download_button'
-    });
-  };
-  const [isVisible, setIsVisible] = useState(true);
-  const lastScrollYRef = useRef(0);
-  const [mounted, setMounted] = useState(false);
-
-  // Handle scroll behavior with throttling for performance
+  // Scroll hide/show
   useEffect(() => {
     let ticking = false;
-
     const controlNavbar = () => {
       const currentScrollY = window.scrollY;
       const delta = currentScrollY - lastScrollYRef.current;
-
-      // Dead zone: ignore tiny scroll movements (< 5px)
-      if (Math.abs(delta) < 5) {
-        ticking = false;
-        return;
-      }
-
+      if (Math.abs(delta) < 5) { ticking = false; return; }
       const shouldBeVisible = currentScrollY < 10 || delta < 0;
-
-      // Only update state if it actually changed
-      setIsVisible(prev => {
-        if (prev === shouldBeVisible) return prev;
-        return shouldBeVisible;
-      });
-
+      setIsVisible(prev => prev === shouldBeVisible ? prev : shouldBeVisible);
       lastScrollYRef.current = currentScrollY;
       ticking = false;
     };
-
     const onScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(controlNavbar);
-        ticking = true;
-      }
+      if (!ticking) { requestAnimationFrame(controlNavbar); ticking = true; }
     };
-
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Set mounted state
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => { setMounted(true); }, []);
 
-  // Close all dropdowns when navbar hides (scrolling down)
+  // Close dropdowns when navbar hides
   useEffect(() => {
     if (!isVisible) {
-      setIsStoreDropdownOpen(false);
-      setIsUserDropdownOpen(false);
-      // Dispatch custom event for LanguageSelector to close
       window.dispatchEvent(new CustomEvent('closeNavbarDropdowns'));
     }
   }, [isVisible]);
 
-  // Handle logout
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isMenuOpen]);
+
+  // Close mobile menu on Escape
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const handler = (e) => { if (e.key === 'Escape') setIsMenuOpen(false); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [isMenuOpen]);
+
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
       await logout();
-      setIsUserDropdownOpen(false);
       setIsMenuOpen(false);
       toast.success(t('navbar.loggedOutSuccessfully', 'Logged out successfully'));
       router.push(getLocalizedUrl('/'));
@@ -199,425 +121,241 @@ const Navbar = ({ hideLanguageSelector = false }) => {
     }
   };
 
-  // Get user initials for avatar
   const getUserInitials = () => {
     if (!currentUser) return '?';
     if (currentUser.displayName) {
       const names = currentUser.displayName.split(' ');
-      if (names.length >= 2) {
-        return `${names[0][0]}${names[1][0]}`.toUpperCase();
-      }
-      return names[0][0].toUpperCase();
+      return names.length >= 2
+        ? `${names[0][0]}${names[1][0]}`.toUpperCase()
+        : names[0][0].toUpperCase();
     }
-    if (currentUser.email) {
-      return currentUser.email[0].toUpperCase();
-    }
-    return '?';
+    return currentUser.email ? currentUser.email[0].toUpperCase() : '?';
   };
 
-  return (
-    <header
-      className={`navbar-header fixed backdrop-blur-sm w-full inset-x-0 justify-center top-0 transition-transform duration-150 ${
-        isVisible ? 'translate-y-0' : '-translate-y-full'
+  const closeMobile = useCallback(() => setIsMenuOpen(false), []);
+
+  // Mobile menu overlay
+  const mobileOverlay = (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Navigation menu"
+      className={`fixed inset-0 z-[60] lg:hidden transition-opacity duration-200 ease-out ${
+        isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
       }`}
-      style={{ zIndex: 9999, backgroundColor: 'var(--navbar-bg)' }}
       dir={direction}
       lang={currentLanguage}
     >
-      <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-2 px-4">
-        <div className="flex lg:flex-1 items-center justify-start">
-          <Link href={getLocalizedUrl(currentUser ? "/dashboard" : "/")} className="flex items-center gap-2">
-            <span className="sr-only">Simnetiq</span>
-            <Image
-              src="/images/logoblack.png"
-              alt="Simnetiq Logo"
-              width={28}
-              height={28}
-              priority
-              fetchPriority="high"
-            />
-            <span className="text-base sm:text-lg font-light text-text-primary">simnetiq</span>
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/60" onClick={closeMobile} aria-hidden="true" />
+
+      {/* Panel */}
+      <div
+        className={`relative mx-4 mt-4 rounded-2xl shadow-lg overflow-hidden transition-[transform,opacity] duration-200 ease-out ${
+          isMenuOpen ? 'translate-y-0 opacity-100' : '-translate-y-2 opacity-0'
+        }`}
+        style={{
+          backgroundColor: 'var(--bg-primary)',
+          border: '1px solid var(--card-border)',
+        }}
+      >
+        {/* Top row — logo + close */}
+        <div className="flex items-center justify-between h-14 px-4" style={{ borderBottom: '1px solid var(--divider)' }}>
+          <Link href={getLocalizedUrl('/')} className="flex items-center gap-2" onClick={closeMobile}>
+            <SimnetiqLogo className="w-6 h-6" />
+            <span className="text-base font-semibold text-text-primary tracking-tight">simnetiq</span>
           </Link>
+          <button
+            onClick={closeMobile}
+            className="p-2 -me-2 text-text-muted hover:text-text-primary transition-colors rounded-full"
+            aria-label="Close menu"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+              <path strokeLinecap="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
-        <div className="flex lg:hidden items-center justify-end gap-x-2">
-          {process.env.NEXT_PUBLIC_ENABLE_CURRENCY_TOGGLE === 'true' && <CurrencyToggle />}
-          {!hideLanguageSelector && <LanguageSelector />}
-          {/* User Avatar for mobile - only show when logged in */}
-          {currentUser && (
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="flex items-center justify-center w-8 h-8 rounded-full bg-tufts-blue text-white text-xs font-semibold"
-              aria-label={t('navbar.userMenu', 'User menu')}
-            >
-              {getUserInitials()}
-            </button>
-          )}
-          {!currentUser && (
-            <button
-              type="button"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-text-primary"
-            >
-              <span className="sr-only">{t('navbar.openMenu', 'Open main menu')}</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" className="size-6">
-                <path d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          )}
-        </div>
+        {/* Nav links */}
+        <div className="px-2 py-2 space-y-0.5">
+          <Link
+            href={getLocalizedUrl('/esim-plans')}
+            onClick={closeMobile}
+            className="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-text-primary hover:bg-[var(--hover-bg)] transition-colors"
+          >
+            {t('navbar.store', 'Store')}
+          </Link>
 
-        <div className="hidden lg:flex lg:items-center lg:gap-x-8">
-          {/* Store Dropdown with Regions */}
-          <div className="relative" ref={storeDropdownRef}>
-            <button
-              onClick={() => setIsStoreDropdownOpen(!isStoreDropdownOpen)}
-              className="flex items-center gap-1 text-sm font-semibold text-text-primary hover:text-tufts-blue transition-colors"
-            >
-              {t('navbar.store', 'Store')}
-              <ChevronDown
-                className={`w-4 h-4 transition-transform ${isStoreDropdownOpen ? 'rotate-180' : ''}`}
-                aria-hidden="true"
-              />
-            </button>
-
-            {/* Store Dropdown Menu */}
-            {isStoreDropdownOpen && (
-              <div className="absolute top-full start-0 mt-2 w-48 bg-bg-secondary shadow-xl rounded-lg z-50" style={{ border: '1px solid var(--card-border)', boxShadow: '0 20px 25px -5px var(--shadow-color)' }}>
-                <ul className="p-2 text-sm font-medium text-text-muted">
-                  {regions
-                    .filter(r => r.id !== 'popular' && r.id !== 'all')
-                    .map((region) => (
-                      <li key={region.id}>
-                        <Link
-                          href={getLocalizedUrl(`/esim-plans?region=${region.id}`)}
-                          className="inline-flex items-center w-full p-2 hover:bg-[var(--hover-bg)] hover:text-text-primary rounded transition-colors"
-                          onClick={() => setIsStoreDropdownOpen(false)}
-                        >
-                          {region.displayName}
-                        </Link>
-                      </li>
-                    ))}
-                </ul>
-              </div>
-            )}
-          </div>
-
-          {/* My eSIMs (Dashboard) - only show when logged in */}
-          {currentUser && (
-            <Link href={getLocalizedUrl("/dashboard")} className="text-sm font-semibold text-text-primary hover:text-tufts-blue transition-colors">
-              {t('navbar.myEsims', 'My eSIMs')}
-            </Link>
-          )}
-
-          {/* Help/Contact link */}
           <Link
             href={getLocalizedUrl('/contact')}
-            className="text-sm font-semibold text-text-primary hover:text-tufts-blue transition-colors"
+            onClick={closeMobile}
+            className="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-text-primary hover:bg-[var(--hover-bg)] transition-colors"
           >
             {t('navbar.help', 'Help')}
           </Link>
 
-          {/* Blog link */}
           <Link
             href={getLocalizedBlogListUrl(currentLanguage)}
-            className="text-sm font-semibold text-text-primary hover:text-tufts-blue transition-colors"
+            onClick={closeMobile}
+            className="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-text-primary hover:bg-[var(--hover-bg)] transition-colors"
           >
             {t('navbar.blog', 'Blog')}
           </Link>
 
-          {/* About link — hide for authenticated users */}
-          {!currentUser && (
-            <Link
-              href={getLocalizedUrl('/about')}
-              className="text-sm font-semibold text-text-primary hover:text-tufts-blue transition-colors"
-            >
-              {t('navbar.about', 'About')}
-            </Link>
-          )}
-        </div>
-
-        {/* Right side with language selector, login, and user avatar */}
-        <div className="hidden lg:flex lg:flex-1 lg:items-center lg:gap-x-3 lg:justify-end">
-          {/* Login button for non-authenticated users - inverted for dark theme */}
-          {!currentUser && (
+          {currentUser ? (
+            <>
+              <Link
+                href={getLocalizedUrl('/dashboard')}
+                onClick={closeMobile}
+                className="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-text-primary hover:bg-[var(--hover-bg)] transition-colors"
+              >
+                {t('navbar.myEsims', 'My eSIMs')}
+              </Link>
+              <Link
+                href={getLocalizedUrl('/settings')}
+                onClick={closeMobile}
+                className="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-text-muted hover:text-text-primary hover:bg-[var(--hover-bg)] transition-colors"
+              >
+                {t('navbar.settings', 'Settings')}
+              </Link>
+            </>
+          ) : (
             <Link
               href={getLocalizedUrl('/login')}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm font-medium rounded-full hover:opacity-90 transition-colors"
+              onClick={closeMobile}
+              className="flex items-center justify-center mx-2 mt-1 px-4 py-2 text-sm font-semibold rounded-full transition-colors"
               style={{ backgroundColor: 'var(--login-bg)', color: 'var(--login-text)' }}
             >
               {t('navbar.login', 'Login')}
             </Link>
           )}
+        </div>
 
-          <ThemeToggle />
-          {!hideLanguageSelector && <LanguageSelector />}
-          {process.env.NEXT_PUBLIC_ENABLE_CURRENCY_TOGGLE === 'true' && <CurrencyToggle />}
+        {/* Language + theme row */}
+        <div className="px-2 py-2" style={{ borderTop: '1px solid var(--divider)' }}>
+          <LanguageSelector variant="mobile" onClose={closeMobile} />
 
-          {/* User Avatar Dropdown - only show when logged in */}
-          {currentUser && (
-            <div className="relative" ref={userDropdownRef}>
-              <button
-                onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-                className="flex items-center justify-center w-9 h-9 rounded-full bg-tufts-blue text-white text-sm font-semibold hover:bg-tufts-blue/90 transition-colors focus:outline-none focus:ring-2 focus:ring-tufts-blue focus:ring-offset-2"
+          <div className="flex items-center justify-between px-3 py-2.5">
+            <span className="text-sm font-medium text-text-muted">{t('navbar.theme', 'Theme')}</span>
+            <ThemeToggle />
+          </div>
+        </div>
+
+        {/* Logout for authenticated users */}
+        {currentUser && (
+          <div className="px-4 py-3" style={{ borderTop: '1px solid var(--divider)' }}>
+            <button
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="w-full py-2.5 text-sm font-semibold text-red-400 border rounded-full hover:bg-red-500/10 transition-colors disabled:opacity-50"
+              style={{ borderColor: 'rgba(248, 113, 113, 0.3)' }}
+            >
+              {isLoggingOut ? t('navbar.loggingOut', 'Logging out...') : t('navbar.logout', 'Log out')}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  return (
+    <header
+      className={`fixed top-0 inset-x-0 z-50 transition-transform duration-150 ${
+        isVisible ? 'translate-y-0' : '-translate-y-full'
+      }`}
+      dir={direction}
+      lang={currentLanguage}
+    >
+      <nav
+        ref={navRef}
+        className="relative w-full backdrop-blur-md"
+        style={{
+          backgroundColor: 'var(--navbar-bg)',
+          borderBottom: '1px solid var(--divider)',
+        }}
+        aria-label="Global"
+      >
+        <div data-nav-inner className="relative flex items-center justify-between h-14 sm:h-16 px-4 sm:px-6 mx-auto max-w-7xl">
+          {/* Left: Logo */}
+          <Link
+            href={getLocalizedUrl(currentUser ? '/dashboard' : '/')}
+            className="flex items-center gap-2 shrink-0"
+          >
+            <SimnetiqLogo className="w-7 h-7 sm:w-8 sm:h-8" />
+            <span className="text-base sm:text-lg font-semibold text-text-primary tracking-tight">
+              simnetiq
+            </span>
+          </Link>
+
+          {/* Center: Desktop nav links — absolutely centered */}
+          <div className="hidden lg:flex items-center gap-0.5 absolute inset-0 justify-center pointer-events-none">
+            <div className="flex items-center gap-0.5 pointer-events-auto">
+              <Link
+                href={getLocalizedUrl('/esim-plans')}
+                className="text-text-muted hover:text-text-primary transition-colors text-sm font-medium px-3 py-2"
+              >
+                {t('navbar.store', 'Store')}
+              </Link>
+
+              <Link
+                href={getLocalizedUrl('/contact')}
+                className="text-text-muted hover:text-text-primary transition-colors text-sm font-medium px-3 py-2"
+              >
+                {t('navbar.help', 'Help')}
+              </Link>
+
+              {currentUser ? (
+                <Link
+                  href={getLocalizedUrl('/dashboard')}
+                  className="text-text-muted hover:text-text-primary transition-colors text-sm font-medium px-3 py-2"
+                >
+                  {t('navbar.myEsims', 'My eSIMs')}
+                </Link>
+              ) : (
+                <Link
+                  href={getLocalizedUrl('/login')}
+                  className="ms-1 px-4 py-1.5 text-sm font-semibold rounded-full transition-colors"
+                  style={{ backgroundColor: 'var(--login-bg)', color: 'var(--login-text)' }}
+                >
+                  {t('navbar.login', 'Login')}
+                </Link>
+              )}
+            </div>
+          </div>
+
+          {/* Right: Desktop controls */}
+          <div className="hidden lg:flex items-center gap-1.5 ms-auto">
+            {currentUser && (
+              <Link
+                href={getLocalizedUrl('/settings')}
+                className="flex items-center justify-center w-8 h-8 rounded-full bg-tufts-blue text-white text-xs font-semibold hover:bg-tufts-blue/90 transition-colors"
                 aria-label={t('navbar.userMenu', 'User menu')}
               >
                 {getUserInitials()}
-              </button>
+              </Link>
+            )}
+            <ThemeToggle />
+            <LanguageSelector variant="desktop" />
+          </div>
 
-              {/* User Dropdown Menu */}
-              {isUserDropdownOpen && (
-                <div className="absolute top-full mt-2 w-48 bg-bg-secondary shadow-xl rounded-lg z-50 end-0" style={{ border: '1px solid var(--card-border)', boxShadow: '0 20px 25px -5px var(--shadow-color)' }}>
-                  {/* User info header */}
-                  <div className="px-4 py-3 border-b border-[var(--divider)]">
-                    <p className="text-sm font-medium text-text-primary truncate text-start">
-                      {currentUser.displayName || t('navbar.user', 'User')}
-                    </p>
-                    <p className="text-xs text-text-muted truncate text-start">
-                      {currentUser.email}
-                    </p>
-                  </div>
-
-                  <ul className="p-2 text-sm font-medium text-text-muted">
-                    <li>
-                      <Link
-                        href={getLocalizedUrl('/settings')}
-                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-[var(--hover-bg)] hover:text-text-primary rounded transition-colors`}
-                        onClick={() => setIsUserDropdownOpen(false)}
-                      >
-                        <SettingsIcon className="w-4 h-4" />
-                        {t('navbar.settings', 'Settings')}
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        href={getLocalizedUrl('/contact')}
-                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-[var(--hover-bg)] hover:text-text-primary rounded transition-colors`}
-                        onClick={() => setIsUserDropdownOpen(false)}
-                      >
-                        <Headphones className="w-4 h-4" />
-                        {t('navbar.support', 'Support')}
-                      </Link>
-                    </li>
-                    <li className="border-t border-[var(--divider)] mt-1 pt-1">
-                      <span className="block px-2 py-1 text-xs text-text-muted/70 uppercase tracking-wider">
-                        {t('navbar.getTheApp', 'Get the App')}
-                      </span>
-                    </li>
-                    <li>
-                      <a
-                        href="https://apps.apple.com/gb/app/simnetiq-global-esim/id6755963262"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-[var(--hover-bg)] hover:text-text-primary rounded transition-colors`}
-                        onClick={() => {
-                          setIsUserDropdownOpen(false);
-                          handleDownloadApp();
-                        }}
-                      >
-                        <Smartphone className="w-4 h-4" />
-                        {t('navbar.iosApp', 'iOS App')}
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="https://play.google.com/store/apps/details?id=com.simnetiq.storeAndroid&hl=en"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-[var(--hover-bg)] hover:text-text-primary rounded transition-colors`}
-                        onClick={() => {
-                          setIsUserDropdownOpen(false);
-                          handleDownloadApp();
-                        }}
-                      >
-                        <Smartphone className="w-4 h-4" />
-                        {t('navbar.androidApp', 'Android App')}
-                      </a>
-                    </li>
-                    <li className="border-t border-[var(--divider)] mt-1 pt-1">
-                      <button
-                        onClick={handleLogout}
-                        disabled={isLoggingOut}
-                        className={`inline-flex items-center gap-2 w-full p-2 hover:bg-red-500/10 text-red-400 hover:text-red-400 rounded transition-colors disabled:opacity-50`}
-                      >
-                        <LogOut className="w-4 h-4 rtl:-scale-x-100" />
-                        {isLoggingOut ? t('navbar.loggingOut', 'Logging out...') : t('navbar.logout', 'Log out')}
-                      </button>
-                    </li>
-                  </ul>
-                </div>
-              )}
-            </div>
-          )}
+          {/* Mobile: hamburger */}
+          <div className="lg:hidden">
+            <button
+              onClick={() => setIsMenuOpen(true)}
+              className="p-2 -me-2 text-text-primary hover:text-text-muted transition-colors"
+              aria-label="Open menu"
+              aria-expanded={isMenuOpen}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+                <path strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
+              </svg>
+            </button>
+          </div>
         </div>
       </nav>
 
-      {/* Mobile menu using Portal */}
-      {isMenuOpen && mounted && createPortal(
-        <div className="lg:hidden" style={{ zIndex: 99999, position: 'fixed', inset: 0 }} dir={direction} lang={currentLanguage}>
-          <div
-            className="fixed inset-0 w-full h-full overflow-y-auto backdrop-blur-md"
-            style={{ backgroundColor: 'var(--overlay-bg)' }}
-            style={{ zIndex: 99999 }}
-          >
-            {/* Header with logo and close button */}
-            <div className="flex items-center justify-between p-6">
-              <Link href={getLocalizedUrl(currentUser ? "/dashboard" : "/")} className="flex items-center gap-2" onClick={() => setIsMenuOpen(false)}>
-                <span className="sr-only">Simnetiq</span>
-                <Image
-                  src="/images/logoblack.png"
-                  alt="Simnetiq Logo"
-                  width={24}
-                  height={24}
-                />
-                <span className="text-base font-bold text-text-primary">Simnetiq</span>
-              </Link>
-              <div className="flex items-center gap-2">
-                <ThemeToggle />
-                <button
-                  type="button"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="-m-2.5 rounded-md p-2.5 text-text-primary hover:bg-[var(--hover-bg)] transition-colors"
-                >
-                  <span className="sr-only">{t('navbar.closeMenu', 'Close menu')}</span>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" className="size-6">
-                    <path d="M6 18 18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            {/* Centered menu items */}
-            <div className="flex flex-col justify-center min-h-[60vh]">
-              <div className="space-y-2">
-                {/* Authenticated menu */}
-                {currentUser ? (
-                  <>
-                    {/* Name only — bigger, centered */}
-                    <p className="text-xl font-bold text-text-primary text-center py-4">
-                      {currentUser.displayName || t('navbar.user', 'User')}
-                    </p>
-
-                    <div className="border-t border-[var(--divider)] my-2 mx-8" />
-
-                    {/* Edit Profile */}
-                    <Link
-                      href={getLocalizedUrl('/settings')}
-                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-text-primary hover:text-tufts-blue hover:bg-[var(--hover-bg)] rounded-md transition-all duration-200 py-3 px-4"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {t('navbar.editProfile', 'Edit Profile')}
-                    </Link>
-
-                    {/* My eSIMs */}
-                    <Link
-                      href={getLocalizedUrl('/dashboard')}
-                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-text-primary hover:text-tufts-blue hover:bg-[var(--hover-bg)] rounded-md transition-all duration-200 py-3 px-4"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {t('navbar.myEsims', 'My eSIMs')}
-                    </Link>
-
-                    {/* Store */}
-                    <Link
-                      href={getLocalizedUrl('/esim-plans')}
-                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-text-primary hover:text-tufts-blue hover:bg-[var(--hover-bg)] rounded-md transition-all duration-200 py-3 px-4"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {t('navbar.store', 'Store')}
-                    </Link>
-
-                    <div className="border-t border-[var(--divider)] my-2 mx-8" />
-
-                    {/* Download App — device-aware */}
-                    <div className="flex justify-center py-3 px-4">
-                      <PlatformDownloadCTA variant="secondary" size="sm" source="mobile_menu" />
-                    </div>
-
-                    <div className="border-t border-[var(--divider)] my-2 mx-8" />
-
-                    {/* Support */}
-                    <Link
-                      href={getLocalizedUrl('/contact')}
-                      className="flex items-center justify-center gap-2 text-base sm:text-lg font-semibold text-text-primary hover:text-tufts-blue hover:bg-[var(--hover-bg)] rounded-md transition-all duration-200 py-3 px-4"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <Headphones className="w-5 h-5" />
-                      {t('navbar.support', 'Support')}
-                    </Link>
-
-                    {/* Log Out — rounded outlined button */}
-                    <div className="flex justify-center pt-4 pb-2 px-8">
-                      <button
-                        onClick={handleLogout}
-                        disabled={isLoggingOut}
-                        className="w-full py-3 text-base font-semibold text-red-400 border border-red-400/30 rounded-full hover:bg-red-500/10 transition-colors disabled:opacity-50"
-                      >
-                        {isLoggingOut ? t('navbar.loggingOut', 'Logging out...') : t('navbar.logout', 'Log out')}
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    {/* Non-authenticated menu — unchanged */}
-                    <Link
-                      href={getLocalizedUrl("/esim-plans")}
-                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-text-primary hover:text-tufts-blue hover:bg-[var(--hover-bg)] rounded-md transition-all duration-200 py-3 px-4"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {t('navbar.store', 'Store')}
-                    </Link>
-
-                    <div className="border-t border-[var(--divider)] my-4 mx-8" />
-
-                    <Link
-                      href={getLocalizedBlogListUrl(currentLanguage)}
-                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-text-muted hover:text-tufts-blue hover:bg-[var(--hover-bg)] rounded-md transition-all duration-200 py-3 px-4"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {t('navbar.blog', 'Blog')}
-                    </Link>
-
-                    <Link
-                      href={getLocalizedUrl('/contact')}
-                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-text-muted hover:text-tufts-blue hover:bg-[var(--hover-bg)] rounded-md transition-all duration-200 py-3 px-4"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {t('navbar.contactUs', 'Contact Us')}
-                    </Link>
-
-                    <Link
-                      href={getLocalizedUrl('/about')}
-                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-text-muted hover:text-tufts-blue hover:bg-[var(--hover-bg)] rounded-md transition-all duration-200 py-3 px-4"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {t('navbar.about', 'About')}
-                    </Link>
-
-                    <div className="border-t border-[var(--divider)] my-4 mx-8" />
-
-                    <div className="flex justify-center py-3 px-4">
-                      <PlatformDownloadCTA variant="secondary" size="sm" source="mobile_menu" />
-                    </div>
-
-                    <div className="border-t border-[var(--divider)] my-4 mx-8" />
-
-                    <Link
-                      href={getLocalizedUrl('/login')}
-                      className="flex items-center justify-center text-base sm:text-lg font-semibold text-text-primary hover:text-tufts-blue hover:bg-[var(--hover-bg)] rounded-md transition-all duration-200 py-3 px-4"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {t('navbar.login', 'Login')}
-                    </Link>
-
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
+      {/* Mobile menu portal */}
+      {mounted && createPortal(mobileOverlay, document.body)}
     </header>
   );
 };

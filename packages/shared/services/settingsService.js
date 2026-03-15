@@ -27,6 +27,7 @@ const defaultSettings = {
 export const getSettings = async () => {
   try {
     const supabase = getSupabase();
+    if (!supabase) return { id: 'general', ...defaultSettings };
     const { data, error } = await supabase
       .from('app_config')
       .select('value')

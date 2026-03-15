@@ -67,8 +67,8 @@ export default function NewHeroSection({ promo = null }) {
       lang={detectedLanguage}
     >
       {/* Blurred orb backgrounds — static, zero TBT */}
-      <div className="absolute -top-10 -start-20 w-[28rem] h-[28rem] bg-tufts-blue/20 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
-      <div className="absolute -bottom-40 -end-20 w-[32rem] h-[32rem] bg-tufts-blue/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
+      <div className="absolute -top-10 -start-20 w-[28rem] h-[28rem] rounded-full blur-3xl pointer-events-none" style={{ backgroundColor: 'rgba(73, 117, 212, 0.2)' }} aria-hidden="true" />
+      <div className="absolute -bottom-40 -end-20 w-[32rem] h-[32rem] rounded-full blur-3xl pointer-events-none" style={{ backgroundColor: 'rgba(73, 117, 212, 0.1)' }} aria-hidden="true" />
 
       {/* Promo banner — shown only when promo prop is provided */}
       {promo && (
@@ -77,7 +77,13 @@ export default function NewHeroSection({ promo = null }) {
           role="banner"
           aria-label="Promotional offer"
         >
-          <div className="flex items-center justify-center gap-2 px-4 py-2.5 bg-accent-highlight/10 border-b border-accent-highlight/20 rtl-native-flex">
+          <div
+            className="flex items-center justify-center gap-2 px-4 py-2.5 rtl-native-flex"
+            style={{
+              backgroundColor: 'rgba(245, 158, 11, 0.1)',
+              borderBottom: '1px solid rgba(245, 158, 11, 0.2)',
+            }}
+          >
             <TagIcon className="w-4 h-4 text-accent-highlight flex-shrink-0" />
             <p className="text-sm font-medium text-accent-highlight text-center">
               {t('hero.promoPrefix', 'Limited offer:')}
@@ -103,14 +109,26 @@ export default function NewHeroSection({ promo = null }) {
             <div className="flex flex-col items-center lg:items-start text-center lg:text-start">
 
               {/* Tagline badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium bg-tufts-blue/10 text-tufts-blue border border-tufts-blue/20 mb-5 rtl-native-flex">
+              <div
+                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium text-tufts-blue mb-5 rtl-native-flex"
+                style={{
+                  backgroundColor: 'rgba(73, 117, 212, 0.1)',
+                  border: '1px solid rgba(73, 117, 212, 0.2)',
+                }}
+              >
                 <GlobeSmallIcon className="w-4 h-4 flex-shrink-0" />
                 <span>{t('hero.tagline', 'Global eSIM Platform')}</span>
               </div>
 
               {/* Promo pill below tagline (inline variant, if not already shown as top banner) */}
               {promo && (
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium bg-accent-highlight/10 text-accent-highlight border border-accent-highlight/20 mb-5 rtl-native-flex">
+                <div
+                  className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium text-accent-highlight mb-5 rtl-native-flex"
+                  style={{
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    border: '1px solid rgba(245, 158, 11, 0.2)',
+                  }}
+                >
                   <TagIcon className="w-4 h-4 flex-shrink-0" />
                   <span>
                     <span className="font-bold">{promo.code}</span>
@@ -131,27 +149,32 @@ export default function NewHeroSection({ promo = null }) {
                 {subtitleText}
               </p>
 
-              {/* CTAs — pill-with-circle design */}
-              {/* Row 1: Explore Plans */}
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-4 w-full sm:w-auto rtl-native-flex">
+              {/* CTAs — all 3 in one row, same pill-with-circle design, same size */}
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 mb-10 w-full sm:w-auto rtl-native-flex">
+                {/* Explore Plans */}
                 <ExploreStoreCTA
-                  variant="darkPrimary"
-                  size="md"
+                  variant="themed"
+                  size="sm"
                   source="hero_primary_cta"
                   className="w-full sm:w-auto"
                 />
-              </div>
-              {/* Row 2: App Store + Google Play */}
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 mb-10 w-full sm:w-auto rtl-native-flex">
                 {/* iOS */}
                 <a
                   href={appStoreLinks.ios}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:scale-[1.02] rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto bg-gray-900 text-white shadow-sm hover:bg-gray-800"
+                  className="inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:scale-[1.02] hover:opacity-90 rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto shadow-sm"
+                  style={{
+                    backgroundColor: 'var(--cta-secondary-bg)',
+                    color: 'var(--cta-secondary-text)',
+                    border: '1px solid var(--cta-secondary-border)',
+                  }}
                 >
                   <span className="flex-1 text-center">{t('hero.appStore', 'App Store')}</span>
-                  <span className="ms-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-white/20 w-8 h-8 rtl-native-flex">
+                  <span
+                    className="ms-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full w-8 h-8 rtl-native-flex"
+                    style={{ backgroundColor: 'var(--cta-secondary-circle-bg)' }}
+                  >
                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <line x1="21" y1="17" x2="18" y2="17"/><line x1="20" y1="21" x2="14.29" y2="10.72"/><line x1="12" y1="6.6" x2="10" y2="3"/><line x1="14" y1="3" x2="4" y2="21"/><line x1="13" y1="17" x2="3" y2="17"/>
                     </svg>
@@ -162,7 +185,7 @@ export default function NewHeroSection({ promo = null }) {
                   href={appStoreLinks.android}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:scale-[1.02] rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto"
+                  className="inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:scale-[1.02] hover:opacity-90 rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto shadow-sm"
                   style={{
                     backgroundColor: 'var(--cta-secondary-bg)',
                     color: 'var(--cta-secondary-text)',
@@ -198,7 +221,7 @@ export default function NewHeroSection({ promo = null }) {
 
             {/* Right column: decorative eSIM visual card */}
             <div className="hidden lg:block relative" aria-hidden="true">
-              <div className="relative w-full aspect-square max-w-lg mx-auto rounded-3xl overflow-hidden border border-white/[0.06] bg-gradient-to-br from-tufts-blue/5 via-bg-secondary to-tufts-blue/10">
+              <div className="relative w-full aspect-square max-w-lg mx-auto rounded-3xl overflow-hidden border border-white/[0.06]" style={{ background: 'linear-gradient(to bottom right, rgba(73, 117, 212, 0.05), var(--bg-secondary), rgba(73, 117, 212, 0.1))' }}>
                 {/* Subtle grid pattern overlay */}
                 <div
                   className="absolute inset-0 opacity-[0.03]"
@@ -214,8 +237,8 @@ export default function NewHeroSection({ promo = null }) {
                 </span>
 
                 {/* Decorative circles */}
-                <div className="absolute top-1/4 right-1/4 w-32 h-32 rounded-full border border-tufts-blue/10" />
-                <div className="absolute bottom-1/3 left-1/3 w-48 h-48 rounded-full border border-tufts-blue/5" />
+                <div className="absolute top-1/4 right-1/4 w-32 h-32 rounded-full" style={{ border: '1px solid rgba(73, 117, 212, 0.1)' }} />
+                <div className="absolute bottom-1/3 left-1/3 w-48 h-48 rounded-full" style={{ border: '1px solid rgba(73, 117, 212, 0.05)' }} />
 
                 {/* Floating stat pills */}
                 <div className="absolute top-8 left-8 glass-card px-4 py-2 text-sm font-medium text-text-primary">
@@ -230,7 +253,7 @@ export default function NewHeroSection({ promo = null }) {
               </div>
 
               {/* Subtle glow behind the card */}
-              <div className="absolute inset-0 -z-10 rounded-3xl bg-tufts-blue/10 blur-2xl scale-90" />
+              <div className="absolute inset-0 -z-10 rounded-3xl blur-2xl scale-90" style={{ backgroundColor: 'rgba(73, 117, 212, 0.1)' }} />
             </div>
 
           </div>

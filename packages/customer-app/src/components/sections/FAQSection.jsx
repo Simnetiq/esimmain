@@ -22,7 +22,7 @@ function FAQItem({ question, answer }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+    <div className="border overflow-hidden" style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--card-border)' }}>
       <button
         onClick={() => setIsOpen((v) => !v)}
         className="w-full p-6 flex items-start justify-between gap-4 text-start rtl-native-flex"
@@ -116,7 +116,7 @@ export default function FAQSection() {
   return (
     <section id="faq" className="max-w-7xl mx-auto px-4 py-16 lg:py-24">
       {/* Header */}
-      <Reveal className="mb-10 text-center">
+      <Reveal className="mb-10 text-start">
         <p className="text-sm font-medium tracking-widest uppercase text-text-muted mb-3">
           {t('faq.title', 'Frequently Asked Questions')}
         </p>

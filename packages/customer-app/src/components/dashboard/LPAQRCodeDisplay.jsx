@@ -55,7 +55,7 @@ const LPAQRCodeDisplay = ({ lpaData }) => {
         <div className="w-full h-full flex items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tufts-blue"></div>
         </div>
-        <p className="text-sm text-gray-600 mt-2">{t('dashboard.generatingQrCode', 'Generating QR Code...')}</p>
+        <p className="text-sm text-text-muted mt-2">{t('dashboard.generatingQrCode', 'Generating QR Code...')}</p>
       </div>
     );
   }
@@ -77,9 +77,9 @@ const LPAQRCodeDisplay = ({ lpaData }) => {
   return (
     <div className="text-center">
       <div className="w-full h-full flex items-center justify-center">
-        <QrCode className="w-32 h-32 text-gray-400" />
+        <QrCode className="w-32 h-32 text-text-muted" />
       </div>
-      <p className="text-sm text-gray-500 mt-2">{t('dashboard.qrGenerationFailed', 'QR generation failed')}</p>
+      <p className="text-sm text-text-muted mt-2">{t('dashboard.qrGenerationFailed', 'QR generation failed')}</p>
     </div>
   );
 };

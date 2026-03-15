@@ -1,8 +1,15 @@
 'use client';
 
 import { useI18n } from '@esim/shared/contexts/I18nContext';
+import FlagImage from '@esim/shared/components/FlagImage';
 import Reveal from '../ui/Reveal';
 import AnimatedCounter from '../ui/AnimatedCounter';
+
+// Flags for the Global Coverage card — picked for visual diversity & small file size
+const COVERAGE_FLAGS = [
+  'us', 'jp', 'de', 'br', 'sa', 'in', 'fr', 'kr',
+  'au', 'il', 'th', 'gb', 'it', 'sg', 'za', 'ae',
+];
 
 // Inline SVG icons — no lucide-react imports
 const GlobeIcon = ({ className }) => (
@@ -106,7 +113,7 @@ export default function FeaturesBento() {
 
   return (
     <section
-      className="bg-bg-primary"
+      className="relative"
       aria-labelledby="features-bento-heading"
     >
       <div className="max-w-7xl mx-auto px-4 py-16 lg:py-24">
@@ -168,18 +175,31 @@ export default function FeaturesBento() {
                   </div>
                 </div>
 
-                {/* AnimatedCounter for the large global coverage card */}
+                {/* Flag grid + counter for the large global coverage card */}
                 {card.counter && (
-                  <div className="relative flex flex-col items-start lg:items-end justify-center flex-shrink-0 lg:ps-8">
-                    <p
-                      className="text-5xl lg:text-7xl font-bold text-tufts-blue leading-none tabular-nums"
-                      aria-label={t('featuresBento.countriesLabel', '200+ countries')}
-                    >
-                      <AnimatedCounter value={200} suffix="+" duration={1200} />
-                    </p>
-                    <p className="text-sm text-text-muted mt-1">
-                      {t('featuresBento.countriesSubLabel', 'countries & regions')}
-                    </p>
+                  <div className="relative flex flex-col items-start lg:items-end justify-center flex-shrink-0 lg:ps-8 gap-4">
+                    <div className="grid grid-cols-8 gap-1.5" aria-hidden="true">
+                      {COVERAGE_FLAGS.map((code, i) => (
+                        <div
+                          key={code}
+                          className="w-7 h-7 rounded-full overflow-hidden ring-1 ring-[var(--card-border)] animate-fade-in-up"
+                          style={{ animationDelay: `${i * 60}ms` }}
+                        >
+                          <FlagImage code={code} className="w-7 h-7 rounded-full object-cover" />
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                      <p
+                        className="text-4xl lg:text-5xl font-bold text-tufts-blue leading-none tabular-nums"
+                        aria-label={t('featuresBento.countriesLabel', '200+ countries')}
+                      >
+                        <AnimatedCounter value={200} suffix="+" duration={1200} />
+                      </p>
+                      <p className="text-sm text-text-muted">
+                        {t('featuresBento.countriesSubLabel', 'countries & regions')}
+                      </p>
+                    </div>
                   </div>
                 )}
               </article>

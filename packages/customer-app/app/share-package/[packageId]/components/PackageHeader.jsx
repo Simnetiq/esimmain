@@ -59,15 +59,15 @@ const PackageHeader = ({
       <div className="mx-auto w-full max-w-9xl">
         <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
           <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-            <p className="font-mono text-sm max-w-2xl sm:text-base font-medium tracking-widest uppercase text-gray-500">
+            <p className="font-mono text-sm max-w-2xl sm:text-base font-medium tracking-widest uppercase text-text-muted">
               {t('sharePackage.secureCheckout', 'Secure Checkout')}
             </p>
-            <h2 className="mt-4 text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-pretty text-eerie-black max-w-5xl">
+            <h2 className="mt-4 text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-pretty text-text-primary max-w-5xl">
               {t('sharePackage.pageTitle', 'Secure Checkout - Buy eSIM')}
             </h2>
           </div>
         </div>
-        <div className="w-full h-px bg-gray-100"></div>
+        <div className="w-full h-px" style={{ backgroundColor: 'var(--divider)' }}></div>
       </div>
     );
   }
@@ -83,14 +83,14 @@ const PackageHeader = ({
     <div className="mx-auto w-full max-w-9xl">
       <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
         <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-          <p className="font-mono text-sm max-w-2xl sm:text-base font-medium tracking-widest uppercase text-gray-500">
+          <p className="font-mono text-sm max-w-2xl sm:text-base font-medium tracking-widest uppercase text-text-muted">
             {t('sharePackage.secureCheckout', 'Secure Checkout')}
           </p>
 
           <div className="mt-4 max-w-5xl share-package-header">
             <div className="flex justify-start items-center gap-4">
               {/* Country/Region/Global Image */}
-              <div className="flex-shrink-0 w-20 sm:w-24 lg:w-28 aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg flex items-center justify-center border-2 border-gray-200 overflow-hidden relative">
+              <div className="flex-shrink-0 w-20 sm:w-24 lg:w-28 aspect-[4/3] rounded-lg flex items-center justify-center overflow-hidden relative" style={{ background: 'linear-gradient(to bottom right, var(--subtle-bg), var(--card-bg))', border: '2px solid var(--card-border)' }}>
                 {countryImage?.url ? (
                   <img
                     src={countryImage.url}
@@ -113,7 +113,7 @@ const PackageHeader = ({
                   {dataDisplay}
                 </h2>
                 <div className="mt-1 flex items-baseline gap-2">
-                  <p className="text-xl sm:text-2xl font-semibold text-eerie-black">
+                  <p className="text-xl sm:text-2xl font-semibold text-text-primary">
                     {formatPrice(packageData.price)}
                   </p>
                   {validityDays > 0 && (
@@ -123,7 +123,7 @@ const PackageHeader = ({
                   )}
                 </div>
                 {/* Data summary line */}
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-text-muted">
                   {dataDisplay} {t('sharePackage.for', 'for')} {validityDays} {t('sharePackage.days', 'days')}
                 </p>
               </div>
@@ -131,7 +131,7 @@ const PackageHeader = ({
           </div>
         </div>
       </div>
-      <div className="w-full h-px bg-gray-100"></div>
+      <div className="w-full h-px" style={{ backgroundColor: 'var(--divider)' }}></div>
     </div>
   );
 };

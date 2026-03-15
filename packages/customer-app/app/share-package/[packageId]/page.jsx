@@ -356,34 +356,34 @@ const SharePackagePage = () => {
   // Loading state — skeleton matching page layout
   if (loading || !translationsLoaded) {
     return (
-      <div className="bg-white min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-primary)' }} dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="relative isolate">
           <div className="mx-auto w-full max-w-9xl">
             {/* Header skeleton */}
             <div className="mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl w-full px-4 pt-10 lg:pt-20">
-              <div className="h-4 sm:h-5 bg-gray-100 rounded w-40 animate-pulse" />
-              <div className="h-8 sm:h-10 lg:h-12 bg-gray-100 rounded w-72 mt-3 animate-pulse" />
-              <div className="h-4 bg-gray-100 rounded w-56 mt-3 animate-pulse" />
+              <div className="h-4 sm:h-5 rounded w-40 animate-pulse" style={{ backgroundColor: 'var(--subtle-bg)' }} />
+              <div className="h-8 sm:h-10 lg:h-12 rounded w-72 mt-3 animate-pulse" style={{ backgroundColor: 'var(--subtle-bg)' }} />
+              <div className="h-4 rounded w-56 mt-3 animate-pulse" style={{ backgroundColor: 'var(--subtle-bg)' }} />
             </div>
-            <div className="w-full h-px bg-gray-100 mt-6" />
+            <div className="w-full h-px mt-6" style={{ backgroundColor: 'var(--divider)' }} />
             {/* Payment skeleton */}
             <div className="mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl w-full px-4 py-8">
               <div className="max-w-md">
-                <div className="h-6 bg-gray-100 rounded w-32 mb-4 animate-pulse" />
-                <div className="h-12 bg-gray-100 rounded w-full mb-3 animate-pulse" />
-                <div className="h-12 bg-gray-50 rounded w-full animate-pulse" />
+                <div className="h-6 rounded w-32 mb-4 animate-pulse" style={{ backgroundColor: 'var(--subtle-bg)' }} />
+                <div className="h-12 rounded w-full mb-3 animate-pulse" style={{ backgroundColor: 'var(--subtle-bg)' }} />
+                <div className="h-12 rounded w-full animate-pulse" style={{ backgroundColor: 'var(--card-bg)' }} />
               </div>
             </div>
-            <div className="w-full h-px bg-gray-100" />
+            <div className="w-full h-px" style={{ backgroundColor: 'var(--divider)' }} />
             {/* Stats skeleton */}
             <div className="mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl w-full px-4 py-8">
               <div className="flex flex-wrap gap-6">
                 {[1,2,3,4].map(i => (
                   <div key={i} className="flex items-center gap-2">
-                    <div className="w-10 h-10 bg-gray-100 rounded animate-pulse" />
+                    <div className="w-10 h-10 rounded animate-pulse" style={{ backgroundColor: 'var(--subtle-bg)' }} />
                     <div>
-                      <div className="h-3 bg-gray-100 rounded w-16 mb-1 animate-pulse" />
-                      <div className="h-4 bg-gray-100 rounded w-20 animate-pulse" />
+                      <div className="h-3 rounded w-16 mb-1 animate-pulse" style={{ backgroundColor: 'var(--subtle-bg)' }} />
+                      <div className="h-4 rounded w-20 animate-pulse" style={{ backgroundColor: 'var(--subtle-bg)' }} />
                     </div>
                   </div>
                 ))}
@@ -398,13 +398,13 @@ const SharePackagePage = () => {
   // Not found state
   if (!packageData) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--bg-secondary)' }} dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="text-center">
-          <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Globe className="w-5 h-5 text-gray-400" />
+          <div className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'var(--subtle-bg)' }}>
+            <Globe className="w-5 h-5 text-text-muted" />
           </div>
-          <h3 className="text-base font-semibold text-gray-900 mb-2">{t('sharePackage.notFound', 'Package Not Found')}</h3>
-          <p className="text-xs text-gray-600 mb-4">
+          <h3 className="text-base font-semibold text-text-primary mb-2">{t('sharePackage.notFound', 'Package Not Found')}</h3>
+          <p className="text-xs text-text-muted mb-4">
             {t('sharePackage.notFoundDesc', "The package you're looking for doesn't exist or has been removed")}
           </p>
           <button
@@ -419,7 +419,7 @@ const SharePackagePage = () => {
   }
 
   return (
-    <div className="bg-white min-h-screen flex flex-col transition-opacity duration-150" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen flex flex-col transition-opacity duration-150" style={{ backgroundColor: 'var(--bg-primary)' }} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Load Stripe.js only on this page where it's needed */}
       <Script src="https://js.stripe.com/v3/" strategy="lazyOnload" />
 
@@ -448,16 +448,16 @@ const SharePackagePage = () => {
       {/* Processing Overlay */}
       {(processingPayment || fraudCheckLoading) && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-6 max-w-sm mx-4">
+          <div className="rounded-lg p-6 max-w-sm mx-4" style={{ backgroundColor: 'var(--bg-primary)' }}>
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tufts-blue mx-auto mb-4"></div>
-              <p className="text-gray-900 font-semibold">
+              <p className="text-text-primary font-semibold">
                 {fraudCheckLoading
                   ? t('sharePackage.verifyingAccount', 'Verifying your account...')
                   : t('sharePackage.redirectingPayment', 'Redirecting to payment...')
                 }
               </p>
-              <p className="text-gray-600 text-sm mt-2">{t('sharePackage.pleaseWait', 'Please wait while we redirect you')}</p>
+              <p className="text-text-muted text-sm mt-2">{t('sharePackage.pleaseWait', 'Please wait while we redirect you')}</p>
             </div>
           </div>
         </div>
@@ -465,8 +465,8 @@ const SharePackagePage = () => {
 
       <div className="relative isolate flex-1 flex flex-col">
         {/* Decorative Lines */}
-        <div className="hidden sm:block absolute top-0 left-0 right-0 h-px bg-gray-200"></div>
-        <div className="hidden sm:block absolute bottom-0 left-0 right-0 h-px bg-gray-200"></div>
+        <div className="hidden sm:block absolute top-0 left-0 right-0 h-px" style={{ backgroundColor: 'var(--divider)' }}></div>
+        <div className="hidden sm:block absolute bottom-0 left-0 right-0 h-px" style={{ backgroundColor: 'var(--divider)' }}></div>
 
         <div className="mx-auto w-full max-w-9xl">
           {/* Package Header */}

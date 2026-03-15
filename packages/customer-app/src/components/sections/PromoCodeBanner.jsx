@@ -60,7 +60,7 @@ export default function PromoCodeBanner({ promo }) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="bg-gradient-to-r from-[#1a1a4e] to-[#0a0a2e] rounded-2xl p-8 lg:p-12 flex flex-col items-center gap-6 text-center">
+      <div className="bg-gradient-to-r from-[#1a1a4e] to-[#0a0a2e] p-8 lg:p-12 flex flex-col items-center gap-6 text-center">
         {/* Headline */}
         <h2 className="text-2xl lg:text-3xl font-bold text-text-primary">
           {headline}

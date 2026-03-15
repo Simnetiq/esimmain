@@ -50,9 +50,9 @@ export async function GET(request) {
 
     // Call the AI notification API
     // Hardcoded URLs for development and production
-    const baseUrl = process.env.NODE_ENV === 'development' 
-      ? 'http://localhost:3000' 
-      : 'https://esim.Simnetiq.net';
+    const baseUrl = process.env.NODE_ENV === 'development'
+      ? 'http://localhost:3000'
+      : process.env.NEXT_PUBLIC_BASE_URL || 'https://www.simnetiq.store';
     
     
     const response = await fetch(`${baseUrl}/api/ai-notification`, {

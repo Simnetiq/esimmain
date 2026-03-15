@@ -54,7 +54,7 @@ If you didn't create an account with Simnetiq, please ignore this email.
 
   } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to send email', details: error.message, fallback: true, otpCode },
+      { error: 'Failed to send email', details: error.message, fallback: true },
       { status: 500 }
     );
   }

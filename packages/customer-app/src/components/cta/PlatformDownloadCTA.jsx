@@ -63,15 +63,15 @@ function DownloadButton({ platform, variant, size, source, className = '' }) {
 
   // Static variant classes
   const variantClasses = {
-    primary: 'bg-gray-900 text-white shadow-lg hover:bg-gray-800 hover:scale-[1.02]',
-    secondary: 'bg-white text-gray-900 border border-gray-200 shadow-sm hover:border-tufts-blue hover:text-tufts-blue',
+    primary: 'bg-[var(--login-bg)] text-[var(--login-text)] shadow-lg hover:opacity-90 hover:scale-[1.02]',
+    secondary: 'bg-[var(--bg-primary)] text-text-primary border border-[var(--card-border)] shadow-sm hover:border-tufts-blue hover:text-tufts-blue',
     outline: 'bg-transparent text-white border border-white/20 shadow-sm hover:border-white/40 hover:bg-white/5',
     themed: 'shadow-sm hover:scale-[1.02] hover:opacity-90',
   };
 
   const circleClasses = {
     primary: 'bg-white/20',
-    secondary: 'bg-gray-100',
+    secondary: 'bg-[var(--subtle-bg)]',
     outline: 'bg-white/10',
     themed: '',
   };

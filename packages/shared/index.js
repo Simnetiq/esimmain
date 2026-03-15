@@ -43,3 +43,4 @@ export { default as AuthModal } from './components/AuthModal.jsx';
 export { default as Providers } from './components/Providers.jsx';
 export { default as LightProviders } from './components/LightProviders.jsx';
 export { default as Loading } from './components/Loading.jsx';
+export { default as FlagImage, FLAG_SVG_SET } from './components/FlagImage.jsx';

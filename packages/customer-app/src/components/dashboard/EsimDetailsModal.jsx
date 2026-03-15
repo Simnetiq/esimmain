@@ -27,7 +27,7 @@ const EsimDetailsModal = ({ esimDetails, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in" dir={direction} onClick={onClose}>
-      <div className="w-full max-w-2xl max-h-[90vh] overflow-hidden bg-white rounded-lg shadow-xl animate-scale-in" onClick={(e) => e.stopPropagation()}>
+      <div className="w-full max-w-2xl max-h-[90vh] overflow-hidden bg-[var(--bg-primary)] rounded-lg shadow-xl animate-scale-in" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className={`bg-gradient-to-r ${isRTL ? 'from-teal-500 to-emerald-500' : 'from-emerald-500 to-teal-500'} px-6 py-4`}>
           <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
@@ -52,42 +52,42 @@ const EsimDetailsModal = ({ esimDetails, onClose }) => {
         {/* Scrollable Content */}
         <div className="overflow-y-auto max-h-[calc(90vh-80px)] p-5 space-y-4">
           {/* Basic eSIM Info */}
-          <div className="bg-gray-50 border border-gray-100 rounded-lg p-4">
+          <div className="bg-[var(--bg-secondary)] border border-[var(--card-border)] rounded-lg p-4">
             <div className={`flex items-center gap-2 mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <Info className="w-4 h-4 text-gray-500" />
-              <h4 className="font-medium text-gray-900">{t('dashboard.basicInformation', 'Basic Information')}</h4>
+              <Info className="w-4 h-4 text-text-muted" />
+              <h4 className="font-medium text-text-primary">{t('dashboard.basicInformation', 'Basic Information')}</h4>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className={`flex items-center justify-between p-3 bg-white rounded border border-gray-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                <span className="text-sm text-gray-500">{t('dashboard.iccid', 'ICCID')}</span>
+              <div className={`flex items-center justify-between p-3 bg-[var(--bg-primary)] rounded border border-[var(--card-border)] ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <span className="text-sm text-text-muted">{t('dashboard.iccid', 'ICCID')}</span>
                 <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                  <span className="text-sm font-mono font-medium text-gray-900 truncate max-w-[140px]">
+                  <span className="text-sm font-mono font-medium text-text-primary truncate max-w-[140px]">
                     {esimDetails.iccid}
                   </span>
                   <button
                     onClick={() => copyToClipboard(esimDetails.iccid, 'ICCID')}
-                    className="p-1 hover:bg-gray-100 rounded transition-colors"
+                    className="p-1 hover:bg-[var(--hover-bg)] rounded transition-colors"
                   >
-                    <Copy className="w-3.5 h-3.5 text-gray-400" />
+                    <Copy className="w-3.5 h-3.5 text-text-muted" />
                   </button>
                 </div>
               </div>
 
-              <div className={`flex items-center justify-between p-3 bg-white rounded border border-gray-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                <span className="text-sm text-gray-500">{t('dashboard.matchingId', 'Matching ID')}</span>
-                <span className="text-sm font-medium text-gray-900">{esimDetails.matching_id}</span>
+              <div className={`flex items-center justify-between p-3 bg-[var(--bg-primary)] rounded border border-[var(--card-border)] ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <span className="text-sm text-text-muted">{t('dashboard.matchingId', 'Matching ID')}</span>
+                <span className="text-sm font-medium text-text-primary">{esimDetails.matching_id}</span>
               </div>
 
-              <div className={`flex items-center justify-between p-3 bg-white rounded border border-gray-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                <span className="text-sm text-gray-500">{t('dashboard.createdAt', 'Created At')}</span>
-                <span className="text-sm font-medium text-gray-900">
+              <div className={`flex items-center justify-between p-3 bg-[var(--bg-primary)] rounded border border-[var(--card-border)] ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <span className="text-sm text-text-muted">{t('dashboard.createdAt', 'Created At')}</span>
+                <span className="text-sm font-medium text-text-primary">
                   {new Date(esimDetails.created_at).toLocaleDateString()}
                 </span>
               </div>
 
-              <div className={`flex items-center justify-between p-3 bg-white rounded border border-gray-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                <span className="text-sm text-gray-500">{t('dashboard.recycled', 'Recycled')}</span>
+              <div className={`flex items-center justify-between p-3 bg-[var(--bg-primary)] rounded border border-[var(--card-border)] ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <span className="text-sm text-text-muted">{t('dashboard.recycled', 'Recycled')}</span>
                 <span className={`text-sm font-medium ${esimDetails.recycled ? 'text-amber-600' : 'text-emerald-600'}`}>
                   {esimDetails.recycled ? t('dashboard.yes', 'Yes') : t('dashboard.no', 'No')}
                 </span>
@@ -99,28 +99,28 @@ const EsimDetailsModal = ({ esimDetails, onClose }) => {
           <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
             <div className={`flex items-center gap-2 mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
               <QrCode className="w-4 h-4 text-blue-600" />
-              <h4 className="font-medium text-gray-900">{t('dashboard.qrCodeInformation', 'QR Code Information')}</h4>
+              <h4 className="font-medium text-text-primary">{t('dashboard.qrCodeInformation', 'QR Code Information')}</h4>
             </div>
 
             <div className="space-y-3">
-              <div className="p-3 bg-white rounded border border-blue-100">
+              <div className="p-3 bg-[var(--bg-primary)] rounded border border-blue-100">
                 <div className={`flex items-center justify-between mb-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                  <span className="text-sm text-gray-500">{t('dashboard.qrCodeData', 'QR Code Data')}</span>
+                  <span className="text-sm text-text-muted">{t('dashboard.qrCodeData', 'QR Code Data')}</span>
                   <button
                     onClick={() => copyToClipboard(esimDetails.qrcode, 'QR Code')}
                     className="p-1 hover:bg-blue-50 rounded transition-colors"
                   >
-                    <Copy className="w-3.5 h-3.5 text-gray-400" />
+                    <Copy className="w-3.5 h-3.5 text-text-muted" />
                   </button>
                 </div>
-                <p className={`text-xs font-mono text-gray-700 break-all bg-gray-50 p-2 rounded ${isRTL ? 'text-right' : 'text-left'}`}>
+                <p className={`text-xs font-mono text-text-primary break-all bg-[var(--bg-secondary)] p-2 rounded ${isRTL ? 'text-right' : 'text-left'}`}>
                   {esimDetails.qrcode}
                 </p>
               </div>
 
               {esimDetails.qrcode_url && (
-                <div className={`flex items-center justify-between p-3 bg-white rounded border border-blue-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                  <span className="text-sm text-gray-500">{t('dashboard.qrCodeUrl', 'QR Code URL')}</span>
+                <div className={`flex items-center justify-between p-3 bg-[var(--bg-primary)] rounded border border-blue-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <span className="text-sm text-text-muted">{t('dashboard.qrCodeUrl', 'QR Code URL')}</span>
                   <a
                     href={esimDetails.qrcode_url}
                     target="_blank"
@@ -134,8 +134,8 @@ const EsimDetailsModal = ({ esimDetails, onClose }) => {
               )}
 
               {esimDetails.direct_apple_installation_url && (
-                <div className={`flex items-center justify-between p-3 bg-white rounded border border-blue-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                  <span className="text-sm text-gray-500">{t('dashboard.appleInstallationUrl', 'Apple Install')}</span>
+                <div className={`flex items-center justify-between p-3 bg-[var(--bg-primary)] rounded border border-blue-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <span className="text-sm text-text-muted">{t('dashboard.appleInstallationUrl', 'Apple Install')}</span>
                   <a
                     href={esimDetails.direct_apple_installation_url}
                     target="_blank"
@@ -155,36 +155,36 @@ const EsimDetailsModal = ({ esimDetails, onClose }) => {
             <div className="bg-emerald-50 border border-emerald-100 rounded-lg p-4">
               <div className={`flex items-center gap-2 mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                 <Package className="w-4 h-4 text-emerald-600" />
-                <h4 className="font-medium text-gray-900">{t('dashboard.packageInformation', 'Package Information')}</h4>
+                <h4 className="font-medium text-text-primary">{t('dashboard.packageInformation', 'Package Information')}</h4>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className={`flex items-center justify-between p-3 bg-white rounded border border-emerald-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                  <span className="text-sm text-gray-500">{t('dashboard.package', 'Package')}</span>
-                  <span className="text-sm font-medium text-gray-900">{esimDetails.simable.package}</span>
+                <div className={`flex items-center justify-between p-3 bg-[var(--bg-primary)] rounded border border-emerald-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <span className="text-sm text-text-muted">{t('dashboard.package', 'Package')}</span>
+                  <span className="text-sm font-medium text-text-primary">{esimDetails.simable.package}</span>
                 </div>
 
-                <div className={`flex items-center justify-between p-3 bg-white rounded border border-emerald-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                  <span className="text-sm text-gray-500">{t('dashboard.data', 'Data')}</span>
-                  <span className="text-sm font-medium text-gray-900">{esimDetails.simable.data}</span>
+                <div className={`flex items-center justify-between p-3 bg-[var(--bg-primary)] rounded border border-emerald-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <span className="text-sm text-text-muted">{t('dashboard.data', 'Data')}</span>
+                  <span className="text-sm font-medium text-text-primary">{esimDetails.simable.data}</span>
                 </div>
 
-                <div className={`flex items-center justify-between p-3 bg-white rounded border border-emerald-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                  <span className="text-sm text-gray-500">{t('dashboard.validity', 'Validity')}</span>
-                  <span className="text-sm font-medium text-gray-900">
+                <div className={`flex items-center justify-between p-3 bg-[var(--bg-primary)] rounded border border-emerald-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <span className="text-sm text-text-muted">{t('dashboard.validity', 'Validity')}</span>
+                  <span className="text-sm font-medium text-text-primary">
                     {esimDetails.simable.validity} {t('dashboard.days', 'days')}
                   </span>
                 </div>
 
-                <div className={`flex items-center justify-between p-3 bg-white rounded border border-emerald-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                  <span className="text-sm text-gray-500">{t('dashboard.price', 'Price')}</span>
-                  <span className="text-sm font-medium text-gray-900">
+                <div className={`flex items-center justify-between p-3 bg-[var(--bg-primary)] rounded border border-emerald-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <span className="text-sm text-text-muted">{t('dashboard.price', 'Price')}</span>
+                  <span className="text-sm font-medium text-text-primary">
                     {esimDetails.simable.currency} {esimDetails.simable.price}
                   </span>
                 </div>
 
-                <div className={`flex items-center justify-between p-3 bg-white rounded border border-emerald-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                  <span className="text-sm text-gray-500">{t('dashboard.status', 'Status')}</span>
+                <div className={`flex items-center justify-between p-3 bg-[var(--bg-primary)] rounded border border-emerald-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <span className="text-sm text-text-muted">{t('dashboard.status', 'Status')}</span>
                   <div className={`flex items-center gap-1.5 ${isRTL ? 'flex-row-reverse' : ''}`}>
                     <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
                     <span className="text-sm font-medium text-emerald-600">
@@ -193,9 +193,9 @@ const EsimDetailsModal = ({ esimDetails, onClose }) => {
                   </div>
                 </div>
 
-                <div className={`flex items-center justify-between p-3 bg-white rounded border border-emerald-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                  <span className="text-sm text-gray-500">{t('dashboard.esimType', 'Type')}</span>
-                  <span className="text-sm font-medium text-gray-900">{esimDetails.simable.esim_type}</span>
+                <div className={`flex items-center justify-between p-3 bg-[var(--bg-primary)] rounded border border-emerald-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <span className="text-sm text-text-muted">{t('dashboard.esimType', 'Type')}</span>
+                  <span className="text-sm font-medium text-text-primary">{esimDetails.simable.esim_type}</span>
                 </div>
               </div>
             </div>
@@ -206,26 +206,26 @@ const EsimDetailsModal = ({ esimDetails, onClose }) => {
             <div className="bg-purple-50 border border-purple-100 rounded-lg p-4">
               <div className={`flex items-center gap-2 mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                 <User className="w-4 h-4 text-purple-600" />
-                <h4 className="font-medium text-gray-900">{t('dashboard.userInformation', 'User Information')}</h4>
+                <h4 className="font-medium text-text-primary">{t('dashboard.userInformation', 'User Information')}</h4>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className={`flex items-center justify-between p-3 bg-white rounded border border-purple-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                  <span className="text-sm text-gray-500">{t('dashboard.name', 'Name')}</span>
-                  <span className="text-sm font-medium text-gray-900">{esimDetails.simable.user.name}</span>
+                <div className={`flex items-center justify-between p-3 bg-[var(--bg-primary)] rounded border border-purple-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <span className="text-sm text-text-muted">{t('dashboard.name', 'Name')}</span>
+                  <span className="text-sm font-medium text-text-primary">{esimDetails.simable.user.name}</span>
                 </div>
 
-                <div className={`flex items-center justify-between p-3 bg-white rounded border border-purple-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                  <span className="text-sm text-gray-500">{t('dashboard.email', 'Email')}</span>
-                  <span className="text-sm font-medium text-gray-900 truncate max-w-[140px]">
+                <div className={`flex items-center justify-between p-3 bg-[var(--bg-primary)] rounded border border-purple-100 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <span className="text-sm text-text-muted">{t('dashboard.email', 'Email')}</span>
+                  <span className="text-sm font-medium text-text-primary truncate max-w-[140px]">
                     {esimDetails.simable.user.email}
                   </span>
                 </div>
 
                 {esimDetails.simable.user.company && (
-                  <div className={`flex items-center justify-between p-3 bg-white rounded border border-purple-100 sm:col-span-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                    <span className="text-sm text-gray-500">{t('dashboard.company', 'Company')}</span>
-                    <span className="text-sm font-medium text-gray-900">{esimDetails.simable.user.company}</span>
+                  <div className={`flex items-center justify-between p-3 bg-[var(--bg-primary)] rounded border border-purple-100 sm:col-span-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <span className="text-sm text-text-muted">{t('dashboard.company', 'Company')}</span>
+                    <span className="text-sm font-medium text-text-primary">{esimDetails.simable.user.company}</span>
                   </div>
                 )}
               </div>
@@ -235,7 +235,7 @@ const EsimDetailsModal = ({ esimDetails, onClose }) => {
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors"
+            className="w-full py-3 bg-[var(--subtle-bg)] hover:bg-[var(--hover-bg)] text-text-primary font-medium rounded-lg transition-colors"
           >
             {t('common.close', 'Close')}
           </button>

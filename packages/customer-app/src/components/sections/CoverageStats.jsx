@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
+import FlagImage from '@esim/shared/components/FlagImage';
 import AnimatedCounter from '../ui/AnimatedCounter';
 import Reveal from '../ui/Reveal';
 
@@ -12,42 +13,78 @@ const REGIONS = [
     slug: 'europe',
     nameKey: 'coverage.regionEurope',
     nameFallback: 'Europe',
-    flags: ['🇩🇪', '🇫🇷', '🇮🇹', '🇪🇸', '🇬🇧'],
+    flags: [
+      { code: 'de', emoji: '🇩🇪' },
+      { code: 'fr', emoji: '🇫🇷' },
+      { code: 'it', emoji: '🇮🇹' },
+      { code: 'es', emoji: '🇪🇸' },
+      { code: 'gb', emoji: '🇬🇧' },
+    ],
   },
   {
     key: 'asia',
     slug: 'asia',
     nameKey: 'coverage.regionAsia',
     nameFallback: 'Asia',
-    flags: ['🇯🇵', '🇰🇷', '🇸🇬', '🇹🇭', '🇮🇳'],
+    flags: [
+      { code: 'jp', emoji: '🇯🇵' },
+      { code: 'kr', emoji: '🇰🇷' },
+      { code: 'sg', emoji: '🇸🇬' },
+      { code: 'th', emoji: '🇹🇭' },
+      { code: 'in', emoji: '🇮🇳' },
+    ],
   },
   {
     key: 'americas',
     slug: 'americas',
     nameKey: 'coverage.regionAmericas',
     nameFallback: 'Americas',
-    flags: ['🇺🇸', '🇨🇦', '🇧🇷', '🇲🇽', '🇦🇷'],
+    flags: [
+      { code: 'us', emoji: '🇺🇸' },
+      { code: 'ca', emoji: '🇨🇦' },
+      { code: 'br', emoji: '🇧🇷' },
+      { code: 'mx', emoji: '🇲🇽' },
+      { code: 'ar', emoji: '🇦🇷' },
+    ],
   },
   {
     key: 'africa',
     slug: 'africa',
     nameKey: 'coverage.regionAfrica',
     nameFallback: 'Africa',
-    flags: ['🇿🇦', '🇰🇪', '🇳🇬', '🇪🇬', '🇲🇦'],
+    flags: [
+      { code: 'za', emoji: '🇿🇦' },
+      { code: 'ke', emoji: '🇰🇪' },
+      { code: 'ng', emoji: '🇳🇬' },
+      { code: 'eg', emoji: '🇪🇬' },
+      { code: 'ma', emoji: '🇲🇦' },
+    ],
   },
   {
     key: 'oceania',
     slug: 'oceania',
     nameKey: 'coverage.regionOceania',
     nameFallback: 'Oceania',
-    flags: ['🇦🇺', '🇳🇿', '🇫🇯', '🇵🇬', '🇼🇸'],
+    flags: [
+      { code: 'au', emoji: '🇦🇺' },
+      { code: 'nz', emoji: '🇳🇿' },
+      { code: 'fj', emoji: '🇫🇯' },
+      { code: 'pg', emoji: '🇵🇬' },
+      { code: 'ws', emoji: '🇼🇸' },
+    ],
   },
   {
     key: 'middle-east',
     slug: 'middle-east',
     nameKey: 'coverage.regionMiddleEast',
     nameFallback: 'Middle East',
-    flags: ['🇦🇪', '🇸🇦', '🇮🇱', '🇯🇴', '🇶🇦'],
+    flags: [
+      { code: 'ae', emoji: '🇦🇪' },
+      { code: 'sa', emoji: '🇸🇦' },
+      { code: 'il', emoji: '🇮🇱' },
+      { code: 'jo', emoji: '🇯🇴' },
+      { code: 'qa', emoji: '🇶🇦' },
+    ],
   },
 ];
 
@@ -106,11 +143,9 @@ export default function CoverageStats() {
             <p className="font-semibold text-text-primary text-start">
               {t(region.nameKey, region.nameFallback)}
             </p>
-            <div className="flex gap-1 flex-wrap rtl-native-flex">
+            <div className="flex gap-1.5 flex-wrap items-center rtl-native-flex">
               {region.flags.map((flag, fi) => (
-                <span key={fi} className="text-xl leading-none">
-                  {flag}
-                </span>
+                <FlagImage key={fi} code={flag.code} emoji={flag.emoji} />
               ))}
             </div>
           </Link>

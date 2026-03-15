@@ -15,7 +15,7 @@ export default function EsimPlansPage() {
           <Suspense fallback={
             <div className="flex justify-center items-center min-h-64">
               <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-tufts-blue"></div>
-              <p className="ml-4 text-gray-600">Завантаження планів...</p>
+              <p className="ml-4 text-text-muted">Завантаження планів...</p>
             </div>
           }>
             <EsimPlans />

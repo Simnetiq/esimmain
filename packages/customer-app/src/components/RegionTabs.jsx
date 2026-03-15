@@ -41,7 +41,8 @@ const RegionTabs = ({ selectedRegion, onRegionChange }) => {
         {[...Array(7)].map((_, i) => (
           <div
             key={i}
-            className="px-4 py-2 h-9 w-24 rounded-full bg-gray-100 animate-pulse flex-shrink-0"
+            className="px-4 py-2 h-9 w-24 rounded-full animate-pulse flex-shrink-0"
+            style={{ backgroundColor: 'var(--subtle-bg)' }}
           />
         ))}
       </div>
@@ -60,9 +61,10 @@ const RegionTabs = ({ selectedRegion, onRegionChange }) => {
             onClick={() => onRegionChange(region.id)}
             className={`px-4 py-2 font-medium text-sm rounded-full flex items-center gap-2 flex-shrink-0 whitespace-nowrap transition-colors duration-200 rtl-native-flex ${
               isSelected
-                ? 'bg-eerie-black text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-tufts-blue text-white'
+                : 'text-text-muted'
             }`}
+            style={isSelected ? {} : { backgroundColor: 'var(--subtle-bg)', border: '1px solid var(--subtle-border)' }}
           >
             {icon}
             {region.displayName}

@@ -92,14 +92,14 @@ export default function About() {
   ];
 
   return (
-    <div className="bg-white flex flex-col overflow-hidden" dir={direction} lang={detectedLanguage}>
+    <div className="bg-[var(--bg-primary)] flex flex-col overflow-hidden" dir={direction} lang={detectedLanguage}>
       <div className="relative flex-1 flex flex-col">
 
         {/* Hero Section */}
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
             <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              <p className={`text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 mb-4 animate-fade-in-up ${isRTL ? 'text-right' : 'text-left'}`}>
+              <p className={`text-sm sm:text-base font-medium tracking-widest uppercase text-text-muted mb-4 animate-fade-in-up ${isRTL ? 'text-right' : 'text-left'}`}>
                 {t('about.sectionLabel', 'About Us')}
               </p>
               <h1 className={`text-2xl sm:text-3xl lg:text-4xl xl:text-5xl tracking-tight font-semibold text-eerie-black max-w-4xl animate-fade-in-up animation-delay-100 leading-[1.15] ${isRTL ? 'text-right' : 'text-left'}`}>
@@ -107,7 +107,7 @@ export default function About() {
               </h1>
             </div>
           </div>
-          <div className="w-full h-px bg-gray-100" />
+          <div className="w-full h-px bg-[var(--subtle-bg)]" />
         </div>
 
         {/* Mission */}
@@ -124,10 +124,10 @@ export default function About() {
                   </h2>
                 </div>
                 <div className={`animate-fade-in-up animation-delay-300 ${isRTL ? 'text-right lg:col-start-1 lg:row-start-1' : ''}`}>
-                  <p className="text-gray-600 text-sm sm:text-base leading-relaxed mb-4">
+                  <p className="text-text-muted text-sm sm:text-base leading-relaxed mb-4">
                     {t('about.missionDesc1', 'We believe connectivity is a fundamental right. Whether you\'re a backpacker, expat, or digital nomad — you deserve fast, affordable internet without the friction of physical SIM cards or surprise roaming charges.')}
                   </p>
-                  <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
+                  <p className="text-text-muted text-sm sm:text-base leading-relaxed">
                     {t('about.missionDesc2', 'Simnetiq was built to make staying connected abroad as simple as scanning a QR code. No contracts, no stores, no hassle — just instant data wherever you land.')}
                   </p>
                 </div>
@@ -138,7 +138,7 @@ export default function About() {
 
         {/* Stats Bar */}
         <div className="mx-auto w-full max-w-9xl">
-          <div className="mx-auto w-full max-w-7xl bg-gray-50">
+          <div className="mx-auto w-full max-w-7xl bg-[var(--bg-secondary)]">
             <div className="px-4 py-10 lg:py-12 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                 {stats.map((stat, index) => (
@@ -150,7 +150,7 @@ export default function About() {
                     <p className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-eerie-black tracking-tight">
                       {stat.value}
                     </p>
-                    <p className="text-xs sm:text-sm font-medium tracking-widest uppercase text-gray-500 mt-2">
+                    <p className="text-xs sm:text-sm font-medium tracking-widest uppercase text-text-muted mt-2">
                       {stat.label}
                     </p>
                   </div>
@@ -164,7 +164,7 @@ export default function About() {
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
             <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              <p className={`text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 mb-4 animate-fade-in-up ${isRTL ? 'text-right' : 'text-left'}`}>
+              <p className={`text-sm sm:text-base font-medium tracking-widest uppercase text-text-muted mb-4 animate-fade-in-up ${isRTL ? 'text-right' : 'text-left'}`}>
                 {t('about.valuesLabel', 'Why Choose Us')}
               </p>
               <h2 className={`text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-eerie-black max-w-5xl animate-fade-in-up animation-delay-100 ${isRTL ? 'text-right' : 'text-left'}`}>
@@ -172,7 +172,7 @@ export default function About() {
               </h2>
             </div>
           </div>
-          <div className="w-full h-px bg-gray-100" />
+          <div className="w-full h-px bg-[var(--subtle-bg)]" />
         </div>
 
         {/* Values Grid */}
@@ -183,7 +183,7 @@ export default function About() {
                 {values.map(({ Icon, title, desc }, index) => (
                   <div
                     key={index}
-                    className="group relative bg-gray-50 overflow-hidden hover:bg-white transition-all duration-500 animate-fade-in-up"
+                    className="group relative bg-[var(--bg-secondary)] overflow-hidden hover:bg-[var(--bg-primary)] transition-all duration-500 animate-fade-in-up"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
                     <div className="p-6 lg:p-8">
@@ -193,7 +193,7 @@ export default function About() {
                       <h3 className={`text-lg lg:text-xl font-semibold text-eerie-black mb-3 ${isRTL ? 'text-right' : 'text-left'}`}>
                         {title}
                       </h3>
-                      <p className={`text-gray-500 text-sm leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
+                      <p className={`text-text-muted text-sm leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
                         {desc}
                       </p>
                     </div>
@@ -208,7 +208,7 @@ export default function About() {
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
             <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              <p className={`text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 mb-4 animate-fade-in-up ${isRTL ? 'text-right' : 'text-left'}`}>
+              <p className={`text-sm sm:text-base font-medium tracking-widest uppercase text-text-muted mb-4 animate-fade-in-up ${isRTL ? 'text-right' : 'text-left'}`}>
                 {t('about.storyLabel', 'Our Story')}
               </p>
               <h2 className={`text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-eerie-black max-w-5xl animate-fade-in-up animation-delay-100 ${isRTL ? 'text-right' : 'text-left'}`}>
@@ -216,7 +216,7 @@ export default function About() {
               </h2>
             </div>
           </div>
-          <div className="w-full h-px bg-gray-100" />
+          <div className="w-full h-px bg-[var(--subtle-bg)]" />
         </div>
 
         <div className="mx-auto w-full max-w-9xl">
@@ -227,14 +227,14 @@ export default function About() {
                   <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-tufts-blue/10 flex items-center justify-center mt-0.5">
                     <HeartIcon className="w-5 h-5 text-tufts-blue" />
                   </div>
-                  <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
+                  <p className="text-text-muted text-sm sm:text-base leading-relaxed">
                     {t('about.storyPara1', 'Simnetiq started with a simple problem: getting connected abroad shouldn\'t be this hard. Between hunting for local SIM shops, dealing with language barriers, and paying outrageous roaming fees — we knew there had to be a better way.')}
                   </p>
                 </div>
-                <p className={`text-gray-600 text-sm sm:text-base leading-relaxed mb-6 ${isRTL ? '' : 'pl-14'}`}>
+                <p className={`text-text-muted text-sm sm:text-base leading-relaxed mb-6 ${isRTL ? '' : 'pl-14'}`}>
                   {t('about.storyPara2', 'Today, Simnetiq serves travelers in over 200 countries with instant digital eSIMs. Purchase online, scan a QR code, and you\'re connected — all before you even leave the airport.')}
                 </p>
-                <p className={`text-gray-600 text-sm sm:text-base leading-relaxed ${isRTL ? '' : 'pl-14'}`}>
+                <p className={`text-text-muted text-sm sm:text-base leading-relaxed ${isRTL ? '' : 'pl-14'}`}>
                   {t('about.storyPara3', 'We\'re a small team of travelers and technologists who believe the best connectivity is the kind you don\'t have to think about. No contracts, no stores, no friction.')}
                 </p>
               </div>
@@ -244,18 +244,18 @@ export default function About() {
 
         {/* CTA */}
         <div className="mx-auto w-full max-w-9xl">
-          <div className="mx-auto w-full max-w-7xl bg-gray-50">
+          <div className="mx-auto w-full max-w-7xl bg-[var(--bg-secondary)]">
             <div className="px-4 py-16 lg:py-20 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
               <div className="text-center animate-fade-in-up">
                 <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-eerie-black tracking-tight mb-4">
                   {t('about.ctaTitle', 'Ready to go global?')}
                 </h2>
-                <p className="text-gray-600 text-sm sm:text-base mb-8 max-w-xl mx-auto leading-relaxed">
+                <p className="text-text-muted text-sm sm:text-base mb-8 max-w-xl mx-auto leading-relaxed">
                   {t('about.ctaDesc', 'Get your eSIM in minutes. Works on any unlocked device.')}
                 </p>
                 <Link
                   href="/esim-plans"
-                  className={`group inline-flex items-center gap-2 px-8 py-3 bg-eerie-black text-white font-medium rounded-full hover:bg-gray-800 transition-colors text-sm sm:text-base ${isRTL ? 'flex-row-reverse' : ''}`}
+                  className={`group inline-flex items-center gap-2 px-8 py-3 bg-[var(--login-bg)] text-[var(--login-text)] font-medium rounded-full hover:opacity-90 transition-colors text-sm sm:text-base ${isRTL ? 'flex-row-reverse' : ''}`}
                 >
                   {t('about.ctaButton', 'Browse Plans')}
                   <ArrowRightIcon className={`w-4 h-4 group-hover:translate-x-1 transition-transform ${isRTL ? 'rotate-180 group-hover:-translate-x-1' : ''}`} />

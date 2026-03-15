@@ -100,17 +100,17 @@ const Login = () => {
 
   return (
     <div
-      className="min-h-screen bg-white"
+      className="min-h-screen bg-[var(--bg-primary)]"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       {/* Content */}
       <div className={`relative min-h-screen flex items-center justify-center px-4 py-8 sm:py-12 transition-opacity duration-150 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
         <div className="w-full max-w-md">
           {/* Card */}
-          <div className="bg-gray-50 p-6 sm:p-10">
+          <div className="bg-[var(--bg-secondary)] p-6 sm:p-10">
             {/* Header */}
             <div className="text-center mb-8">
-              <p className="text-sm font-medium tracking-widest uppercase text-gray-500 mb-3">
+              <p className="text-sm font-medium tracking-widest uppercase text-text-muted mb-3">
                 {t('auth.login.welcome', 'Welcome Back')}
               </p>
               <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-3">
@@ -118,13 +118,13 @@ const Login = () => {
                 <span className="text-eerie-black">{t('auth.login.or', 'or')}</span>{' '}
                 <span className="text-eerie-black">{t('auth.login.getStarted', 'get started')}</span>
               </h1>
-              <p className="text-gray-600 text-sm">
+              <p className="text-text-muted text-sm">
                 {t('auth.login.quickAccess', 'Quick and secure access with your Google or Apple account')}
               </p>
             </div>
 
             {/* Divider */}
-            <div className="w-full h-px bg-gray-200 mb-8" />
+            <div className="w-full h-px mb-8" style={{ backgroundColor: 'var(--divider)' }} />
 
             {/* Sign In Buttons */}
             <div className="space-y-3">
@@ -132,10 +132,10 @@ const Login = () => {
                 type="button"
                 onClick={handleGoogleSignIn}
                 disabled={loading || !mounted}
-                className="w-full flex items-center justify-center gap-3 px-6 py-3.5 bg-white border border-gray-200 rounded-full hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-3 px-6 py-3.5 bg-[var(--bg-primary)] border border-[var(--card-border)] rounded-full hover:bg-[var(--hover-bg)] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loadingProvider === 'google' ? (
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-600" />
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[var(--text-muted)]" />
                 ) : (
                   <GoogleIcon />
                 )}
@@ -148,7 +148,8 @@ const Login = () => {
                 type="button"
                 onClick={handleAppleSignIn}
                 disabled={loading || !mounted}
-                className="w-full flex items-center justify-center gap-3 px-6 py-3.5 bg-eerie-black text-white rounded-full hover:bg-gray-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-full hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ backgroundColor: 'var(--login-bg)', color: 'var(--login-text)' }}
               >
                 {loadingProvider === 'apple' ? (
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
@@ -162,7 +163,7 @@ const Login = () => {
             </div>
 
             {/* Terms */}
-            <p className="mt-6 text-xs text-gray-500 text-center">
+            <p className="mt-6 text-xs text-text-muted text-center">
               {t('auth.login.termsNotice', 'By continuing, you agree to our')}{' '}
               <Link href={getLocalizedUrl('/terms-of-service')} className="text-tufts-blue hover:underline">
                 {t('auth.login.termsOfService', 'Terms of Service')}
@@ -175,11 +176,11 @@ const Login = () => {
           </div>
 
           {/* Download App CTA — matches ActivationSection style */}
-          <div className="mt-4 bg-gray-50 p-6 sm:p-8">
+          <div className="mt-4 bg-[var(--bg-secondary)] p-6 sm:p-8">
             <p className={`text-xs font-medium tracking-widest uppercase text-tufts-blue mb-1 ${isRTL ? 'text-right' : 'text-left'}`}>
               {t('auth.login.downloadApp', 'Download our app')}
             </p>
-            <p className={`text-sm text-gray-500 mb-3 ${isRTL ? 'text-right' : 'text-left'}`}>
+            <p className={`text-sm text-text-muted mb-3 ${isRTL ? 'text-right' : 'text-left'}`}>
               {t('auth.login.appDescription', 'Get instant eSIM activation and manage your plans on the go.')}
             </p>
 
@@ -201,11 +202,11 @@ const Login = () => {
                 href={appStoreLinks.android}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center rounded-full bg-white pl-5 pr-1 py-1 text-sm font-semibold text-gray-900 ring-1 ring-gray-200 shadow-sm transition-all duration-150 hover:bg-gray-50 hover:scale-[1.02] w-full sm:w-auto"
+                className="inline-flex items-center rounded-full bg-[var(--bg-primary)] pl-5 pr-1 py-1 text-sm font-semibold text-text-primary ring-1 ring-[var(--card-border)] shadow-sm transition-all duration-150 hover:bg-[var(--hover-bg)] hover:scale-[1.02] w-full sm:w-auto"
               >
                 <span className="flex-1 text-center">{t('activation.googlePlay', 'Google Play')}</span>
-                <span className="ml-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-gray-100 w-8 h-8">
-                  <svg className="w-4 h-4 text-gray-900" viewBox="0 0 24 24" fill="currentColor">
+                <span className="ml-2.5 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-[var(--subtle-bg)] w-8 h-8">
+                  <svg className="w-4 h-4 text-text-primary" viewBox="0 0 24 24" fill="currentColor">
                     <path fillRule="evenodd" clipRule="evenodd" d="M2 3.65629C2 2.15127 3.59967 1.18549 4.93149 1.88645L20.7844 10.2301C22.2091 10.9799 22.2091 13.0199 20.7844 13.7698L4.9315 22.1134C3.59968 22.8144 2 21.8486 2 20.3436V3.65629ZM19.8529 11.9999L16.2682 10.1132L14.2243 11.9999L16.2682 13.8866L19.8529 11.9999ZM14.3903 14.875L12.75 13.3608L6.75782 18.8921L14.3903 14.875ZM12.75 10.639L14.3903 9.12488L6.75782 5.10777L12.75 10.639ZM4 5.28391L11.2757 11.9999L4 18.7159V5.28391Z"/>
                   </svg>
                 </span>

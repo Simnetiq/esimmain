@@ -131,45 +131,45 @@ const CryptoCheckoutContent = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[var(--bg-secondary)] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-text-primary mb-2">
             {t('cryptoCheckout.title', 'Choose Cryptocurrency')}
           </h1>
-          <p className="text-gray-600">
+          <p className="text-text-muted">
             {t('cryptoCheckout.subtitle', 'Pay with Bitcoin, USDC, Ethereum, and more')}
           </p>
-          <div className="mt-2 text-sm text-gray-500">
+          <div className="mt-2 text-sm text-text-muted">
             Powered by Coinbase Commerce 🔒
           </div>
         </div>
 
         {/* Package Summary */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+        <div className="bg-[var(--bg-primary)] rounded-lg shadow-md p-6 mb-6">
+          <h2 className="text-lg font-semibold text-text-primary mb-4">
             {t('cryptoCheckout.orderSummary', 'Order Summary')}
           </h2>
           <div className="flex justify-between items-center mb-2">
-            <span className="text-gray-600">{packageData.packageName}</span>
-            <span className="font-semibold text-gray-900">
+            <span className="text-text-muted">{packageData.packageName}</span>
+            <span className="font-semibold text-text-primary">
               {formatPrice(packageData.price)}
             </span>
           </div>
           {packageData.data && (
-            <div className="text-sm text-gray-500 mt-2">
+            <div className="text-sm text-text-muted mt-2">
               {packageData.data} {packageData.dataUnit || 'GB'} • {packageData.period} days
             </div>
           )}
         </div>
 
         {/* Cryptocurrency Selection */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+        <div className="bg-[var(--bg-primary)] rounded-lg shadow-md p-6 mb-6">
+          <h2 className="text-lg font-semibold text-text-primary mb-4">
             {t('cryptoCheckout.selectCryptocurrency', 'Select Cryptocurrency')}
           </h2>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-text-muted mb-4">
             Choose your preferred cryptocurrency. Coinbase Commerce will show you the exact amount to pay.
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -180,14 +180,14 @@ const CryptoCheckoutContent = () => {
                 className={`p-5 rounded-lg border-2 transition-all ${
                   selectedCurrency === crypto.code
                     ? 'border-tufts-blue bg-blue-50 shadow-md'
-                    : 'border-gray-200 hover:border-gray-300 hover:shadow'
+                    : 'border-[var(--card-border)] hover:border-text-muted hover:shadow'
                 }`}
               >
                 <div className="text-center">
                   <div className="text-4xl mb-2">{crypto.symbol}</div>
-                  <div className="font-semibold text-base text-gray-900">{crypto.code}</div>
-                  <div className="text-xs text-gray-500 mt-1">{crypto.name}</div>
-                  <div className="text-xs text-gray-400 mt-1">{crypto.network}</div>
+                  <div className="font-semibold text-base text-text-primary">{crypto.code}</div>
+                  <div className="text-xs text-text-muted mt-1">{crypto.name}</div>
+                  <div className="text-xs text-text-muted mt-1">{crypto.network}</div>
                 </div>
               </button>
             ))}
@@ -195,15 +195,15 @@ const CryptoCheckoutContent = () => {
         </div>
 
         {/* Features */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="bg-[var(--bg-primary)] rounded-lg shadow-md p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex items-start gap-3">
               <Shield className="w-5 h-5 text-tufts-blue mt-1" />
               <div>
-                <div className="font-semibold text-sm text-gray-900">
+                <div className="font-semibold text-sm text-text-primary">
                   {t('cryptoCheckout.secure', 'Secure Payment')}
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-text-muted">
                   {t('cryptoCheckout.secureDesc', 'End-to-end encrypted')}
                 </div>
               </div>
@@ -211,10 +211,10 @@ const CryptoCheckoutContent = () => {
             <div className="flex items-start gap-3">
               <Zap className="w-5 h-5 text-tufts-blue mt-1" />
               <div>
-                <div className="font-semibold text-sm text-gray-900">
+                <div className="font-semibold text-sm text-text-primary">
                   {t('cryptoCheckout.instant', 'Instant Delivery')}
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-text-muted">
                   {t('cryptoCheckout.instantDesc', 'Get your eSIM immediately')}
                 </div>
               </div>
@@ -222,10 +222,10 @@ const CryptoCheckoutContent = () => {
             <div className="flex items-start gap-3">
               <Globe className="w-5 h-5 text-tufts-blue mt-1" />
               <div>
-                <div className="font-semibold text-sm text-gray-900">
+                <div className="font-semibold text-sm text-text-primary">
                   {t('cryptoCheckout.global', 'Global Coverage')}
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-text-muted">
                   {t('cryptoCheckout.globalDesc', 'Works worldwide')}
                 </div>
               </div>
@@ -255,7 +255,7 @@ const CryptoCheckoutContent = () => {
         {/* Back Button */}
         <button
           onClick={() => router.back()}
-          className="w-full mt-4 py-3 text-gray-600 hover:text-gray-900 transition-colors"
+          className="w-full mt-4 py-3 text-text-muted hover:text-text-primary transition-colors"
         >
           {t('cryptoCheckout.back', 'Back to Plans')}
         </button>

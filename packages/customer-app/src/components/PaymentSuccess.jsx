@@ -264,10 +264,10 @@ const PaymentSuccess = () => {
   // Loading state
   if (authLoading || i18nLoading || processing) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--bg-secondary)' }} dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-tufts-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">{t('paymentSuccess.loading', 'Processing payment...')}</p>
+          <p className="text-text-muted">{t('paymentSuccess.loading', 'Processing payment...')}</p>
         </div>
       </div>
     );
@@ -276,11 +276,11 @@ const PaymentSuccess = () => {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
-        <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8 text-center">
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'var(--bg-secondary)' }} dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="max-w-md mx-auto rounded-lg shadow-lg p-8 text-center" style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--card-border)' }}>
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('paymentSuccess.error', 'Error')}</h2>
-          <p className="text-gray-600 mb-6">{error}</p>
+          <h2 className="text-2xl font-bold text-text-primary mb-2">{t('paymentSuccess.error', 'Error')}</h2>
+          <p className="text-text-muted mb-6">{error}</p>
           <button
             onClick={() => router.push('/dashboard')}
             className="w-full px-8 py-4 bg-tufts-blue text-white font-semibold rounded-lg hover:bg-cobalt-blue transition-colors"
@@ -295,21 +295,21 @@ const PaymentSuccess = () => {
   // Pending state - waiting for webhook to process
   if (orderStatus === 'pending') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
-        <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8 text-center">
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'var(--bg-secondary)' }} dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="max-w-md mx-auto rounded-lg shadow-lg p-8 text-center" style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--card-border)' }}>
           <Clock className="w-16 h-16 text-yellow-500 mx-auto mb-4 animate-pulse" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <h2 className="text-2xl font-bold text-text-primary mb-2">
             {t('paymentSuccess.processingTitle', 'Processing Your Order')}
           </h2>
-          <p className="text-gray-600 mb-4">
+          <p className="text-text-muted mb-4">
             {t('paymentSuccess.processingMessage', 'Your payment was successful! We are now activating your eSIM. This usually takes a few seconds.')}
           </p>
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-tufts-blue mx-auto mb-4"></div>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-text-muted">
             {t('paymentSuccess.processingNote', 'This page will automatically update when your eSIM is ready.')}
           </p>
           {orderInfo && (
-            <p className="text-xs text-gray-400 mt-4">
+            <p className="text-xs text-text-muted mt-4">
               {t('paymentSuccess.orderId', 'Order ID')}: {orderInfo.orderId}
             </p>
           )}
@@ -321,23 +321,23 @@ const PaymentSuccess = () => {
   // Success state with QR code
   if (orderStatus === 'completed' && qrCodeData) {
     return (
-      <div className="bg-gray-50 min-h-screen flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--bg-secondary)' }} dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="relative isolate flex-1 flex flex-col">
 
           {/* Success Header with gradient */}
-          <div className="bg-gradient-to-b from-emerald-50 via-white to-gray-50 pt-12 pb-8 sm:pt-16 sm:pb-10">
+          <div className="pt-12 pb-8 sm:pt-16 sm:pb-10" style={{ background: 'linear-gradient(to bottom, rgba(16, 185, 129, 0.05), var(--bg-primary), var(--bg-secondary))' }}>
             <div className="max-w-2xl mx-auto px-4 text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 mb-5">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-5" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)' }}>
                 <CheckCircle className="w-8 h-8 text-emerald-600" />
               </div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 tracking-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary mb-2 tracking-tight">
                 {t('paymentSuccess.title', 'Payment Successful!')}
               </h1>
-              <p className="text-gray-500 text-base sm:text-lg">
+              <p className="text-text-muted text-base sm:text-lg">
                 {t('paymentSuccess.subtitle', 'Your eSIM has been activated successfully')}
               </p>
               {orderInfo && (
-                <p className="text-xs text-gray-400 mt-3 font-mono">
+                <p className="text-xs text-text-muted mt-3 font-mono">
                   {t('paymentSuccess.orderId', 'Order ID')}: {orderInfo.orderId}
                 </p>
               )}
@@ -346,13 +346,13 @@ const PaymentSuccess = () => {
 
           {/* QR Code Card */}
           <div className="max-w-lg mx-auto w-full px-4 -mt-2">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="rounded-2xl shadow-sm overflow-hidden" style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--card-border)' }}>
               {/* QR Code */}
               <div className="p-6 sm:p-8 flex flex-col items-center">
-                <p className="text-sm text-gray-500 mb-5 text-center">
+                <p className="text-sm text-text-muted mb-5 text-center">
                   {t('paymentSuccess.qrCodeDescription', 'Scan this QR code with your device to activate your eSIM')}
                 </p>
-                <div className="bg-white p-3 rounded-xl border-2 border-gray-100 shadow-sm">
+                <div className="bg-white p-3 rounded-xl border-2 shadow-sm" style={{ borderColor: 'var(--subtle-border)' }}>
                   {generatedQrCode ? (
                     <Image
                       src={generatedQrCode}
@@ -370,8 +370,8 @@ const PaymentSuccess = () => {
                       className="w-56 h-56 sm:w-64 sm:h-64"
                     />
                   ) : (
-                    <div className="w-56 h-56 sm:w-64 sm:h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-                      <QrCode className="w-16 h-16 text-gray-300" />
+                    <div className="w-56 h-56 sm:w-64 sm:h-64 flex items-center justify-center rounded-lg" style={{ backgroundColor: 'var(--subtle-bg)' }}>
+                      <QrCode className="w-16 h-16 text-text-muted" />
                     </div>
                   )}
                 </div>
@@ -379,26 +379,26 @@ const PaymentSuccess = () => {
 
               {/* LPA & ICCID details */}
               {(qrCodeData.lpa || qrCodeData.qrCode || qrCodeData.iccid) && (
-                <div className="border-t border-gray-100 px-6 py-4 space-y-2">
+                <div className="px-6 py-4 space-y-2" style={{ borderTop: '1px solid var(--subtle-border)' }}>
                   {(qrCodeData.lpa || qrCodeData.qrCode) && (
                     <div>
-                      <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">{t('paymentSuccess.lpaCode', 'LPA Code')}</span>
-                      <p className="mt-1 font-mono text-xs text-gray-600 break-all bg-gray-50 p-2 rounded-lg">
+                      <span className="text-xs font-medium text-text-muted uppercase tracking-wide">{t('paymentSuccess.lpaCode', 'LPA Code')}</span>
+                      <p className="mt-1 font-mono text-xs text-text-muted break-all p-2 rounded-lg" style={{ backgroundColor: 'var(--subtle-bg)' }}>
                         {qrCodeData.lpa || qrCodeData.qrCode}
                       </p>
                     </div>
                   )}
                   {qrCodeData.iccid && (
                     <div>
-                      <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">{t('paymentSuccess.iccid', 'ICCID')}</span>
-                      <p className="mt-1 font-mono text-xs text-gray-600">{qrCodeData.iccid}</p>
+                      <span className="text-xs font-medium text-text-muted uppercase tracking-wide">{t('paymentSuccess.iccid', 'ICCID')}</span>
+                      <p className="mt-1 font-mono text-xs text-text-muted">{qrCodeData.iccid}</p>
                     </div>
                   )}
                 </div>
               )}
 
               {/* Action buttons */}
-              <div className="border-t border-gray-100 p-4 flex flex-col sm:flex-row gap-3">
+              <div className="p-4 flex flex-col sm:flex-row gap-3" style={{ borderTop: '1px solid var(--subtle-border)' }}>
                 <button
                   onClick={() => {
                     const qrSource = generatedQrCode || qrCodeData.qrCodeUrl;
@@ -418,7 +418,8 @@ const PaymentSuccess = () => {
                 {currentUser && (
                   <button
                     onClick={() => router.push('/dashboard')}
-                    className="flex-1 inline-flex items-center justify-center px-5 py-2.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-200 transition-colors"
+                    className="flex-1 inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium rounded-xl transition-colors"
+                    style={{ backgroundColor: 'var(--subtle-bg)', color: 'var(--text-primary)' }}
                   >
                     {t('paymentSuccess.goToDashboard', 'Go to Dashboard')}
                   </button>
@@ -431,28 +432,29 @@ const PaymentSuccess = () => {
           <div className="max-w-lg mx-auto w-full px-4 mt-5">
             <Link
               href="/help/install-esim"
-              className="group block bg-white rounded-2xl shadow-sm border border-gray-200 p-5 sm:p-6 hover:border-tufts-blue/30 hover:shadow-md transition-all duration-200"
+              className="group block rounded-2xl shadow-sm p-5 sm:p-6 hover:shadow-md transition-all duration-200"
+              style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--card-border)' }}
             >
               <div className={`flex items-start gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
                 <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-tufts-blue/10 flex items-center justify-center group-hover:bg-tufts-blue/20 transition-colors">
                   <BookOpen className="w-5 h-5 text-tufts-blue" />
                 </div>
                 <div className={`flex-1 min-w-0 ${isRTL ? 'text-right' : ''}`}>
-                  <h3 className="text-base font-semibold text-gray-900 mb-1">
+                  <h3 className="text-base font-semibold text-text-primary mb-1">
                     {t('paymentSuccess.installGuideTitle', 'How to Install Your eSIM')}
                   </h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">
+                  <p className="text-sm text-text-muted leading-relaxed">
                     {t('paymentSuccess.installGuideDescription', 'Step-by-step instructions for iPhone and Android — takes less than 2 minutes.')}
                   </p>
                 </div>
-                <ArrowRight className={`w-5 h-5 text-gray-300 group-hover:text-tufts-blue group-hover:translate-x-0.5 transition-all flex-shrink-0 mt-3 ${isRTL ? 'rotate-180 group-hover:-translate-x-0.5' : ''}`} />
+                <ArrowRight className={`w-5 h-5 text-text-muted group-hover:text-tufts-blue group-hover:translate-x-0.5 transition-all flex-shrink-0 mt-3 ${isRTL ? 'rotate-180 group-hover:-translate-x-0.5' : ''}`} />
               </div>
             </Link>
           </div>
 
           {/* Quick tips */}
           <div className="max-w-lg mx-auto w-full px-4 mt-5 mb-12">
-            <div className="bg-amber-50 border border-amber-100 rounded-2xl p-5">
+            <div className="rounded-2xl p-5" style={{ backgroundColor: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.15)' }}>
               <div className={`flex items-start gap-3 ${isRTL ? 'flex-row-reverse text-right' : ''}`}>
                 <Smartphone className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
                 <div>
@@ -476,10 +478,10 @@ const PaymentSuccess = () => {
 
   // Default/fallback state
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-[var(--bg-secondary)] flex items-center justify-center" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="text-center">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-tufts-blue mx-auto mb-4"></div>
-        <p className="text-gray-600">{t('paymentSuccess.loading', 'Loading...')}</p>
+        <p className="text-text-muted">{t('paymentSuccess.loading', 'Loading...')}</p>
       </div>
     </div>
   );

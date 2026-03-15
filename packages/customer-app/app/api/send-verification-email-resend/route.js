@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
 import { NextResponse } from 'next/server';
 
-const resend = new Resend(process.env.RESEND_API_KEY || 're_fallback_key');
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
 export async function POST(request) {
   try {
@@ -112,25 +112,25 @@ Need help? Contact us at support@simnetiq.store
     `;
 
     // Check if Resend API key is properly configured
-    if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === 're_fallback_key') {
+    if (!RESEND_API_KEY) {
       return NextResponse.json(
-        { 
-          success: true, 
-          messageId: 'fallback_' + Date.now(),
-          message: 'Email service not configured - verification code: ' + otpCode,
-          fallback: true,
-          otpCode: otpCode // Include OTP in response for manual verification
+        {
+          success: false,
+          error: 'Email service is not configured: RESEND_API_KEY is missing',
+          fallback: true
         },
-        { status: 200 }
+        { status: 503 }
       );
     }
 
+    const resend = new Resend(RESEND_API_KEY);
+
     // Send email using Resend
     // Use Resend's onboarding domain until custom domain is verified
-    const fromEmail = process.env.RESEND_VERIFIED_DOMAIN 
+    const fromEmail = process.env.RESEND_VERIFIED_DOMAIN
       ? `Simnetiq <noreply@${process.env.RESEND_VERIFIED_DOMAIN}>`
       : 'Simnetiq <onboarding@resend.dev>'; // Temporary: Use Resend's test domain
-    
+
     const { data, error } = await resend.emails.send({
       from: fromEmail,
       to: [email],

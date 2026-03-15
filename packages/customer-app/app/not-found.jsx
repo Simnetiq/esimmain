@@ -69,7 +69,7 @@ export default function NotFound() {
 
           <button
             onClick={handleGoBack}
-            className="flex items-center justify-center gap-2 px-6 py-2.5 bg-white text-eerie-black border-2 border-eerie-black/20 rounded-full font-semibold hover:border-eerie-black/40 transition-all duration-200 w-full sm:w-auto"
+            className="flex items-center justify-center gap-2 px-6 py-2.5 bg-[var(--bg-primary)] text-eerie-black border-2 border-eerie-black/20 rounded-full font-semibold hover:border-eerie-black/40 transition-all duration-200 w-full sm:w-auto"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />

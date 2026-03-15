@@ -107,41 +107,41 @@ const CookiePolicy = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-[var(--bg-primary)]" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="relative">
         {/* Header Section */}
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
             <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              <p className={`text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+              <p className={`text-sm sm:text-base font-medium tracking-widest uppercase text-text-muted mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
                 {t('cookies.pageTitle', 'Cookie Policy')}
               </p>
               <h1 className={`text-2xl sm:text-3xl lg:text-4xl xl:text-5xl tracking-tight font-semibold text-eerie-black max-w-4xl mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
                 {t('cookies.heading', 'How Simnetiq Uses Cookies')}
               </h1>
-              <p className={`text-gray-600 text-base lg:text-lg max-w-3xl mb-6 ${isRTL ? 'text-right' : 'text-left'}`}>
+              <p className={`text-text-muted text-base lg:text-lg max-w-3xl mb-6 ${isRTL ? 'text-right' : 'text-left'}`}>
                 {t('cookies.intro', 'This Cookie Policy explains how Simnetiq Ltd ("we", "us", or "our") uses cookies and similar technologies when you visit our website and use our services. This policy complies with GDPR and other applicable privacy laws.')}
               </p>
-              <p className={`text-sm text-gray-500 ${isRTL ? 'text-right' : 'text-left'}`}>
+              <p className={`text-sm text-text-muted ${isRTL ? 'text-right' : 'text-left'}`}>
                 {t('cookies.lastUpdated', 'Last updated')}: December 30, 2025
               </p>
             </div>
           </div>
-          <div className="w-full h-px bg-gray-100" />
+          <div className="w-full h-px bg-[var(--card-border)]" />
         </div>
 
         {/* What Are Cookies Section */}
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl">
             <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              <div className="bg-gray-50 rounded-lg p-6 lg:p-8 mb-8">
+              <div className="bg-[var(--bg-secondary)] rounded-lg p-6 lg:p-8 mb-8">
                 <h2 className={`text-xl lg:text-2xl font-semibold text-eerie-black mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('cookies.whatAreCookies.title', 'What Are Cookies?')}
                 </h2>
-                <p className={`text-gray-600 leading-relaxed mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+                <p className={`text-text-muted leading-relaxed mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('cookies.whatAreCookies.p1', 'Cookies are small text files that are stored in your browser\'s directory on your computer. They help website operators understand how visitors use their website, remember user login details, and store website preferences.')}
                 </p>
-                <p className={`text-gray-600 leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
+                <p className={`text-text-muted leading-relaxed ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('cookies.whatAreCookies.p2', 'Simnetiq uses cookies and similar technologies (such as URL tracking, local storage, and pixel tags). Throughout this Cookie Policy, we refer to all of these technologies as "cookies".')}
                 </p>
               </div>
@@ -155,7 +155,7 @@ const CookiePolicy = () => {
                 {cookieTypes.map((type, index) => {
                   const IconComponent = type.IconComponent;
                   return (
-                    <div key={index} className="group relative bg-gray-50 rounded-lg overflow-hidden hover:bg-white transition-all duration-300">
+                    <div key={index} className="group relative bg-[var(--bg-secondary)] rounded-lg overflow-hidden hover:bg-[var(--bg-primary)] transition-all duration-300">
                       <div className="p-5 lg:p-6">
                         <div className={`flex items-start justify-between mb-4 `}>
                           <div className={`flex items-center gap-3 `}>
@@ -166,7 +166,7 @@ const CookiePolicy = () => {
                               <h3 className={`text-base lg:text-lg font-semibold text-eerie-black ${isRTL ? 'text-right' : 'text-left'}`}>
                                 {type.title}
                               </h3>
-                              <p className={`text-sm text-gray-500 ${isRTL ? 'text-right' : 'text-left'}`}>
+                              <p className={`text-sm text-text-muted ${isRTL ? 'text-right' : 'text-left'}`}>
                                 {type.description}
                               </p>
                             </div>
@@ -174,7 +174,7 @@ const CookiePolicy = () => {
                           <span className={`px-2.5 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
                             type.canDisable 
                               ? 'bg-tufts-blue/10 text-tufts-blue' 
-                              : 'bg-gray-200 text-gray-700'
+                              : 'bg-[var(--card-border)] text-text-primary'
                           }`}>
                             {type.canDisable 
                               ? t('cookies.optional', 'Optional') 
@@ -187,14 +187,14 @@ const CookiePolicy = () => {
                           {type.examples.map((example, exIndex) => (
                             <li key={exIndex} className={`flex items-start gap-2 ${isRTL ? 'flex-row-reverse text-right' : ''}`}>
                               <div className="w-1.5 h-1.5 bg-tufts-blue rounded-full mt-2 flex-shrink-0" />
-                              <span className="text-sm text-gray-600">{example}</span>
+                              <span className="text-sm text-text-muted">{example}</span>
                             </li>
                           ))}
                         </ul>
 
                         {type.legalBasis && (
-                          <div className="mt-3 pt-3 border-t border-gray-200">
-                            <p className="text-xs text-gray-500">
+                          <div className="mt-3 pt-3 border-t border-[var(--card-border)]">
+                            <p className="text-xs text-text-muted">
                               <strong>Legal Basis:</strong> {type.legalBasis}
                             </p>
                           </div>
@@ -202,7 +202,7 @@ const CookiePolicy = () => {
 
                         {type.providers && (
                           <div className="mt-2">
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-text-muted">
                               <strong>Providers:</strong> {type.providers.join(', ')}
                             </p>
                           </div>
@@ -215,17 +215,17 @@ const CookiePolicy = () => {
               </div>
 
               {/* Detailed Third-Party Cookie Information */}
-              <div className="bg-gray-50 rounded-lg p-6 lg:p-8 mb-8">
+              <div className="bg-[var(--bg-secondary)] rounded-lg p-6 lg:p-8 mb-8">
                 <h2 className={`text-xl lg:text-2xl font-semibold text-eerie-black mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
                   Detailed Third-Party Cookie Information
                 </h2>
 
                 {/* Meta Pixel */}
-                <div className="mb-6 pb-6 border-b border-gray-200">
+                <div className="mb-6 pb-6 border-b border-[var(--card-border)]">
                   <h3 className={`text-lg font-semibold text-eerie-black mb-3 ${isRTL ? 'text-right' : 'text-left'}`}>
                     Meta Pixel (Facebook/Instagram)
                   </h3>
-                  <div className="space-y-2 text-gray-600 text-sm">
+                  <div className="space-y-2 text-text-muted text-sm">
                     <p><strong>Purpose:</strong> Advertising, conversion tracking, ad targeting, and measurement</p>
                     <p><strong>Data Collected:</strong> Page views, purchases, events, device information, IP addresses, cookie IDs, browser information</p>
                     <p><strong>Retention:</strong> Up to 2 years (as per Meta&apos;s data retention policy)</p>
@@ -243,11 +243,11 @@ const CookiePolicy = () => {
                 </div>
 
                 {/* Google Analytics */}
-                <div className="mb-6 pb-6 border-b border-gray-200">
+                <div className="mb-6 pb-6 border-b border-[var(--card-border)]">
                   <h3 className={`text-lg font-semibold text-eerie-black mb-3 ${isRTL ? 'text-right' : 'text-left'}`}>
                     Google Analytics & Google Tag Manager
                   </h3>
-                  <div className="space-y-2 text-gray-600 text-sm">
+                  <div className="space-y-2 text-text-muted text-sm">
                     <p><strong>Purpose:</strong> Website analytics, performance monitoring, user behavior analysis, conversion tracking</p>
                     <p><strong>Data Collected:</strong> IP addresses (anonymized), device IDs, user behavior, page views, events, session duration, referrer information, cookies</p>
                     <p><strong>Retention:</strong> 26 months (default, configurable)</p>
@@ -275,7 +275,7 @@ const CookiePolicy = () => {
                   <h3 className={`text-lg font-semibold text-eerie-black mb-3 ${isRTL ? 'text-right' : 'text-left'}`}>
                     Stripe (Payment Processing)
                   </h3>
-                  <div className="space-y-2 text-gray-600 text-sm">
+                  <div className="space-y-2 text-text-muted text-sm">
                     <p><strong>Purpose:</strong> Secure payment processing, fraud prevention, checkout functionality</p>
                     <p><strong>Data Collected:</strong> Payment information, device fingerprinting, IP addresses, transaction data</p>
                     <p><strong>Retention:</strong> As required by Stripe&apos;s legal and regulatory obligations</p>
@@ -300,7 +300,7 @@ const CookiePolicy = () => {
                     Consent Management (GDPR Compliance)
                   </h2>
                 </div>
-                <div className={`space-y-3 text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                <div className={`space-y-3 text-text-primary ${isRTL ? 'text-right' : 'text-left'}`}>
                   <p>
                     <strong>Opt-In Required:</strong> We require your explicit opt-in consent before loading non-essential 
                     cookies and tracking technologies (Meta Pixel, Google Analytics, marketing cookies).
@@ -324,31 +324,31 @@ const CookiePolicy = () => {
               </div>
 
               {/* Managing Cookies */}
-              <div className="bg-gray-50 rounded-lg p-6 lg:p-8 mb-8">
+              <div className="bg-[var(--bg-secondary)] rounded-lg p-6 lg:p-8 mb-8">
                 <h2 className={`text-xl lg:text-2xl font-semibold text-eerie-black mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('cookies.managing.title', 'Managing Your Cookie Preferences')}
                 </h2>
-                <p className={`text-gray-600 leading-relaxed mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+                <p className={`text-text-muted leading-relaxed mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('cookies.managing.p1', 'You can control cookies through your browser settings or our cookie preferences. Here\'s how to manage cookies in popular browsers:')}
                 </p>
-                <ul className={`space-y-2 text-gray-600 text-sm mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+                <ul className={`space-y-2 text-text-muted text-sm mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
                   <li>• <strong>Chrome:</strong> Settings → Privacy and Security → Cookies and other site data</li>
                   <li>• <strong>Firefox:</strong> Preferences → Privacy & Security → Cookies and Site Data</li>
                   <li>• <strong>Safari:</strong> Preferences → Privacy → Manage Website Data</li>
                   <li>• <strong>Edge:</strong> Settings → Cookies and site permissions → Cookies and site data</li>
                   <li>• <strong>Opera:</strong> Settings → Privacy & Security → Cookies</li>
                 </ul>
-                <p className={`text-gray-600 text-sm ${isRTL ? 'text-right' : 'text-left'}`}>
+                <p className={`text-text-muted text-sm ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('cookies.managing.note', 'Note: Disabling cookies may affect the functionality of our website and services. Essential cookies are required for basic functionality and cannot be disabled.')}
                 </p>
               </div>
 
               {/* Cookie Retention */}
-              <div className="bg-gray-50 rounded-lg p-6 lg:p-8 mb-8">
+              <div className="bg-[var(--bg-secondary)] rounded-lg p-6 lg:p-8 mb-8">
                 <h2 className={`text-xl lg:text-2xl font-semibold text-eerie-black mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
                   Cookie Retention Periods
                 </h2>
-                <div className={`space-y-3 text-gray-600 text-sm ${isRTL ? 'text-right' : 'text-left'}`}>
+                <div className={`space-y-3 text-text-muted text-sm ${isRTL ? 'text-right' : 'text-left'}`}>
                   <p><strong>Session Cookies:</strong> Deleted when you close your browser</p>
                   <p><strong>Persistent Cookies:</strong> Remain on your device for a set period:</p>
                   <ul className="space-y-1 ml-4">
@@ -366,10 +366,10 @@ const CookiePolicy = () => {
                 <h2 className={`text-xl lg:text-2xl font-semibold text-eerie-black mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('cookies.contact.title', 'Contact Us')}
                 </h2>
-                <p className={`text-gray-600 leading-relaxed mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+                <p className={`text-text-muted leading-relaxed mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('cookies.contact.description', 'If you have any questions about our Cookie Policy or how we use cookies, please contact us:')}
                 </p>
-                <div className={`space-y-2 text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                <div className={`space-y-2 text-text-primary ${isRTL ? 'text-right' : 'text-left'}`}>
                   <p><strong>Simnetiq Ltd</strong></p>
                   <p>Germany</p>
                   <p>

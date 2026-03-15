@@ -46,7 +46,7 @@ export default function ExploreStoreCTA({
   const variantClasses = {
     primary: 'bg-tufts-blue text-white shadow-lg hover:bg-tufts-blue/90 hover:scale-[1.02]',
     dark: 'bg-eerie-black text-white shadow-lg hover:bg-eerie-black/90 hover:scale-[1.02]',
-    secondary: 'bg-white text-gray-900 border border-gray-200 shadow-sm hover:border-tufts-blue hover:text-tufts-blue',
+    secondary: 'bg-[var(--bg-primary)] text-text-primary border border-[var(--card-border)] shadow-sm hover:border-tufts-blue hover:text-tufts-blue',
     darkPrimary: 'bg-tufts-blue text-white shadow-lg shadow-tufts-blue/20 hover:bg-tufts-blue/90 hover:scale-[1.02]',
     themed: 'shadow-lg hover:scale-[1.02] hover:opacity-90',
   };
@@ -82,7 +82,7 @@ export default function ExploreStoreCTA({
       <span className="flex-1 text-center">{t('hero.exploreStore', 'eSIM Store')}</span>
       <span
         className={`ms-3 flex-shrink-0 inline-flex items-center justify-center rounded-full rtl-native-flex ${
-          variant === 'darkPrimary' ? 'bg-white' : (isDarkStyle ? '' : (variant === 'secondary' ? 'bg-gray-100' : 'bg-white/20'))
+          variant === 'darkPrimary' ? 'bg-white' : (isDarkStyle ? '' : (variant === 'secondary' ? 'bg-[var(--subtle-bg)]' : 'bg-white/20'))
         } ${config.circle}`}
         style={isThemed ? {
           backgroundColor: 'var(--cta-primary-circle-bg)',

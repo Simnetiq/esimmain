@@ -238,10 +238,10 @@ const BlogPost = ({ slug }) => {
   // Loading state
   if (loading || !mounted) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center" dir={direction} lang={detectedLanguage}>
+      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center" dir={direction} lang={detectedLanguage}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tufts-blue mx-auto" />
-          <p className="mt-4 text-gray-600">{t('blog.loading', 'Loading blog post...')}</p>
+          <p className="mt-4 text-text-muted">{t('blog.loading', 'Loading blog post...')}</p>
         </div>
       </div>
     );
@@ -250,7 +250,7 @@ const BlogPost = ({ slug }) => {
   // Error state
   if (error || !post) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center" dir={direction} lang={detectedLanguage}>
+      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center" dir={direction} lang={detectedLanguage}>
         <div className="text-center px-4">
           <h1 className="text-4xl font-medium tracking-tight text-eerie-black mb-4">
             {t('blog.postNotFound', 'Post Not Found')}
@@ -276,7 +276,7 @@ const BlogPost = ({ slug }) => {
         />
       )}
       
-      <div className="bg-white min-h-screen flex flex-col" dir={direction} lang={detectedLanguage}>
+      <div className="bg-[var(--bg-primary)] min-h-screen flex flex-col" dir={direction} lang={detectedLanguage}>
         <div className="relative isolate flex-1 flex flex-col">
           {/* Grid Patterns */}
           {/* Header Section */}
@@ -323,7 +323,7 @@ const BlogPost = ({ slug }) => {
                 </div>
               </div>
             </div>
-            <div className="w-full h-px bg-gray-100" />
+            <div className="w-full h-px bg-[var(--card-border)]" />
           </div>
 
           {/* Featured Image */}
@@ -343,7 +343,7 @@ const BlogPost = ({ slug }) => {
                   </div>
                 </div>
               </div>
-              <div className="w-full h-px bg-gray-100" />
+              <div className="w-full h-px bg-[var(--card-border)]" />
             </div>
           )}
 
@@ -351,13 +351,13 @@ const BlogPost = ({ slug }) => {
           <div className="mx-auto w-full max-w-9xl">
             <div className="mx-auto w-full max-w-7xl">
               <div className="px-4 py-4 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-                <article className={`prose prose-lg prose-slate max-w-none prose-headings:font-semibold prose-headings:text-eerie-black prose-p:text-cool-black prose-p:leading-relaxed prose-a:text-tufts-blue prose-a:no-underline hover:prose-a:underline prose-strong:text-eerie-black prose-code:text-tufts-blue prose-code:bg-gray-100 prose-code:px-1 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-img:rounded-lg prose-img:shadow-md ${isRTL ? 'text-right' : 'text-left'}`}>
+                <article className={`prose prose-lg prose-slate max-w-none prose-headings:font-semibold prose-headings:text-eerie-black prose-p:text-cool-black prose-p:leading-relaxed prose-a:text-tufts-blue prose-a:no-underline hover:prose-a:underline prose-strong:text-eerie-black prose-code:text-tufts-blue prose-code:bg-[var(--subtle-bg)] prose-code:px-1 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-img:rounded-lg prose-img:shadow-md ${isRTL ? 'text-right' : 'text-left'}`}>
                   <div dangerouslySetInnerHTML={{ __html: parsedContent }} />
                 </article>
 
                 {/* Tags */}
                 {post.tags && post.tags.length > 0 && (
-                  <div className="mt-8 pt-6 border-t border-gray-200">
+                  <div className="mt-8 pt-6 border-t border-[var(--card-border)]">
                     <h3 className={`text-base font-semibold text-eerie-black mb-4 ${isRTL ? 'text-right' : ''}`}>
                       {t('blog.relatedTags', 'Related Tags')}
                     </h3>
@@ -385,18 +385,18 @@ const BlogPost = ({ slug }) => {
       {/* Share Modal */}
       {showShareModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={closeShareModal}>
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6" onClick={e => e.stopPropagation()}>
+          <div className="bg-[var(--bg-primary)] rounded-2xl shadow-xl max-w-md w-full p-6" onClick={e => e.stopPropagation()}>
             <div className={`flex items-center justify-between mb-6 `}>
               <h3 className="text-lg font-semibold text-eerie-black">{t('blog.sharePost', 'Share this post')}</h3>
-              <button onClick={closeShareModal} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                <XIcon className="w-5 h-5 text-gray-500" />
+              <button onClick={closeShareModal} className="p-2 hover:bg-[var(--hover-bg)] rounded-full transition-colors">
+                <XIcon className="w-5 h-5 text-text-muted" />
               </button>
             </div>
             
             <div className="space-y-3">
               <button
                 onClick={copyToClipboard}
-                className={`w-full flex items-center justify-center gap-2 px-4 py-3 bg-eerie-black text-white rounded-full hover:bg-gray-800 transition-colors `}
+                className={`w-full flex items-center justify-center gap-2 px-4 py-3 bg-[var(--login-bg)] text-[var(--login-text)] rounded-full hover:opacity-90 transition-colors `}
               >
                 <CopyIcon className="w-5 h-5" />
                 <span>{t('blog.copyLink', 'Copy Link')}</span>
@@ -412,7 +412,7 @@ const BlogPost = ({ slug }) => {
                   <button
                     key={id}
                     onClick={() => shareToSocial(id)}
-                    className={`flex items-center justify-center gap-2 px-4 py-3 border border-gray-200 rounded-full ${color} hover:text-white hover:border-transparent transition-colors`}
+                    className={`flex items-center justify-center gap-2 px-4 py-3 border border-[var(--card-border)] rounded-full ${color} hover:text-white hover:border-transparent transition-colors`}
                   >
                     <span className="font-medium">{label}</span>
                   </button>

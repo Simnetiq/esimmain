@@ -59,7 +59,10 @@ async function processStuckOrder(supabase, orderId, orderData) {
 }
 
 async function handleRequest(adminKey) {
-  const expectedAdminKey = process.env.ADMIN_SECRET_KEY || 'change-me-in-production';
+  const expectedAdminKey = process.env.ADMIN_SECRET_KEY;
+  if (!expectedAdminKey) {
+    return NextResponse.json({ error: 'Server misconfiguration: ADMIN_SECRET_KEY not set' }, { status: 503 });
+  }
   if (adminKey !== expectedAdminKey) {
     return NextResponse.json({ error: 'Unauthorized - Invalid admin key' }, { status: 401 });
   }

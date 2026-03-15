@@ -161,41 +161,42 @@ const AiraloPlans = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-bg-primary flex items-center justify-center">
         <div className="text-center">
-          <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
-          <p className="text-gray-600">Loading eSIM packages...</p>
+          <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-tufts-blue" />
+          <p className="text-text-muted">Loading eSIM packages...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-bg-primary py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+        <div className="text-start mb-8">
+          <h1 className="text-4xl font-bold text-text-primary mb-4">
             Global eSIM Packages
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-text-muted max-w-3xl">
             Stay connected worldwide with our reliable eSIM packages powered by Airalo
           </p>
         </div>
 
         {/* Search and Filters */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <div className="p-6 mb-8" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search */}
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute start-3 top-3 w-5 h-5 text-gray-400" />
+                <Search className="absolute start-3 top-3 w-5 h-5 text-text-muted" />
                 <input
                   type="text"
                   placeholder={t('search.packagesPlaceholder', 'Search packages, countries, or descriptions...')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full ps-10 pe-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full ps-10 pe-4 py-3 rounded-lg text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-tufts-blue/30 focus:border-transparent"
+                  style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--card-border)' }}
                 />
               </div>
             </div>
@@ -203,7 +204,8 @@ const AiraloPlans = () => {
             {/* Filter Toggle */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              className="flex items-center px-4 py-3 rounded-lg transition-colors text-text-primary"
+              style={{ backgroundColor: 'var(--subtle-bg)' }}
             >
               <Filter className="w-5 h-5 me-2" />
               {t('search.filters', 'Filters')}
@@ -217,18 +219,19 @@ const AiraloPlans = () => {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="mt-4 pt-4 border-t border-gray-200"
+                className="mt-4 pt-4" style={{ borderTop: '1px solid var(--divider)' }}
               >
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* Country Filter */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-text-muted mb-2">
                       Country
                     </label>
                     <select
                       value={selectedCountry}
                       onChange={(e) => setSelectedCountry(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-tufts-blue/30"
+                      style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--card-border)' }}
                     >
                       <option value="">All Countries</option>
                       {countries.map(country => (
@@ -241,13 +244,14 @@ const AiraloPlans = () => {
 
                   {/* Region Filter */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-text-muted mb-2">
                       Region
                     </label>
                     <select
                       value={selectedRegion}
                       onChange={(e) => setSelectedRegion(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-tufts-blue/30"
+                      style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--card-border)' }}
                     >
                       <option value="">All Regions</option>
                       {getUniqueRegions().map(region => (
@@ -260,13 +264,14 @@ const AiraloPlans = () => {
 
                   {/* Sort By */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-text-muted mb-2">
                       Sort By
                     </label>
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-tufts-blue/30"
+                      style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--card-border)' }}
                     >
                       <option value="price">Price (Low to High)</option>
                       <option value="data">Data (High to Low)</option>
@@ -287,20 +292,21 @@ const AiraloPlans = () => {
               key={pkg.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer"
+              className="hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer"
+              style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}
               onClick={() => handlePackageSelect(pkg)}
             >
               {/* Package Header */}
-              <div className="p-6 border-b border-gray-100">
+              <div className="p-6" style={{ borderBottom: '1px solid var(--divider)' }}>
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900 truncate">
+                  <h3 className="text-lg font-semibold text-text-primary truncate">
                     {pkg.name}
                   </h3>
                   <span className="text-2xl">
                     {getCountryFlag(pkg.country_code)}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 line-clamp-2">
+                <p className="text-sm text-text-muted line-clamp-2">
                   {pkg.description}
                 </p>
               </div>
@@ -308,19 +314,19 @@ const AiraloPlans = () => {
               {/* Package Details */}
               <div className="p-6">
                 <div className="space-y-3 mb-6">
-                  <div className="flex items-center text-gray-600">
+                  <div className="flex items-center text-text-muted">
                     <Wifi className="w-4 h-4 me-2" />
                     <span className="text-sm">
                       {formatData(pkg.data, pkg.data_unit)}
                     </span>
                   </div>
-                  <div className="flex items-center text-gray-600">
+                  <div className="flex items-center text-text-muted">
                     <Clock className="w-4 h-4 me-2" />
                     <span className="text-sm">
                       {pkg.validity} {pkg.validity_unit}
                     </span>
                   </div>
-                  <div className="flex items-center text-gray-600">
+                  <div className="flex items-center text-text-muted">
                     <MapPin className="w-4 h-4 me-2" />
                     <span className="text-sm">
                       {pkg.country_code?.toUpperCase() || 'Global'}
@@ -336,10 +342,10 @@ const AiraloPlans = () => {
 
                 {/* Price */}
                 <div className="text-center mb-6">
-                  <div className="text-3xl font-bold text-gray-900">
+                  <div className="text-3xl font-bold text-text-primary">
                     {formatPrice(pkg.price, pkg.currency)}
                   </div>
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-text-muted">
                     One-time payment
                   </div>
                 </div>
@@ -347,7 +353,7 @@ const AiraloPlans = () => {
                 {/* Features */}
                 <div className="space-y-2 mb-6">
                   {pkg.features?.map((feature, index) => (
-                    <div key={index} className="flex items-center text-sm text-gray-600">
+                    <div key={index} className="flex items-center text-sm text-text-muted">
                       <CheckCircle className="w-4 h-4 me-2 text-green-500" />
                       {feature}
                     </div>
@@ -362,11 +368,11 @@ const AiraloPlans = () => {
         {/* No Results */}
         {filteredPackages.length === 0 && !loading && (
           <div className="text-center py-12">
-            <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <AlertCircle className="w-12 h-12 text-text-muted mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-text-primary mb-2">
               No packages found
             </h3>
-            <p className="text-gray-600">
+            <p className="text-text-muted">
               Try adjusting your search terms or filters
             </p>
           </div>
@@ -374,7 +380,7 @@ const AiraloPlans = () => {
 
         {/* Results Count */}
         {filteredPackages.length > 0 && (
-          <div className="text-center mt-8 text-gray-600">
+          <div className="text-center mt-8 text-text-muted">
             Showing {filteredPackages.length} of {packages.length} packages
           </div>
         )}

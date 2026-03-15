@@ -80,7 +80,7 @@ const FlexiblePlanCard = ({ plan, t, onClick, isRTL = false }) => {
                 {/* Badges */}
                 <div className="flex flex-wrap items-center gap-1.5 mb-2">
                     {plan.isFeatured && (
-                        <span className="inline-flex items-center gap-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                        <span className="inline-flex items-center gap-0.5 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider" style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)' }}>
                             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                             </svg>
@@ -88,12 +88,12 @@ const FlexiblePlanCard = ({ plan, t, onClick, isRTL = false }) => {
                         </span>
                     )}
                     {!plan.isFeatured && plan.isBestValue && (
-                        <span className="inline-flex items-center bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                        <span className="inline-flex items-center text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider" style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)' }}>
                             {t('plans.bestValue', 'Best Value')}
                         </span>
                     )}
                     {hasVoice && (
-                        <span className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                        <span className="inline-flex items-center gap-1 text-blue-700 text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)' }}>
                             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                             </svg>
@@ -101,7 +101,7 @@ const FlexiblePlanCard = ({ plan, t, onClick, isRTL = false }) => {
                         </span>
                     )}
                     {hasSms && (
-                        <span className="inline-flex items-center gap-1 bg-purple-50 text-purple-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                        <span className="inline-flex items-center gap-1 text-purple-700 text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: 'rgba(168, 85, 247, 0.1)' }}>
                             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                             </svg>

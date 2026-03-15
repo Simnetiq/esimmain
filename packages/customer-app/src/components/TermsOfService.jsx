@@ -179,9 +179,9 @@ const TermsOfService = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white py-24">
+    <div className="min-h-screen bg-[var(--bg-primary)] py-24">
       {/* Header Section */}
-      <section className="bg-white">
+      <section className="bg-[var(--bg-primary)]">
         <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
           <div className="text-center">
             <h2 className="text-center text-xl font-semibold text-tufts-blue">
@@ -207,12 +207,12 @@ const TermsOfService = () => {
       </section>
 
       {/* Content Section */}
-      <section className="bg-white">
+      <section className="bg-[var(--bg-primary)]">
         <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8 mt-6">
           
           {/* Introduction */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Agreement Overview</h2>
@@ -252,7 +252,7 @@ const TermsOfService = () => {
                   key={index}
                   className="relative"
                 >
-                  <div className="absolute inset-px rounded-xl bg-white"></div>
+                  <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
                   <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
                     <div className="px-8 pt-8 pb-8">
                       <div className="flex items-center mb-6">
@@ -279,7 +279,7 @@ const TermsOfService = () => {
 
           {/* Third-Party Service Providers */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <div className="flex items-center mb-4">
@@ -370,7 +370,7 @@ const TermsOfService = () => {
 
           {/* Intellectual Property */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">12. Intellectual Property Rights</h2>
@@ -392,7 +392,7 @@ const TermsOfService = () => {
 
           {/* Device Compatibility */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">13. Device Compatibility and Technical Requirements</h2>
@@ -421,7 +421,7 @@ const TermsOfService = () => {
 
           {/* Limitation of Liability */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <div className="flex items-center mb-4">
@@ -465,7 +465,7 @@ const TermsOfService = () => {
 
           {/* Termination */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <div className="flex items-center mb-4">
@@ -501,7 +501,7 @@ const TermsOfService = () => {
 
           {/* Governing Law */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">16. Governing Law and Dispute Resolution</h2>
@@ -537,7 +537,7 @@ const TermsOfService = () => {
 
           {/* Contact Information */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">17. Contact Information</h2>
@@ -546,7 +546,7 @@ const TermsOfService = () => {
                     If you have any questions about these Terms of Service or need to contact us regarding 
                     our services, please reach out through the following channels:
                   </p>
-                  <div className="bg-gray-50 p-6 rounded-lg">
+                  <div className="bg-[var(--bg-secondary)] p-6 rounded-lg">
                     <div className="space-y-3">
                       <div>
                         <strong>Company:</strong> Simnetiq Ltd<br />
@@ -571,7 +571,7 @@ const TermsOfService = () => {
 
           {/* Related Policies */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Related Legal Documents</h2>
@@ -590,14 +590,14 @@ const TermsOfService = () => {
                     </Link>
                     <Link 
                       href="/return-policy"
-                      className="flex items-center space-x-3 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      className="flex items-center space-x-3 px-4 py-3 bg-[var(--subtle-bg)] text-text-primary rounded-lg hover:bg-[var(--hover-bg)] transition-colors"
                     >
                       <RefreshCw className="w-5 h-5" />
                       <span>Return Policy</span>
                     </Link>
                     <Link 
                       href="/cookie-policy"
-                      className="flex items-center space-x-3 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      className="flex items-center space-x-3 px-4 py-3 bg-[var(--subtle-bg)] text-text-primary rounded-lg hover:bg-[var(--hover-bg)] transition-colors"
                     >
                       <FileText className="w-5 h-5" />
                       <span>Cookie Policy</span>
@@ -646,20 +646,20 @@ const TermsOfService = () => {
                     className="w-full h-full object-contain"
                   />
                 </div>
-                <h2 className="text-2xl font-semibold tracking-tight text-balance text-gray-900 md:text-3xl">
+                <h2 className="text-2xl font-semibold tracking-tight text-balance text-text-primary md:text-3xl">
                   Doppler VPN
                 </h2>
                 <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
                   <Link
                     href="/doppler-vpn-terms-of-service"
-                    className="group inline-flex items-center gap-3 rounded-full bg-gray-900 px-6 py-3 text-sm font-medium text-white shadow-lg transition-all duration-200 hover:bg-gray-800 hover:scale-105"
+                    className="group inline-flex items-center gap-3 rounded-full bg-[var(--login-bg)] px-6 py-3 text-sm font-medium text-[var(--login-text)] shadow-lg transition-all duration-200 hover:opacity-90 hover:scale-105"
                   >
                     <FileText className="h-5 w-5" />
                     <span className="text-base">VPN Terms of Service</span>
                   </Link>
                   <Link
                     href="/doppler-vpn-privacy-policy"
-                    className="group inline-flex items-center gap-3 rounded-full bg-white px-6 py-3 text-sm font-medium text-gray-900 ring-1 ring-gray-200 shadow-sm transition-all duration-200 hover:bg-gray-50 hover:scale-105"
+                    className="group inline-flex items-center gap-3 rounded-full bg-[var(--bg-primary)] px-6 py-3 text-sm font-medium text-text-primary ring-1 ring-[var(--card-border)] shadow-sm transition-all duration-200 hover:bg-[var(--hover-bg)] hover:scale-105"
                   >
                     <Shield className="h-5 w-5" />
                     <span className="text-base">VPN Privacy Policy</span>

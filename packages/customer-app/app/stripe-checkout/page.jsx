@@ -210,39 +210,39 @@ const StripeCheckoutContent = () => {
       {!packageData ? (
         <Loading />
       ) : (
-        <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8" dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="min-h-screen bg-[var(--bg-secondary)] py-12 px-4 sm:px-6 lg:px-8" dir={isRTL ? 'rtl' : 'ltr'}>
           <div className="max-w-4xl mx-auto">
             {/* Header */}
             <div className={`text-center mb-8 ${isRTL ? 'font-arabic' : ''}`}>
               <div className="flex items-center justify-center mb-4">
                 <CreditCard className="w-12 h-12 text-tufts-blue" />
               </div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-3xl font-bold text-text-primary mb-2">
                 {t('stripeCheckout.title', 'Secure Card Payment')}
               </h1>
-              <p className="text-gray-600">
+              <p className="text-text-muted">
                 {t('stripeCheckout.subtitle', 'Pay securely with your credit or debit card')}
               </p>
-              <div className={`mt-2 flex items-center justify-center gap-2 text-sm text-gray-500 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className={`mt-2 flex items-center justify-center gap-2 text-sm text-text-muted ${isRTL ? 'flex-row-reverse' : ''}`}>
                 <Lock className="w-4 h-4" />
                 <span>{t('stripeCheckout.poweredBy', 'Powered by Stripe - Industry-leading security')}</span>
               </div>
             </div>
 
             {/* Package Summary */}
-            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-              <h2 className={`text-lg font-semibold text-gray-900 mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+            <div className="bg-[var(--bg-primary)] rounded-lg shadow-md p-6 mb-6">
+              <h2 className={`text-lg font-semibold text-text-primary mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
                 {t('stripeCheckout.orderSummary', 'Order Summary')}
               </h2>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">{packageData.packageName}</span>
-                  <span className="font-semibold text-gray-900">
+                  <span className="text-text-muted">{packageData.packageName}</span>
+                  <span className="font-semibold text-text-primary">
                     {formatPrice(packageData.price)}
                   </span>
                 </div>
                 {packageData.data && (
-                  <div className="text-sm text-gray-500 pt-2 border-t">
+                  <div className="text-sm text-text-muted pt-2 border-t border-[var(--card-border)]">
                     <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                       <Globe className="w-4 h-4" />
                       <span>{packageData.data} {packageData.dataUnit || 'GB'} • {packageData.period} {t('stripeCheckout.days', 'days')}</span>
@@ -250,9 +250,9 @@ const StripeCheckoutContent = () => {
                   </div>
                 )}
                 {packageData.originalPrice && packageData.originalPrice > packageData.price && (
-                  <div className="flex justify-between items-center text-sm pt-2 border-t">
-                    <span className="text-gray-500">{t('stripeCheckout.originalPrice', 'Original Price')}</span>
-                    <span className="text-gray-500 line-through">
+                  <div className="flex justify-between items-center text-sm pt-2 border-t border-[var(--card-border)]">
+                    <span className="text-text-muted">{t('stripeCheckout.originalPrice', 'Original Price')}</span>
+                    <span className="text-text-muted line-through">
                       {formatPrice(packageData.originalPrice)}
                     </span>
                   </div>
@@ -277,8 +277,8 @@ const StripeCheckoutContent = () => {
                   </div>
                 )}
 
-                <div className="flex justify-between items-center pt-3 border-t text-lg font-bold">
-                  <span className="text-gray-900">{t('stripeCheckout.total', 'Total')}</span>
+                <div className="flex justify-between items-center pt-3 border-t border-[var(--card-border)] text-lg font-bold">
+                  <span className="text-text-primary">{t('stripeCheckout.total', 'Total')}</span>
                   <span className="text-tufts-blue">
                     {promoResult?.valid
                       ? formatPrice(promoResult.finalPrice)
@@ -290,8 +290,8 @@ const StripeCheckoutContent = () => {
             </div>
 
             {/* ── Promo Code Section ── */}
-            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-              <h2 className={`text-lg font-semibold text-gray-900 mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+            <div className="bg-[var(--bg-primary)] rounded-lg shadow-md p-6 mb-6">
+              <h2 className={`text-lg font-semibold text-text-primary mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
                 {t('stripeCheckout.promoCode', 'Promo Code')}
               </h2>
 
@@ -325,7 +325,7 @@ const StripeCheckoutContent = () => {
                     placeholder={t('stripeCheckout.promoPlaceholder', 'Enter promo code')}
                     maxLength={50}
                     className={`flex-1 px-4 py-2 border rounded-lg font-mono text-sm focus:outline-none focus:ring-2 focus:ring-tufts-blue uppercase ${
-                      promoResult?.valid === false ? 'border-red-400 bg-red-50' : 'border-gray-300'
+                      promoResult?.valid === false ? 'border-red-400 bg-red-50' : 'border-[var(--card-border)]'
                     } ${isRTL ? 'text-right' : 'text-left'}`}
                   />
                   <button
@@ -355,32 +355,32 @@ const StripeCheckoutContent = () => {
             </div>
 
             {/* Payment Method Info */}
-            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-              <h2 className={`text-lg font-semibold text-gray-900 mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+            <div className="bg-[var(--bg-primary)] rounded-lg shadow-md p-6 mb-6">
+              <h2 className={`text-lg font-semibold text-text-primary mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
                 {t('stripeCheckout.paymentMethod', 'Payment Method')}
               </h2>
               <div className={`flex items-center gap-4 p-4 bg-blue-50 rounded-lg border-2 border-tufts-blue ${isRTL ? 'flex-row-reverse' : ''}`}>
                 <CreditCard className="w-8 h-8 text-tufts-blue" />
                 <div className={isRTL ? 'text-right' : 'text-left'}>
-                  <div className="font-semibold text-gray-900">{t('stripeCheckout.cardType', 'Credit / Debit Card')}</div>
-                  <div className="text-sm text-gray-600">{t('stripeCheckout.cardBrands', 'Visa, Mastercard, American Express, and more')}</div>
+                  <div className="font-semibold text-text-primary">{t('stripeCheckout.cardType', 'Credit / Debit Card')}</div>
+                  <div className="text-sm text-text-muted">{t('stripeCheckout.cardBrands', 'Visa, Mastercard, American Express, and more')}</div>
                 </div>
               </div>
-              <div className={`mt-4 text-sm text-gray-500 ${isRTL ? 'text-right' : 'text-left'}`}>
+              <div className={`mt-4 text-sm text-text-muted ${isRTL ? 'text-right' : 'text-left'}`}>
                 <p>{t('stripeCheckout.redirectNote', "You'll be redirected to Stripe's secure checkout page to complete your payment.")}</p>
               </div>
             </div>
 
             {/* Features */}
-            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div className="bg-[var(--bg-primary)] rounded-lg shadow-md p-6 mb-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className={`flex items-start gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <Shield className="w-5 h-5 text-tufts-blue mt-1 flex-shrink-0" />
                   <div className={isRTL ? 'text-right' : 'text-left'}>
-                    <div className="font-semibold text-sm text-gray-900">
+                    <div className="font-semibold text-sm text-text-primary">
                       {t('stripeCheckout.secure', 'Bank-Level Security')}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-text-muted">
                       {t('stripeCheckout.secureDesc', 'PCI DSS Level 1 certified')}
                     </div>
                   </div>
@@ -388,10 +388,10 @@ const StripeCheckoutContent = () => {
                 <div className={`flex items-start gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <Zap className="w-5 h-5 text-tufts-blue mt-1 flex-shrink-0" />
                   <div className={isRTL ? 'text-right' : 'text-left'}>
-                    <div className="font-semibold text-sm text-gray-900">
+                    <div className="font-semibold text-sm text-text-primary">
                       {t('stripeCheckout.instant', 'Instant Activation')}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-text-muted">
                       {t('stripeCheckout.instantDesc', 'eSIM ready in seconds')}
                     </div>
                   </div>
@@ -399,10 +399,10 @@ const StripeCheckoutContent = () => {
                 <div className={`flex items-start gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <Globe className="w-5 h-5 text-tufts-blue mt-1 flex-shrink-0" />
                   <div className={isRTL ? 'text-right' : 'text-left'}>
-                    <div className="font-semibold text-sm text-gray-900">
+                    <div className="font-semibold text-sm text-text-primary">
                       {t('stripeCheckout.global', 'Worldwide Coverage')}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-text-muted">
                       {t('stripeCheckout.globalDesc', 'Works in 190+ countries')}
                     </div>
                   </div>
@@ -435,15 +435,15 @@ const StripeCheckoutContent = () => {
             {/* Back Button */}
             <button
               onClick={() => router.back()}
-              className="w-full mt-4 py-3 text-gray-600 hover:text-gray-900 transition-colors"
+              className="w-full mt-4 py-3 text-text-muted hover:text-text-primary transition-colors"
             >
               {t('stripeCheckout.back', 'Back to Plans')}
             </button>
 
             {/* Trust Badges */}
             <div className="mt-8 text-center">
-              <div className="text-xs text-gray-500 mb-3">{t('stripeCheckout.trusted', 'Trusted by thousands worldwide')}</div>
-              <div className={`flex items-center justify-center gap-6 text-gray-400 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className="text-xs text-text-muted mb-3">{t('stripeCheckout.trusted', 'Trusted by thousands worldwide')}</div>
+              <div className={`flex items-center justify-center gap-6 text-text-muted ${isRTL ? 'flex-row-reverse' : ''}`}>
                 <div className={`flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <Shield className="w-4 h-4" />
                   <span className="text-xs">{t('stripeCheckout.sslEncrypted', 'SSL Encrypted')}</span>

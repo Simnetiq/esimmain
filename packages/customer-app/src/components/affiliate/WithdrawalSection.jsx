@@ -118,11 +118,11 @@ const WithdrawalSection = ({
   };
   if (checkingBankAccount) {
     return (
-      <section className="bg-white py-16" dir={isRTL ? 'rtl' : 'ltr'}>
+      <section className="bg-[var(--bg-primary)] py-16" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
           <div className="relative">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
-            <div className="relative flex h-full flex-col overflow-hidden rounded-xl border-2 border-gray-200/50 shadow-xl shadow-gray-200/50">
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
+            <div className="relative flex h-full flex-col overflow-hidden rounded-xl border-2 border-[var(--card-border)]/50 shadow-xl shadow-[var(--card-border)]/50">
               <div className="px-8 pt-8 pb-8">
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-tufts-blue mx-auto mb-4"></div>
@@ -142,10 +142,10 @@ const WithdrawalSection = ({
     const IconComponent = accountInfo?.icon || CreditCard;
     
     return (
-      <section className="bg-white py-16" dir={isRTL ? 'rtl' : 'ltr'}>
+      <section className="bg-[var(--bg-primary)] py-16" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
           <div className="relative">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <div className="text-center mb-8">
@@ -160,7 +160,7 @@ const WithdrawalSection = ({
 
                 {/* Bank Account Details Card */}
                 {accountInfo && (
-                  <div className="bg-gray-50 rounded-xl p-6 mb-6 max-w-md mx-auto">
+                  <div className="bg-[var(--bg-secondary)] rounded-xl p-6 mb-6 max-w-md mx-auto">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center space-x-3">
                         <div className="bg-tufts-blue/10 p-2 rounded-lg">
@@ -177,14 +177,14 @@ const WithdrawalSection = ({
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => onEditBankAccount && onEditBankAccount(bankAccountDetails)}
-                          className="p-2 text-cool-black hover:text-tufts-blue hover:bg-white rounded-lg transition-colors"
+                          className="p-2 text-cool-black hover:text-tufts-blue hover:bg-[var(--bg-primary)] rounded-lg transition-colors"
                           title={t('affiliate.editPaymentMethod', 'Edit payment method')}
                         >
                           <Edit3 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => onDeleteBankAccount && onDeleteBankAccount(bankAccountDetails.id)}
-                          className="p-2 text-cool-black hover:text-red-600 hover:bg-white rounded-lg transition-colors"
+                          className="p-2 text-cool-black hover:text-red-600 hover:bg-[var(--bg-primary)] rounded-lg transition-colors"
                           title={t('affiliate.deletePaymentMethod', 'Delete payment method')}
                         >
                           <Trash2 className="w-4 h-4" />
@@ -232,7 +232,7 @@ const WithdrawalSection = ({
                   
                   <button
                     onClick={() => onAddBankAccount && onAddBankAccount()}
-                    className="bg-white text-tufts-blue border-2 border-tufts-blue hover:bg-tufts-blue hover:text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2"
+                    className="bg-[var(--bg-primary)] text-tufts-blue border-2 border-tufts-blue hover:bg-tufts-blue hover:text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2"
                   >
                     <Plus className="w-5 h-5" />
                     <span>{t('affiliate.addAnotherMethod', 'Add Another Method')}</span>
@@ -250,10 +250,10 @@ const WithdrawalSection = ({
   const availablePaymentMethods = getPaymentMethods(userCountry);
 
   return (
-    <section className="bg-white py-16" dir={isRTL ? 'rtl' : 'ltr'}>
+    <section className="bg-[var(--bg-primary)] py-16" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
         <div className="relative">
-          <div className="absolute inset-px rounded-xl bg-white"></div>
+          <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
           <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
             <div className="px-8 pt-8 pb-8">
               <div className="text-center mb-8">
@@ -273,7 +273,7 @@ const WithdrawalSection = ({
                   <button
                     key={index}
                     onClick={() => onAddBankAccount && onAddBankAccount(method.type)}
-                    className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors group"
+                    className="w-full flex items-center justify-between p-4 bg-[var(--bg-secondary)] hover:bg-[var(--hover-bg)] rounded-xl transition-colors group"
                   >
                     <div className="flex items-center space-x-3">
                       <div className="bg-tufts-blue/10 group-hover:bg-tufts-blue/20 p-2 rounded-lg transition-colors">

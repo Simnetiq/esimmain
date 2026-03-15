@@ -109,9 +109,9 @@ const AffiliatePage = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-[var(--bg-primary)]">
         {/* Header Section */}
-        <section className="bg-white">
+        <section className="bg-[var(--bg-primary)]">
         <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
           <div className="text-center">
             <h2 className="text-center text-xl font-semibold text-tufts-blue">
@@ -137,12 +137,12 @@ const AffiliatePage = () => {
       </section>
 
       {/* Content Section */}
-      <section className="bg-white">
+      <section className="bg-[var(--bg-primary)]">
         <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8 mt-6">
           
           {/* Introduction */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Program Overview</h2>
@@ -174,7 +174,7 @@ const AffiliatePage = () => {
                   key={index}
                   className="relative"
                 >
-                  <div className="absolute inset-px rounded-xl bg-white"></div>
+                  <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
                   <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
                     <div className="px-8 pt-8 pb-8">
                       <div className="flex items-center mb-6">
@@ -194,7 +194,7 @@ const AffiliatePage = () => {
 
           {/* Additional Benefits */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Additional Benefits</h2>
@@ -219,7 +219,7 @@ const AffiliatePage = () => {
 
           {/* How It Works */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">How It Works</h2>
@@ -252,7 +252,7 @@ const AffiliatePage = () => {
 
           {/* Call to Action */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8 text-center">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Ready to Start Earning?</h2>
@@ -270,7 +270,7 @@ const AffiliatePage = () => {
                   </Link>
                   <Link
                     href="/login"
-                    className="inline-flex items-center px-8 py-3 bg-white text-tufts-blue rounded-xl font-semibold hover:bg-gray-50 transition-colors duration-200 border-2 border-tufts-blue"
+                    className="inline-flex items-center px-8 py-3 bg-[var(--bg-primary)] text-tufts-blue rounded-xl font-semibold hover:bg-[var(--hover-bg)] transition-colors duration-200 border-2 border-tufts-blue"
                   >
                     Already a Member?
                   </Link>
@@ -282,7 +282,7 @@ const AffiliatePage = () => {
 
           {/* FAQ Section */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <div className="flex items-center mb-6">
@@ -291,7 +291,7 @@ const AffiliatePage = () => {
                 </div>
                 <div className="space-y-6">
                   {faqs.map((faq, index) => (
-                    <div key={index} className="border-b border-gray-100 pb-4 last:border-b-0">
+                    <div key={index} className="border-b border-[var(--card-border)] pb-4 last:border-b-0">
                       <h3 className="text-lg font-medium text-eerie-black mb-2">
                         {faq.question}
                       </h3>
@@ -308,7 +308,7 @@ const AffiliatePage = () => {
 
           {/* Related Information */}
           <div className="relative mb-8">
-            <div className="absolute inset-px rounded-xl bg-white"></div>
+            <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
                 <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Related Information</h2>
@@ -327,14 +327,14 @@ const AffiliatePage = () => {
                     </Link>
                     <Link 
                       href="/privacy-policy"
-                      className="flex items-center space-x-3 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      className="flex items-center space-x-3 px-4 py-3 bg-[var(--subtle-bg)] text-text-primary rounded-lg hover:bg-[var(--hover-bg)] transition-colors"
                     >
                       <FileText className="w-5 h-5" />
                       <span>Privacy Policy</span>
                     </Link>
                     <Link 
                       href="/contact"
-                      className="flex items-center space-x-3 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      className="flex items-center space-x-3 px-4 py-3 bg-[var(--subtle-bg)] text-text-primary rounded-lg hover:bg-[var(--hover-bg)] transition-colors"
                     >
                       <Users className="w-5 h-5" />
                       <span>Contact Support</span>

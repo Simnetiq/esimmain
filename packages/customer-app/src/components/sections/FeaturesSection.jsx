@@ -74,21 +74,21 @@ export default function FeaturesSection() {
   const gridFeatures = features.slice(1);
 
   return (
-    <div className="features-section bg-white flex flex-col overflow-hidden">
+    <div className="features-section flex flex-col overflow-hidden relative">
       <div className="relative flex-1 flex flex-col">
         {/* Header Section */}
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
             <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              <p className="text-sm sm:text-base font-medium tracking-widest uppercase text-gray-500 mb-4 animate-fade-in-up text-start">
+              <p className="text-sm sm:text-base font-medium tracking-widest uppercase text-text-muted mb-4 animate-fade-in-up text-start">
                 {t('features.title', 'Why Choose Us')}
               </p>
-              <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-eerie-black max-w-5xl animate-fade-in-up animation-delay-100 text-start">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-text-primary max-w-5xl animate-fade-in-up animation-delay-100 text-start">
                 {t('features.subtitle', 'Everything you need to stay connected abroad')}
               </h2>
             </div>
           </div>
-          <div className="w-full h-px bg-gray-100" />
+          <div className="w-full h-px" style={{ backgroundColor: 'var(--divider)' }} />
         </div>
 
         {/* Features Grid */}
@@ -97,7 +97,7 @@ export default function FeaturesSection() {
             <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
 
               {/* Hero Feature Card — full width, horizontal on desktop */}
-              <div className="relative bg-gray-50 overflow-hidden animate-fade-in-up mb-4">
+              <div className="relative overflow-hidden animate-fade-in-up mb-4" style={{ backgroundColor: 'var(--card-bg)' }}>
                 <div className="flex flex-col md:flex-row rtl-native-flex">
                   {/* Image — left half on desktop, full width on mobile */}
                   <div className="relative h-56 sm:h-64 md:h-auto md:w-1/2 overflow-hidden">
@@ -116,7 +116,7 @@ export default function FeaturesSection() {
                   {/* Content — right half */}
                   <div className="relative flex-1 p-6 lg:p-10 flex flex-col justify-center">
                     {/* Large step number */}
-                    <span className="absolute top-4 end-4 lg:end-8 text-[5rem] md:text-[7rem] lg:text-[9rem] font-semibold leading-none text-eerie-black/[0.04] select-none pointer-events-none" aria-hidden="true">
+                    <span className="absolute top-4 end-4 lg:end-8 text-[5rem] md:text-[7rem] lg:text-[9rem] font-semibold leading-none text-text-primary/[0.04] select-none pointer-events-none" aria-hidden="true">
                       {heroFeature.number}
                     </span>
 
@@ -129,10 +129,10 @@ export default function FeaturesSection() {
                       <p className="text-xs font-medium tracking-widest uppercase text-tufts-blue mb-2 text-start">
                         {heroFeature.tag}
                       </p>
-                      <h3 className="text-xl lg:text-2xl font-semibold text-eerie-black mb-3 tracking-tight text-start">
+                      <h3 className="text-xl lg:text-2xl font-semibold text-text-primary mb-3 tracking-tight text-start">
                         {heroFeature.title}
                       </h3>
-                      <p className="text-gray-500 text-sm sm:text-base leading-relaxed max-w-md text-start">
+                      <p className="text-text-muted text-sm sm:text-base leading-relaxed max-w-md text-start">
                         {heroFeature.description}
                       </p>
                     </div>
@@ -145,7 +145,8 @@ export default function FeaturesSection() {
                 {gridFeatures.map((feature, index) => (
                   <div
                     key={index}
-                    className="relative bg-gray-50 overflow-hidden animate-fade-in-up content-visibility-auto"
+                    className="relative overflow-hidden animate-fade-in-up content-visibility-auto"
+                    style={{ backgroundColor: 'var(--card-bg)' }}
                     style={{ animationDelay: `${(index + 1) * 100}ms` }}
                   >
                     {/* Image Area */}
@@ -165,17 +166,17 @@ export default function FeaturesSection() {
                     {/* Content */}
                     <div className="relative p-5 lg:p-6">
                       {/* Large step number */}
-                      <span className="absolute -top-10 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-eerie-black/[0.04] select-none pointer-events-none" aria-hidden="true">
+                      <span className="absolute -top-10 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-text-primary/[0.04] select-none pointer-events-none" aria-hidden="true">
                         {feature.number}
                       </span>
 
                       <p className="text-xs font-medium tracking-widest uppercase text-tufts-blue mb-2 text-start">
                         {feature.tag}
                       </p>
-                      <h3 className="text-lg lg:text-xl font-semibold text-eerie-black mb-2 text-start">
+                      <h3 className="text-lg lg:text-xl font-semibold text-text-primary mb-2 text-start">
                         {feature.title}
                       </h3>
-                      <p className="text-gray-500 text-sm leading-relaxed text-start">
+                      <p className="text-text-muted text-sm leading-relaxed text-start">
                         {feature.description}
                       </p>
                     </div>

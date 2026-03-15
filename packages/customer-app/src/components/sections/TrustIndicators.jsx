@@ -75,7 +75,7 @@ export default function TrustIndicators() {
 
   return (
     <section
-      className="bg-bg-primary"
+      className="relative"
       aria-labelledby="trust-indicators-heading"
     >
       <div className="max-w-7xl mx-auto px-4 py-16 lg:py-24">

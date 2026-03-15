@@ -102,7 +102,7 @@ export default function RoamingComparison() {
 
   return (
     <section
-      className="bg-bg-primary"
+      className="relative"
       aria-labelledby="roaming-heading"
       ref={sectionRef}
     >
