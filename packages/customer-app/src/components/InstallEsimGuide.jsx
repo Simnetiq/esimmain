@@ -89,7 +89,7 @@ const KeyboardIcon = ({ className }) => (
 
 const StepNumber = ({ number }) => (
   <span
-    className="absolute top-4 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-eerie-black/[0.04] select-none pointer-events-none"
+    className="absolute top-4 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-300 dark:text-gray-700 select-none pointer-events-none"
     aria-hidden="true"
   >
     {number}

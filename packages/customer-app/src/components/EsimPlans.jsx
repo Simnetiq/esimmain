@@ -533,13 +533,7 @@ const EsimPlans = ({ isHomePage = false }) => {
                 )}
             </div>
 
-            {isHomePage && (
-                <div className="text-center mt-8">
-                    <Link href={locale && locale !== 'en' ? `/${locale}/esim-plans` : '/esim-plans'} className="text-tufts-blue hover:text-tufts-blue/80 font-semibold transition-colors">
-                        {t('plans.viewAll', 'View All 200+ Destinations →')}
-                    </Link>
-                </div>
-            )}
+           
 
             <PlanSelectionBottomSheet
                 isOpen={showCheckoutModal}

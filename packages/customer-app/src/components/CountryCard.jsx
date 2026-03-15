@@ -150,8 +150,8 @@ const CountryCard = ({
           ) : (
             <span className="text-xs text-text-muted">{t('plans.priceNotAvailable', 'Price N/A')}</span>
           )}
-          <span className="w-7 h-7 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300" style={{ backgroundColor: 'var(--cta-primary-bg)' }}>
-            <ArrowUpRightIcon className="w-3.5 h-3.5 rtl:-scale-x-100" style={{ color: 'var(--cta-primary-text)' }} />
+          <span className="w-7 h-7 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300" style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--card-border)' }}>
+            <ArrowUpRightIcon className="w-3.5 h-3.5 rtl:-scale-x-100" style={{ color: 'var(--text-primary)' }} />
           </span>
         </div>
       </div>

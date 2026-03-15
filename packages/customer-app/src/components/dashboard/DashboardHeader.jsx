@@ -105,7 +105,7 @@ const DashboardHeader = ({ currentUser, orders = [] }) => {
                 >
                   {/* Actual value as faded watermark — zero-padded if <10 */}
                   <span
-                    className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-text-primary/10 select-none pointer-events-none"
+                    className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-300 dark:text-gray-700 select-none pointer-events-none"
                     aria-hidden="true"
                   >
                     {typeof stat.value === 'number' && stat.value < 10 ? `0${stat.value}` : stat.value}

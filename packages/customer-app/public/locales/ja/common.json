@@ -857,6 +857,10 @@
     "step3Desc": "到着すると自動的にデータが使えます。それだけです。"
   },
   "comparison": {
+    "label": "賢い選択",
+    "featureHeader": "機能",
+    "physicalHeader": "物理SIM",
+    "esimHeader": "Simnetiq eSIM",
     "title": "eSIM vs 物理SIM",
     "subtitle": "旅行者がeSIMに乗り換える理由",
     "activation": "アクティベーション",

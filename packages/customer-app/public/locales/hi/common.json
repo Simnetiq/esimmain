@@ -857,6 +857,10 @@
     "step3Desc": "गंतव्य पहुंचने पर डेटा अपने आप एक्टिव हो जाता है। बस इतना ही।"
   },
   "comparison": {
+    "label": "स्मार्ट विकल्प",
+    "featureHeader": "विशेषता",
+    "physicalHeader": "फिज़िकल SIM",
+    "esimHeader": "Simnetiq eSIM",
     "title": "eSIM बनाम फिज़िकल SIM",
     "subtitle": "देखें क्यों यात्री eSIM अपना रहे हैं",
     "activation": "एक्टिवेशन",

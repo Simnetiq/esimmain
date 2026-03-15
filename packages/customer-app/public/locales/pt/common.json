@@ -857,6 +857,10 @@
     "step3Desc": "Os dados são ativados automaticamente quando você chega. Simples assim."
   },
   "comparison": {
+    "label": "A escolha inteligente",
+    "featureHeader": "Recurso",
+    "physicalHeader": "SIM físico",
+    "esimHeader": "Simnetiq eSIM",
     "title": "eSIM vs Chip Físico",
     "subtitle": "Veja por que viajantes estão migrando para o eSIM",
     "activation": "Ativação",

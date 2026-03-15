@@ -82,7 +82,7 @@ export default function HowItWorks() {
               id="how-it-works-heading"
               className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary"
             >
-              {t('howItWorks.title', 'Up and running in minutes')}
+              {t('howItWorks.title', 'How It Works')}
             </h2>
             <p className="text-text-muted mt-3 max-w-lg text-base">
               {t('howItWorks.subtitle', 'No queues, no contracts, no physical cards. Just fast, reliable data wherever you go.')}

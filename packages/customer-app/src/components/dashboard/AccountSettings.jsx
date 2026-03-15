@@ -321,7 +321,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
         {/* ── Personal Information ── */}
         <div className="group relative bg-[var(--bg-secondary)] overflow-hidden hover:bg-[var(--bg-primary)] transition-all duration-500 p-5">
           <span
-            className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-text-primary/10 select-none pointer-events-none"
+            className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-300 dark:text-gray-700 select-none pointer-events-none"
             aria-hidden="true"
           >
             01
@@ -405,7 +405,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
         {(isGoogleUser || isAppleUser) && (
           <div className="group relative bg-[var(--bg-secondary)] overflow-hidden hover:bg-[var(--bg-primary)] transition-all duration-500 p-5">
             <span
-              className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-text-primary/10 select-none pointer-events-none"
+              className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-300 dark:text-gray-700 select-none pointer-events-none"
               aria-hidden="true"
             >
               02
@@ -438,7 +438,7 @@ const AccountSettings = ({ currentUser, userProfile, onLoadUserProfile }) => {
         {/* ── Newsletter ── */}
         <div className="group relative bg-[var(--bg-secondary)] overflow-hidden hover:bg-[var(--bg-primary)] transition-all duration-500 p-5">
           <span
-            className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-text-primary/10 select-none pointer-events-none"
+            className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-300 dark:text-gray-700 select-none pointer-events-none"
             aria-hidden="true"
           >
             {isGoogleUser || isAppleUser ? '03' : '02'}

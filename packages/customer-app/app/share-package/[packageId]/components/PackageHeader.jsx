@@ -1,9 +1,17 @@
 'use client';
 
 import React from 'react';
-import { Globe } from 'lucide-react';
 import { formatPrice } from '@esim/shared/utils/priceUtils';
-import { formatDataDisplay, getValidityDays } from '@esim/shared/utils/planDisplayUtils';
+import { formatDataDisplay, getValidityDays, planIsRegional, getCoveredCountryCount } from '@esim/shared/utils/planDisplayUtils';
+
+// Inline Globe SVG — no lucide-react import
+const GlobeIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="10" />
+    <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+    <path d="M2 12h20" />
+  </svg>
+);
 
 // Helper to capitalize first letter of each word
 const capitalizeWords = (str) => {
@@ -74,6 +82,9 @@ const PackageHeader = ({
 
   const displayCountryName = capitalizeWords(urlCountryName) || getFullCountryName(urlCountryCode || packageData.country_code);
   const isGlobal = isGlobalPlan ? isGlobalPlan(packageData) : false;
+  const isRegional = planIsRegional(packageData);
+  const coveredCountryCount = getCoveredCountryCount(packageData);
+  const isMultiCountry = isGlobal || (isRegional && coveredCountryCount > 1);
 
   // Use shared formatDataDisplay for consistent data formatting
   const dataDisplay = formatDataDisplay(packageData);
@@ -99,7 +110,7 @@ const PackageHeader = ({
                   />
                 ) : isGlobal ? (
                   <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
-                    <Globe className="w-10 h-10 text-tufts-blue" />
+                    <GlobeIcon className="w-10 h-10 text-tufts-blue" />
                   </div>
                 ) : null}
               </div>
@@ -126,6 +137,18 @@ const PackageHeader = ({
                 <p className="mt-1 text-sm text-text-muted">
                   {dataDisplay} {t('sharePackage.for', 'for')} {validityDays} {t('sharePackage.days', 'days')}
                 </p>
+                {/* Globe indicator for regional/international plans */}
+                {isMultiCountry && (
+                  <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium text-tufts-blue rtl-native-flex" style={{ backgroundColor: 'rgba(73, 117, 212, 0.1)', border: '1px solid rgba(73, 117, 212, 0.2)' }}>
+                    <GlobeIcon className="w-3.5 h-3.5 flex-shrink-0" />
+                    <span>
+                      {isGlobal
+                        ? t('sharePackage.globalPlan', 'Global Plan')
+                        : t('sharePackage.regionalPlan', 'Regional Plan — {count} countries').replace('{count}', coveredCountryCount)
+                      }
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>

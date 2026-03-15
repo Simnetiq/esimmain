@@ -22,34 +22,34 @@ export default function ComparisonTable() {
 
   const rows = [
     {
-      feature: t('comparison.rowActivation', 'Activation'),
-      physical: t('comparison.physicalActivation', 'Wait for delivery (1–5 days)'),
-      esim: t('comparison.esimActivation', 'Instant — scan QR code'),
+      feature: t('comparison.activation', 'Activation'),
+      physical: t('comparison.physicalActivation', 'Find a store, wait in line'),
+      esim: t('comparison.esimActivation', 'Scan QR, ready in 2 min'),
     },
     {
-      feature: t('comparison.rowAvailability', 'Availability'),
-      physical: t('comparison.physicalAvailability', 'Buy at airport kiosk or store'),
-      esim: t('comparison.esimAvailability', 'Purchase online, anywhere'),
+      feature: t('comparison.availability', 'Availability'),
+      physical: t('comparison.physicalAvailability', 'Airport/city shops only'),
+      esim: t('comparison.esimAvailability', 'Buy online, anytime'),
     },
     {
-      feature: t('comparison.rowSwitching', 'Switching plans'),
-      physical: t('comparison.physicalSwitching', 'Swap card, lose your number'),
-      esim: t('comparison.esimSwitching', 'Switch plans digitally, no hassle'),
+      feature: t('comparison.switching', 'Switching plans'),
+      physical: t('comparison.physicalSwitching', 'Buy new card, swap physically'),
+      esim: t('comparison.esimSwitching', 'Add new plan digitally'),
     },
     {
-      feature: t('comparison.rowKeepNumber', 'Keep your number'),
-      physical: t('comparison.physicalKeepNumber', 'No — requires a new SIM'),
-      esim: t('comparison.esimKeepNumber', 'Yes — eSIM runs alongside your SIM'),
+      feature: t('comparison.keepNumber', 'Keep your number'),
+      physical: t('comparison.physicalKeepNumber', 'Must remove main SIM'),
+      esim: t('comparison.esimKeepNumber', 'Runs alongside your SIM'),
     },
     {
-      feature: t('comparison.rowMultiCountry', 'Multiple countries'),
-      physical: t('comparison.physicalMultiCountry', 'Buy a new SIM each country'),
-      esim: t('comparison.esimMultiCountry', 'One plan covers many regions'),
+      feature: t('comparison.multiCountry', 'Multiple countries'),
+      physical: t('comparison.physicalMultiCountry', 'New SIM per country'),
+      esim: t('comparison.esimMultiCountry', 'Switch plans instantly'),
     },
     {
-      feature: t('comparison.rowCost', 'Cost'),
-      physical: t('comparison.physicalCost', 'Carrier roaming — up to $15/day'),
-      esim: t('comparison.esimCost', 'From $1/day — transparent pricing'),
+      feature: t('comparison.cost', 'Cost'),
+      physical: t('comparison.physicalCost', 'Store markup + taxi to shop'),
+      esim: t('comparison.esimCost', 'Direct pricing, no extras'),
     },
   ];
 

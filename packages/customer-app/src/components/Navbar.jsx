@@ -160,8 +160,8 @@ const Navbar = () => {
         }}
       >
         {/* Top row — logo + close */}
-        <div className="flex items-center justify-between h-14 px-4" style={{ borderBottom: '1px solid var(--divider)' }}>
-          <Link href={getLocalizedUrl('/')} className="flex items-center gap-2" onClick={closeMobile}>
+        <div className="flex rtl-native-flex items-center justify-between h-14 px-4" style={{ borderBottom: '1px solid var(--divider)' }}>
+          <Link href={getLocalizedUrl('/')} className="flex rtl-native-flex items-center gap-2" onClick={closeMobile} dir="ltr">
             <SimnetiqLogo className="w-6 h-6" />
             <span className="text-base font-semibold text-text-primary tracking-tight">simnetiq</span>
           </Link>
@@ -235,7 +235,7 @@ const Navbar = () => {
         <div className="px-2 py-2" style={{ borderTop: '1px solid var(--divider)' }}>
           <LanguageSelector variant="mobile" onClose={closeMobile} />
 
-          <div className="flex items-center justify-between px-3 py-2.5">
+          <div className="flex rtl-native-flex items-center justify-between px-3 py-2.5">
             <span className="text-sm font-medium text-text-muted">{t('navbar.theme', 'Theme')}</span>
             <ThemeToggle />
           </div>
@@ -275,11 +275,12 @@ const Navbar = () => {
         }}
         aria-label="Global"
       >
-        <div data-nav-inner className="relative flex items-center justify-between h-14 sm:h-16 px-4 sm:px-6 mx-auto max-w-7xl">
-          {/* Left: Logo */}
+        <div data-nav-inner className="relative flex rtl-native-flex items-center justify-between h-14 sm:h-16 px-4 sm:px-6 mx-auto max-w-7xl">
+          {/* Left: Logo — always LTR so icon+text order is preserved */}
           <Link
             href={getLocalizedUrl(currentUser ? '/dashboard' : '/')}
-            className="flex items-center gap-2 shrink-0"
+            className="flex rtl-native-flex items-center gap-2 shrink-0"
+            dir="ltr"
           >
             <SimnetiqLogo className="w-7 h-7 sm:w-8 sm:h-8" />
             <span className="text-base sm:text-lg font-semibold text-text-primary tracking-tight">
@@ -288,8 +289,8 @@ const Navbar = () => {
           </Link>
 
           {/* Center: Desktop nav links — absolutely centered */}
-          <div className="hidden lg:flex items-center gap-0.5 absolute inset-0 justify-center pointer-events-none">
-            <div className="flex items-center gap-0.5 pointer-events-auto">
+          <div className="hidden lg:flex rtl-native-flex items-center gap-0.5 absolute inset-0 justify-center pointer-events-none">
+            <div className="flex rtl-native-flex items-center gap-0.5 pointer-events-auto">
               <Link
                 href={getLocalizedUrl('/esim-plans')}
                 className="text-text-muted hover:text-text-primary transition-colors text-sm font-medium px-3 py-2"
@@ -324,7 +325,7 @@ const Navbar = () => {
           </div>
 
           {/* Right: Desktop controls */}
-          <div className="hidden lg:flex items-center gap-1.5 ms-auto">
+          <div className="hidden lg:flex rtl-native-flex items-center gap-1.5 ms-auto">
             {currentUser && (
               <Link
                 href={getLocalizedUrl('/settings')}

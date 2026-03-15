@@ -802,6 +802,10 @@
     "step3Desc": "Data activates automatically when you arrive. That's it."
   },
   "comparison": {
+    "label": "De slimme keuze",
+    "featureHeader": "Kenmerk",
+    "physicalHeader": "Fysieke SIM",
+    "esimHeader": "Simnetiq eSIM",
     "title": "eSIM vs Physical SIM",
     "subtitle": "See why travelers are switching to eSIM",
     "activation": "Activation",

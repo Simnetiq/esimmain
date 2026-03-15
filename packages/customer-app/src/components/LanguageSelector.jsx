@@ -24,6 +24,11 @@ const localeConfig = {
   pl: { label: 'PL', countryCode: 'pl', name: 'Polski' },
   uk: { label: 'УК', countryCode: 'ua', name: 'Українська' },
   hi: { label: 'हि', countryCode: 'in', name: 'हिन्दी' },
+  it: { label: 'IT', countryCode: 'it', name: 'Italiano' },
+  ko: { label: '한', countryCode: 'kr', name: '한국어' },
+  nl: { label: 'NL', countryCode: 'nl', name: 'Nederlands' },
+  th: { label: 'ไท', countryCode: 'th', name: 'ไทย' },
+  tr: { label: 'TR', countryCode: 'tr', name: 'Türkçe' },
 };
 
 const supportedLocales = Object.keys(localeConfig);
@@ -117,11 +122,11 @@ const LanguageSelector = ({ variant = 'desktop', onClose }) => {
   const getLocalizedPath = useCallback((langCode) => {
     // Blog URLs
     if (pathname.includes('/blog')) {
-      const langBlogPost = pathname.match(/^\/(he|ar|ru|de|fr|es|pt|ja|zh|pl|uk|hi)\/blog\/(.+)$/);
+      const langBlogPost = pathname.match(/^\/(he|ar|ru|de|fr|es|pt|ja|zh|pl|uk|hi|it|ko|nl|th|tr)\/blog\/(.+)$/);
       if (langBlogPost) return getLocalizedBlogUrl(langBlogPost[2], langCode);
       const blogPost = pathname.match(/^\/blog\/(.+)$/);
       if (blogPost) return getLocalizedBlogUrl(blogPost[1], langCode);
-      if (pathname.match(/^\/(he|ar|ru|de|fr|es|pt|ja|zh|pl|uk|hi)\/blog\/?$/) || pathname === '/blog' || pathname === '/blog/') {
+      if (pathname.match(/^\/(he|ar|ru|de|fr|es|pt|ja|zh|pl|uk|hi|it|ko|nl|th|tr)\/blog\/?$/) || pathname === '/blog' || pathname === '/blog/') {
         return getLocalizedBlogListUrl(langCode);
       }
     }
@@ -129,6 +134,7 @@ const LanguageSelector = ({ variant = 'desktop', onClose }) => {
     // Strip existing language prefix
     let cleanPath = pathname;
     const prefixes = ['/he', '/ar', '/ru', '/de', '/fr', '/es', '/pt', '/ja', '/zh', '/pl', '/uk', '/hi',
+      '/it', '/ko', '/nl', '/th', '/tr',
       '/hebrew', '/arabic', '/russian', '/german', '/french', '/spanish'];
     for (const pfx of prefixes) {
       if (cleanPath === pfx || cleanPath.startsWith(pfx + '/')) {
@@ -156,10 +162,10 @@ const LanguageSelector = ({ variant = 'desktop', onClose }) => {
       <>
         <button
           onClick={() => setIsOpen(prev => !prev)}
-          className="flex items-center justify-between w-full px-3 py-2.5 rounded-lg text-sm font-medium text-text-primary hover:bg-[var(--hover-bg)] transition-colors"
+          className="flex rtl-native-flex items-center justify-between w-full px-3 py-2.5 rounded-lg text-sm font-medium text-text-primary hover:bg-[var(--hover-bg)] transition-colors"
           aria-expanded={isOpen}
         >
-          <span className="flex items-center gap-2">
+          <span className="flex rtl-native-flex items-center gap-2">
             <img src={getFlagUrl(currentLang.countryCode)} alt="" className="w-5 h-5 rounded-full object-cover" />
             {currentLang.name}
           </span>
@@ -186,7 +192,7 @@ const LanguageSelector = ({ variant = 'desktop', onClose }) => {
                   <button
                     key={loc}
                     onClick={() => switchLanguage(loc)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors duration-150 min-w-0 ${
+                    className={`flex rtl-native-flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors duration-150 min-w-0 ${
                       isActive
                         ? 'text-tufts-blue ring-1'
                         : 'text-text-muted hover:text-text-primary hover:bg-[var(--hover-bg)]'
@@ -220,7 +226,7 @@ const LanguageSelector = ({ variant = 'desktop', onClose }) => {
       <button
         ref={btnRef}
         onClick={toggleOpen}
-        className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ${
+        className={`flex rtl-native-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-200 ${
           isOpen
             ? 'bg-bg-secondary text-text-primary'
             : 'text-text-primary hover:bg-[var(--hover-bg)]'
@@ -244,7 +250,7 @@ const LanguageSelector = ({ variant = 'desktop', onClose }) => {
         <div
           ref={panelRef}
           style={panelPos ? { top: panelPos.top, right: panelPos.right, left: panelPos.left } : undefined}
-          className={`fixed z-[60] w-[min(calc(100vw-2rem),42rem)] transition-all duration-200 origin-top-right ${
+          className={`fixed z-[60] w-[min(calc(100vw-2rem),42rem)] transition-all duration-200 ltr:origin-top-right rtl:origin-top-left ${
             isOpen && panelPos
               ? 'opacity-100 scale-100 pointer-events-auto'
               : 'opacity-0 scale-95 pointer-events-none'
@@ -271,7 +277,7 @@ const LanguageSelector = ({ variant = 'desktop', onClose }) => {
                     role="menuitem"
                     tabIndex={isOpen ? 0 : -1}
                     onClick={() => switchLanguage(loc)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors duration-150 min-w-0 ${
+                    className={`flex rtl-native-flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors duration-150 min-w-0 ${
                       isActive
                         ? 'text-tufts-blue'
                         : 'text-text-muted hover:text-text-primary hover:bg-[var(--hover-bg)]'

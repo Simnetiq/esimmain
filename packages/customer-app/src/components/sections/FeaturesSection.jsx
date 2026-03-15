@@ -88,7 +88,6 @@ export default function FeaturesSection() {
               </h2>
             </div>
           </div>
-          <div className="w-full h-px" style={{ backgroundColor: 'var(--divider)' }} />
         </div>
 
         {/* Features Grid */}
@@ -116,7 +115,7 @@ export default function FeaturesSection() {
                   {/* Content — right half */}
                   <div className="relative flex-1 p-6 lg:p-10 flex flex-col justify-center">
                     {/* Large step number */}
-                    <span className="absolute top-4 end-4 lg:end-8 text-[5rem] md:text-[7rem] lg:text-[9rem] font-semibold leading-none text-text-primary/[0.04] select-none pointer-events-none" aria-hidden="true">
+                    <span className="absolute top-4 end-4 lg:end-8 text-[5rem] md:text-[7rem] lg:text-[9rem] font-semibold leading-none text-gray-300 dark:text-gray-700 select-none pointer-events-none" aria-hidden="true">
                       {heroFeature.number}
                     </span>
 
@@ -146,8 +145,7 @@ export default function FeaturesSection() {
                   <div
                     key={index}
                     className="relative overflow-hidden animate-fade-in-up content-visibility-auto"
-                    style={{ backgroundColor: 'var(--card-bg)' }}
-                    style={{ animationDelay: `${(index + 1) * 100}ms` }}
+                    style={{ backgroundColor: 'var(--card-bg)', animationDelay: `${(index + 1) * 100}ms` }}
                   >
                     {/* Image Area */}
                     <div className="relative h-40 sm:h-48 overflow-hidden">
@@ -166,7 +164,7 @@ export default function FeaturesSection() {
                     {/* Content */}
                     <div className="relative p-5 lg:p-6">
                       {/* Large step number */}
-                      <span className="absolute -top-10 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-text-primary/[0.04] select-none pointer-events-none" aria-hidden="true">
+                      <span className="absolute -top-10 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-300 dark:text-gray-700 select-none pointer-events-none" aria-hidden="true">
                         {feature.number}
                       </span>
 

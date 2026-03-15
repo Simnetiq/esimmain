@@ -856,6 +856,10 @@
     "step3Desc": "הנתונים מופעלים אוטומטית כשמגיעים ליעד. זה הכל."
   },
   "comparison": {
+    "label": "הבחירה החכמה",
+    "featureHeader": "תכונה",
+    "physicalHeader": "SIM פיזי",
+    "esimHeader": "Simnetiq eSIM",
     "title": "eSIM לעומת SIM פיזי",
     "subtitle": "גלו למה מטיילים עוברים ל-eSIM",
     "activation": "הפעלה",

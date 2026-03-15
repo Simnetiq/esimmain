@@ -160,7 +160,7 @@ const Settings = () => {
             <div className="px-4 pb-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
               <div className="group relative bg-[var(--bg-secondary)] overflow-hidden hover:bg-[var(--bg-primary)] transition-all duration-500 p-5">
                 <span
-                  className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-text-primary/10 select-none pointer-events-none"
+                  className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-300 dark:text-gray-700 select-none pointer-events-none"
                   aria-hidden="true"
                 >
                   {/* Dynamic step number based on whether social provider section exists */}

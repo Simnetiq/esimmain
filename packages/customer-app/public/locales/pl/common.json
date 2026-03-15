@@ -857,6 +857,10 @@
     "step3Desc": "Dane aktywują się automatycznie po przyjeździe. To wszystko."
   },
   "comparison": {
+    "label": "Mądry wybór",
+    "featureHeader": "Cecha",
+    "physicalHeader": "Fizyczna karta SIM",
+    "esimHeader": "Simnetiq eSIM",
     "title": "eSIM vs fizyczna karta SIM",
     "subtitle": "Zobacz, dlaczego podróżnicy przechodzą na eSIM",
     "activation": "Aktywacja",

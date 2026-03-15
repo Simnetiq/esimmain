@@ -41,7 +41,14 @@
     "promoPrefix": "Use code",
     "promoSuffix": "for {{discount}}% off your first eSIM",
     "fiveStarRated": "5-Star Rated",
-    "sevenDayRefund": "7-Day Refund"
+    "sevenDayRefund": "7-Day Refund",
+    "tagline": "Global eSIM Platform",
+    "searchPlaceholder": "Where are you traveling?",
+    "popularDestinations": "Popular destinations",
+    "noResults": "No destinations found",
+    "explorePlans": "Explore Plans",
+    "appStore": "App Store",
+    "googlePlay": "Google Play"
   },
   "features": {
     "title": "Connect globally",
@@ -802,6 +809,10 @@
     "step3Desc": "Data activates automatically when you arrive. That's it."
   },
   "comparison": {
+    "label": "The smart choice",
+    "featureHeader": "Feature",
+    "physicalHeader": "Physical SIM",
+    "esimHeader": "Simnetiq eSIM",
     "title": "eSIM vs Physical SIM",
     "subtitle": "See why travelers are switching to eSIM",
     "activation": "Activation",
@@ -855,7 +866,10 @@
     "sources": "telekom.de · att.com · vodafone.de · airalo.com"
   },
   "featuresBento": {
+    "label": "Everything included",
     "title": "Why Choose Simnetiq",
+    "countriesLabel": "200+ countries",
+    "countriesSubLabel": "countries & regions",
     "globalCoverage": "Global Coverage",
     "globalCoverageDesc": "200+ countries, 400+ carriers. One app.",
     "instantActivation": "Instant Activation",

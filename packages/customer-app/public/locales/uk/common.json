@@ -857,6 +857,10 @@
     "step3Desc": "Інтернет активується автоматично по прибутті. Ось і все."
   },
   "comparison": {
+    "label": "Розумний вибір",
+    "featureHeader": "Функція",
+    "physicalHeader": "Фізична SIM",
+    "esimHeader": "Simnetiq eSIM",
     "title": "eSIM vs Фізична SIM",
     "subtitle": "Дізнайтесь, чому мандрівники переходять на eSIM",
     "activation": "Активація",

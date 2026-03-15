@@ -857,6 +857,10 @@
     "step3Desc": "到达目的地后流量自动激活，就是这么简单。"
   },
   "comparison": {
+    "label": "明智之选",
+    "featureHeader": "功能",
+    "physicalHeader": "实体SIM卡",
+    "esimHeader": "Simnetiq eSIM",
     "title": "eSIM vs 实体SIM卡",
     "subtitle": "看看为什么旅行者纷纷转向 eSIM",
     "activation": "激活方式",

@@ -162,7 +162,6 @@ export default function TravelBlogsSection() {
               </div>
             </div>
           </div>
-          <div className="w-full h-px" style={{ backgroundColor: 'var(--divider)' }} />
         </div>
 
         {/* Blog Cards Grid */}

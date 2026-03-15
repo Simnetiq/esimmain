@@ -145,21 +145,9 @@
     flex-direction: column;
   }
 
-  [dir="rtl"] .justify-start {
-    justify-content: flex-end;
-  }
-
-  [dir="rtl"] .justify-end {
-    justify-content: flex-start;
-  }
-
-  [dir="rtl"] .items-start {
-    align-items: flex-end;
-  }
-
-  [dir="rtl"] .items-end {
-    align-items: flex-start;
-  }
+  /* NOTE: justify-start/end and items-start/end are NOT flipped here.
+     - justify-start/end: already handled by flex-direction: row-reverse above
+     - items-start/end: cross-axis (vertical), not directional — must NOT flip */
 
   [dir="rtl"] .text-left {
     text-align: right;

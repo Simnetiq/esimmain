@@ -19,20 +19,9 @@
   font-family: var(--font-open-sans), system-ui, sans-serif;
 }
 
-/* Text alignment - RTL inherits right alignment */
-[dir="rtl"] p,
-[dir="rtl"] label,
-[dir="rtl"] span:not(.text-center):not([class*="icon"]) {
-  text-align: right;
-}
-
-/* Headings - inherit RTL, but centered titles stay centered */
-[dir="rtl"] h1:not(.text-center),
-[dir="rtl"] h2:not(.text-center),
-[dir="rtl"] h3:not(.text-center),
-[dir="rtl"] h4:not(.text-center) {
-  text-align: right;
-}
+/* Text alignment: browser handles default right-alignment via dir="rtl".
+   Components use text-start/text-end/text-center which resolve correctly.
+   No global text-align overrides needed — they fight with logical properties. */
 
 /* Form inputs RTL */
 [dir="rtl"] input,
@@ -83,9 +72,7 @@
 [dir="rtl"] .flex-col { flex-direction: column; }
 [dir="rtl"] .flex-col-reverse { flex-direction: column-reverse; }
 
-/* Justify utilities flip in RTL */
-[dir="rtl"] .justify-start { justify-content: flex-end; }
-[dir="rtl"] .justify-end { justify-content: flex-start; }
+/* justify-start/end: not flipped — already handled by row-reverse on flex containers */
 
 /* Text alignment utilities flip */
 [dir="rtl"] .text-left { text-align: right; }
@@ -104,26 +91,8 @@
 [dir="rtl"] .rounded-l-xl { border-radius: 0 0.75rem 0.75rem 0; }
 [dir="rtl"] .rounded-r-xl { border-radius: 0.75rem 0 0 0.75rem; }
 
-/* Navbar — keep LTR layout, only apply RTL fonts and text direction */
-[dir="rtl"] .navbar-header {
-  direction: ltr;
-}
-[dir="rtl"] .navbar-header .flex:not(.flex-col),
-[dir="rtl"] .navbar-header .inline-flex {
-  flex-direction: row;
-}
-[dir="rtl"] .navbar-header .justify-start {
-  justify-content: flex-start;
-}
-[dir="rtl"] .navbar-header .justify-end {
-  justify-content: flex-end;
-}
-[dir="rtl"] .navbar-header a,
-[dir="rtl"] .navbar-header button,
-[dir="rtl"] .navbar-header span,
-[dir="rtl"] .navbar-header p {
-  font-family: var(--font-open-sans), var(--font-ibm-plex-arabic), system-ui, sans-serif;
-}
+/* Navbar — uses rtl-native-flex on individual containers + dir="ltr" on logo.
+   Old .navbar-header LTR lock removed — class was unused. */
 
 /* Prose (blog) RTL */
 [dir="rtl"] .prose {
@@ -164,4 +133,11 @@
    Use on containers where the global row-reverse override causes double-reversal. */
 [dir="rtl"] .rtl-native-flex {
   flex-direction: row !important;
+}
+
+/* Breakpoint-aware variant: only restores row at sm+ so flex-col is preserved on mobile */
+@media (min-width: 640px) {
+  [dir="rtl"] .rtl-native-flex-sm {
+    flex-direction: row !important;
+  }
 }

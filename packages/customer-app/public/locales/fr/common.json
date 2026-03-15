@@ -856,6 +856,10 @@
     "step3Desc": "Les données s'activent automatiquement à votre arrivée. C'est tout."
   },
   "comparison": {
+    "label": "Le choix malin",
+    "featureHeader": "Fonctionnalité",
+    "physicalHeader": "SIM physique",
+    "esimHeader": "Simnetiq eSIM",
     "title": "eSIM vs SIM physique",
     "subtitle": "Découvrez pourquoi les voyageurs passent à l'eSIM",
     "activation": "Activation",

@@ -116,7 +116,7 @@ const FAQ_NUMBERS = ['01', '02', '03', '04'];
 const FAQCategory = ({ icon: Icon, title, faqs, openFaq, onToggle, categoryIndex }) => (
   <div className="group relative bg-[var(--bg-secondary)] overflow-hidden hover:bg-[var(--bg-primary)] transition-all duration-500">
     <span
-      className="absolute top-4 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-eerie-black/[0.04] select-none pointer-events-none"
+      className="absolute top-4 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-300 dark:text-gray-700 select-none pointer-events-none"
       aria-hidden="true"
     >
       {FAQ_NUMBERS[categoryIndex]}

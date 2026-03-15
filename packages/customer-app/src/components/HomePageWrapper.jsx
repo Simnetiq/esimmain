@@ -2,9 +2,12 @@
 
 import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { detectLanguageFromPath, getLanguageDirection } from '@esim/shared/utils/languageUtils';
+
+const StickyMobileCTA = dynamic(() => import('./StickyMobileCTA'), { ssr: false });
 
 export default function HomePageWrapper({ children }) {
   const pathname = usePathname();
@@ -36,6 +39,7 @@ export default function HomePageWrapper({ children }) {
           {children}
         </div>
       </main>
+      <StickyMobileCTA />
     </div>
   );
 }

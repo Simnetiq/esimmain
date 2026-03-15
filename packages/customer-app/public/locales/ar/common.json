@@ -857,6 +857,10 @@
     "step3Desc": "تُفعّل البيانات تلقائياً عند وصولك. هذا كل شيء."
   },
   "comparison": {
+    "label": "الخيار الذكي",
+    "featureHeader": "الميزة",
+    "physicalHeader": "SIM فعلي",
+    "esimHeader": "Simnetiq eSIM",
     "title": "eSIM مقابل شريحة SIM التقليدية",
     "subtitle": "اكتشف لماذا يتحول المسافرون إلى eSIM",
     "activation": "التفعيل",

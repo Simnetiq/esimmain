@@ -802,6 +802,10 @@
     "step3Desc": "Data activates automatically when you arrive. That's it."
   },
   "comparison": {
+    "label": "현명한 선택",
+    "featureHeader": "기능",
+    "physicalHeader": "물리적 SIM",
+    "esimHeader": "Simnetiq eSIM",
     "title": "eSIM vs Physical SIM",
     "subtitle": "See why travelers are switching to eSIM",
     "activation": "Activation",

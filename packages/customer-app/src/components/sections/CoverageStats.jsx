@@ -6,6 +6,7 @@ import { useI18n } from '@esim/shared/contexts/I18nContext';
 import FlagImage from '@esim/shared/components/FlagImage';
 import AnimatedCounter from '../ui/AnimatedCounter';
 import Reveal from '../ui/Reveal';
+import { ExploreStoreCTA } from '../cta';
 
 const REGIONS = [
   {
@@ -148,11 +149,30 @@ export default function CoverageStats() {
                 <FlagImage key={fi} code={flag.code} emoji={flag.emoji} />
               ))}
             </div>
-            <p className="text-xs text-tufts-blue font-medium text-start mt-1">
-              {t('coverage.exploreCTA', 'Start exploring {{region}} now', { region: t(region.nameKey, region.nameFallback) })} →
-            </p>
+            <div className="flex items-center justify-between mt-1 rtl-native-flex">
+              <p className="text-xs text-tufts-blue font-medium text-start">
+                {t('coverage.exploreCTA', 'Start exploring {{region}} now', { region: t(region.nameKey, region.nameFallback) })}
+              </p>
+              <span
+                className="flex-shrink-0 inline-flex items-center justify-center rounded-full w-6 h-6 rtl-native-flex"
+                style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--card-border)' }}
+              >
+                <svg className="w-3 h-3 rtl:-scale-x-100" style={{ color: 'var(--text-primary)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M7 17 17 7"/><path d="M7 7h10v10"/>
+                </svg>
+              </span>
+            </div>
           </Link>
         ))}
+      </Reveal>
+
+      {/* CTA below region grid */}
+      <Reveal delay={200} className="flex justify-center mt-10">
+        <ExploreStoreCTA
+          variant="themed"
+          size="md"
+          source="coverage_cta"
+        />
       </Reveal>
     </section>
   );

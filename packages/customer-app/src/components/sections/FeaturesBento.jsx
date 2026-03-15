@@ -68,7 +68,7 @@ export default function FeaturesBento() {
       key: 'globalCoverage',
       Icon: GlobeIcon,
       title: t('featuresBento.globalCoverage', 'Global Coverage'),
-      description: t('featuresBento.globalCoverageDesc', 'Access reliable data in over 200 countries and regions through our partner network of top-tier carriers.'),
+      description: t('featuresBento.globalCoverageDesc', '200+ countries, 400+ carriers. One app.'),
       large: true,
       gradient: true,
       counter: true,
@@ -78,35 +78,35 @@ export default function FeaturesBento() {
       key: 'instantActivation',
       Icon: ZapIcon,
       title: t('featuresBento.instantActivation', 'Instant Activation'),
-      description: t('featuresBento.instantActivationDesc', 'Your eSIM is ready in under 2 minutes. Purchase, scan, connect — no waiting.'),
+      description: t('featuresBento.instantActivationDesc', 'From purchase to connected in under 2 minutes'),
       delay: 100,
     },
     {
       key: 'topUp',
       Icon: RefreshIcon,
       title: t('featuresBento.topUp', 'Top-Up Anytime'),
-      description: t('featuresBento.topUpDesc', 'Running low on data? Add more directly from the app without reinstalling your eSIM.'),
+      description: t('featuresBento.topUpDesc', 'Running low? Add more data without reinstalling your eSIM'),
       delay: 200,
     },
     {
       key: 'securePayments',
       Icon: LockIcon,
       title: t('featuresBento.securePayments', 'Secure Payments'),
-      description: t('featuresBento.securePaymentsDesc', 'All transactions are encrypted and processed via Stripe — PCI-DSS compliant.'),
+      description: t('featuresBento.securePaymentsDesc', 'Stripe-powered checkout. Apple Pay, Google Pay, all major cards.'),
       delay: 300,
     },
     {
       key: 'multiLanguage',
       Icon: LanguagesIcon,
       title: t('featuresBento.multiLanguage', 'Multi-Language'),
-      description: t('featuresBento.multiLanguageDesc', 'Shop in your language. We support English, Arabic, Hebrew, Russian, German, and more.'),
+      description: t('featuresBento.multiLanguageDesc', 'Full support in 18 languages including Arabic, Hebrew, Japanese, and more'),
       delay: 400,
     },
     {
       key: 'support',
       Icon: HeadsetIcon,
       title: t('featuresBento.support', 'Dedicated Support'),
-      description: t('featuresBento.supportDesc', 'Real humans available via email and chat to help you get connected wherever you are.'),
+      description: t('featuresBento.supportDesc', 'Real human support via email and in-app. No chatbots.'),
       delay: 500,
     },
   ];
@@ -128,7 +128,7 @@ export default function FeaturesBento() {
               id="features-bento-heading"
               className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary max-w-xl"
             >
-              {t('featuresBento.title', 'All the features you need in one place')}
+              {t('featuresBento.title', 'Why Choose Simnetiq')}
             </h2>
           </Reveal>
         </div>

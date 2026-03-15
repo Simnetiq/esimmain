@@ -24,7 +24,7 @@ const DESTINATIONS = [
     id: 'turkey',
     labelKey: 'roaming.dest.turkey',
     labelDefault: 'Turkey',
-    flag: '🇹🇷',
+    flag: 'tr',
     carriers: [
       { id: 'att', labelKey: 'roaming.carrier.att', labelDefault: 'AT&T / Verizon (US)', price: 84, noteKey: 'roaming.note.dayPass', noteDefault: 'Day Pass $12/day × 7' },
       { id: 'vodafone', labelKey: 'roaming.carrier.vodafoneDE', labelDefault: 'Vodafone (Germany)', price: 56, noteKey: 'roaming.note.easyTravel', noteDefault: 'EasyTravel €7.99/day' },
@@ -36,7 +36,7 @@ const DESTINATIONS = [
     id: 'thailand',
     labelKey: 'roaming.dest.thailand',
     labelDefault: 'Thailand',
-    flag: '🇹🇭',
+    flag: 'th',
     carriers: [
       { id: 'att', labelKey: 'roaming.carrier.att', labelDefault: 'AT&T / Verizon (US)', price: 84, noteKey: 'roaming.note.dayPass', noteDefault: 'Day Pass $12/day × 7' },
       { id: 'vodafone', labelKey: 'roaming.carrier.vodafoneDE', labelDefault: 'Vodafone (Germany)', price: 38, noteKey: 'roaming.note.reisePaket', noteDefault: 'ReisePaket World 4GB/week' },
@@ -48,7 +48,7 @@ const DESTINATIONS = [
     id: 'japan',
     labelKey: 'roaming.dest.japan',
     labelDefault: 'Japan',
-    flag: '🇯🇵',
+    flag: 'jp',
     carriers: [
       { id: 'att', labelKey: 'roaming.carrier.att', labelDefault: 'AT&T / Verizon (US)', price: 84, noteKey: 'roaming.note.dayPass', noteDefault: 'Day Pass $12/day × 7' },
       { id: 'vodafone', labelKey: 'roaming.carrier.vodafoneDE', labelDefault: 'Vodafone (Germany)', price: 38, noteKey: 'roaming.note.reisePaket', noteDefault: 'ReisePaket World 4GB/week' },
@@ -60,7 +60,7 @@ const DESTINATIONS = [
     id: 'brazil',
     labelKey: 'roaming.dest.brazil',
     labelDefault: 'Brazil',
-    flag: '🇧🇷',
+    flag: 'br',
     carriers: [
       { id: 'att', labelKey: 'roaming.carrier.att', labelDefault: 'AT&T / Verizon (US)', price: 84, noteKey: 'roaming.note.dayPass', noteDefault: 'Day Pass $12/day × 7' },
       { id: 'vodafone', labelKey: 'roaming.carrier.vodafoneDE', labelDefault: 'Vodafone (Germany)', price: 38, noteKey: 'roaming.note.reisePaket', noteDefault: 'ReisePaket World 4GB/week' },
@@ -72,7 +72,7 @@ const DESTINATIONS = [
     id: 'egypt',
     labelKey: 'roaming.dest.egypt',
     labelDefault: 'Egypt',
-    flag: '🇪🇬',
+    flag: 'eg',
     carriers: [
       { id: 'att', labelKey: 'roaming.carrier.att', labelDefault: 'AT&T / Verizon (US)', price: 84, noteKey: 'roaming.note.dayPass', noteDefault: 'Day Pass $12/day × 7' },
       { id: 'vodafone', labelKey: 'roaming.carrier.vodafoneDE', labelDefault: 'Vodafone (Germany)', price: 38, noteKey: 'roaming.note.reisePaket', noteDefault: 'ReisePaket World 4GB/week' },
@@ -95,7 +95,7 @@ function DestinationTab({ dest, isActive, onClick }) {
       `}
       aria-pressed={isActive}
     >
-      <span className="text-base">{dest.flag}</span>
+      <img src={'/flags/' + dest.flag + '.svg'} alt="" className="w-5 h-5 rounded-full object-cover" />
       {dest.labelDefault}
     </button>
   );

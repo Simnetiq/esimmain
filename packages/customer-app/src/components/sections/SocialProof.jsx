@@ -53,7 +53,7 @@ export default function SocialProof() {
 
         {/* Tagline */}
         <p className="text-text-muted">
-          {t('socialProof.tagline', 'Trusted by travelers in 200+ countries worldwide')}
+          {t('socialProof.tagline', 'Trusted by travelers in 200+ countries')}
         </p>
       </Reveal>
     </section>

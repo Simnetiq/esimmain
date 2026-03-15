@@ -1,12 +1,13 @@
 'use client';
 
 import { useMemo } from 'react';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
 import { appStoreLinks } from '@esim/shared/utils/appStoreLinks';
 import { ExploreStoreCTA } from '../cta';
+import dynamic from 'next/dynamic';
+const HeroSearch = dynamic(() => import('../HeroSearch'), { ssr: false });
 
 // Inline SVG icons — no lucide-react imports
 const TagIcon = ({ className }) => (
@@ -45,8 +46,8 @@ export default function NewHeroSection({ promo = null }) {
   const detectedLanguage = i18nLoading ? ssrSafeLanguage : (locale || ssrSafeLanguage);
 
   const isRtl = detectedLanguage === 'he' || detectedLanguage === 'ar';
-  const currentLocale = i18nLoading ? ssrSafeLanguage : (locale || ssrSafeLanguage);
-  const esimPlansUrl = currentLocale && currentLocale !== 'en' ? `/${currentLocale}/esim-plans` : '/esim-plans';
+  // Always use ssrSafeLanguage for URLs to avoid hydration mismatch
+  const esimPlansUrl = ssrSafeLanguage && ssrSafeLanguage !== 'en' ? `/${ssrSafeLanguage}/esim-plans` : '/esim-plans';
 
   const headlinePart1 = t('hero.darkHeadlinePart1', 'Stay connected');
   const headlineHighlight = t('hero.darkHeadlineHighlight', 'anywhere');
@@ -55,7 +56,7 @@ export default function NewHeroSection({ promo = null }) {
 
   const trustBadges = [
     t('hero.countries', '200+ Countries'),
-    t('hero.instantActivation', 'Instant Activation'),
+    t('hero.instantActivation', 'Instant Setup'),
     t('hero.fiveStarRated', '5-Star Rated'),
     t('hero.sevenDayRefund', '7-Day Refund'),
   ];
@@ -86,7 +87,7 @@ export default function NewHeroSection({ promo = null }) {
           >
             <TagIcon className="w-4 h-4 text-accent-highlight flex-shrink-0" />
             <p className="text-sm font-medium text-accent-highlight text-center">
-              {t('hero.promoPrefix', 'Limited offer:')}
+              {t('hero.promoPrefix', 'Use code')}
               {' '}
               <span className="font-bold">{promo.code}</span>
               {' '}
@@ -94,7 +95,7 @@ export default function NewHeroSection({ promo = null }) {
               {' '}
               {promo.message || `${promo.discount} off`}
               {' '}
-              {t('hero.promoSuffix', 'on your first eSIM')}
+              {t('hero.promoSuffix', 'for {{discount}}% off your first eSIM')}
             </p>
           </div>
         </div>
@@ -106,7 +107,7 @@ export default function NewHeroSection({ promo = null }) {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
             {/* Left column: content */}
-            <div className="flex flex-col items-center lg:items-start text-center lg:text-start">
+            <div className={`flex flex-col ${isRtl ? 'items-start text-start' : 'items-center lg:items-start text-center lg:text-start'}`}>
 
               {/* Tagline badge */}
               <div
@@ -145,12 +146,15 @@ export default function NewHeroSection({ promo = null }) {
                 <span className="block bg-gradient-to-t from-text-muted to-text-primary bg-clip-text text-transparent">{headlinePart2}</span>
               </h1>
 
-              <p className="text-sm sm:text-base md:text-lg text-text-muted mb-8 max-w-md sm:max-w-xl leading-relaxed">
+              <p className="text-sm sm:text-base md:text-lg text-text-muted mb-4 max-w-md sm:max-w-xl leading-relaxed text-start">
                 {subtitleText}
               </p>
 
+              {/* Destination search with autocomplete */}
+              <HeroSearch esimPlansUrl={esimPlansUrl} />
+
               {/* CTAs — all 3 in one row, same pill-with-circle design, same size */}
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 mb-10 w-full sm:w-auto rtl-native-flex">
+              <div className={`flex flex-col sm:flex-row ${isRtl ? 'items-start' : 'items-center'} justify-center lg:justify-start gap-3 mb-10 w-full sm:w-auto rtl-native-flex-sm`}>
                 {/* Explore Plans */}
                 <ExploreStoreCTA
                   variant="themed"
@@ -206,7 +210,7 @@ export default function NewHeroSection({ promo = null }) {
 
               {/* Trust badges — Doppler-style plain checkmark list */}
               <div
-                className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 text-xs text-text-muted rtl-native-flex"
+                className={`flex flex-wrap items-center ${isRtl ? 'justify-start' : 'justify-center lg:justify-start'} gap-x-6 gap-y-2 text-xs text-text-muted rtl-native-flex`}
                 role="list"
                 aria-label="Trust indicators"
               >
@@ -219,41 +223,48 @@ export default function NewHeroSection({ promo = null }) {
               </div>
             </div>
 
-            {/* Right column: decorative eSIM visual card */}
-            <div className="hidden lg:block relative" aria-hidden="true">
-              <div className="relative w-full aspect-square max-w-lg mx-auto rounded-3xl overflow-hidden border border-white/[0.06]" style={{ background: 'linear-gradient(to bottom right, rgba(73, 117, 212, 0.05), var(--bg-secondary), rgba(73, 117, 212, 0.1))' }}>
-                {/* Subtle grid pattern overlay */}
-                <div
-                  className="absolute inset-0 opacity-[0.03]"
-                  style={{
-                    backgroundImage: 'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)',
-                    backgroundSize: '40px 40px',
-                  }}
-                />
+            {/* Right column: phone mockup with 3D overflow effect */}
+            <div className="hidden lg:flex items-center justify-center relative" aria-hidden="true">
+              {/* Glow behind the entire composition */}
+              <div className="absolute inset-0 -z-10 blur-3xl scale-75 opacity-60" style={{ backgroundColor: 'rgba(73, 117, 212, 0.15)' }} />
 
-                {/* Large watermark */}
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[8rem] font-bold text-white/[0.03] select-none pointer-events-none tracking-widest">
-                  eSIM
-                </span>
-
-                {/* Decorative circles */}
-                <div className="absolute top-1/4 right-1/4 w-32 h-32 rounded-full" style={{ border: '1px solid rgba(73, 117, 212, 0.1)' }} />
-                <div className="absolute bottom-1/3 left-1/3 w-48 h-48 rounded-full" style={{ border: '1px solid rgba(73, 117, 212, 0.05)' }} />
-
-                {/* Floating stat pills */}
-                <div className="absolute top-8 left-8 glass-card px-4 py-2 text-sm font-medium text-text-primary">
-                  <span className="text-tufts-blue font-bold">200+</span> Countries
+              {/* Container — phones overflow this boundary for 3D depth */}
+              <div className="relative w-full max-w-lg mx-auto" style={{ height: '520px' }}>
+                {/* Background frame with rounded corners — clips the sky background */}
+                <div className="absolute inset-x-8 inset-y-12 rounded-3xl overflow-hidden border border-white/[0.06]" style={{ boxShadow: '0 32px 64px rgba(0,0,0,0.3)' }}>
+                  <img
+                    src="/images/hero-phones.avif"
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover"
+                    loading="eager"
+                    fetchPriority="low"
+                  />
+                  {/* Gradient overlay for depth */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
                 </div>
-                <div className="absolute top-1/2 right-6 -translate-y-1/2 glass-card px-4 py-2 text-sm font-medium text-text-primary">
-                  Instant <span className="text-accent-success">Activation</span>
+
+                {/* Dark phone — behind, tilted left, overflows top */}
+                <div className="absolute z-10 drop-shadow-2xl" style={{ width: '220px', left: '10%', bottom: '0', transform: 'rotate(-6deg)' }}>
+                  <img
+                    src="/images/phone-dark.png"
+                    alt=""
+                    className="w-full h-auto"
+                    loading="eager"
+                    fetchPriority="low"
+                  />
                 </div>
-                <div className="absolute bottom-8 left-12 glass-card px-4 py-2 text-sm font-medium text-text-primary">
-                  From <span className="text-accent-highlight font-bold">$3</span>/GB
+
+                {/* Light phone — in front, slightly right, overflows top and right */}
+                <div className="absolute z-20 drop-shadow-2xl" style={{ width: '230px', right: '5%', bottom: '-16px', transform: 'rotate(3deg)' }}>
+                  <img
+                    src="/images/phone-light.png"
+                    alt=""
+                    className="w-full h-auto"
+                    loading="eager"
+                    fetchPriority="low"
+                  />
                 </div>
               </div>
-
-              {/* Subtle glow behind the card */}
-              <div className="absolute inset-0 -z-10 rounded-3xl blur-2xl scale-90" style={{ backgroundColor: 'rgba(73, 117, 212, 0.1)' }} />
             </div>
 
           </div>

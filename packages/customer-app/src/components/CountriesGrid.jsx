@@ -150,23 +150,46 @@ const CountriesGrid = ({
       {hasMoreCountries && (
         <div className="text-center mt-8">
           {isHomePage && onShowMoreClick ? (
-            // Home page: "Show More" redirects to plans page
+            // Home page: "Show More" redirects to plans page — pill-with-circle CTA
             <button
               onClick={onShowMoreClick}
-              className="btn-secondary px-8 py-3 font-semibold rounded-full transition-all duration-300 hover:scale-105 inline-flex items-center gap-2 rtl-native-flex"
+              className="inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:opacity-90 rtl-native-flex ps-5 pe-1 py-1 text-sm"
+              style={{
+                backgroundColor: 'var(--cta-secondary-bg)',
+                color: 'var(--cta-secondary-text)',
+                border: '1px solid var(--cta-secondary-border)',
+              }}
             >
-              {t('plans.showMore', 'Show More')}
-              <svg className="w-4 h-4 rtl:-scale-x-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
+              <span>{t('plans.showMore', 'Show More')}</span>
+              <span
+                className="ms-3 flex-shrink-0 inline-flex items-center justify-center rounded-full w-8 h-8 rtl-native-flex"
+                style={{ backgroundColor: 'var(--cta-secondary-circle-bg)' }}
+              >
+                <svg className="w-3.5 h-3.5 rtl:-scale-x-100" style={{ color: 'var(--cta-secondary-circle-text)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M7 17 17 7"/><path d="M7 7h10v10"/>
+                </svg>
+              </span>
             </button>
           ) : (
-            // Plans page: "Load More" expands the grid
+            // Plans page: "Load More" expands the grid — pill-with-circle CTA
             <button
               onClick={handleLoadMore}
-              className="btn-secondary px-8 py-3 font-semibold rounded-full transition-all duration-300 hover:scale-105"
+              className="inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:opacity-90 rtl-native-flex ps-5 pe-1 py-1 text-sm"
+              style={{
+                backgroundColor: 'var(--cta-secondary-bg)',
+                color: 'var(--cta-secondary-text)',
+                border: '1px solid var(--cta-secondary-border)',
+              }}
             >
-              {t('plans.loadMore', 'Load More')} ({remainingCount > BATCH_SIZE ? BATCH_SIZE : remainingCount} {t('plans.more', 'more')})
+              <span>{t('plans.loadMore', 'Load More')} ({remainingCount > BATCH_SIZE ? BATCH_SIZE : remainingCount} {t('plans.more', 'more')})</span>
+              <span
+                className="ms-3 flex-shrink-0 inline-flex items-center justify-center rounded-full w-8 h-8 rtl-native-flex"
+                style={{ backgroundColor: 'var(--cta-secondary-circle-bg)' }}
+              >
+                <svg className="w-3.5 h-3.5" style={{ color: 'var(--cta-secondary-circle-text)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m6 9 6 6 6-6"/>
+                </svg>
+              </span>
             </button>
           )}
         </div>

@@ -65,7 +65,7 @@ const DashboardSkeleton = () => (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                 {[0, 1, 2].map((i) => (
                   <div key={i} className="relative bg-[var(--bg-secondary)] overflow-hidden p-5">
-                    <span className="absolute top-3 right-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-text-primary/5 select-none pointer-events-none" aria-hidden="true">--</span>
+                    <span className="absolute top-3 right-4 text-[5rem] lg:text-[6rem] font-semibold leading-none text-gray-300 dark:text-gray-700 select-none pointer-events-none" aria-hidden="true">--</span>
                     <div className="relative">
                       <div className="w-11 h-11 rounded-lg bg-[var(--card-border)] animate-pulse mb-4" />
                       <div className="h-3 w-24 bg-[var(--card-border)] rounded animate-pulse" />
