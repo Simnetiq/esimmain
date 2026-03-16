@@ -100,11 +100,22 @@ const Login = () => {
 
   return (
     <div
-      className="min-h-screen bg-[var(--bg-primary)]"
+      className="relative min-h-screen bg-[var(--bg-primary)] overflow-hidden"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
+      {/* Dot grid background — matches hero */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-20"
+        aria-hidden="true"
+        style={{
+          backgroundImage: 'radial-gradient(var(--tufts-blue, #4975D4) 1px, transparent 1px)',
+          backgroundSize: '48px 48px',
+        }}
+      />
+      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[var(--bg-primary)] to-transparent pointer-events-none" aria-hidden="true" />
+
       {/* Content */}
-      <div className={`relative min-h-screen flex items-center justify-center px-4 py-8 sm:py-12 transition-opacity duration-150 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
+      <div className={`relative z-10 min-h-screen flex items-center justify-center px-4 py-8 sm:py-12 transition-opacity duration-150 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
         <div className="w-full max-w-md">
           {/* Card */}
           <div className="bg-[var(--bg-secondary)] p-6 sm:p-10">

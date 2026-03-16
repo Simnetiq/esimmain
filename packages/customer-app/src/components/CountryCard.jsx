@@ -125,7 +125,7 @@ const CountryCard = ({
                 )}
               </p>
               {isPromoted && (
-                <span className="inline-flex items-center gap-1 text-emerald-700 text-[10px] font-bold px-1.5 py-0.5 flex-shrink-0" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)' }}>
+                <span className="inline-flex items-center gap-1 text-tufts-blue text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ backgroundColor: 'rgba(73, 117, 212, 0.1)' }}>
                   {t('plans.topChoice', 'Most Popular')}
                 </span>
               )}
