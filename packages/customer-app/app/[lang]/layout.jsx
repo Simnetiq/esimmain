@@ -26,16 +26,21 @@ export async function generateMetadata({ params }) {
 function getLocaleCode(lang) {
   const locales = {
     en: 'en_US',
+    ar: 'ar_SA',
+    de: 'de_DE',
     es: 'es_ES',
     fr: 'fr_FR',
-    de: 'de_DE',
-    ar: 'ar_AR',
     he: 'he_IL',
     hi: 'hi_IN',
+    it: 'it_IT',
     ja: 'ja_JP',
+    ko: 'ko_KR',
+    nl: 'nl_NL',
     pl: 'pl_PL',
     pt: 'pt_BR',
     ru: 'ru_RU',
+    th: 'th_TH',
+    tr: 'tr_TR',
     uk: 'uk_UA',
     zh: 'zh_CN',
   }

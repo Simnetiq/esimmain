@@ -9,10 +9,15 @@ const SUPPORTED_LANGUAGES = [
   { code: 'ar', name: 'Arabic' },
   { code: 'he', name: 'Hebrew' },
   { code: 'hi', name: 'Hindi' },
+  { code: 'it', name: 'Italian' },
   { code: 'ja', name: 'Japanese' },
+  { code: 'ko', name: 'Korean' },
+  { code: 'nl', name: 'Dutch' },
   { code: 'pl', name: 'Polish' },
   { code: 'pt', name: 'Portuguese' },
   { code: 'ru', name: 'Russian' },
+  { code: 'th', name: 'Thai' },
+  { code: 'tr', name: 'Turkish' },
   { code: 'uk', name: 'Ukrainian' },
   { code: 'zh', name: 'Chinese' }
 ];

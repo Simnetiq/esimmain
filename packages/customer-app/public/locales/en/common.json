@@ -49,7 +49,8 @@
     "noResults": "No destinations found",
     "explorePlans": "Explore Plans",
     "appStore": "App Store",
-    "googlePlay": "Google Play"
+    "googlePlay": "Google Play",
+    "popular": "Popular"
   },
   "features": {
     "title": "Connect globally",

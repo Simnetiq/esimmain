@@ -1,6 +1,7 @@
 'use client';
 
 import { useI18n } from '@esim/shared/contexts/I18nContext';
+import { appStoreLinks } from '@esim/shared/utils/appStoreLinks';
 import FlagImage from '@esim/shared/components/FlagImage';
 import Reveal from '../ui/Reveal';
 import AnimatedCounter from '../ui/AnimatedCounter';
@@ -116,7 +117,7 @@ export default function FeaturesBento() {
       className="relative"
       aria-labelledby="features-bento-heading"
     >
-      <div className="max-w-7xl mx-auto px-4 py-16 lg:py-24">
+      <div className="max-w-7xl mx-auto px-4 pt-16 lg:pt-24 pb-6 lg:pb-8">
 
         {/* Section header */}
         <div className="mb-12 text-start">
@@ -205,6 +206,55 @@ export default function FeaturesBento() {
               </article>
             </Reveal>
           ))}
+
+          {/* Download app card — sits in the grid, 2/3 width on desktop */}
+          <Reveal delay={600} className="md:col-span-2">
+            <div className="relative overflow-hidden h-full" style={{ border: '1px solid var(--card-border)' }}>
+              <img src="/images/fd.avif" alt="" className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+              <div className="absolute inset-0 bg-black/60" />
+              <div className="relative px-6 py-6 flex flex-col justify-center h-full gap-4">
+                <div>
+                  <h3 className="text-lg font-bold text-white mb-1">
+                    {t('featuresBento.downloadTitle', 'Get the Simnetiq app')}
+                  </h3>
+                  <p className="text-sm text-white/70">
+                    {t('featuresBento.downloadDesc', 'Manage your eSIMs, top up data, and stay connected — all from your phone.')}
+                  </p>
+                </div>
+                {/* App Store rating */}
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-0.5">
+                    {[...Array(5)].map((_, i) => (
+                      <svg key={i} className="w-3.5 h-3.5 text-amber-400" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                    ))}
+                  </div>
+                  <span className="text-sm font-bold text-white">5.0</span>
+                  <span className="text-xs text-white/50">App Store</span>
+                </div>
+                <div className="flex gap-3">
+                  <a
+                    href={appStoreLinks.ios}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold bg-white text-black hover:bg-white/90 transition-colors"
+                  >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="21" y1="17" x2="18" y2="17"/><line x1="20" y1="21" x2="14.29" y2="10.72"/><line x1="12" y1="6.6" x2="10" y2="3"/><line x1="14" y1="3" x2="4" y2="21"/><line x1="13" y1="17" x2="3" y2="17"/></svg>
+                    App Store
+                  </a>
+                  <a
+                    href={appStoreLinks.android}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold text-white hover:bg-white/10 transition-colors"
+                    style={{ border: '1px solid rgba(255,255,255,0.3)' }}
+                  >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path fillRule="evenodd" clipRule="evenodd" d="M2 3.65629C2 2.15127 3.59967 1.18549 4.93149 1.88645L20.7844 10.2301C22.2091 10.9799 22.2091 13.0199 20.7844 13.7698L4.9315 22.1134C3.59968 22.8144 2 21.8486 2 20.3436V3.65629ZM19.8529 11.9999L16.2682 10.1132L14.2243 11.9999L16.2682 13.8866L19.8529 11.9999ZM14.3903 14.875L12.75 13.3608L6.75782 18.8921L14.3903 14.875ZM12.75 10.639L14.3903 9.12488L6.75782 5.10777L12.75 10.639ZM4 5.28391L11.2757 11.9999L4 18.7159V5.28391Z"/></svg>
+                    Google Play
+                  </a>
+                </div>
+              </div>
+            </div>
+          </Reveal>
         </div>
 
       </div>

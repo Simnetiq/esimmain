@@ -8,8 +8,10 @@ const ALL_LANGUAGES = ['en', ...VALID_LOCALES];
 
 const OG_LOCALES = {
   en: 'en_US', ar: 'ar_SA', de: 'de_DE', es: 'es_ES',
-  fr: 'fr_FR', he: 'he_IL', hi: 'hi_IN', ja: 'ja_JP',
-  pl: 'pl_PL', pt: 'pt_BR', ru: 'ru_RU', uk: 'uk_UA', zh: 'zh_CN',
+  fr: 'fr_FR', he: 'he_IL', hi: 'hi_IN', it: 'it_IT',
+  ja: 'ja_JP', ko: 'ko_KR', nl: 'nl_NL', pl: 'pl_PL',
+  pt: 'pt_BR', ru: 'ru_RU', th: 'th_TH', tr: 'tr_TR',
+  uk: 'uk_UA', zh: 'zh_CN',
 };
 
 const FALLBACK_DESC = {
@@ -19,13 +21,18 @@ const FALLBACK_DESC = {
   es: 'Lea nuestras últimas ideas sobre tecnología eSIM y conectividad global.',
   fr: 'Lisez nos dernières informations sur la technologie eSIM et la connectivité mondiale.',
   he: 'קראו את התובנות האחרונות שלנו על טכנולוגיית eSIM וקישוריות גלובלית.',
-  ru: 'Читайте наши последние идеи о технологии eSIM и глобальной связи.',
-  pt: 'Leia nossas ultimas novidades sobre tecnologia eSIM e conectividade global.',
-  ja: 'eSIM技術とグローバル接続に関する最新情報をお読みください。',
   hi: 'eSIM तकनीक और वैश्विक कनेक्टिविटी के बारे में हमारी नवीनतम जानकारी पढ़ें।',
-  zh: '阅读我们关于eSIM技术和全球连接的最新见解。',
+  it: 'Leggi le nostre ultime novità sulla tecnologia eSIM e la connettività globale.',
+  ja: 'eSIM技術とグローバル接続に関する最新情報をお読みください。',
+  ko: 'eSIM 기술과 글로벌 연결에 대한 최신 정보를 확인하세요.',
+  nl: 'Lees onze laatste inzichten over eSIM-technologie en wereldwijde connectiviteit.',
   pl: 'Przeczytaj nasze najnowsze informacje o technologii eSIM i globalnej łączności.',
+  pt: 'Leia nossas ultimas novidades sobre tecnologia eSIM e conectividade global.',
+  ru: 'Читайте наши последние идеи о технологии eSIM и глобальной связи.',
+  th: 'อ่านข้อมูลล่าสุดเกี่ยวกับเทคโนโลยี eSIM และการเชื่อมต่อทั่วโลก',
+  tr: 'eSIM teknolojisi ve küresel bağlantı hakkında en son bilgilerimizi okuyun.',
   uk: 'Читайте наші найновіші матеріали про технологію eSIM та глобальний зв\'язок.',
+  zh: '阅读我们关于eSIM技术和全球连接的最新见解。',
 };
 
 export const revalidate = 3600; // ISR: revalidate every hour

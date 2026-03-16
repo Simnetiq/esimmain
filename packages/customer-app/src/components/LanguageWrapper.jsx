@@ -10,7 +10,7 @@ const LanguageWrapper = ({ children }) => {
   const translatedPages = [
     '/', 
     // Language-code routes
-    '/he', '/ar', '/ru', '/de', '/fr', '/es', '/pt', '/ja', '/hi', '/zh', '/pl', '/uk',
+    '/he', '/ar', '/ru', '/de', '/fr', '/es', '/pt', '/ja', '/hi', '/zh', '/pl', '/uk', '/it', '/ko', '/nl', '/th', '/tr',
     // Old language routes (for backward compatibility)
     '/hebrew', '/arabic', '/russian', '/german', '/french', '/spanish', 
     // Other translated pages
@@ -41,6 +41,11 @@ const LanguageWrapper = ({ children }) => {
                     pathname.startsWith('/zh/blog') ||
                     pathname.startsWith('/pl/blog') ||
                     pathname.startsWith('/uk/blog') ||
+                    pathname.startsWith('/it/blog') ||
+                    pathname.startsWith('/ko/blog') ||
+                    pathname.startsWith('/nl/blog') ||
+                    pathname.startsWith('/th/blog') ||
+                    pathname.startsWith('/tr/blog') ||
                     // Old language blog routes (for backward compatibility)
                     pathname.startsWith('/hebrew/blog') ||
                     pathname.startsWith('/arabic/blog') ||
@@ -62,6 +67,11 @@ const LanguageWrapper = ({ children }) => {
                                 pathname.startsWith('/zh/') ||
                                 pathname.startsWith('/pl/') ||
                                 pathname.startsWith('/uk/') ||
+                                pathname.startsWith('/it/') ||
+                                pathname.startsWith('/ko/') ||
+                                pathname.startsWith('/nl/') ||
+                                pathname.startsWith('/th/') ||
+                                pathname.startsWith('/tr/') ||
                                 // Old language routes (for backward compatibility)
                                 pathname.startsWith('/hebrew/') ||
                                 pathname.startsWith('/arabic/') ||

@@ -284,6 +284,24 @@ const EsimPlans = ({ isHomePage = false }) => {
         if (region) setSelectedRegion(region);
     }, [searchParams]);
 
+    // Auto-open bottom sheet when ?country=slug is in URL
+    useEffect(() => {
+        if (!isMounted || countriesLoading) return;
+        const countrySlug = searchParams.get('country');
+        if (!countrySlug) return;
+        // Find matching country by slug or name (case-insensitive)
+        const match = countries.find(c =>
+            (c.slug || '').toLowerCase() === countrySlug.toLowerCase() ||
+            (c.name || '').toLowerCase() === countrySlug.toLowerCase()
+        );
+        if (match) {
+            handleCountrySelect(match);
+        } else {
+            // Fallback: use slug as search term so user sees filtered results
+            setSearchTerm(countrySlug);
+        }
+    }, [isMounted, countriesLoading, countries, searchParams, handleCountrySelect]);
+
     // Fetch Regional Plans from Supabase (with cancellation to prevent race conditions)
     useEffect(() => {
         let cancelled = false;
@@ -384,35 +402,53 @@ const EsimPlans = ({ isHomePage = false }) => {
 
     if (!isMounted) {
         return (
-            <div className="min-h-screen">
-                {/* Header skeleton */}
+            <div className="min-h-screen" suppressHydrationWarning>
+                {/* Header skeleton — matches actual header structure */}
                 <div className="w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-8 sm:mt-12 lg:mt-20">
-                    <div className="h-4 sm:h-5 bg-white/10 rounded w-32 animate-pulse" />
-                    <div className="h-7 sm:h-8 lg:h-10 xl:h-12 bg-white/10 rounded w-80 mt-3 sm:mt-4 animate-pulse" />
+                    <div className="h-4 sm:h-5 w-32 animate-pulse" style={{ backgroundColor: 'var(--subtle-bg)' }} />
+                    <div className="h-7 sm:h-8 lg:h-10 xl:h-12 w-80 mt-3 sm:mt-4 animate-pulse" style={{ backgroundColor: 'var(--subtle-bg)' }} />
                 </div>
                 <div className="w-full h-px bg-white/5 mt-4 sm:mt-6" />
 
                 {/* Search skeleton */}
                 <div className="w-full border-b border-white/5">
                     <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
-                        <div className="h-10 sm:h-11 bg-white/10 rounded w-full animate-pulse" />
+                        <div className="h-10 sm:h-11 w-full animate-pulse" style={{ backgroundColor: 'var(--subtle-bg)' }} />
                     </div>
                 </div>
 
                 {/* Content skeleton */}
-                <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-                    {/* Region tabs skeleton */}
-                    <div className="flex gap-2 mb-8">
-                        {[1,2,3,4,5].map(i => (
-                            <div key={i} className="h-8 bg-white/10 rounded-full w-20 animate-pulse" />
+                <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+                    {/* Region tabs skeleton — matches RegionTabs: 7 pills, rounded-full, h-9, w-24 */}
+                    <div className="flex gap-2">
+                        {[1,2,3,4,5,6,7].map(i => (
+                            <div key={i} className="px-4 py-2 h-9 w-24 rounded-full animate-pulse flex-shrink-0" style={{ backgroundColor: 'var(--subtle-bg)' }} />
                         ))}
                     </div>
-                    {/* Countries grid skeleton */}
-                    <div className="h-5 bg-white/10 rounded w-28 mb-4 animate-pulse" />
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                        {Array.from({length: 8}).map((_, i) => (
-                            <div key={i} className="h-16 bg-white/[0.03] rounded animate-pulse" />
-                        ))}
+                    {/* Countries heading skeleton */}
+                    <div>
+                        <div className="h-5 w-28 mb-3 animate-pulse" style={{ backgroundColor: 'var(--subtle-bg)' }} />
+                        {/* Countries grid skeleton — matches CountriesGrid: grid-cols-2 md:3 lg:4, gap-3 sm:gap-4 */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                            {Array.from({length: 8}).map((_, i) => (
+                                <div key={i} className="relative overflow-hidden animate-pulse" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
+                                    <span className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none select-none pointer-events-none" style={{ color: 'var(--subtle-border)' }} aria-hidden="true">--</span>
+                                    <div className="relative p-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-12 h-12 rounded-full flex-shrink-0" style={{ backgroundColor: 'var(--subtle-bg)' }} />
+                                            <div className="flex-1 min-w-0">
+                                                <div className="h-4 w-3/4 mb-1.5" style={{ backgroundColor: 'var(--subtle-bg)' }} />
+                                                <div className="h-3 w-1/2" style={{ backgroundColor: 'var(--subtle-bg)' }} />
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center justify-between pt-3">
+                                            <div className="h-5 w-16" style={{ backgroundColor: 'var(--subtle-bg)' }} />
+                                            <div className="w-7 h-7 rounded-full" style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--card-border)' }} />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>

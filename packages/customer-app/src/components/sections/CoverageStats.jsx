@@ -15,11 +15,11 @@ const REGIONS = [
     nameKey: 'coverage.europe',
     nameFallback: 'Europe',
     flags: [
-      { code: 'de', emoji: '🇩🇪' },
-      { code: 'fr', emoji: '🇫🇷' },
-      { code: 'it', emoji: '🇮🇹' },
-      { code: 'es', emoji: '🇪🇸' },
-      { code: 'gb', emoji: '🇬🇧' },
+      { code: 'de', emoji: '🇩🇪', name: 'Germany' },
+      { code: 'fr', emoji: '🇫🇷', name: 'France' },
+      { code: 'it', emoji: '🇮🇹', name: 'Italy' },
+      { code: 'es', emoji: '🇪🇸', name: 'Spain' },
+      { code: 'gb', emoji: '🇬🇧', name: 'UK' },
     ],
   },
   {
@@ -28,11 +28,11 @@ const REGIONS = [
     nameKey: 'coverage.asia',
     nameFallback: 'Asia',
     flags: [
-      { code: 'jp', emoji: '🇯🇵' },
-      { code: 'kr', emoji: '🇰🇷' },
-      { code: 'sg', emoji: '🇸🇬' },
-      { code: 'th', emoji: '🇹🇭' },
-      { code: 'in', emoji: '🇮🇳' },
+      { code: 'jp', emoji: '🇯🇵', name: 'Japan' },
+      { code: 'kr', emoji: '🇰🇷', name: 'S. Korea' },
+      { code: 'sg', emoji: '🇸🇬', name: 'Singapore' },
+      { code: 'th', emoji: '🇹🇭', name: 'Thailand' },
+      { code: 'in', emoji: '🇮🇳', name: 'India' },
     ],
   },
   {
@@ -41,11 +41,11 @@ const REGIONS = [
     nameKey: 'coverage.americas',
     nameFallback: 'Americas',
     flags: [
-      { code: 'us', emoji: '🇺🇸' },
-      { code: 'ca', emoji: '🇨🇦' },
-      { code: 'br', emoji: '🇧🇷' },
-      { code: 'mx', emoji: '🇲🇽' },
-      { code: 'ar', emoji: '🇦🇷' },
+      { code: 'us', emoji: '🇺🇸', name: 'USA' },
+      { code: 'ca', emoji: '🇨🇦', name: 'Canada' },
+      { code: 'br', emoji: '🇧🇷', name: 'Brazil' },
+      { code: 'mx', emoji: '🇲🇽', name: 'Mexico' },
+      { code: 'ar', emoji: '🇦🇷', name: 'Argentina' },
     ],
   },
   {
@@ -54,11 +54,11 @@ const REGIONS = [
     nameKey: 'coverage.africa',
     nameFallback: 'Africa',
     flags: [
-      { code: 'za', emoji: '🇿🇦' },
-      { code: 'ke', emoji: '🇰🇪' },
-      { code: 'ng', emoji: '🇳🇬' },
-      { code: 'eg', emoji: '🇪🇬' },
-      { code: 'ma', emoji: '🇲🇦' },
+      { code: 'za', emoji: '🇿🇦', name: 'S. Africa' },
+      { code: 'ke', emoji: '🇰🇪', name: 'Kenya' },
+      { code: 'ng', emoji: '🇳🇬', name: 'Nigeria' },
+      { code: 'eg', emoji: '🇪🇬', name: 'Egypt' },
+      { code: 'ma', emoji: '🇲🇦', name: 'Morocco' },
     ],
   },
   {
@@ -67,11 +67,11 @@ const REGIONS = [
     nameKey: 'coverage.oceania',
     nameFallback: 'Oceania',
     flags: [
-      { code: 'au', emoji: '🇦🇺' },
-      { code: 'nz', emoji: '🇳🇿' },
-      { code: 'fj', emoji: '🇫🇯' },
-      { code: 'pg', emoji: '🇵🇬' },
-      { code: 'ws', emoji: '🇼🇸' },
+      { code: 'au', emoji: '🇦🇺', name: 'Australia' },
+      { code: 'nz', emoji: '🇳🇿', name: 'New Zealand' },
+      { code: 'fj', emoji: '🇫🇯', name: 'Fiji' },
+      { code: 'pg', emoji: '🇵🇬', name: 'Papua NG' },
+      { code: 'ws', emoji: '🇼🇸', name: 'Samoa' },
     ],
   },
   {
@@ -80,11 +80,11 @@ const REGIONS = [
     nameKey: 'coverage.middleEast',
     nameFallback: 'Middle East',
     flags: [
-      { code: 'ae', emoji: '🇦🇪' },
-      { code: 'sa', emoji: '🇸🇦' },
-      { code: 'il', emoji: '🇮🇱' },
-      { code: 'jo', emoji: '🇯🇴' },
-      { code: 'qa', emoji: '🇶🇦' },
+      { code: 'ae', emoji: '🇦🇪', name: 'UAE' },
+      { code: 'sa', emoji: '🇸🇦', name: 'Saudi Arabia' },
+      { code: 'il', emoji: '🇮🇱', name: 'Israel' },
+      { code: 'jo', emoji: '🇯🇴', name: 'Jordan' },
+      { code: 'qa', emoji: '🇶🇦', name: 'Qatar' },
     ],
   },
 ];
@@ -144,19 +144,16 @@ export default function CoverageStats() {
             <p className="font-semibold text-text-primary text-start">
               {t(region.nameKey, region.nameFallback)}
             </p>
-            <div className="flex gap-1.5 flex-wrap items-center rtl-native-flex">
+            <div className="flex flex-col gap-1.5">
               {region.flags.slice(0, 3).map((flag, fi) => (
-                <FlagImage key={fi} code={flag.code} emoji={flag.emoji} />
+                <div key={fi} className="flex items-center gap-2 rtl-native-flex">
+                  <FlagImage code={flag.code} emoji={flag.emoji} />
+                  <span className="text-xs text-text-muted">{flag.name}</span>
+                </div>
               ))}
               {region.flags.length > 3 && (
-                <span
-                  className="inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold"
-                  style={{
-                    backgroundColor: 'var(--hover-bg)',
-                    color: 'var(--text-muted)',
-                  }}
-                >
-                  +{region.flags.length - 3}
+                <span className="text-xs text-text-muted ps-7">
+                  +{region.flags.length - 3} {t('coverage.more', 'more')}
                 </span>
               )}
             </div>

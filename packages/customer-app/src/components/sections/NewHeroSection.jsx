@@ -1,20 +1,31 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
 import { appStoreLinks } from '@esim/shared/utils/appStoreLinks';
 import { ExploreStoreCTA } from '../cta';
+import FlagImage from '@esim/shared/components/FlagImage';
 import dynamic from 'next/dynamic';
 // Skeleton placeholder — reserves exact height to prevent CLS when HeroSearch loads
 const HeroSearchSkeleton = () => (
-  <div className="w-full sm:max-w-md mb-8 h-[50px] rounded-full animate-pulse flex items-center gap-3 px-4" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
+  <div className="w-full sm:max-w-md mb-6 h-[50px] rounded-full animate-pulse flex items-center gap-3 px-4" style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--card-border)' }}>
     <div className="w-5 h-5 rounded-full" style={{ backgroundColor: 'var(--hover-bg)' }} />
     <div className="h-3 rounded-full flex-1 max-w-[200px]" style={{ backgroundColor: 'var(--hover-bg)' }} />
   </div>
 );
 const HeroSearch = dynamic(() => import('../HeroSearch'), { ssr: false, loading: () => <HeroSearchSkeleton /> });
+
+// Popular country chips — static, no state dependency
+const POPULAR_COUNTRIES = [
+  { code: 'jp', name: 'Japan', slug: 'japan' },
+  { code: 'de', name: 'Germany', slug: 'germany' },
+  { code: 'us', name: 'USA', slug: 'united-states' },
+  { code: 'th', name: 'Thailand', slug: 'thailand' },
+  { code: 'it', name: 'Italy', slug: 'italy' },
+];
 
 // Inline SVG icons — no lucide-react imports
 const TagIcon = ({ className }) => (
@@ -39,7 +50,7 @@ const GlobeSmallIcon = ({ className }) => (
 );
 
 /**
- * NewHeroSection — dark theme full-viewport hero, 2-column Doppler-inspired layout.
+ * NewHeroSection — premium hero with 60/40 asymmetric grid, Raleway headline.
  * h1 is the LCP element: renders immediately, no state-dependent rendering.
  *
  * @param {{ promo: { code: string; discount: string; message?: string } | null }} props
@@ -67,6 +78,12 @@ export default function NewHeroSection({ promo = null }) {
     t('hero.fiveStarRated', '5-Star Rated'),
   ];
 
+  // Refs for scroll parallax
+  const darkPhoneRef = useRef(null);
+  const lightPhoneRef = useRef(null);
+  const heroRef = useRef(null);
+  const rafId = useRef(0);
+
   // Platform detection — show both on SSR, hide irrelevant on client
   const [platform, setPlatform] = useState('both'); // 'ios' | 'android' | 'both'
   useEffect(() => {
@@ -75,15 +92,73 @@ export default function NewHeroSection({ promo = null }) {
     else if (/Android/i.test(ua)) setPlatform('android');
   }, []);
 
+  // Scroll parallax for phone mockups (desktop only)
+  useEffect(() => {
+    const mql = window.matchMedia('(min-width: 1024px)');
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const handleScroll = () => {
+      cancelAnimationFrame(rafId.current);
+      rafId.current = requestAnimationFrame(() => {
+        if (!heroRef.current) return;
+        const rect = heroRef.current.getBoundingClientRect();
+        const sectionHeight = rect.height || 1;
+        const scrolled = -rect.top;
+        const progress = Math.max(0, Math.min(1, scrolled / sectionHeight));
+
+        if (lightPhoneRef.current) {
+          const drift = progress * sectionHeight * 0.15;
+          const scale = 1 + progress * 0.1;
+          lightPhoneRef.current.style.transform = `translateY(${drift}px) scale(${scale}) rotate(3deg)`;
+        }
+        if (darkPhoneRef.current) {
+          const drift = progress * sectionHeight * 0.08;
+          const scale = 1 - progress * 0.08;
+          darkPhoneRef.current.style.transform = `translateY(${drift}px) scale(${scale}) rotate(-4deg)`;
+        }
+      });
+    };
+
+    const toggle = () => {
+      if (mql.matches) {
+        window.addEventListener('scroll', handleScroll, { passive: true });
+      } else {
+        window.removeEventListener('scroll', handleScroll);
+      }
+    };
+
+    toggle();
+    mql.addEventListener('change', toggle);
+    return () => {
+      mql.removeEventListener('change', toggle);
+      window.removeEventListener('scroll', handleScroll);
+      cancelAnimationFrame(rafId.current);
+    };
+  }, []);
+
+  const countryUrl = (slug) =>
+    ssrSafeLanguage && ssrSafeLanguage !== 'en' ? `/${ssrSafeLanguage}/esim-plans?country=${slug}` : `/esim-plans?country=${slug}`;
+
   return (
     <section
+      ref={heroRef}
       className="relative min-h-screen flex flex-col bg-bg-primary overflow-hidden"
       aria-label="Hero"
       lang={detectedLanguage}
+      suppressHydrationWarning
     >
-      {/* Blurred orb backgrounds — static, zero TBT */}
-      <div className="absolute -top-10 -start-20 w-[28rem] h-[28rem] rounded-full blur-3xl pointer-events-none" style={{ backgroundColor: 'rgba(73, 117, 212, 0.2)' }} aria-hidden="true" />
-      <div className="absolute -bottom-40 -end-20 w-[32rem] h-[32rem] rounded-full blur-3xl pointer-events-none" style={{ backgroundColor: 'rgba(73, 117, 212, 0.1)' }} aria-hidden="true" />
+      {/* Dot grid background */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-20"
+        aria-hidden="true"
+        style={{
+          backgroundImage: `radial-gradient(var(--tufts-blue, #4975D4) 1px, transparent 1px)`,
+          backgroundSize: '48px 48px',
+        }}
+      />
+
+      {/* Gradient fade at bottom so grid doesn't end abruptly */}
+      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-bg-primary to-transparent pointer-events-none" aria-hidden="true" />
 
       {/* Promo banner — shown only when promo prop is provided */}
       {promo && (
@@ -121,11 +196,11 @@ export default function NewHeroSection({ promo = null }) {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start lg:pt-8">
 
             {/* Left column: content */}
-            <div className={`flex flex-col ${isRtl ? 'items-start text-start' : 'items-center lg:items-start text-center lg:text-start'}`}>
+            <div className="flex flex-col items-center text-center lg:items-start lg:text-start">
 
               {/* Tagline badge */}
               <div
-                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium text-tufts-blue mb-5 rtl-native-flex"
+                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium text-tufts-blue mb-6 rtl-native-flex"
                 style={{
                   backgroundColor: 'rgba(73, 117, 212, 0.1)',
                   border: '1px solid rgba(73, 117, 212, 0.2)',
@@ -135,10 +210,10 @@ export default function NewHeroSection({ promo = null }) {
                 <span>{t('hero.tagline', 'Global eSIM Platform')}</span>
               </div>
 
-              {/* Promo pill below tagline (inline variant, if not already shown as top banner) */}
+              {/* Promo pill below tagline */}
               {promo && (
                 <div
-                  className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium text-accent-highlight mb-5 rtl-native-flex"
+                  className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium text-accent-highlight mb-6 rtl-native-flex"
                   style={{
                     backgroundColor: 'rgba(245, 158, 11, 0.1)',
                     border: '1px solid rgba(245, 158, 11, 0.2)',
@@ -154,21 +229,40 @@ export default function NewHeroSection({ promo = null }) {
               )}
 
               {/* h1 — LCP element. Renders immediately; no state dependencies. */}
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-text-primary leading-tight mb-6">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-text-primary leading-[1.1] mb-6">
                 <span className="block">{headlinePart1}</span>
                 <span className={`block text-tufts-blue${!isRtl ? ' italic' : ''}`}>{headlineHighlight}</span>
-                <span className="block bg-gradient-to-t from-text-muted to-text-primary bg-clip-text text-transparent">{headlinePart2}</span>
+                <span className="block text-text-muted">{headlinePart2}</span>
               </h1>
 
-              <p className="text-sm sm:text-base md:text-lg text-text-muted mb-4 max-w-md sm:max-w-xl leading-relaxed text-start">
+              <p className="text-sm sm:text-base lg:text-lg text-text-muted mb-6 max-w-xl leading-relaxed">
                 {subtitleText}
               </p>
 
               {/* Destination search with autocomplete */}
               <HeroSearch esimPlansUrl={esimPlansUrl} />
 
+              {/* Popular country chips */}
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 mb-6 rtl-native-flex">
+                <span className="text-xs text-text-muted">{t('hero.popular', 'Popular')}:</span>
+                {POPULAR_COUNTRIES.map((country) => (
+                  <Link
+                    key={country.code}
+                    href={countryUrl(country.slug)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium text-text-muted transition-colors duration-150 hover:text-text-primary rtl-native-flex"
+                    style={{
+                      backgroundColor: 'var(--bg-primary)',
+                      border: '1px solid var(--card-border)',
+                    }}
+                  >
+                    <FlagImage code={country.code} className="w-4 h-4 rounded-full object-cover" />
+                    <span>{country.name}</span>
+                  </Link>
+                ))}
+              </div>
+
               {/* CTAs — all 3 in one row, same pill-with-circle design, same size */}
-              <div className={`flex flex-col sm:flex-row ${isRtl ? 'items-start' : 'items-center'} justify-center lg:justify-start gap-3 mb-10 w-full sm:w-auto rtl-native-flex-sm`}>
+              <div className="flex flex-col sm:flex-row items-center lg:items-start gap-3 mb-6 w-full sm:w-auto rtl-native-flex-sm">
                 {/* Explore Plans */}
                 <ExploreStoreCTA
                   variant="themed"
@@ -181,6 +275,7 @@ export default function NewHeroSection({ promo = null }) {
                   href={appStoreLinks.ios}
                   target="_blank"
                   rel="noopener noreferrer"
+                  suppressHydrationWarning
                   className={`inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:opacity-90 rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto shadow-sm ${platform === 'android' ? 'hidden' : ''}`}
                   style={{
                     backgroundColor: 'var(--cta-secondary-bg)',
@@ -203,6 +298,7 @@ export default function NewHeroSection({ promo = null }) {
                   href={appStoreLinks.android}
                   target="_blank"
                   rel="noopener noreferrer"
+                  suppressHydrationWarning
                   className={`inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:opacity-90 rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto shadow-sm ${platform === 'ios' ? 'hidden' : ''}`}
                   style={{
                     backgroundColor: 'var(--cta-secondary-bg)',
@@ -222,9 +318,9 @@ export default function NewHeroSection({ promo = null }) {
                 </a>
               </div>
 
-              {/* Trust badges — Doppler-style plain checkmark list */}
+              {/* Trust badges — plain checkmark list */}
               <div
-                className={`flex flex-wrap items-center ${isRtl ? 'justify-start' : 'justify-center lg:justify-start'} gap-x-6 gap-y-2 text-xs text-text-muted rtl-native-flex`}
+                className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 text-xs text-text-muted rtl-native-flex"
                 role="list"
                 aria-label="Trust indicators"
               >
@@ -237,46 +333,31 @@ export default function NewHeroSection({ promo = null }) {
               </div>
             </div>
 
-            {/* Right column: phone mockup with 3D overflow effect */}
+            {/* Right column: multi-layered phone mockup */}
             <div className="hidden lg:flex items-center justify-center relative" aria-hidden="true">
-              {/* Glow behind the entire composition */}
-              <div className="absolute inset-0 -z-10 blur-3xl scale-75 opacity-60" style={{ backgroundColor: 'rgba(73, 117, 212, 0.15)' }} />
 
               {/* Container — phones overflow this boundary for 3D depth */}
-              <div className="relative w-full max-w-lg mx-auto" style={{ height: '520px' }}>
-                {/* Background frame with rounded corners — clips the sky background */}
-                <div className="absolute inset-x-8 inset-y-12 rounded-3xl overflow-hidden border border-white/[0.06]" style={{ boxShadow: '0 32px 64px rgba(0,0,0,0.3)' }}>
-                  <img
-                    src="/images/hero-phones.avif"
-                    alt=""
-                    className="absolute inset-0 w-full h-full object-cover"
-                    loading="eager"
-                    fetchPriority="low"
-                  />
-                  {/* Gradient overlay for depth */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+              <div className="relative w-full max-w-xl mx-auto" style={{ height: '620px' }}>
+
+                {/* Stacked travel photos — layered, bigger */}
+                <div className="absolute rounded-2xl overflow-hidden border border-white/[0.06]" style={{ width: '80%', height: '65%', left: '0%', top: '5%', transform: 'rotate(-3deg)', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
+                  <img src="/images/hero-phuket.avif" alt="" className="w-full h-full object-cover" loading="eager" fetchPriority="low" />
+                </div>
+                <div className="absolute rounded-2xl overflow-hidden border border-white/[0.06]" style={{ width: '80%', height: '65%', right: '0%', top: '12%', transform: 'rotate(2deg)', boxShadow: '0 12px 40px rgba(0,0,0,0.25)' }}>
+                  <img src="/images/hero-phones.avif" alt="" className="w-full h-full object-cover" loading="eager" fetchPriority="low" />
+                </div>
+                <div className="absolute rounded-2xl overflow-hidden border border-white/[0.06]" style={{ width: '75%', height: '60%', right: '-5%', top: '20%', transform: 'rotate(5deg)', boxShadow: '0 16px 48px rgba(0,0,0,0.3)' }}>
+                  <img src="/images/hero-paris.avif" alt="" className="w-full h-full object-cover" loading="eager" fetchPriority="low" />
                 </div>
 
-                {/* Dark phone — behind, tilted left, overflows top */}
-                <div className="absolute z-10 drop-shadow-2xl" style={{ width: '220px', left: '10%', bottom: '0', transform: 'rotate(-6deg)' }}>
-                  <img
-                    src="/images/phone-dark.png"
-                    alt=""
-                    className="w-full h-auto"
-                    loading="eager"
-                    fetchPriority="low"
-                  />
+                {/* Dark phone — behind, tilted left */}
+                <div ref={darkPhoneRef} className="absolute z-10 drop-shadow-2xl will-change-transform" style={{ width: '220px', left: '18%', bottom: '0', transform: 'rotate(-4deg)' }}>
+                  <img src="/images/phone-dark.png" alt="" className="w-full h-auto" loading="eager" fetchPriority="low" />
                 </div>
 
-                {/* Light phone — in front, slightly right, overflows top and right */}
-                <div className="absolute z-20 drop-shadow-2xl" style={{ width: '230px', right: '5%', bottom: '-16px', transform: 'rotate(3deg)' }}>
-                  <img
-                    src="/images/phone-light.png"
-                    alt=""
-                    className="w-full h-auto"
-                    loading="eager"
-                    fetchPriority="low"
-                  />
+                {/* Light phone — in front, slightly right */}
+                <div ref={lightPhoneRef} className="absolute z-20 drop-shadow-2xl will-change-transform" style={{ width: '230px', right: '15%', bottom: '-8px', transform: 'rotate(3deg)' }}>
+                  <img src="/images/phone-light.png" alt="" className="w-full h-auto" loading="eager" fetchPriority="low" />
                 </div>
               </div>
             </div>

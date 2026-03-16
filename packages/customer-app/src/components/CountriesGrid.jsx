@@ -83,19 +83,22 @@ const CountriesGrid = ({
     return (
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4" dir={direction} lang={detectedLanguage}>
         {[...Array(8)].map((_, i) => (
-          <div key={i} className="relative overflow-hidden p-4 animate-pulse" style={{ backgroundColor: 'var(--subtle-bg)' }}>
-            <span className="absolute top-2 right-3 text-[3.5rem] sm:text-[4.5rem] font-semibold leading-none select-none" style={{ color: 'var(--card-border)' }} aria-hidden="true">--</span>
-            <div className="relative">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 rounded-full flex-shrink-0" style={{ backgroundColor: 'var(--card-border)' }} />
-                <div className="flex-1">
-                  <div className="h-4 rounded w-3/4 mb-1.5" style={{ backgroundColor: 'var(--card-border)' }} />
-                  <div className="h-3 rounded w-1/2" style={{ backgroundColor: 'var(--card-border)' }} />
+          <div key={i} className="relative overflow-hidden animate-pulse" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
+            {/* Watermark placeholder — matches CountryCard: top-3 end-4, text-[5rem] lg:text-[6rem] */}
+            <span className="absolute top-3 end-4 text-[5rem] lg:text-[6rem] font-semibold leading-none select-none pointer-events-none" style={{ color: 'var(--subtle-border)' }} aria-hidden="true">--</span>
+            <div className="relative p-4">
+              {/* Flag circle + name/plan count */}
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full flex-shrink-0" style={{ backgroundColor: 'var(--subtle-bg)' }} />
+                <div className="flex-1 min-w-0">
+                  <div className="h-4 w-3/4 mb-1.5" style={{ backgroundColor: 'var(--subtle-bg)' }} />
+                  <div className="h-3 w-1/2" style={{ backgroundColor: 'var(--subtle-bg)' }} />
                 </div>
               </div>
-              <div className="flex items-center justify-between pt-3" style={{ borderTop: '1px solid var(--subtle-border)' }}>
-                <div className="h-5 rounded w-16" style={{ backgroundColor: 'var(--card-border)' }} />
-                <div className="w-7 h-7 rounded-full" style={{ backgroundColor: 'var(--card-border)' }} />
+              {/* Price + arrow — no separator, matches CountryCard */}
+              <div className="flex items-center justify-between pt-3">
+                <div className="h-5 w-16" style={{ backgroundColor: 'var(--subtle-bg)' }} />
+                <div className="w-7 h-7 rounded-full" style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--card-border)' }} />
               </div>
             </div>
           </div>

@@ -20,11 +20,11 @@ export default async function HomePage() {
   return (
     <HomePageWrapper>
       <NewHeroSection promo={promo} />
-      <SocialProof />
-      <HowItWorks />
       <RoamingComparison />
       <CoverageStats />
       <FeaturesBento />
+      <SocialProof />
+      <HowItWorks />
       <AppDownload />
       <FAQSection />
       <TravelBlogsSection />

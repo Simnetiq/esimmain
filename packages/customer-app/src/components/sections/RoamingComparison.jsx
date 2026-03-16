@@ -118,7 +118,7 @@ function DestinationTab({ dest, isActive, onClick, t }) {
       onClick={onClick}
       role="tab"
       className={`
-        flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap
+        flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 whitespace-nowrap shrink-0
         ${isActive
           ? 'bg-tufts-blue text-white shadow-sm'
           : 'text-text-muted hover:text-text-primary'
@@ -128,8 +128,8 @@ function DestinationTab({ dest, isActive, onClick, t }) {
       aria-selected={isActive}
       tabIndex={isActive ? 0 : -1}
     >
-      <img src={'/flags/' + dest.flag + '.svg'} alt="" className="w-5 h-5 rounded-full object-cover" />
-      {t(dest.labelKey, dest.labelDefault)}
+      <img src={'/flags/' + dest.flag + '.svg'} alt="" className="w-4 h-4 sm:w-5 sm:h-5 rounded-full object-cover flex-shrink-0" />
+      <span className="truncate">{t(dest.labelKey, dest.labelDefault)}</span>
     </button>
   );
 }

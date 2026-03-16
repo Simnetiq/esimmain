@@ -68,7 +68,7 @@ export default function HeroSearch({ esimPlansUrl }) {
   const navigateToCountry = useCallback((countryName) => {
     setIsOpen(false);
     setQuery('');
-    router.push(`${esimPlansUrl}?search=${encodeURIComponent(countryName)}`);
+    router.push(`${esimPlansUrl}?country=${encodeURIComponent(countryName)}`);
   }, [router, esimPlansUrl]);
 
   const handleKeyDown = useCallback((e) => {
@@ -116,7 +116,7 @@ export default function HeroSearch({ esimPlansUrl }) {
       <div
         className="flex items-center gap-3 px-4 py-3 rounded-full transition-all duration-200 rtl-native-flex"
         style={{
-          backgroundColor: 'var(--card-bg)',
+          backgroundColor: 'var(--bg-primary)',
           border: `1px solid ${isOpen ? 'var(--tufts-blue, #4975D4)' : 'var(--card-border)'}`,
           color: 'var(--text-muted)',
         }}
