@@ -58,44 +58,21 @@ class ConfigService {
   }
 
   async getAiraloConfig() {
-    try {
-      const envKey = process.env.AIRALO_CLIENT_SECRET;
-      const envMode = process.env.AIRALO_MODE || 'sandbox';
-      const envBaseUrl = process.env.AIRALO_BASE_URL || 'https://partners-api.airalo.com/v2';
-      if (envKey) {
-        return { apiKey: envKey, environment: envMode, baseUrl: envBaseUrl };
-      }
-      const config = await this._getConfigValue('airalo');
-      if (config?.api_key) {
-        return {
-          apiKey: config.api_key,
-          environment: config.environment || 'sandbox',
-          baseUrl: 'https://partners-api.airalo.com/v2'
-        };
-      }
-      return { apiKey: null, environment: 'sandbox', baseUrl: 'https://sandbox-partners-api.airalo.com/v2' };
-    } catch (error) {
-      return { apiKey: null, environment: 'sandbox', baseUrl: 'https://sandbox-partners-api.airalo.com/v2' };
+    const envKey = process.env.AIRALO_CLIENT_SECRET;
+    const envMode = process.env.AIRALO_MODE || 'sandbox';
+    const envBaseUrl = process.env.AIRALO_BASE_URL || 'https://partners-api.airalo.com/v2';
+    if (!envKey) {
+      throw new Error('AIRALO_CLIENT_SECRET is not set in environment variables');
     }
+    return { apiKey: envKey, environment: envMode, baseUrl: envBaseUrl };
   }
 
   async getStripePublishableKey(mode = 'test') {
-    try {
-      const envKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
-      if (envKey) return envKey;
-
-      const config = await this._getConfigValue('stripe');
-      if (config) {
-        const liveKey = config.livePublishableKey || config.live_publishable_key;
-        if (liveKey) return liveKey;
-      }
-      throw new Error('Stripe keys not configured. Please contact administrator.');
-    } catch (error) {
-      if (error.message?.includes('expired')) {
-        this.logExpiredStripeKey('publishable', error);
-      }
-      throw new Error('Stripe keys not configured. Please contact administrator.');
+    const envKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+    if (!envKey) {
+      throw new Error('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not set in environment variables');
     }
+    return envKey;
   }
 
   async getStripeSecretKey(mode = 'test') {
@@ -156,41 +133,19 @@ class ConfigService {
   }
 
   async getOpenRouterConfig() {
-    try {
-      const config = await this._getConfigValue('openrouter');
-      if (config?.api_key) {
-        return {
-          apiKey: config.api_key,
-          model: config.model || 'openai/gpt-3.5-turbo',
-          baseUrl: 'https://openrouter.ai/api/v1',
-          maxTokens: config.max_tokens || 150,
-          temperature: config.temperature || 0.7,
-          siteName: config.site_name || 'Simnetiq',
-          siteUrl: config.site_url || 'https://esim.Simnetiq.net'
-        };
-      }
-      const envKey = process.env.OPENROUTER_API_KEY;
-      if (envKey) {
-        return {
-          apiKey: envKey,
-          model: process.env.OPENROUTER_MODEL || 'openai/gpt-3.5-turbo',
-          baseUrl: 'https://openrouter.ai/api/v1',
-          maxTokens: parseInt(process.env.OPENROUTER_MAX_TOKENS) || 150,
-          temperature: parseFloat(process.env.OPENROUTER_TEMPERATURE) || 0.7,
-          siteName: process.env.OPENROUTER_SITE_NAME || 'Simnetiq',
-          siteUrl: process.env.OPENROUTER_SITE_URL || 'https://esim.Simnetiq.net'
-        };
-      }
-      return {
-        apiKey: null, model: 'openai/gpt-3.5-turbo', baseUrl: 'https://openrouter.ai/api/v1',
-        maxTokens: 150, temperature: 0.7, siteName: 'Simnetiq', siteUrl: 'https://esim.Simnetiq.net'
-      };
-    } catch (error) {
-      return {
-        apiKey: null, model: 'openai/gpt-3.5-turbo', baseUrl: 'https://openrouter.ai/api/v1',
-        maxTokens: 150, temperature: 0.7, siteName: 'Simnetiq', siteUrl: 'https://Simnetiq.com'
-      };
+    const envKey = process.env.OPENROUTER_API_KEY;
+    if (!envKey) {
+      throw new Error('OPENROUTER_API_KEY is not set in environment variables');
     }
+    return {
+      apiKey: envKey,
+      model: process.env.OPENROUTER_MODEL || 'openai/gpt-3.5-turbo',
+      baseUrl: 'https://openrouter.ai/api/v1',
+      maxTokens: parseInt(process.env.OPENROUTER_MAX_TOKENS) || 150,
+      temperature: parseFloat(process.env.OPENROUTER_TEMPERATURE) || 0.7,
+      siteName: process.env.OPENROUTER_SITE_NAME || 'Simnetiq',
+      siteUrl: process.env.OPENROUTER_SITE_URL || 'https://esim.Simnetiq.net'
+    };
   }
 
   clearCache() {

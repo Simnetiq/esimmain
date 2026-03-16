@@ -47,13 +47,10 @@ export const I18nProvider = ({ children }) => {
   const initialLocale = getLanguageFromPathname(pathname);
   
   const [locale, setLocale] = useState(initialLocale);
-  const [translations, setTranslations] = useState(() => {
-    if (translationCache[initialLocale]) {
-      return translationCache[initialLocale];
-    }
-    return {};
-  });
-  const [isLoading, setIsLoading] = useState(!translationCache[initialLocale]);
+  // Always start with empty translations to match server render (server never has cache).
+  // Translations load in useEffect to avoid hydration mismatches.
+  const [translations, setTranslations] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const currentLocale = getLanguageFromPathname(pathname);
