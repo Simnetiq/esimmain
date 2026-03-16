@@ -3,16 +3,16 @@
 import { usePathname } from 'next/navigation';
 import { I18nProvider } from '@esim/shared/contexts/I18nContext';
 
-const LanguageWrapper = ({ children }) => {
+const LanguageWrapper = ({ children, initialTranslations, initialLocale }) => {
   const pathname = usePathname();
-  
+
   // Pages that should have I18n context
   const translatedPages = [
-    '/', 
+    '/',
     // Language-code routes
     '/he', '/ar', '/ru', '/de', '/fr', '/es', '/pt', '/ja', '/hi', '/zh', '/pl', '/uk', '/it', '/ko', '/nl', '/th', '/tr',
     // Old language routes (for backward compatibility)
-    '/hebrew', '/arabic', '/russian', '/german', '/french', '/spanish', 
+    '/hebrew', '/arabic', '/russian', '/german', '/french', '/spanish',
     // Other translated pages
     '/contact', '/login', '/register', '/forgot-password', '/reset-password', '/verify-email', '/dashboard', '/esim-plans', '/privacy-policy', '/terms-of-service', '/cookie-policy', '/return-policy', '/payment-success', '/stripe-checkout', '/crypto-checkout', '/affiliate-program'
   ];
@@ -22,7 +22,7 @@ const LanguageWrapper = ({ children }) => {
 
   // Check for special pages that should always have i18n context
   const isSpecialPage = pathname === '/not-found' || pathname === '/404';
-  
+
   // Check for help pages
   const isHelpPage = pathname.startsWith('/help');
 
@@ -79,13 +79,13 @@ const LanguageWrapper = ({ children }) => {
                                 pathname.startsWith('/german/') ||
                                 pathname.startsWith('/french/') ||
                                 pathname.startsWith('/spanish/');
-  
+
   if (!translatedPages.includes(pathname) && !isBlogPage && !isHelpPage && !isLanguageSpecificPage && !isSpecialPage && !isSharePackagePage) {
     return children;
   }
-  
+
   return (
-    <I18nProvider>
+    <I18nProvider initialTranslations={initialTranslations} initialLocale={initialLocale}>
       {children}
     </I18nProvider>
   );

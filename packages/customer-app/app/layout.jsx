@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 // dynamic import moved to ClientOnlyScripts
 import { Open_Sans, IBM_Plex_Sans_Arabic, DM_Sans, IBM_Plex_Sans } from 'next/font/google'
 import { Analytics as VercelAnalytics } from '@vercel/analytics/react'
+import { headers } from 'next/headers'
 import Providers from '../src/components/Providers'
 import ConditionalNavbar from '../src/components/ConditionalNavbar'
 import ConditionalFooter from '../src/components/ConditionalFooter'
@@ -10,6 +11,7 @@ import LanguageWrapper from '../src/components/LanguageWrapper'
 import ScrollToTop from '../src/components/ScrollToTop'
 import DynamicHtmlLang from '../src/components/DynamicHtmlLang'
 import { metadata as metadataConfig, generateAlternates } from '../src/config/metadata'
+import { getServerTranslations, getLocaleFromPathname } from '../src/lib/getServerTranslations'
 import './globals.css'
 
 import ClientOnlyScripts from '../src/components/ClientOnlyScripts'
@@ -73,7 +75,7 @@ export const metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://www.simnetiq.store'),  
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://www.simnetiq.store'),
   alternates: generateAlternates('/'),
   openGraph: {
     type: 'website',
@@ -97,7 +99,7 @@ export const metadata = {
     description: defaultMetadata.openGraph.description,
     images: ['/images/og-image.png'],
   },
-  icons: {  
+  icons: {
     icon: [
       { url: '/images/logo_icon/favicon.png', sizes: '32x32', type: 'image/png' },
       { url: '/images/logo_icon/favicon.png', sizes: '16x16', type: 'image/png' },
@@ -131,14 +133,24 @@ export const metadata = {
   },
 }
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  // Read locale from middleware-set header (server-side, no client dependency)
+  const headersList = await headers()
+  const pathname = headersList.get('x-pathname') || '/'
+  const locale = getLocaleFromPathname(pathname)
+
+  // Load translations from filesystem — synchronous read, cached per locale.
+  // This ensures SSR HTML contains the correct translated text, eliminating
+  // hydration mismatches caused by client-side-only translation loading.
+  const initialTranslations = getServerTranslations(locale)
+
   return (
-    <html suppressHydrationWarning>
+    <html lang={locale} dir={locale === 'ar' || locale === 'he' ? 'rtl' : 'ltr'} suppressHydrationWarning>
       <head>
-        {/* Preload critical translation file with high priority */}
+        {/* Preload the CORRECT locale translation file with high priority */}
         <link
           rel="preload"
-          href="/locales/en/common.json"
+          href={`/locales/${locale}/common.json`}
           as="fetch"
           type="application/json"
           crossOrigin="anonymous"
@@ -155,18 +167,18 @@ export default function RootLayout({ children }) {
         {/* DNS prefetch for non-critical third-party domains (deferred loading) */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
-        
+
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/images/logo_icon/favicon.png" type="image/png" />
         <link rel="apple-touch-icon" href="/images/logo_icon/ioslogo.png" />
-        
+
         {/* Stripe.js - only dns-prefetch since it's not needed on every page */}
         <link rel="dns-prefetch" href="https://js.stripe.com" />
-        
+
         <meta name="theme-color" content="#0a0a0a" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        
+
         {/* Structured Data for SEO — Organization */}
         <script
           type="application/ld+json"
@@ -308,9 +320,9 @@ export default function RootLayout({ children }) {
           }}
         />
       </head>
-      <body suppressHydrationWarning className={`${dmSans.variable} ${openSans.variable} ${ibmPlexArabic.variable} ${ibmPlexSans.variable}`}>
+      <body className={`${dmSans.variable} ${openSans.variable} ${ibmPlexArabic.variable} ${ibmPlexSans.variable}`}>
         <Providers>
-          <LanguageWrapper>
+          <LanguageWrapper initialTranslations={initialTranslations} initialLocale={locale}>
             <DynamicHtmlLang />
             <ScrollToTop />
             <Suspense fallback={null}>

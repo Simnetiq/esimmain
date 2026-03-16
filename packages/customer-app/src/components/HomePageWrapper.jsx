@@ -15,10 +15,9 @@ export default function HomePageWrapper({ children }) {
   const { locale, isLoading: i18nLoading } = useI18n();
   const { currentUser, loading: authLoading } = useAuth();
 
-  // SSR-safe: always use pathname-based detection for initial render to match server HTML.
-  // After i18n finishes loading, switch to context locale.
+  // With server-side translations, locale from context matches pathname on first render.
   const ssrSafeLanguage = detectLanguageFromPath(pathname) || 'en';
-  const currentLanguage = i18nLoading ? ssrSafeLanguage : (locale || ssrSafeLanguage);
+  const currentLanguage = locale || ssrSafeLanguage;
   const isRTL = getLanguageDirection(currentLanguage) === 'rtl';
 
   // Redirect authenticated users to dashboard (non-blocking)

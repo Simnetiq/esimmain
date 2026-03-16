@@ -56,7 +56,7 @@ const FlexiblePlanCard = ({ plan, t, onClick, isRTL = false }) => {
     return (
         <div
             onClick={onClick}
-            className="bg-white/[0.03] p-4 hover:bg-white/5 transition-all duration-500 cursor-pointer group h-full flex flex-col justify-between relative overflow-hidden"
+            className="bg-white/[0.03] p-4 hover:bg-white/5 border border-[rgba(73,117,212,0.2)] transition-all duration-500 cursor-pointer group h-full flex flex-col justify-between relative overflow-hidden"
             dir={isRTL ? 'rtl' : 'ltr'}
         >
             {/* Price — big watermark on the right */}
@@ -403,7 +403,7 @@ const EsimPlans = ({ isHomePage = false }) => {
 
     if (!isMounted) {
         return (
-            <div className="min-h-screen" suppressHydrationWarning>
+            <div className="min-h-screen">
                 {/* Header skeleton — matches actual header structure */}
                 <div className="w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-8 sm:mt-12 lg:mt-20">
                     <div className="h-4 sm:h-5 w-32 animate-pulse" style={{ backgroundColor: 'var(--subtle-bg)' }} />
@@ -471,15 +471,34 @@ const EsimPlans = ({ isHomePage = false }) => {
             <div className="w-full h-px bg-white/5 mt-4 sm:mt-6"></div>
 
             {/* Sticky Search */}
-            <div className="w-full sticky top-0 z-40 border-b border-white/5">
-                <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
-                    <input
-                        type="text"
-                        placeholder={t('plans.searchPlaceholder', 'Search eSIM plans...')}
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="input-field w-full py-2.5 sm:py-3 resize-none ps-10 pe-4 text-start"
-                    />
+            <div className="w-full sticky top-0 z-40" style={{ backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--card-border)' }}>
+                <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-3">
+                    <div className="relative max-w-xl">
+                        <svg className="absolute start-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        </svg>
+                        <input
+                            type="text"
+                            placeholder={t('plans.searchPlaceholder', 'Search eSIM plans...')}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full py-2.5 ps-10 pe-10 rounded-full text-sm text-text-primary placeholder:text-text-muted outline-none transition-all duration-200 text-start"
+                            style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--card-border)' }}
+                            onFocus={(e) => { e.target.style.borderColor = 'var(--tufts-blue)'; e.target.style.boxShadow = '0 0 0 3px rgba(73,117,212,0.1)'; }}
+                            onBlur={(e) => { e.target.style.borderColor = 'var(--card-border)'; e.target.style.boxShadow = 'none'; }}
+                        />
+                        {searchTerm && (
+                            <button
+                                onClick={() => setSearchTerm('')}
+                                className="absolute end-3.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
+                                aria-label="Clear search"
+                            >
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
 

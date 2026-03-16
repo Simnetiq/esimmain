@@ -15,6 +15,7 @@ export async function GET(request) {
       .from('dataplans')
       .select('*')
       .eq('status', 'active')
+      .neq('package_type', 'topup')
       .order('price', { ascending: true });
 
     if (countryCode) {

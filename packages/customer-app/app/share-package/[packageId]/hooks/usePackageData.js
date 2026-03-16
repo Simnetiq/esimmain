@@ -234,6 +234,7 @@ export const usePackageData = () => {
           .from('dataplans')
           .select('*')
           .eq('id', packageId)
+          .neq('package_type', 'topup')
           .single();
 
         if (data && !sbError) {

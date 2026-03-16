@@ -139,36 +139,29 @@ export default function CoverageStats() {
           <Link
             key={region.key}
             href={localizedPath(`/esim-plans?region=${region.slug}`)}
-            className="glass-card flex flex-col gap-3 hover:border-[var(--tufts-blue)] transition-colors duration-200"
+            className="glass-card flex flex-col justify-between gap-3 hover:border-[var(--tufts-blue)] transition-colors duration-200"
           >
-            <p className="font-semibold text-text-primary text-start">
-              {t(region.nameKey, region.nameFallback)}
-            </p>
-            <div className="flex flex-col gap-1.5">
-              {region.flags.slice(0, 3).map((flag, fi) => (
-                <div key={fi} className="flex items-center gap-2 rtl-native-flex">
-                  <FlagImage code={flag.code} emoji={flag.emoji} />
-                  <span className="text-xs text-text-muted">{flag.name}</span>
-                </div>
-              ))}
-              {region.flags.length > 3 && (
-                <span className="text-xs text-text-muted ps-7">
-                  +{region.flags.length - 3} {t('coverage.more', 'more')}
+            <div>
+              <div className="flex items-center justify-between rtl-native-flex">
+                <p className="font-semibold text-text-primary text-start">
+                  {t(region.nameKey, region.nameFallback)}
+                </p>
+                <span
+                  className="flex-shrink-0 inline-flex items-center justify-center rounded-full w-6 h-6 rtl-native-flex"
+                  style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--card-border)' }}
+                >
+                  <svg className="w-3 h-3 rtl:-scale-x-100" style={{ color: 'var(--text-primary)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M7 17 17 7"/><path d="M7 7h10v10"/>
+                  </svg>
                 </span>
-              )}
-            </div>
-            <div className="flex items-center justify-between mt-1 rtl-native-flex">
-              <p className="text-xs text-tufts-blue font-medium text-start">
-                {t('coverage.exploreCTA', 'Start exploring {{region}} now', { region: t(region.nameKey, region.nameFallback) })}
-              </p>
-              <span
-                className="flex-shrink-0 inline-flex items-center justify-center rounded-full w-6 h-6 rtl-native-flex"
-                style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--card-border)' }}
-              >
-                <svg className="w-3 h-3 rtl:-scale-x-100" style={{ color: 'var(--text-primary)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M7 17 17 7"/><path d="M7 7h10v10"/>
-                </svg>
-              </span>
+              </div>
+              <div className="flex items-center gap-1.5 mt-3 rtl-native-flex">
+                {region.flags.map((flag, fi) => (
+                  <div key={fi} className="flex-shrink-0">
+                    <FlagImage code={flag.code} emoji={flag.emoji} className="w-6 h-6 rounded-full object-cover" />
+                  </div>
+                ))}
+              </div>
             </div>
           </Link>
         ))}

@@ -18,13 +18,13 @@ const HeroSearchSkeleton = () => (
 );
 const HeroSearch = dynamic(() => import('../HeroSearch'), { ssr: false, loading: () => <HeroSearchSkeleton /> });
 
-// Popular country chips — static, no state dependency
+// Popular country chips — translated via i18n keys
 const POPULAR_COUNTRIES = [
-  { code: 'jp', name: 'Japan', slug: 'japan' },
-  { code: 'de', name: 'Germany', slug: 'germany' },
-  { code: 'us', name: 'USA', slug: 'united-states' },
-  { code: 'th', name: 'Thailand', slug: 'thailand' },
-  { code: 'it', name: 'Italy', slug: 'italy' },
+  { code: 'jp', nameKey: 'country.japan', fallback: 'Japan', slug: 'japan' },
+  { code: 'de', nameKey: 'country.germany', fallback: 'Germany', slug: 'germany' },
+  { code: 'us', nameKey: 'country.usa', fallback: 'USA', slug: 'united-states' },
+  { code: 'th', nameKey: 'country.thailand', fallback: 'Thailand', slug: 'thailand' },
+  { code: 'it', nameKey: 'country.italy', fallback: 'Italy', slug: 'italy' },
 ];
 
 // Inline SVG icons — no lucide-react imports
@@ -59,9 +59,10 @@ export default function NewHeroSection({ promo = null }) {
   const pathname = usePathname();
   const { locale, t, isLoading: i18nLoading } = useI18n();
 
-  // SSR-safe language: pathname-based to avoid hydration mismatch
+  // Use pathname-based locale as the stable source of truth for SSR/hydration.
+  // With server-side translations, locale from context matches this on first render.
   const ssrSafeLanguage = useMemo(() => detectLanguageFromPath(pathname) || 'en', [pathname]);
-  const detectedLanguage = i18nLoading ? ssrSafeLanguage : (locale || ssrSafeLanguage);
+  const detectedLanguage = locale || ssrSafeLanguage;
 
   const isRtl = detectedLanguage === 'he' || detectedLanguage === 'ar';
   // Always use ssrSafeLanguage for URLs to avoid hydration mismatch
@@ -147,7 +148,6 @@ export default function NewHeroSection({ promo = null }) {
       className="relative min-h-screen flex flex-col bg-bg-primary overflow-hidden"
       aria-label="Hero"
       lang={detectedLanguage}
-      suppressHydrationWarning
     >
       {/* Dot grid background */}
       <div
@@ -255,7 +255,7 @@ export default function NewHeroSection({ promo = null }) {
                     }}
                   >
                     <FlagImage code={country.code} className="w-4 h-4 rounded-full object-cover" />
-                    <span>{country.name}</span>
+                    <span>{t(country.nameKey, country.fallback)}</span>
                   </Link>
                 ))}
               </div>
@@ -274,7 +274,6 @@ export default function NewHeroSection({ promo = null }) {
                   href={appStoreLinks.ios}
                   target="_blank"
                   rel="noopener noreferrer"
-                  suppressHydrationWarning
                   className={`inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:opacity-90 rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto shadow-sm ${mounted && platform === 'android' ? 'hidden' : ''}`}
                   style={{
                     backgroundColor: 'var(--cta-secondary-bg)',
@@ -297,7 +296,6 @@ export default function NewHeroSection({ promo = null }) {
                   href={appStoreLinks.android}
                   target="_blank"
                   rel="noopener noreferrer"
-                  suppressHydrationWarning
                   className={`inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:opacity-90 rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto shadow-sm ${mounted && platform === 'ios' ? 'hidden' : ''}`}
                   style={{
                     backgroundColor: 'var(--cta-secondary-bg)',

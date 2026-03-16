@@ -66,9 +66,8 @@ export default function HeroSection() {
   // hydration mismatch from localStorage reads
   const ssrSafeLanguage = useMemo(() => detectLanguageFromPath(pathname) || 'en', [pathname]);
 
-  // Always use pathname-based language for initial render to avoid hydration mismatch.
-  // Once i18n finishes loading, switch to the context locale.
-  const detectedLanguage = i18nLoading ? ssrSafeLanguage : (locale || ssrSafeLanguage);
+  // With server-side translations, locale matches ssrSafeLanguage on first render.
+  const detectedLanguage = locale || ssrSafeLanguage;
 
   // Apply IBM Plex Sans Italic for "easiest way" only in EN and DE
   const useIbmPlexSansItalic = detectedLanguage === 'en' || detectedLanguage === 'de';
@@ -89,7 +88,7 @@ export default function HeroSection() {
   const subtitleText = t('hero.subtitle', 'Get eSIM data plans for 200+ countries. Activate in minutes — no SIM card, no roaming fees.');
 
   return (
-    <div className="hero-section relative min-h-screen flex flex-col bg-white" lang={detectedLanguage} suppressHydrationWarning>
+    <div className="hero-section relative min-h-screen flex flex-col bg-white" lang={detectedLanguage}>
       {/* SVG dot grid with routes — zero JS, zero TBT impact */}
       <div className="absolute inset-0 flex items-center justify-center overflow-hidden" aria-hidden="true" style={{ maskImage: 'radial-gradient(ellipse 60% 55% at 50% 50%, black 40%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse 60% 55% at 50% 50%, black 40%, transparent 100%)' }}>
         <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">

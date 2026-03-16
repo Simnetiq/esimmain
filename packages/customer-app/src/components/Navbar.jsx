@@ -39,21 +39,13 @@ const Navbar = () => {
   const lastScrollYRef = useRef(0);
   const navRef = useRef(null);
 
-  // Language detection
+  // Language detection — with server-side translations, locale is correct from first render
   const pathnameLanguage = detectLanguageFromPath(pathname) || 'en';
-  const ssrSafeLanguage = i18nLoading ? pathnameLanguage : (locale || 'en');
-  const [currentLanguage, setCurrentLanguage] = useState(ssrSafeLanguage);
+  const [currentLanguage, setCurrentLanguage] = useState(locale || pathnameLanguage);
 
   useEffect(() => {
-    if (i18nLoading) {
-      const saved = localStorage.getItem('Simnetiq-language');
-      if (saved && saved !== currentLanguage) setCurrentLanguage(saved);
-    }
-  }, [i18nLoading]);
-
-  useEffect(() => {
-    if (!i18nLoading && locale) setCurrentLanguage(locale);
-  }, [i18nLoading, locale]);
+    if (locale) setCurrentLanguage(locale);
+  }, [locale]);
 
   const direction = getLanguageDirection(currentLanguage);
 

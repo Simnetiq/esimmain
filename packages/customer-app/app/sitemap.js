@@ -12,7 +12,8 @@ export default async function sitemap() {
   const languages = ['en', 'es', 'fr', 'de', 'ar', 'he', 'hi', 'it', 'ja', 'ko', 'nl', 'pl', 'pt', 'ru', 'th', 'tr', 'uk', 'zh'];
   const now = new Date().toISOString();
 
-  // Helper: generate hreflang alternates for a path
+  // Helper: generate a single sitemap entry with hreflang alternates for all 18 languages.
+  // This is the correct approach — one entry per path with hreflang pointing to all locale variants.
   function withAlternates(path, lastmod, changefreq, priority) {
     const alternates = {};
     languages.forEach(lang => {
@@ -30,7 +31,7 @@ export default async function sitemap() {
     };
   }
 
-  // --- Static pages ---
+  // --- Static pages (each with all 18 hreflang alternates) ---
   const staticPages = [
     withAlternates('', now, 'daily', 1.0),
     withAlternates('/esim-plans', now, 'daily', 0.9),
@@ -46,44 +47,12 @@ export default async function sitemap() {
     withAlternates('/return-policy', now, 'yearly', 0.3),
   ];
 
-  // --- Localized static pages (non-English) ---
-  const localizedPages = [];
-  const mainPaths = ['', '/esim-plans', '/blog', '/contact', '/about', '/affiliate-program', '/jobs'];
-  const legalPaths = ['/privacy-policy', '/terms-of-service', '/cookie-policy', '/return-policy'];
-
-  languages.forEach(lang => {
-    if (lang === 'en') return;
-    mainPaths.forEach(path => {
-      const priority = path === '' ? 0.9 : path === '/esim-plans' ? 0.85 : path === '/blog' ? 0.8 : 0.6;
-      const freq = ['', '/esim-plans', '/blog'].includes(path) ? 'daily' : 'weekly';
-      localizedPages.push({
-        url: `${baseUrl}/${lang}${path}`,
-        lastModified: now,
-        changeFrequency: freq,
-        priority,
-      });
-    });
-    legalPaths.forEach(path => {
-      localizedPages.push({
-        url: `${baseUrl}/${lang}${path}`,
-        lastModified: now,
-        changeFrequency: 'yearly',
-        priority: 0.3,
-      });
-    });
-    localizedPages.push({
-      url: `${baseUrl}/${lang}/login`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.4,
-    });
-  });
-
-  // --- Country eSIM pages from Supabase ---
-  const countryPages = [];
+  // --- Dynamic pages from Supabase ---
+  const dynamicPages = [];
   const supabase = getSupabase();
 
   if (supabase) {
+    // --- Country eSIM pages ---
     try {
       const { data: countries } = await supabase
         .from('countries')
@@ -94,27 +63,14 @@ export default async function sitemap() {
 
       if (countries) {
         for (const country of countries) {
-          const lastmod = country.updated_at || now;
-          // English: /esim/germany, other langs: /fr/esim/germany
-          countryPages.push(withAlternates(`/esim/${country.slug}`, lastmod, 'weekly', 0.8));
-
-          // Also add localized versions
-          languages.forEach(lang => {
-            if (lang === 'en') return;
-            countryPages.push({
-              url: `${baseUrl}/${lang}/esim/${country.slug}`,
-              lastModified: lastmod,
-              changeFrequency: 'weekly',
-              priority: 0.75,
-            });
-          });
+          dynamicPages.push(withAlternates(`/esim/${country.slug}`, country.updated_at || now, 'weekly', 0.8));
         }
       }
     } catch (e) {
       console.error('Sitemap: failed to fetch countries', e);
     }
 
-    // --- Blog posts with multi-locale alternates ---
+    // --- Blog posts with translation-aware hreflangs ---
     try {
       const { data: posts } = await supabase
         .from('blog_posts')
@@ -128,7 +84,6 @@ export default async function sitemap() {
           const slug = post.base_slug;
           const availableLangs = (post.blog_post_translations || []).map(t => t.language);
 
-          // Build hreflang alternates based on actual translations
           const blogAlternates = {};
           availableLangs.forEach(lang => {
             blogAlternates[lang] = lang === 'en'
@@ -136,7 +91,7 @@ export default async function sitemap() {
               : `${baseUrl}/${lang}/blog/${slug}`;
           });
 
-          countryPages.push({
+          dynamicPages.push({
             url: `${baseUrl}/blog/${slug}`,
             lastModified: lastmod,
             changeFrequency: 'weekly',
@@ -146,12 +101,10 @@ export default async function sitemap() {
         }
       }
     } catch (e) {
-      // blog_posts table may not exist - that's OK
+      // blog_posts table may not exist
     }
-  }
 
-  // --- Regions pages ---
-  if (supabase) {
+    // --- Region pages ---
     try {
       const { data: regions } = await supabase
         .from('regions')
@@ -160,7 +113,7 @@ export default async function sitemap() {
 
       if (regions) {
         for (const region of regions) {
-          countryPages.push(withAlternates(`/esim/${region.slug}`, region.updated_at || now, 'weekly', 0.75));
+          dynamicPages.push(withAlternates(`/esim/${region.slug}`, region.updated_at || now, 'weekly', 0.75));
         }
       }
     } catch (e) {
@@ -170,7 +123,6 @@ export default async function sitemap() {
 
   return [
     ...staticPages,
-    ...localizedPages,
-    ...countryPages,
+    ...dynamicPages,
   ];
 }

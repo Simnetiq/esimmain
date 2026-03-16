@@ -178,13 +178,25 @@ async function handleSync(source: string) {
   const allPackages = await fetchAllPackages(baseUrl, token);
   const receivedIds = new Set(allPackages.map(p => p.id));
 
-  // 3. Upsert to Supabase in batches
+  // 3. Deduplicate packages from Airalo before upserting
+  // Airalo can send the same plan with different IDs (e.g. "lofotel-7days-1gb" vs "lofotel-in-7days-1gb")
+  // Keep only the first occurrence per (country_iso, data_amount_mb, validity_days, price, operator_name)
+  const seenPlans = new Set<string>();
+  const deduplicatedPackages = allPackages.filter(pkg => {
+    const dedupeKey = `${pkg.country_code}|${pkg.amount || 0}|${pkg.day || 0}|${parseFloat(String(pkg.price)) || 0}|${pkg.operator_title || ''}`;
+    if (seenPlans.has(dedupeKey)) return false;
+    seenPlans.add(dedupeKey);
+    return true;
+  });
+  const skippedDuplicates = allPackages.length - deduplicatedPackages.length;
+
+  // 4. Upsert to Supabase in batches
   let synced = 0;
   let topups = 0;
   const BATCH = 200;
 
-  for (let i = 0; i < allPackages.length; i += BATCH) {
-    const batch = allPackages.slice(i, i + BATCH).map(pkg => ({
+  for (let i = 0; i < deduplicatedPackages.length; i += BATCH) {
+    const batch = deduplicatedPackages.slice(i, i + BATCH).map(pkg => ({
       id: pkg.id,
       name: pkg.title || `${(pkg.amount || 0) / 1024}GB - ${pkg.day} Days`,
       title: pkg.title,
@@ -220,14 +232,14 @@ async function handleSync(source: string) {
     if (error) {
       console.error(`Batch upsert error at offset ${i}:`, error.message);
     } else {
-      for (const pkg of allPackages.slice(i, i + BATCH)) {
+      for (const pkg of deduplicatedPackages.slice(i, i + BATCH)) {
         if (pkg.type === 'topup') topups++;
         else synced++;
       }
     }
   }
 
-  // 4. Deactivate packages no longer in Airalo response
+  // 5. Deactivate packages no longer in Airalo response
   let deactivated = 0;
   if (allPackages.length > 100) {
     const { data: existing } = await supabase
@@ -268,6 +280,7 @@ async function handleSync(source: string) {
         packages_synced: synced,
         topups_synced: topups,
         deactivated,
+        skipped_duplicates: skippedDuplicates,
         total_from_api: allPackages.length,
         duration_seconds: parseFloat((durationMs / 1000).toFixed(2)),
         source,
@@ -283,6 +296,7 @@ async function handleSync(source: string) {
     packages_synced: synced,
     topups_synced: topups,
     deactivated,
+    skipped_duplicates: skippedDuplicates,
     total_from_api: allPackages.length,
     duration_seconds: (durationMs / 1000).toFixed(2),
     last_synced_at: now,
