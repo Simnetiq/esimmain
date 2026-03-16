@@ -21,6 +21,7 @@ import toast from 'react-hot-toast';
 import AccessDeniedAlert from './dashboard/AccessDeniedAlert';
 import DashboardHeader from './dashboard/DashboardHeader';
 import RecentOrders from './dashboard/RecentOrders';
+import AccountSettings from './dashboard/AccountSettings';
 
 // Lazy load modals - not needed for initial render
 const QRCodeModal = dynamic(() => import('./dashboard/QRCodeModal'), {
@@ -105,9 +106,11 @@ const DashboardSkeleton = () => (
 );
 
 const Dashboard = () => {
-  const { currentUser, userProfile, loadUserProfile, loading: authLoading } = useAuth();
+  const { currentUser, userProfile, loadUserProfile, logout, loading: authLoading } = useAuth();
   const { t, locale } = useI18n();
   const pathname = usePathname();
+  const [activeTab, setActiveTab] = useState('esims');
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -1120,6 +1123,20 @@ const Dashboard = () => {
 
 
 
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      toast.success(t('navbar.loggedOutSuccessfully', 'Logged out successfully'));
+      const homeUrl = currentLanguage === 'en' ? '/' : `/${currentLanguage}`;
+      router.push(homeUrl);
+    } catch {
+      toast.error(t('navbar.failedToLogout', 'Failed to logout'));
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col transition-opacity duration-150 opacity-100" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Access Denied Alert */}
@@ -1136,16 +1153,75 @@ const Dashboard = () => {
           orders={orders}
         />
 
-        {/* Recent Orders */}
-        <RecentOrders
-          orders={orders}
-          loading={loading}
-          onViewQRCode={handleViewQRCode}
-          usageCache={usageCache}
-          loadingUsageMap={loadingUsageMap}
-          planMetadataMap={planMetadataMap}
-          plansLoading={plansLoading}
-        />
+        {/* Tab Switcher */}
+        <div className="mx-auto w-full max-w-9xl">
+          <div className="mx-auto w-full max-w-7xl">
+            <div className="px-4 mb-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setActiveTab('esims')}
+                  className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                    activeTab === 'esims'
+                      ? 'bg-tufts-blue text-white'
+                      : 'text-text-muted hover:text-text-primary'
+                  }`}
+                  style={activeTab !== 'esims' ? { backgroundColor: 'var(--hover-bg)' } : undefined}
+                >
+                  {t('dashboard.tabEsims', 'My eSIMs')}
+                </button>
+                <button
+                  onClick={() => setActiveTab('account')}
+                  className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                    activeTab === 'account'
+                      ? 'bg-tufts-blue text-white'
+                      : 'text-text-muted hover:text-text-primary'
+                  }`}
+                  style={activeTab !== 'account' ? { backgroundColor: 'var(--hover-bg)' } : undefined}
+                >
+                  {t('dashboard.tabAccount', 'Account')}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === 'esims' ? (
+          <RecentOrders
+            orders={orders}
+            loading={loading}
+            onViewQRCode={handleViewQRCode}
+            usageCache={usageCache}
+            loadingUsageMap={loadingUsageMap}
+            planMetadataMap={planMetadataMap}
+            plansLoading={plansLoading}
+          />
+        ) : (
+          <>
+            <AccountSettings
+              currentUser={currentUser}
+              userProfile={userProfile}
+              onLoadUserProfile={loadUserProfile}
+            />
+            {/* Sign out button */}
+            <div className="mx-auto w-full max-w-9xl">
+              <div className="mx-auto w-full max-w-7xl">
+                <div className="px-4 pb-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
+                  <div className="group relative p-5 overflow-hidden" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+                    <button
+                      onClick={handleLogout}
+                      disabled={isLoggingOut}
+                      className="w-full py-3 text-sm font-semibold text-red-400 border rounded-full hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                      style={{ borderColor: 'rgba(248, 113, 113, 0.3)' }}
+                    >
+                      {isLoggingOut ? t('navbar.loggingOut', 'Logging out...') : t('navbar.logout', 'Log out')}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* QR Code Modal - Now unified with details and usage */}

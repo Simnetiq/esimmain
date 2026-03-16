@@ -135,13 +135,6 @@ const DashboardHeader = ({ currentUser, orders = [] }) => {
                 </span>
               </Link>
 
-              <Link
-                href={getLocalizedUrl('/settings')}
-                className="inline-flex items-center gap-2 px-5 py-3 bg-[var(--subtle-bg)] text-text-muted text-sm font-medium rounded-full hover:bg-[var(--hover-bg)] transition-colors rtl-native-flex"
-              >
-                <SettingsIcon className="w-4 h-4" />
-                <span>{t('dashboard.accountSettings', 'Account Settings')}</span>
-              </Link>
             </div>
 
           </div>
