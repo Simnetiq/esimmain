@@ -126,6 +126,7 @@ const fetchCountriesFromSupabase = async (locale = 'en') => {
       .eq('status', 'active')
       .eq('is_enabled', true)
       .neq('plan_type', 'global')
+      .neq('package_type', 'topup')
   ]);
 
   const { data, error } = countriesResult;
@@ -311,6 +312,7 @@ export const useCountryPlansSupabase = (countryCode) => {
         .eq('status', 'active')
         .eq('is_enabled', true)
         .neq('plan_type', 'global')
+        .neq('package_type', 'topup')
         .order('price', { ascending: true });
 
       if (error) throw error;

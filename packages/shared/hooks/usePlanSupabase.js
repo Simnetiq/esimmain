@@ -68,6 +68,7 @@ export async function fetchPlanByIdWithFallback(planId) {
     .select('*')
     .eq('status', 'active')
     .eq('is_enabled', true)
+    .neq('package_type', 'topup')
     .or(`name.ilike.%${planId}%,country_id.ilike.%${planId}%`)
     .order('price', { ascending: true })
     .limit(1)
@@ -147,7 +148,8 @@ export function usePlansSupabase(planIds) {
         .select('*')
         .in('id', planIds)
         .eq('status', 'active')
-        .eq('is_enabled', true);
+        .eq('is_enabled', true)
+        .neq('package_type', 'topup');
 
       if (error) {
         console.error('[usePlansSupabase] Error:', error);

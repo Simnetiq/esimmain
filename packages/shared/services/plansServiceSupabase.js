@@ -142,6 +142,7 @@ export async function fetchPlanById(planId) {
     .eq('id', planId)
     .eq('status', 'active')
     .eq('is_enabled', true)
+    .neq('package_type', 'topup')
     .single();
 
   if (error) {
@@ -185,6 +186,7 @@ export async function fetchCountryPlans(countryCode) {
     .eq('status', 'active')
     .eq('is_enabled', true)
     .neq('plan_type', 'global')
+    .neq('package_type', 'topup')
     .order('price', { ascending: true });
 
   if (error) {
@@ -225,6 +227,7 @@ export async function fetchGlobalPlans() {
     .select('*')
     .eq('status', 'active')
     .eq('is_enabled', true)
+    .neq('package_type', 'topup')
     .or('plan_type.eq.global,country_id.ilike.%global%,name.ilike.%global%')
     .order('price', { ascending: true });
 
@@ -293,7 +296,8 @@ export async function fetchRegionalPlans(regionSlug) {
       )
     `)
     .eq('status', 'active')
-    .eq('is_enabled', true);
+    .eq('is_enabled', true)
+    .neq('package_type', 'topup');
 
   if (isGlobal) {
     // For global region, fetch plans that have region_id = 'global'
@@ -439,6 +443,7 @@ export async function searchPlans(query, options = {}) {
     .select('*')
     .eq('status', 'active')
     .eq('is_enabled', true)
+    .neq('package_type', 'topup')
     .or(`name.ilike.%${query}%,country_id.ilike.%${query}%,operator_name.ilike.%${query}%`)
     .order('price', { ascending: true })
     .limit(limit);

@@ -11,6 +11,21 @@
 
 import { getSupabase, isSupabaseAvailable } from '../lib/supabase';
 
+/** Get the current Supabase session access token for authenticated API calls. */
+async function getAuthHeaders() {
+  try {
+    const supabase = getSupabase();
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.access_token) {
+      return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+      };
+    }
+  } catch (e) { /* fall through */ }
+  return { 'Content-Type': 'application/json' };
+}
+
 export const esimService = {
   /**
    * ⛔ DISABLED FOR SECURITY
@@ -55,9 +70,10 @@ export const esimService = {
 
       const mockSimData = orderData.orderData?.sims?.[0] || orderData.sims?.[0];
 
+      const headers = await getAuthHeaders();
       const response = await fetch('/api/airalo/qr-code', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           orderId,
           airaloOrderId: orderData.airaloOrderId || orderData.id,
@@ -79,9 +95,10 @@ export const esimService = {
 
   async getEsimDetails(orderId) {
     try {
+      const headers = await getAuthHeaders();
       const response = await fetch('/api/airalo/sim-details', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ orderId })
       });
       const result = await response.json();
@@ -95,9 +112,10 @@ export const esimService = {
 
   async getEsimUsage(orderId) {
     try {
+      const headers = await getAuthHeaders();
       const response = await fetch('/api/airalo/sim-usage', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ orderId })
       });
       const result = await response.json();
@@ -111,9 +129,10 @@ export const esimService = {
 
   async getEsimUsageByIccid(iccid) {
     try {
+      const headers = await getAuthHeaders();
       const response = await fetch('/api/airalo/sim-usage', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ iccid })
       });
       const result = await response.json();
@@ -133,9 +152,10 @@ export const esimService = {
 
   async getEsimDetailsByIccid(iccid) {
     try {
+      const headers = await getAuthHeaders();
       const response = await fetch('/api/airalo/sim-details', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ iccid })
       });
       const result = await response.json();
@@ -204,9 +224,10 @@ export const esimService = {
 
   async updateEsimBrand(iccid, brandSettingsName = null) {
     try {
+      const headers = await getAuthHeaders();
       const response = await fetch('/api/airalo/sim-brand', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ iccid, brand_settings_name: brandSettingsName })
       });
       const result = await response.json();
@@ -242,9 +263,10 @@ export const esimService = {
 
   async getEsimPackageHistory(iccid) {
     try {
+      const headers = await getAuthHeaders();
       const response = await fetch('/api/airalo/sim-packages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ iccid })
       });
       const result = await response.json();

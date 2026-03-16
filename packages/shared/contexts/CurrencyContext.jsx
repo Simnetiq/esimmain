@@ -65,29 +65,9 @@ export const CurrencyProvider = ({ children }) => {
       }
     }
 
-    if (!supabase || !currentUser) {
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const { data } = await supabase
-        .from('user_currency_preferences')
-        .select('currency_code')
-        .eq('user_id', currentUser.id)
-        .single();
-
-      if (data?.currency_code) {
-        setCurrencyState(data.currency_code);
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('simnetiq-currency', data.currency_code);
-        }
-      }
-    } catch {
-      // No preference saved yet — keep default or localStorage value
-    } finally {
-      setIsLoading(false);
-    }
+    // Currency preference is stored in localStorage only.
+    // The user_currency_preferences table does not exist yet.
+    setIsLoading(false);
   }, [supabase, currentUser]);
 
   // Set currency with persistence
@@ -97,20 +77,8 @@ export const CurrencyProvider = ({ children }) => {
       localStorage.setItem('simnetiq-currency', code);
     }
 
-    if (!supabase || !currentUser) return;
-
-    try {
-      await supabase.from('user_currency_preferences').upsert(
-        {
-          user_id: currentUser.id,
-          currency_code: code,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'user_id' }
-      );
-    } catch (err) {
-      console.warn('Failed to save currency preference:', err.message);
-    }
+    // Currency preference persisted via localStorage only.
+    // DB table user_currency_preferences does not exist yet.
   }, [supabase, currentUser]);
 
   useEffect(() => {

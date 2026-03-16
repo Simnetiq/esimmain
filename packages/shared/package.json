@@ -67,6 +67,7 @@
     "./lib/fcm": "./lib/fcm.js",
     "./lib/supabase": "./lib/supabase.js",
     "./lib/apiAuth": "./lib/apiAuth.js",
+    "./lib/airaloToken": "./lib/airaloToken.js",
     "./lib/supabaseAdmin": "./lib/supabaseAdmin.js",
     "./lib/email": "./lib/email.js",
     "./lib/passkit": "./lib/passkit.js",

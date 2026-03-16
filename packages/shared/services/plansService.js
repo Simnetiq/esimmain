@@ -21,7 +21,8 @@ export const getAllPlans = async () => {
     const supabase = getSupabase();
     const { data, error } = await supabase
       .from('dataplans')
-      .select('*');
+      .select('*')
+      .neq('package_type', 'topup');
 
     if (error) throw error;
 

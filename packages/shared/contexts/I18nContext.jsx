@@ -42,26 +42,60 @@ const getLanguageFromPathname = (pathname) => {
   return 'en';
 };
 
-export const I18nProvider = ({ children }) => {
+/**
+ * I18nProvider — accepts optional `initialTranslations` and `initialLocale`
+ * props so that SSR can render correct translated text (no hydration mismatch).
+ *
+ * When `initialTranslations` is provided (from server-side JSON read), the
+ * provider initialises with those translations and skips the client-side
+ * fetch for the initial locale. Navigation to other locales still triggers
+ * a client-side fetch.
+ */
+export const I18nProvider = ({ children, initialTranslations, initialLocale }) => {
   const pathname = usePathname();
   const pathnameLocale = getLanguageFromPathname(pathname);
 
+  // Determine whether we have server-provided translations for this locale
+  const hasInitialData =
+    initialTranslations &&
+    Object.keys(initialTranslations).length > 0 &&
+    initialLocale === pathnameLocale;
+
+  // Seed the in-memory cache so client-side navigation back to this locale
+  // won't trigger a fetch either.
+  if (hasInitialData && !translationCache[initialLocale]) {
+    translationCache[initialLocale] = initialTranslations;
+  }
+
   const [locale, setLocale] = useState(pathnameLocale);
-  const [translations, setTranslations] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
+  const [translations, setTranslations] = useState(
+    hasInitialData ? initialTranslations : (translationCache[pathnameLocale] || {})
+  );
+  const [isLoading, setIsLoading] = useState(
+    hasInitialData || translationCache[pathnameLocale] ? false : true
+  );
   // Track which locale the current translations belong to so we can detect
   // stale state even when locale === pathnameLocale (e.g. navigating away and
   // back to the same locale — useState keeps old translations but server has {}).
-  const [translationsLocale, setTranslationsLocale] = useState(null);
+  const [translationsLocale, setTranslationsLocale] = useState(
+    hasInitialData ? initialLocale : (translationCache[pathnameLocale] ? pathnameLocale : null)
+  );
 
   // Synchronous state reset during render — the provider persists in the layout
   // so useState does NOT re-initialize on navigation. Reset whenever the URL
   // locale changes OR translations are stale (loaded for a previous locale).
   if (locale !== pathnameLocale || (translationsLocale && translationsLocale !== pathnameLocale)) {
     setLocale(pathnameLocale);
-    setTranslations({});
-    setTranslationsLocale(null);
-    setIsLoading(true);
+    // If we have cached translations for the new locale, use them immediately
+    if (translationCache[pathnameLocale]) {
+      setTranslations(translationCache[pathnameLocale]);
+      setTranslationsLocale(pathnameLocale);
+      setIsLoading(false);
+    } else {
+      setTranslations({});
+      setTranslationsLocale(null);
+      setIsLoading(true);
+    }
   }
 
   useEffect(() => {
@@ -79,7 +113,7 @@ export const I18nProvider = ({ children }) => {
   const loadTranslations = async (localeToLoad) => {
     try {
       setIsLoading(true);
-      
+
       if (translationCache[localeToLoad]) {
         setTranslations(translationCache[localeToLoad]);
         setTranslationsLocale(localeToLoad);
@@ -132,12 +166,12 @@ export const I18nProvider = ({ children }) => {
   const changeLanguage = async (newLocale) => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('Simnetiq-language', newLocale);
-      
+
       if (window.saveLanguageToCookie) {
         window.saveLanguageToCookie(newLocale);
       }
     }
-    
+
     // Save to Supabase if user is logged in
     try {
       const supabase = getSupabase();
@@ -151,7 +185,7 @@ export const I18nProvider = ({ children }) => {
     } catch {
       // Not logged in or Supabase not available — that's fine
     }
-    
+
     setLocale(newLocale);
     await loadTranslations(newLocale);
   };

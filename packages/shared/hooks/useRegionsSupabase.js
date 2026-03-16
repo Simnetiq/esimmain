@@ -259,6 +259,7 @@ export const useRegionDetailsSupabase = (regionId, locale = 'en') => {
         .or(`region_id.eq.${regionId},plan_type.eq.${region.type === 'global' ? 'global' : regionId}`)
         .eq('status', 'active')
         .eq('is_enabled', true)
+        .neq('package_type', 'topup')
         .order('price', { ascending: true });
 
       // Process translations

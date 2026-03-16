@@ -53,9 +53,8 @@ export const getSettings = async () => {
       };
     }
     return { id: 'general', ...defaultSettings };
-  } catch (error) {
-    console.error('Error getting settings:', error);
-    throw error;
+  } catch {
+    return { id: 'general', ...defaultSettings };
   }
 };
 
@@ -141,8 +140,7 @@ export const getReferralSettings = async () => {
   try {
     const settings = await getSettings();
     return settings.referral || defaultSettings.referral;
-  } catch (error) {
-    console.error('Error getting referral settings:', error);
+  } catch {
     return defaultSettings.referral;
   }
 };
@@ -151,8 +149,7 @@ export const getRegularSettings = async () => {
   try {
     const settings = await getSettings();
     return settings.regular || { discountPercentage: 10, minimumPrice: 0.5 };
-  } catch (error) {
-    console.error('Error getting regular settings:', error);
+  } catch {
     return { discountPercentage: 10, minimumPrice: 0.5 };
   }
 };
