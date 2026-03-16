@@ -17,7 +17,13 @@ const ReferralBottomSheet = ({ isOpen, onClose }) => {
   const [validationError, setValidationError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasUsedReferral, setHasUsedReferral] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { currentUser, loadUserProfile } = useAuth();
+
+  // Mount guard to prevent AnimatePresence flash during hydration
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Check if user has already used a referral code
   useEffect(() => {
@@ -128,6 +134,8 @@ const ReferralBottomSheet = ({ isOpen, onClose }) => {
     setValidationError('');
     onClose();
   };
+
+  if (!mounted) return null;
 
   return (
     <AnimatePresence>

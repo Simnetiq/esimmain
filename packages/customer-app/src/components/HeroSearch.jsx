@@ -135,8 +135,10 @@ export default function HeroSearch({ esimPlansUrl }) {
           placeholder={t('hero.searchPlaceholder', 'Where are you traveling?')}
           className="flex-1 bg-transparent border-none outline-none text-sm sm:text-base text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
           autoComplete="off"
+          role="combobox"
           aria-expanded={isOpen}
           aria-haspopup="listbox"
+          aria-autocomplete="list"
           aria-label={t('hero.searchPlaceholder', 'Where are you traveling?')}
         />
         {query && (

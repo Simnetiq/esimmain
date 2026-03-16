@@ -59,28 +59,28 @@ export default function FAQSection() {
       question: t('faq.whatIsEsim', 'What is an eSIM and how does it work?'),
       answer: t(
         'faq.whatIsEsimAnswer',
-        "An eSIM (embedded SIM) is a digital SIM card that's built into your device. Instead of inserting a physical SIM card, you can download and activate a cellular plan directly onto your device."
+        "An eSIM (embedded SIM) is a digital SIM card that's built into your device. Instead of inserting a physical SIM card, you can download and activate a cellular plan directly onto your device. This allows you to switch between carriers and plans without needing to swap physical cards."
       ),
     },
     {
       question: t('faq.deviceSupport', 'Which devices support eSIM?'),
       answer: t(
         'faq.deviceSupportAnswer',
-        'Most modern smartphones support eSIM, including iPhone XS and newer, Google Pixel 3 and newer, Samsung Galaxy S20 and newer, and many others.'
+        'Most modern smartphones support eSIM, including iPhone XS and newer, Google Pixel 3 and newer, Samsung Galaxy S20 and newer, and many others. Check your device settings or contact us to confirm compatibility.'
       ),
     },
     {
       question: t('faq.howToActivate', 'How do I activate my eSIM?'),
       answer: t(
         'faq.howToActivateAnswer',
-        "After purchase, you'll receive a QR code via email. Simply scan this code with your device's camera in the cellular settings, and your eSIM will be activated automatically."
+        "After purchase, you'll receive a QR code via email. Simply scan this code with your device's camera in the cellular settings, and your eSIM will be activated automatically. Detailed instructions are provided for each device type."
       ),
     },
     {
       question: t('faq.paymentMethods', 'What payment methods do you accept?'),
       answer: t(
         'faq.paymentMethodsAnswer',
-        'We accept all major credit cards (Visa, Mastercard, American Express), Apple Pay, Google Pay, and various local payment methods.'
+        'We accept all major credit cards (Visa, Mastercard, American Express), PayPal, Apple Pay, Google Pay, and various local payment methods depending on your region.'
       ),
     },
     {
@@ -94,7 +94,7 @@ export default function FAQSection() {
       question: t('faq.notConnecting', "My eSIM isn't connecting to the network. What should I do?"),
       answer: t(
         'faq.notConnectingAnswer',
-        "First, ensure you're in an area with network coverage. Try restarting your device, toggling airplane mode on/off, or manually selecting the network in your cellular settings."
+        "First, ensure you're in an area with network coverage. Try restarting your device, toggling airplane mode on/off, or manually selecting the network in your cellular settings. If issues persist, contact our support team."
       ),
     },
     {

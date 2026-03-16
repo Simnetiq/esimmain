@@ -49,7 +49,7 @@ export default function AppDownload() {
   const { t } = useI18n();
 
   const esimFeatures = [
-    t('appDownload.bullet1', 'Buy and activate eSIMs instantly'),
+    t('appDownload.bullet1', 'Buy and activate eSIMs'),
     t('appDownload.bullet2', 'Monitor data usage in real-time'),
     t('appDownload.bullet3', 'Top up with one tap'),
     t('appDownload.bullet4', 'Get QR codes instantly'),
@@ -93,7 +93,7 @@ export default function AppDownload() {
                       <Image src="/images/instant.avif" alt="Simnetiq eSIM app" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" loading="lazy" />
                       <div className="absolute bottom-4 start-4 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white rtl-native-flex" style={{ backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}>
                         <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
-                        {t('appDownload.badgeBoth', 'Available on iOS & Android')}
+                        {t('appDownload.badgeBoth', 'AVAILABLE ON IOS & ANDROID')}
                       </div>
                     </div>
                     <div className="relative flex-1 p-6 lg:p-10 flex flex-col justify-center">

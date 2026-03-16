@@ -79,14 +79,14 @@ export default function HeroSection() {
   // Trust indicators data
   const trustIndicators = [
     { Icon: GlobeIcon, label: t('hero.countries', '200+ Countries'), key: 'countries' },
-    { Icon: ZapIcon, label: t('hero.instantActivation', 'Instant Activation'), key: 'activation' },
-    { Icon: ShieldIcon, label: t('hero.securePayment', 'Secure Payment'), key: 'secure' },
+    { Icon: ZapIcon, label: t('hero.instantActivation', 'Instant Setup'), key: 'activation' },
+    { Icon: ShieldIcon, label: t('hero.securePayment', 'Secure Checkout'), key: 'secure' },
   ];
 
   const headlinePart1 = t('hero.headlinePart1', 'The ');
-  const headlineHighlight = t('hero.headlineHighlight', 'easiest way');
-  const headlinePart2 = t('hero.headlinePart2', 'to get data anywhere in the world');
-  const subtitleText = t('hero.subtitle', 'Activate your eSIM in minutes and stay connected in 200+ destinations worldwide.');
+  const headlineHighlight = t('hero.headlineHighlight', 'simplest way');
+  const headlinePart2 = t('hero.headlinePart2', 'to stay online abroad');
+  const subtitleText = t('hero.subtitle', 'Get eSIM data plans for 200+ countries. Activate in minutes — no SIM card, no roaming fees.');
 
   return (
     <div className="hero-section relative min-h-screen flex flex-col bg-white" lang={detectedLanguage}>

@@ -13,7 +13,8 @@ import Reveal from '../ui/Reveal';
  *   Travel Mobil Basic World (Zone 3: Thailand, Japan, Brazil, Egypt): €29.95/5GB
  * - AT&T: att.com/international/day-pass — $12/day International Day Pass
  * - Verizon: verizon.com/plans/international — $12/day TravelPass
- * - Vodafone DE: vodafone.de — EasyTravel €7.99/day (Zone 2), ReisePaket World €34.99/week/4GB (Zone 3)
+ * - Three UK: three.co.uk — Go Roam $6/day (Feel At Home), Go Roam World $8/day
+ * - Rogers CA: rogers.com — Roam Like Home $10/day
  * - eSIM market pricing: airalo.com, esimdb.com (5GB/30-day plans)
  *
  * Scenario: 1-week trip, ~5GB data usage
@@ -26,10 +27,11 @@ const DESTINATIONS = [
     labelDefault: 'Turkey',
     flag: 'tr',
     carriers: [
-      { id: 'att', labelKey: 'roaming.carrier.att', labelDefault: 'AT&T / Verizon (US)', price: 84, noteKey: 'roaming.note.dayPass', noteDefault: 'Day Pass $12/day × 7' },
-      { id: 'vodafone', labelKey: 'roaming.carrier.vodafoneDE', labelDefault: 'Vodafone (Germany)', price: 56, noteKey: 'roaming.note.easyTravel', noteDefault: 'EasyTravel €7.99/day' },
-      { id: 'telekom', labelKey: 'roaming.carrier.telekomDE', labelDefault: 'Telekom (Germany)', price: 16, noteKey: 'roaming.note.travelMobil', noteDefault: 'Travel Mobil Basic 5GB' },
-      { id: 'simnetiq', labelKey: 'roaming.carrier.simnetiq', labelDefault: 'Simnetiq eSIM', price: 4.5, noteKey: 'roaming.note.esim5gb', noteDefault: '5GB plan' },
+      { id: 'att', labelKey: 'roaming.carrier.att', labelDefault: 'AT&T (US)', price: 84, noteKey: 'roaming.note.dayPass', noteDefault: 'Day Pass $12/day × 7', flagCode: 'us' },
+      { id: 'rogers', labelKey: 'roaming.carrier.rogersCA', labelDefault: 'Rogers (Canada)', price: 70, noteKey: 'roaming.note.roamLikeHome', noteDefault: 'Roam Like Home $10/day × 7', flagCode: 'ca' },
+      { id: 'three', labelKey: 'roaming.carrier.threeUK', labelDefault: 'Three (UK)', price: 42, noteKey: 'roaming.note.goRoam', noteDefault: 'Go Roam $6/day × 7', flagCode: 'gb' },
+      { id: 'telekom', labelKey: 'roaming.carrier.telekomDE', labelDefault: 'Telekom (DE)', price: 16, noteKey: 'roaming.note.travelMobil', noteDefault: 'Travel Mobil Basic 5GB', flagCode: 'de' },
+      { id: 'simnetiq', labelKey: 'roaming.carrier.simnetiq', labelDefault: 'Simnetiq eSIM', price: 10, noteKey: 'roaming.note.esim5gb', noteDefault: '5GB plan' },
     ],
   },
   {
@@ -38,10 +40,11 @@ const DESTINATIONS = [
     labelDefault: 'Thailand',
     flag: 'th',
     carriers: [
-      { id: 'att', labelKey: 'roaming.carrier.att', labelDefault: 'AT&T / Verizon (US)', price: 84, noteKey: 'roaming.note.dayPass', noteDefault: 'Day Pass $12/day × 7' },
-      { id: 'vodafone', labelKey: 'roaming.carrier.vodafoneDE', labelDefault: 'Vodafone (Germany)', price: 38, noteKey: 'roaming.note.reisePaket', noteDefault: 'ReisePaket World 4GB/week' },
-      { id: 'telekom', labelKey: 'roaming.carrier.telekomDE', labelDefault: 'Telekom (Germany)', price: 33, noteKey: 'roaming.note.travelMobilWorld', noteDefault: 'Travel Mobil World 5GB' },
-      { id: 'simnetiq', labelKey: 'roaming.carrier.simnetiq', labelDefault: 'Simnetiq eSIM', price: 4.5, noteKey: 'roaming.note.esim5gb', noteDefault: '5GB plan' },
+      { id: 'att', labelKey: 'roaming.carrier.att', labelDefault: 'AT&T (US)', price: 84, noteKey: 'roaming.note.dayPass', noteDefault: 'Day Pass $12/day × 7', flagCode: 'us' },
+      { id: 'rogers', labelKey: 'roaming.carrier.rogersCA', labelDefault: 'Rogers (Canada)', price: 70, noteKey: 'roaming.note.roamLikeHome', noteDefault: 'Roam Like Home $10/day × 7', flagCode: 'ca' },
+      { id: 'three', labelKey: 'roaming.carrier.threeUK', labelDefault: 'Three (UK)', price: 56, noteKey: 'roaming.note.goRoamWorld', noteDefault: 'Go Roam World $8/day × 7', flagCode: 'gb' },
+      { id: 'telekom', labelKey: 'roaming.carrier.telekomDE', labelDefault: 'Telekom (DE)', price: 33, noteKey: 'roaming.note.travelMobilWorld', noteDefault: 'Travel Mobil World 5GB', flagCode: 'de' },
+      { id: 'simnetiq', labelKey: 'roaming.carrier.simnetiq', labelDefault: 'Simnetiq eSIM', price: 8, noteKey: 'roaming.note.esim5gb', noteDefault: '5GB plan' },
     ],
   },
   {
@@ -50,10 +53,11 @@ const DESTINATIONS = [
     labelDefault: 'Japan',
     flag: 'jp',
     carriers: [
-      { id: 'att', labelKey: 'roaming.carrier.att', labelDefault: 'AT&T / Verizon (US)', price: 84, noteKey: 'roaming.note.dayPass', noteDefault: 'Day Pass $12/day × 7' },
-      { id: 'vodafone', labelKey: 'roaming.carrier.vodafoneDE', labelDefault: 'Vodafone (Germany)', price: 38, noteKey: 'roaming.note.reisePaket', noteDefault: 'ReisePaket World 4GB/week' },
-      { id: 'telekom', labelKey: 'roaming.carrier.telekomDE', labelDefault: 'Telekom (Germany)', price: 33, noteKey: 'roaming.note.travelMobilWorld', noteDefault: 'Travel Mobil World 5GB' },
-      { id: 'simnetiq', labelKey: 'roaming.carrier.simnetiq', labelDefault: 'Simnetiq eSIM', price: 5.5, noteKey: 'roaming.note.esim5gb', noteDefault: '5GB plan' },
+      { id: 'att', labelKey: 'roaming.carrier.att', labelDefault: 'AT&T (US)', price: 84, noteKey: 'roaming.note.dayPass', noteDefault: 'Day Pass $12/day × 7', flagCode: 'us' },
+      { id: 'rogers', labelKey: 'roaming.carrier.rogersCA', labelDefault: 'Rogers (Canada)', price: 70, noteKey: 'roaming.note.roamLikeHome', noteDefault: 'Roam Like Home $10/day × 7', flagCode: 'ca' },
+      { id: 'three', labelKey: 'roaming.carrier.threeUK', labelDefault: 'Three (UK)', price: 56, noteKey: 'roaming.note.goRoamWorld', noteDefault: 'Go Roam World $8/day × 7', flagCode: 'gb' },
+      { id: 'telekom', labelKey: 'roaming.carrier.telekomDE', labelDefault: 'Telekom (DE)', price: 33, noteKey: 'roaming.note.travelMobilWorld', noteDefault: 'Travel Mobil World 5GB', flagCode: 'de' },
+      { id: 'simnetiq', labelKey: 'roaming.carrier.simnetiq', labelDefault: 'Simnetiq eSIM', price: 11, noteKey: 'roaming.note.esim5gb', noteDefault: '5GB plan' },
     ],
   },
   {
@@ -62,10 +66,11 @@ const DESTINATIONS = [
     labelDefault: 'Brazil',
     flag: 'br',
     carriers: [
-      { id: 'att', labelKey: 'roaming.carrier.att', labelDefault: 'AT&T / Verizon (US)', price: 84, noteKey: 'roaming.note.dayPass', noteDefault: 'Day Pass $12/day × 7' },
-      { id: 'vodafone', labelKey: 'roaming.carrier.vodafoneDE', labelDefault: 'Vodafone (Germany)', price: 38, noteKey: 'roaming.note.reisePaket', noteDefault: 'ReisePaket World 4GB/week' },
-      { id: 'telekom', labelKey: 'roaming.carrier.telekomDE', labelDefault: 'Telekom (Germany)', price: 33, noteKey: 'roaming.note.travelMobilWorld', noteDefault: 'Travel Mobil World 5GB' },
-      { id: 'simnetiq', labelKey: 'roaming.carrier.simnetiq', labelDefault: 'Simnetiq eSIM', price: 6, noteKey: 'roaming.note.esim5gb', noteDefault: '5GB plan' },
+      { id: 'att', labelKey: 'roaming.carrier.att', labelDefault: 'AT&T (US)', price: 84, noteKey: 'roaming.note.dayPass', noteDefault: 'Day Pass $12/day × 7', flagCode: 'us' },
+      { id: 'rogers', labelKey: 'roaming.carrier.rogersCA', labelDefault: 'Rogers (Canada)', price: 70, noteKey: 'roaming.note.roamLikeHome', noteDefault: 'Roam Like Home $10/day × 7', flagCode: 'ca' },
+      { id: 'three', labelKey: 'roaming.carrier.threeUK', labelDefault: 'Three (UK)', price: 56, noteKey: 'roaming.note.goRoamWorld', noteDefault: 'Go Roam World $8/day × 7', flagCode: 'gb' },
+      { id: 'telekom', labelKey: 'roaming.carrier.telekomDE', labelDefault: 'Telekom (DE)', price: 33, noteKey: 'roaming.note.travelMobilWorld', noteDefault: 'Travel Mobil World 5GB', flagCode: 'de' },
+      { id: 'simnetiq', labelKey: 'roaming.carrier.simnetiq', labelDefault: 'Simnetiq eSIM', price: 14, noteKey: 'roaming.note.esim5gb', noteDefault: '5GB plan' },
     ],
   },
   {
@@ -74,29 +79,57 @@ const DESTINATIONS = [
     labelDefault: 'Egypt',
     flag: 'eg',
     carriers: [
-      { id: 'att', labelKey: 'roaming.carrier.att', labelDefault: 'AT&T / Verizon (US)', price: 84, noteKey: 'roaming.note.dayPass', noteDefault: 'Day Pass $12/day × 7' },
-      { id: 'vodafone', labelKey: 'roaming.carrier.vodafoneDE', labelDefault: 'Vodafone (Germany)', price: 38, noteKey: 'roaming.note.reisePaket', noteDefault: 'ReisePaket World 4GB/week' },
-      { id: 'telekom', labelKey: 'roaming.carrier.telekomDE', labelDefault: 'Telekom (Germany)', price: 33, noteKey: 'roaming.note.travelMobilWorld', noteDefault: 'Travel Mobil World 5GB' },
+      { id: 'att', labelKey: 'roaming.carrier.att', labelDefault: 'AT&T (US)', price: 84, noteKey: 'roaming.note.dayPass', noteDefault: 'Day Pass $12/day × 7', flagCode: 'us' },
+      { id: 'rogers', labelKey: 'roaming.carrier.rogersCA', labelDefault: 'Rogers (Canada)', price: 70, noteKey: 'roaming.note.roamLikeHome', noteDefault: 'Roam Like Home $10/day × 7', flagCode: 'ca' },
+      { id: 'three', labelKey: 'roaming.carrier.threeUK', labelDefault: 'Three (UK)', price: 56, noteKey: 'roaming.note.goRoamWorld', noteDefault: 'Go Roam World $8/day × 7', flagCode: 'gb' },
+      { id: 'telekom', labelKey: 'roaming.carrier.telekomDE', labelDefault: 'Telekom (DE)', price: 33, noteKey: 'roaming.note.travelMobilWorld', noteDefault: 'Travel Mobil World 5GB', flagCode: 'de' },
       { id: 'simnetiq', labelKey: 'roaming.carrier.simnetiq', labelDefault: 'Simnetiq eSIM', price: 5, noteKey: 'roaming.note.esim5gb', noteDefault: '5GB plan' },
+    ],
+  },
+  {
+    id: 'usa',
+    labelKey: 'roaming.dest.usa',
+    labelDefault: 'USA',
+    flag: 'us',
+    carriers: [
+      { id: 'three', labelKey: 'roaming.carrier.threeUK', labelDefault: 'Three (UK)', price: 42, noteKey: 'roaming.note.goRoam', noteDefault: 'Go Roam $6/day × 7', flagCode: 'gb' },
+      { id: 'telekom', labelKey: 'roaming.carrier.telekomDE', labelDefault: 'Telekom (DE)', price: 16, noteKey: 'roaming.note.travelMobil', noteDefault: 'Travel Mobil Basic 5GB', flagCode: 'de' },
+      { id: 'rogers', labelKey: 'roaming.carrier.rogersCA', labelDefault: 'Rogers (Canada)', price: 70, noteKey: 'roaming.note.roamLikeHome', noteDefault: 'Roam Like Home $10/day × 7', flagCode: 'ca' },
+      { id: 'simnetiq', labelKey: 'roaming.carrier.simnetiq', labelDefault: 'Simnetiq eSIM', price: 11.5, noteKey: 'roaming.note.esim5gb', noteDefault: '5GB plan' },
+    ],
+  },
+  {
+    id: 'spain',
+    labelKey: 'roaming.dest.spain',
+    labelDefault: 'Spain',
+    flag: 'es',
+    carriers: [
+      { id: 'att', labelKey: 'roaming.carrier.att', labelDefault: 'AT&T (US)', price: 84, noteKey: 'roaming.note.dayPass', noteDefault: 'Day Pass $12/day × 7', flagCode: 'us' },
+      { id: 'three', labelKey: 'roaming.carrier.threeUK', labelDefault: 'Three (UK)', price: 0, noteKey: 'roaming.note.goRoamFree', noteDefault: 'Go Roam included (EU)', flagCode: 'gb' },
+      { id: 'rogers', labelKey: 'roaming.carrier.rogersCA', labelDefault: 'Rogers (Canada)', price: 70, noteKey: 'roaming.note.roamLikeHome', noteDefault: 'Roam Like Home $10/day × 7', flagCode: 'ca' },
+      { id: 'simnetiq', labelKey: 'roaming.carrier.simnetiq', labelDefault: 'Simnetiq eSIM', price: 10, noteKey: 'roaming.note.esim5gb', noteDefault: '5GB plan' },
     ],
   },
 ];
 
-function DestinationTab({ dest, isActive, onClick }) {
+function DestinationTab({ dest, isActive, onClick, t }) {
   return (
     <button
       onClick={onClick}
+      role="tab"
       className={`
-        flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-all duration-200 whitespace-nowrap
+        flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap
         ${isActive
           ? 'bg-tufts-blue text-white shadow-sm'
-          : 'text-text-muted hover:text-text-primary hover:bg-[var(--hover-bg)]'
+          : 'text-text-muted hover:text-text-primary'
         }
       `}
-      aria-pressed={isActive}
+      style={!isActive ? { backgroundColor: 'var(--hover-bg)' } : undefined}
+      aria-selected={isActive}
+      tabIndex={isActive ? 0 : -1}
     >
       <img src={'/flags/' + dest.flag + '.svg'} alt="" className="w-5 h-5 rounded-full object-cover" />
-      {dest.labelDefault}
+      {t(dest.labelKey, dest.labelDefault)}
     </button>
   );
 }
@@ -109,6 +142,9 @@ function CarrierBar({ carrier, maxPrice, isVisible, index, t }) {
     <div className="mb-4 last:mb-0">
       <div className="flex justify-between items-baseline mb-1.5 gap-2 sm:gap-4 rtl-native-flex">
         <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 overflow-hidden">
+          {carrier.flagCode && (
+            <img src={`/flags/${carrier.flagCode}.svg`} alt="" className="w-4 h-4 rounded-full object-cover flex-shrink-0" />
+          )}
           <span className={`text-xs sm:text-sm font-medium truncate ${isSimnetiq ? 'text-tufts-blue font-semibold' : 'text-text-primary'}`}>
             {t(carrier.labelKey, carrier.labelDefault)}
           </span>
@@ -177,7 +213,7 @@ export default function RoamingComparison() {
       aria-labelledby="roaming-heading"
       ref={sectionRef}
     >
-      <div className="max-w-7xl mx-auto px-4 py-16 lg:py-24">
+      <div className="max-w-7xl mx-auto px-4 pt-16 lg:pt-24 pb-4 lg:pb-8">
 
         {/* Section header */}
         <div className="mb-10 text-start">
@@ -206,6 +242,7 @@ export default function RoamingComparison() {
                 dest={dest}
                 isActive={idx === activeDestIdx}
                 onClick={() => setActiveDestIdx(idx)}
+                t={t}
               />
             ))}
           </div>
@@ -240,7 +277,7 @@ export default function RoamingComparison() {
               {t('roaming.disclaimer', 'Carrier rates based on official published prices (Mar 2026). eSIM prices reflect typical market rates.')}
             </p>
             <p className="text-xs text-text-muted opacity-70">
-              {t('roaming.sources', 'telekom.de · att.com · vodafone.de · airalo.com')}
+              {t('roaming.sources', 'telekom.de · att.com · three.co.uk · rogers.com · airalo.com')}
             </p>
           </div>
         </div>

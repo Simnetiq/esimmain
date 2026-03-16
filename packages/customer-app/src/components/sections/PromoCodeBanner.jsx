@@ -54,7 +54,7 @@ export default function PromoCodeBanner({ promo }) {
 
   const headline = t(
     'promoBanner.headline',
-    'Save {discount}% on your first eSIM',
+    'Get {{discount}}% off your first eSIM plan',
     { discount: promo.discount_percent }
   );
 
@@ -95,14 +95,14 @@ export default function PromoCodeBanner({ promo }) {
           href={localizedPath('/esim-plans')}
           className="inline-flex items-center gap-2 bg-tufts-blue hover:bg-tufts-blue/90 text-white rounded-full px-6 py-3 font-semibold transition-all duration-150"
         >
-          {t('promoBanner.cta', 'Browse Plans')} →
+          {t('promoBanner.cta', 'Shop Plans Now')} →
         </Link>
 
         {/* Fine print */}
         <p className="text-text-muted text-xs max-w-md">
           {t(
             'promoBanner.finePrint',
-            'Limited time offer. One use per customer. Cannot be combined with other offers.'
+            'Valid for new customers. One use per account.'
           )}
         </p>
       </div>

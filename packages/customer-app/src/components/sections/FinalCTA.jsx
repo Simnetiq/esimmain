@@ -16,14 +16,14 @@ export default function FinalCTA({ promo }) {
         <div className="bg-gradient-to-r from-[#1a1a4e] via-tufts-blue to-[#4975D4] py-16 lg:py-24 px-8 flex flex-col items-center text-center gap-6">
           {/* Headline */}
           <h2 className="text-3xl lg:text-5xl font-bold text-white max-w-3xl leading-tight">
-            {t('finalCta.title', 'Stay connected, wherever you go')}
+            {t('finalCta.title', 'Ready to stay connected worldwide?')}
           </h2>
 
           {/* Subtitle */}
           <p className="text-lg text-white/80 max-w-xl">
             {t(
               'finalCta.subtitle',
-              'Instant eSIM activation for 200+ countries. No SIM cards, no roaming fees.'
+              'Get your eSIM in minutes. Works on any unlocked device.'
             )}
           </p>
 
@@ -48,7 +48,7 @@ export default function FinalCTA({ promo }) {
             <p className="text-white/60 text-sm">
               {t(
                 'finalCta.promoReminder',
-                'Use code {code} for {discount}% off your first eSIM',
+                'Use code {{code}} for {{discount}}% off',
                 { code: promo.code, discount: promo.discount_percent }
               )}
             </p>

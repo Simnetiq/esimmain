@@ -70,10 +70,10 @@ export default function ComparisonTable() {
               id="comparison-heading"
               className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary"
             >
-              {t('comparison.title', 'eSIM vs. Physical SIM')}
+              {t('comparison.title', 'eSIM vs Physical SIM')}
             </h2>
             <p className="text-text-muted mt-3 max-w-lg text-base">
-              {t('comparison.subtitle', 'See exactly why millions of travellers are switching to eSIM.')}
+              {t('comparison.subtitle', 'See why travelers are switching to eSIM')}
             </p>
           </Reveal>
         </div>

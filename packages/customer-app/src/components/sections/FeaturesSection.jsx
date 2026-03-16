@@ -36,8 +36,8 @@ export default function FeaturesSection() {
       Icon: ZapIcon,
       number: '01',
       tag: t('features.instantActivation.tag', 'INSTANT ACTIVATION'),
-      title: t('features.instantActivation.title', 'Ready in seconds'),
-      description: t('features.instantActivation.description', 'Get connected instantly with our digital eSIM. No waiting for delivery, no physical SIM cards needed.'),
+      title: t('features.instantActivation.title', 'Instant Activation'),
+      description: t('features.instantActivation.description', 'Get connected immediately with our QR code activation. No waiting, no delays. Perfect for travelers who need instant internet access upon arrival.'),
       image: '/images/instant.avif',
       priority: true,
     },
@@ -45,8 +45,8 @@ export default function FeaturesSection() {
       Icon: GlobeIcon,
       number: '02',
       tag: t('features.globalCoverage.tag', 'GLOBAL COVERAGE'),
-      title: t('features.globalCoverage.title', '200+ countries'),
-      description: t('features.globalCoverage.description', 'Stay connected anywhere in the world with our extensive network of partner carriers.'),
+      title: t('features.globalCoverage.title', 'Global Coverage'),
+      description: t('features.globalCoverage.description', 'Stay connected in 200+ countries with our extensive eSIM network coverage worldwide. Perfect for backpackers exploring multiple destinations and digital nomads working remotely.'),
       image: '/images/global.avif',
       priority: true,
     },
@@ -54,8 +54,8 @@ export default function FeaturesSection() {
       Icon: ShieldIcon,
       number: '03',
       tag: t('features.securePayment.tag', 'SECURE PAYMENT'),
-      title: t('features.securePayment.title', 'Protected transactions'),
-      description: t('features.securePayment.description', 'Your payment data is secured with industry-leading encryption and trusted payment providers.'),
+      title: t('features.securePayment.title', 'Secure Payment'),
+      description: t('features.securePayment.description', '256-bit SSL encryption and multiple payment options for your security. Trusted by thousands of travelers and digital nomads worldwide.'),
       image: '/images/secure.avif',
       priority: false,
     },
@@ -81,10 +81,10 @@ export default function FeaturesSection() {
           <div className="mx-auto w-full max-w-7xl lg:mt-20 mt-10">
             <div className="px-4 py-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
               <p className="text-sm sm:text-base font-medium tracking-widest uppercase text-text-muted mb-4 animate-fade-in-up text-start">
-                {t('features.title', 'Why Choose Us')}
+                {t('features.title', 'Connect globally')}
               </p>
               <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl tracking-tight font-semibold text-text-primary max-w-5xl animate-fade-in-up animation-delay-100 text-start">
-                {t('features.subtitle', 'Everything you need to stay connected abroad')}
+                {t('features.subtitle', 'Perfect eSIM solution for backpackers, travelers, and digital nomads worldwide')}
               </h2>
             </div>
           </div>

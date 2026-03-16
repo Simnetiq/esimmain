@@ -12,7 +12,7 @@ const REGIONS = [
   {
     key: 'europe',
     slug: 'europe',
-    nameKey: 'coverage.regionEurope',
+    nameKey: 'coverage.europe',
     nameFallback: 'Europe',
     flags: [
       { code: 'de', emoji: '🇩🇪' },
@@ -25,7 +25,7 @@ const REGIONS = [
   {
     key: 'asia',
     slug: 'asia',
-    nameKey: 'coverage.regionAsia',
+    nameKey: 'coverage.asia',
     nameFallback: 'Asia',
     flags: [
       { code: 'jp', emoji: '🇯🇵' },
@@ -38,7 +38,7 @@ const REGIONS = [
   {
     key: 'americas',
     slug: 'americas',
-    nameKey: 'coverage.regionAmericas',
+    nameKey: 'coverage.americas',
     nameFallback: 'Americas',
     flags: [
       { code: 'us', emoji: '🇺🇸' },
@@ -51,7 +51,7 @@ const REGIONS = [
   {
     key: 'africa',
     slug: 'africa',
-    nameKey: 'coverage.regionAfrica',
+    nameKey: 'coverage.africa',
     nameFallback: 'Africa',
     flags: [
       { code: 'za', emoji: '🇿🇦' },
@@ -64,7 +64,7 @@ const REGIONS = [
   {
     key: 'oceania',
     slug: 'oceania',
-    nameKey: 'coverage.regionOceania',
+    nameKey: 'coverage.oceania',
     nameFallback: 'Oceania',
     flags: [
       { code: 'au', emoji: '🇦🇺' },
@@ -77,7 +77,7 @@ const REGIONS = [
   {
     key: 'middle-east',
     slug: 'middle-east',
-    nameKey: 'coverage.regionMiddleEast',
+    nameKey: 'coverage.middleEast',
     nameFallback: 'Middle East',
     flags: [
       { code: 'ae', emoji: '🇦🇪' },
@@ -100,12 +100,12 @@ export default function CoverageStats() {
     {
       value: 200,
       suffix: '+',
-      label: t('coverage.countries', '200+ Countries'),
+      label: t('coverage.countries', 'Countries'),
     },
     {
       value: 400,
       suffix: '+',
-      label: t('coverage.dataPlans', '400+ Data Plans'),
+      label: t('coverage.dataPlans', 'Data Plans'),
     },
     {
       value: 18,
@@ -115,7 +115,7 @@ export default function CoverageStats() {
     {
       value: 2,
       suffix: ' min',
-      label: t('coverage.avgActivation', 'Avg. Activation'),
+      label: t('coverage.avgActivation', 'Avg Activation'),
     },
   ];
 

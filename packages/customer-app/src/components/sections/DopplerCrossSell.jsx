@@ -31,10 +31,10 @@ export default function DopplerCrossSell() {
   const { t } = useI18n();
 
   const features = [
-    t('dopplerCrossSell.feature1', 'WireGuard protocol — blazing fast'),
-    t('dopplerCrossSell.feature2', 'Strict no-logs policy'),
-    t('dopplerCrossSell.feature3', 'Up to 10 devices simultaneously'),
-    t('dopplerCrossSell.feature4', 'VLESS-Reality via Telegram bot'),
+    t('dopplerCrossSell.feature1', 'No-registration VPN — no email, no phone'),
+    t('dopplerCrossSell.feature2', 'VLESS-Reality anti-censorship encryption'),
+    t('dopplerCrossSell.feature3', 'Built-in ad blocker & private DNS'),
+    t('dopplerCrossSell.feature4', 'Strict no-logs policy by design'),
   ];
 
   return (

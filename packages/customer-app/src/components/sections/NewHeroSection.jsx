@@ -7,7 +7,14 @@ import { detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
 import { appStoreLinks } from '@esim/shared/utils/appStoreLinks';
 import { ExploreStoreCTA } from '../cta';
 import dynamic from 'next/dynamic';
-const HeroSearch = dynamic(() => import('../HeroSearch'), { ssr: false });
+// Skeleton placeholder — reserves exact height to prevent CLS when HeroSearch loads
+const HeroSearchSkeleton = () => (
+  <div className="w-full sm:max-w-md mb-8 h-[50px] rounded-full animate-pulse flex items-center gap-3 px-4" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
+    <div className="w-5 h-5 rounded-full" style={{ backgroundColor: 'var(--hover-bg)' }} />
+    <div className="h-3 rounded-full flex-1 max-w-[200px]" style={{ backgroundColor: 'var(--hover-bg)' }} />
+  </div>
+);
+const HeroSearch = dynamic(() => import('../HeroSearch'), { ssr: false, loading: () => <HeroSearchSkeleton /> });
 
 // Inline SVG icons — no lucide-react imports
 const TagIcon = ({ className }) => (
@@ -82,7 +89,7 @@ export default function NewHeroSection({ promo = null }) {
       {promo && (
         <div
           className="relative z-10 w-full animate-promo-pulse"
-          role="banner"
+          role="status"
           aria-label="Promotional offer"
         >
           <div
@@ -111,7 +118,7 @@ export default function NewHeroSection({ promo = null }) {
       {/* Main hero content */}
       <div className="relative z-10 flex-1 flex flex-col justify-center px-4 py-20 lg:py-28">
         <div className="w-full max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start lg:pt-8">
 
             {/* Left column: content */}
             <div className={`flex flex-col ${isRtl ? 'items-start text-start' : 'items-center lg:items-start text-center lg:text-start'}`}>
@@ -169,13 +176,12 @@ export default function NewHeroSection({ promo = null }) {
                   source="hero_primary_cta"
                   className="w-full sm:w-auto"
                 />
-                {/* iOS — hidden on Android */}
-                {platform !== 'android' && (
+                {/* iOS — hidden on Android via CSS to avoid layout shift */}
                 <a
                   href={appStoreLinks.ios}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:opacity-90 rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto shadow-sm"
+                  className={`inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:opacity-90 rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto shadow-sm ${platform === 'android' ? 'hidden' : ''}`}
                   style={{
                     backgroundColor: 'var(--cta-secondary-bg)',
                     color: 'var(--cta-secondary-text)',
@@ -192,14 +198,12 @@ export default function NewHeroSection({ promo = null }) {
                     </svg>
                   </span>
                 </a>
-                )}
-                {/* Android — hidden on iOS */}
-                {platform !== 'ios' && (
+                {/* Android — hidden on iOS via CSS to avoid layout shift */}
                 <a
                   href={appStoreLinks.android}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:opacity-90 rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto shadow-sm"
+                  className={`inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:opacity-90 rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto shadow-sm ${platform === 'ios' ? 'hidden' : ''}`}
                   style={{
                     backgroundColor: 'var(--cta-secondary-bg)',
                     color: 'var(--cta-secondary-text)',
@@ -216,7 +220,6 @@ export default function NewHeroSection({ promo = null }) {
                     </svg>
                   </span>
                 </a>
-                )}
               </div>
 
               {/* Trust badges — Doppler-style plain checkmark list */}

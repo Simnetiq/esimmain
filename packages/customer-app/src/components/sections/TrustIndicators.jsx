@@ -50,25 +50,25 @@ export default function TrustIndicators() {
     {
       Icon: ShieldIcon,
       title: t('trust.noRoamingFees', 'No Roaming Fees'),
-      description: t('trust.noRoamingFeesDesc', 'Say goodbye to bill shock. Pay a flat rate and use data freely at your destination.'),
+      description: t('trust.noRoamingFeesDesc', 'Save hundreds on international data charges'),
       delay: 0,
     },
     {
       Icon: QrCodeIcon,
       title: t('trust.qrActivation', 'QR Activation'),
-      description: t('trust.qrActivationDesc', 'Scan a QR code and your eSIM is live in under 2 minutes — no store visit required.'),
+      description: t('trust.qrActivationDesc', 'Scan, activate, connect — under 2 minutes'),
       delay: 100,
     },
     {
       Icon: GlobeIcon,
-      title: t('trust.languages', 'Multi-Language'),
-      description: t('trust.languagesDesc', 'Our platform supports 10+ languages so you can browse and buy in your native tongue.'),
+      title: t('trust.languages', '18 Languages'),
+      description: t('trust.languagesDesc', 'Support in your language, wherever you\'re from'),
       delay: 200,
     },
     {
       Icon: CheckCircleIcon,
-      title: t('trust.moneyBack', '7-Day Money Back'),
-      description: t('trust.moneyBackDesc', "Not happy? Get a full refund within 7 days if you haven't used your data."),
+      title: t('trust.moneyBack', 'Money-Back Guarantee'),
+      description: t('trust.moneyBackDesc', '7-day full refund on unused plans'),
       delay: 300,
     },
   ];
@@ -90,7 +90,7 @@ export default function TrustIndicators() {
               id="trust-indicators-heading"
               className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary max-w-lg"
             >
-              {t('trust.title', 'Built for travellers who need it to just work')}
+              {t('trust.title', 'Why Travelers Trust Simnetiq')}
             </h2>
           </Reveal>
         </div>

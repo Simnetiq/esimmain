@@ -68,8 +68,8 @@ const CountryCard = ({
   return (
     <div
       onClick={onClick}
-      className="group relative overflow-hidden transition-all duration-500 cursor-pointer"
-      style={{ backgroundColor: 'var(--card-bg)' }}
+      className="group relative overflow-hidden transition-all duration-200 cursor-pointer"
+      style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}
       title={fullName}
       data-country-name={fullName}
       data-country-code={countryCode}
@@ -107,39 +107,34 @@ const CountryCard = ({
             <h3 className="text-sm sm:text-base font-semibold text-text-primary truncate leading-tight">
               {displayName}
             </h3>
-            <p className="text-xs text-text-muted mt-0.5">
-              {planCount > 0
-                ? `${planCount} ${planCount === 1 ? t('plans.plan', 'plan') : t('plans.plans', 'plans')}`
-                : t('plans.noPlansAvailable', 'No plans')
-              }
-              {hasPlansWithVoice && (
-                <span className="hidden sm:inline text-teal-600 ms-1.5" title={t('plan.callsAvailable', 'Plans with calls available')}>
-                  <PhoneIcon className="w-3 h-3 inline" />
+            <div className="flex items-center gap-2 mt-0.5 rtl-native-flex">
+              <p className="text-xs text-text-muted">
+                {planCount > 0
+                  ? `${planCount} ${planCount === 1 ? t('plans.plan', 'plan') : t('plans.plans', 'plans')}`
+                  : t('plans.noPlansAvailable', 'No plans')
+                }
+                {hasPlansWithVoice && (
+                  <span className="hidden sm:inline text-teal-600 ms-1.5" title={t('plan.callsAvailable', 'Plans with calls available')}>
+                    <PhoneIcon className="w-3 h-3 inline" />
+                  </span>
+                )}
+                {hasPlansWithSms && (
+                  <span className="hidden sm:inline text-purple-600 ms-1" title={t('plan.smsAvailable', 'Plans with SMS available')}>
+                    <MessageIcon className="w-3 h-3 inline" />
+                  </span>
+                )}
+              </p>
+              {isPromoted && (
+                <span className="inline-flex items-center gap-1 text-emerald-700 text-[10px] font-bold px-1.5 py-0.5 flex-shrink-0" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)' }}>
+                  {t('plans.topChoice', 'Most Popular')}
                 </span>
               )}
-              {hasPlansWithSms && (
-                <span className="hidden sm:inline text-purple-600 ms-1" title={t('plan.smsAvailable', 'Plans with SMS available')}>
-                  <MessageIcon className="w-3 h-3 inline" />
-                </span>
-              )}
-            </p>
+            </div>
           </div>
         </div>
 
-        {/* Most Popular badge — below the flag row */}
-        {isPromoted && (
-          <div className="mt-2 text-start">
-            <span className="inline-flex items-center gap-1 text-emerald-700 text-[10px] font-bold px-1.5 py-0.5" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)' }}>
-              {t('plans.topChoice', 'Most Popular')}
-            </span>
-          </div>
-        )}
-
-        {/* Spacer when no badge to keep consistent card height */}
-        {!isPromoted && <div className="mt-2" />}
-
         {/* Price + arrow */}
-        <div className="flex items-center justify-between pt-3 rtl-native-flex" style={{ borderTop: '1px solid var(--subtle-border)' }}>
+        <div className="flex items-center justify-between pt-3 rtl-native-flex">
           {minPrice ? (
             <div className="flex items-baseline gap-1.5 rtl-native-flex">
               <span className="text-xs text-text-muted">{t('plans.from', 'From')}</span>

@@ -42,13 +42,13 @@ export default function SocialProof() {
           {Array.from({ length: 5 }).map((_, i) => (
             <StarIcon key={i} />
           ))}
-          <span className="text-2xl font-bold text-text-primary ms-2">4.5</span>
+          <span className="text-2xl font-bold text-text-primary ms-2">{t('socialProof.rating', '4.5')}</span>
         </div>
 
         {/* App Store label */}
         <div className="flex items-center justify-center gap-1.5 mb-6 rtl-native-flex">
           <AppleIcon />
-          <span className="text-text-muted text-sm">App Store</span>
+          <span className="text-text-muted text-sm">{t('socialProof.appStore', 'App Store')}</span>
         </div>
 
         {/* Tagline */}

@@ -20,7 +20,8 @@
     "androidApp": "Android App",
     "userMenu": "User menu",
     "user": "User",
-    "about": "About"
+    "about": "About",
+    "theme": "Theme"
   },
   "hero": {
     "headlinePart1": "The ",
@@ -32,7 +33,7 @@
     "securePayment": "Secure Checkout",
     "downloadAppIOS": "Download for iOS",
     "downloadAppAndroid": "Download for Android",
-    "exploreStore": " eSIM Store",
+    "exploreStore": "eSIM Store",
     "downloadApp": "Download App",
     "darkHeadlinePart1": "Stay connected",
     "darkHeadlineHighlight": "anywhere",
@@ -104,13 +105,28 @@
     "appDescription": "Get instant eSIM data plans for 200+ countries. No physical SIM needed, activate in minutes.",
     "appStore": "App Store",
     "googlePlay": "Google Play",
+    "sectionLabel": "Our Apps",
+    "sectionTitle": "Everything you need, in your pocket",
+    "platforms": "iOS & Android",
+    "appTagline": "Travel data, simplified",
+    "feature1": "Buy and activate eSIMs instantly",
+    "feature2": "Monitor data usage in real-time",
+    "feature3": "Top up with one tap",
+    "feature4": "Get QR codes instantly",
+    "appStoreRating": "on App Store",
     "doppler": {
       "badge": "By Simnetiq",
       "title": "Doppler VPN",
       "description": "Fast, no-logs VPN powered by WireGuard on mobile and advanced VLESS via Telegram bot. All major platforms, up to 10 devices.",
       "promo": "Launch offer: use code LAUNCH20 for 20% off",
       "appStore": "App Store",
-      "learnMore": "Learn More"
+      "learnMore": "Learn More",
+      "tagline": "By Simnetiq",
+      "platforms": "iOS & All platforms",
+      "feature1": "WireGuard protocol — blazing fast",
+      "feature2": "Strict no-logs policy",
+      "feature3": "Up to 10 devices simultaneously",
+      "feature4": "VLESS-Reality via Telegram bot"
     }
   },
   "footer": {
@@ -788,6 +804,7 @@
     "days": "Days"
   },
   "trust": {
+    "label": "Why Simnetiq",
     "title": "Why Travelers Trust Simnetiq",
     "noRoamingFees": "No Roaming Fees",
     "noRoamingFeesDesc": "Save hundreds on international data charges",
@@ -848,24 +865,29 @@
       "thailand": "Thailand",
       "japan": "Japan",
       "brazil": "Brazil",
-      "egypt": "Egypt"
+      "egypt": "Egypt",
+      "usa": "USA",
+      "spain": "Spain"
     },
     "carrier": {
-      "att": "AT&T / Verizon (US)",
-      "vodafoneDE": "Vodafone (Germany)",
-      "telekomDE": "Telekom (Germany)",
+      "att": "AT&T (US)",
+      "telekomDE": "Telekom (DE)",
+      "threeUK": "Three (UK)",
+      "rogersCA": "Rogers (Canada)",
       "simnetiq": "Simnetiq eSIM"
     },
     "note": {
       "dayPass": "Day Pass $12/day × 7",
-      "easyTravel": "EasyTravel €7.99/day",
-      "reisePaket": "ReisePaket World 4GB/week",
+      "goRoam": "Go Roam $6/day × 7",
+      "goRoamWorld": "Go Roam World $8/day × 7",
+      "goRoamFree": "Go Roam included (EU)",
+      "roamLikeHome": "Roam Like Home $10/day × 7",
       "travelMobil": "Travel Mobil Basic 5GB",
       "travelMobilWorld": "Travel Mobil World 5GB",
       "esim5gb": "5GB plan"
     },
     "disclaimer": "Carrier rates based on official published prices (Mar 2026). eSIM prices reflect typical market rates.",
-    "sources": "telekom.de · att.com · vodafone.de · airalo.com"
+    "sources": "telekom.de · att.com · three.co.uk · rogers.com · airalo.com"
   },
   "featuresBento": {
     "label": "Everything included",
@@ -902,13 +924,20 @@
   "devices": {
     "title": "Device Compatibility",
     "notSure": "Not sure if your device supports eSIM?",
-    "checkFaq": "Check FAQ"
+    "checkFaq": "Not sure? Check FAQ",
+    "iphone": "iPhone",
+    "iphoneModels": "XS, XR, 11–16 series, SE 3rd gen",
+    "samsung": "Samsung",
+    "samsungModels": "Galaxy S20+, Z Fold/Flip, A54+",
+    "google": "Google",
+    "googleModels": "Pixel 3+, all newer models"
   },
   "promoBanner": {
     "headline": "Get {{discount}}% off your first eSIM plan",
     "cta": "Shop Plans Now",
     "finePrint": "Valid for new customers. One use per account.",
-    "copied": "Copied!"
+    "copied": "Copied!",
+    "copy": "Copy"
   },
   "appDownload": {
     "badge": "AVAILABLE ON IOS",
@@ -917,19 +946,37 @@
     "bullet1": "Buy and activate eSIMs",
     "bullet2": "Monitor data usage in real-time",
     "bullet3": "Top up with one tap",
-    "bullet4": "Get QR codes instantly"
+    "bullet4": "Get QR codes instantly",
+    "sectionLabel": "Made by us",
+    "sectionTitle": "Our apps, built for travellers",
+    "tagline": "Manage everything from your phone",
+    "rating": "on App Store",
+    "appStore": "App Store",
+    "googlePlay": "Google Play"
   },
   "dopplerCrossSell": {
     "badge": "By Simnetiq",
     "title": "Doppler VPN",
     "description": "No-logs VPN with WireGuard + VLESS. Up to 10 devices.",
-    "promo": "Use code LAUNCH20 for 20% off",
-    "cta": "Learn More"
+    "promo": "Launch offer: use code LAUNCH20 for 20% off",
+    "cta": "Learn More",
+    "feature1": "No-registration VPN — no email, no phone",
+    "feature2": "VLESS-Reality anti-censorship encryption",
+    "feature3": "Built-in ad blocker & private DNS",
+    "feature4": "Strict no-logs policy by design",
+    "platforms": "iOS, Android & all platforms",
+    "appStore": "App Store",
+    "googlePlay": "Google Play"
   },
   "socialProof": {
     "rating": "4.5",
     "appStore": "App Store",
     "tagline": "Trusted by travelers in 200+ countries"
+  },
+  "travelBlogs": {
+    "title": "Travel Tips & Guides",
+    "subtitle": "Latest travel insights for digital nomads",
+    "viewAll": "View all articles"
   },
   "finalCta": {
     "title": "Ready to stay connected worldwide?",

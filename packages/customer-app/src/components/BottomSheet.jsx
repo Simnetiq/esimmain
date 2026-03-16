@@ -1,16 +1,16 @@
 'use client';
 
-import React, { useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
 import { getLanguageDirection, detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
 import { usePathname } from 'next/navigation';
 
-const BottomSheet = ({ 
-  isOpen, 
-  onClose, 
-  children, 
+const BottomSheet = ({
+  isOpen,
+  onClose,
+  children,
   title = "Select Plan",
   maxHeight = "90vh",
   variant = "bottom" // "bottom" or "center"
@@ -19,6 +19,12 @@ const BottomSheet = ({
   const backdropRef = useRef(null);
   const { locale } = useI18n();
   const pathname = usePathname();
+
+  // Mount guard: prevent AnimatePresence from flashing during SSR->client hydration
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   
   // Get current language for RTL detection - Memoized
   const currentLanguage = useMemo(() => {
@@ -64,6 +70,9 @@ const BottomSheet = ({
       onClose();
     }
   }, [variant, onClose]);
+
+  // Don't render AnimatePresence until after client-side mount to prevent hydration flash
+  if (!mounted) return null;
 
   return (
     <AnimatePresence>
