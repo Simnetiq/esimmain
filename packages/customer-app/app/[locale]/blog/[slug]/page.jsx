@@ -3,7 +3,7 @@ import BlogPost from '../../../../src/components/BlogPost';
 import { BlogJsonLd } from '../../../../src/components/seo/BlogJsonLd';
 import blogServiceSupabase from '@esim/shared/services/blogServiceSupabase';
 
-const VALID_LOCALES = ['ar', 'de', 'es', 'fr', 'he', 'hi', 'ja', 'pl', 'pt', 'ru', 'uk', 'zh'];
+const VALID_LOCALES = ['ar', 'de', 'es', 'fr', 'he', 'hi', 'it', 'ja', 'ko', 'nl', 'pl', 'pt', 'ru', 'th', 'tr', 'uk', 'zh'];
 const ALL_LANGUAGES = ['en', ...VALID_LOCALES];
 
 const OG_LOCALES = {

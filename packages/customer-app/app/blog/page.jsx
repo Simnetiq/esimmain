@@ -5,7 +5,7 @@ import RTLWrapper from '../../src/components/RTLWrapper';
 
 export const dynamic = 'force-dynamic';
 
-const VALID_LOCALES = ['ar', 'de', 'es', 'fr', 'he', 'hi', 'ja', 'pl', 'pt', 'ru', 'uk', 'zh'];
+const VALID_LOCALES = ['ar', 'de', 'es', 'fr', 'he', 'hi', 'it', 'ja', 'ko', 'nl', 'pl', 'pt', 'ru', 'th', 'tr', 'uk', 'zh'];
 
 export const metadata = {
   title: 'eSIM Travel Blog — Tips & Guides | Simnetiq',
@@ -22,7 +22,7 @@ export const metadata = {
     languages: Object.fromEntries([
       ['x-default', '/blog'],
       ['en', '/blog'],
-      ...['ar', 'de', 'es', 'fr', 'he', 'hi', 'ja', 'pl', 'pt', 'ru', 'uk', 'zh'].map(l => [l, `/${l}/blog`]),
+      ...['ar', 'de', 'es', 'fr', 'he', 'hi', 'it', 'ja', 'ko', 'nl', 'pl', 'pt', 'ru', 'th', 'tr', 'uk', 'zh'].map(l => [l, `/${l}/blog`]),
     ]),
   },
 }

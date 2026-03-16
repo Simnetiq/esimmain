@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 import { revalidatePath } from 'next/cache';
 
-const SUPPORTED_LANGUAGES = ['es', 'fr', 'de', 'ar', 'he', 'hi', 'ja', 'pl', 'pt', 'ru', 'uk', 'zh'];
+const SUPPORTED_LANGUAGES = ['es', 'fr', 'de', 'ar', 'he', 'hi', 'it', 'ja', 'ko', 'nl', 'pl', 'pt', 'ru', 'th', 'tr', 'uk', 'zh'];
 
 const LANGUAGE_NAMES = {
   es: 'Spanish',

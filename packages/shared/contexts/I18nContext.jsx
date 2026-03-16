@@ -35,7 +35,7 @@ export const useI18n = () => {
 
 // Helper function to detect language from pathname
 const getLanguageFromPathname = (pathname) => {
-  const langCodes = ['he', 'ar', 'ru', 'de', 'fr', 'es', 'pt', 'ja', 'hi', 'zh', 'pl', 'uk'];
+  const langCodes = ['he', 'ar', 'ru', 'de', 'fr', 'es', 'pt', 'ja', 'hi', 'zh', 'pl', 'uk', 'it', 'ko', 'nl', 'th', 'tr'];
   for (const code of langCodes) {
     if (pathname.startsWith(`/${code}/`) || pathname === `/${code}`) return code;
   }

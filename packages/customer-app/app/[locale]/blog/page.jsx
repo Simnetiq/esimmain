@@ -3,7 +3,7 @@ import Blog from '../../../src/components/Blog';
 import Loading from '../../../src/components/Loading';
 import RTLWrapper from '../../../src/components/RTLWrapper';
 
-const VALID_LOCALES = ['ar', 'de', 'es', 'fr', 'he', 'hi', 'ja', 'pl', 'pt', 'ru', 'uk', 'zh'];
+const VALID_LOCALES = ['ar', 'de', 'es', 'fr', 'he', 'hi', 'it', 'ja', 'ko', 'nl', 'pl', 'pt', 'ru', 'th', 'tr', 'uk', 'zh'];
 
 const LOCALE_META = {
   ar: { title: 'المدونة - خطط eSIM', description: 'آخر الأخبار والنصائح حول تقنية eSIM وخطط البيانات العالمية.', ogLocale: 'ar_SA' },
@@ -18,6 +18,11 @@ const LOCALE_META = {
   zh: { title: '博客 - eSIM套餐', description: '关于eSIM技术、旅行连接和全球数据套餐的最新新闻、技巧和见解。', ogLocale: 'zh_CN' },
   pl: { title: 'Blog - Plany eSIM', description: 'Najnowsze wiadomości, porady i informacje o technologii eSIM i globalnych planach danych.', ogLocale: 'pl_PL' },
   uk: { title: 'Блог - Плани eSIM', description: 'Останні новини, поради та аналітика про технологію eSIM та глобальні тарифи.', ogLocale: 'uk_UA' },
+  it: { title: 'Blog - Piani eSIM', description: 'Ultime notizie, consigli e approfondimenti sulla tecnologia eSIM e piani dati globali.', ogLocale: 'it_IT' },
+  ko: { title: '블로그 - eSIM 플랜', description: 'eSIM 기술과 글로벌 데이터 플랜에 대한 최신 뉴스, 팁 및 정보.', ogLocale: 'ko_KR' },
+  nl: { title: 'Blog - eSIM-plannen', description: 'Laatste nieuws, tips en inzichten over eSIM-technologie en wereldwijde dataplannen.', ogLocale: 'nl_NL' },
+  th: { title: 'บล็อก - แผน eSIM', description: 'ข่าวล่าสุด เคล็ดลับ และข้อมูลเชิงลึกเกี่ยวกับเทคโนโลยี eSIM และแผนข้อมูลทั่วโลก', ogLocale: 'th_TH' },
+  tr: { title: 'Blog - eSIM Planları', description: 'eSIM teknolojisi ve küresel veri planları hakkında en son haberler, ipuçları ve bilgiler.', ogLocale: 'tr_TR' },
 };
 
 export async function generateStaticParams() {
