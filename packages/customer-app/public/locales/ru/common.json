@@ -20,7 +20,8 @@
     "androidApp": "Android приложение",
     "userMenu": "Меню пользователя",
     "user": "Пользователь",
-    "about": "О нас"
+    "about": "О нас",
+    "theme": "Тема"
   },
   "hero": {
     "headlinePart1": "Интернет за границей —",
@@ -45,7 +46,11 @@
     "searchPlaceholder": "Куда вы путешествуете?",
     "popularDestinations": "Популярные направления",
     "noResults": "Направления не найдены",
-    "popular": "Популярные"
+    "popular": "Популярные",
+    "appStore": "App Store",
+    "explorePlans": "Смотреть тарифы",
+    "googlePlay": "Google Play",
+    "tagline": "Глобальная платформа eSIM"
   },
   "QRCodeModal": {},
   "features": {
@@ -86,8 +91,23 @@
       "description": "Быстрый VPN без логов на базе WireGuard для мобильных и продвинутого VLESS через Telegram-бот. Все основные платформы, до 10 устройств.",
       "promo": "Акция запуска: код 20 — скидка 20%",
       "appStore": "Скачать в App Store",
-      "learnMore": "Подробнее"
-    }
+      "learnMore": "Подробнее",
+      "feature1": "Протокол WireGuard — молниеносная скорость",
+      "feature2": "Строгая политика без логов",
+      "feature3": "До 10 устройств одновременно",
+      "feature4": "VLESS-Reality через Telegram-бот",
+      "platforms": "iOS и все платформы",
+      "tagline": "От Simnetiq"
+    },
+    "appStoreRating": "в App Store",
+    "appTagline": "Мобильные данные для путешествий — просто",
+    "feature1": "Покупайте и активируйте eSIM мгновенно",
+    "feature2": "Отслеживайте расход данных в реальном времени",
+    "feature3": "Пополняйте одним нажатием",
+    "feature4": "Получайте QR-коды мгновенно",
+    "platforms": "iOS & Android",
+    "sectionLabel": "Наши приложения",
+    "sectionTitle": "Всё, что нужно, в вашем кармане"
   },
   "footer": {
     "brandName": "Simnetiq",
@@ -800,13 +820,17 @@
       "thailand": "Таиланд",
       "japan": "Япония",
       "brazil": "Бразилия",
-      "egypt": "Египет"
+      "egypt": "Египет",
+      "spain": "Испания",
+      "usa": "США"
     },
     "carrier": {
       "att": "AT&T / Verizon (США)",
       "vodafoneDE": "Vodafone (Германия)",
       "telekomDE": "Telekom (Германия)",
-      "simnetiq": "Simnetiq eSIM"
+      "simnetiq": "Simnetiq eSIM",
+      "rogersCA": "Rogers (Канада)",
+      "threeUK": "Three (Великобритания)"
     },
     "note": {
       "dayPass": "Day Pass $12/день × 7",
@@ -814,7 +838,11 @@
       "reisePaket": "ReisePaket World 4 ГБ/неделя",
       "travelMobil": "Travel Mobil Basic 5 ГБ",
       "travelMobilWorld": "Travel Mobil World 5 ГБ",
-      "esim5gb": "Пакет 5 ГБ"
+      "esim5gb": "Пакет 5 ГБ",
+      "goRoam": "Go Roam $6/день × 7",
+      "goRoamFree": "Go Roam включён (ЕС)",
+      "goRoamWorld": "Go Roam World $8/день × 7",
+      "roamLikeHome": "Roam Like Home $10/день × 7"
     },
     "saveUpTo": "Максимальная экономия vs. роуминг оператора",
     "fromPriceValue": "$5",
@@ -849,7 +877,8 @@
     "languages": "18 языков",
     "languagesDesc": "Поддержка на вашем языке, откуда бы вы ни были",
     "moneyBack": "Гарантия возврата",
-    "moneyBackDesc": "Полный возврат за 7 дней для неиспользованных тарифов"
+    "moneyBackDesc": "Полный возврат за 7 дней для неиспользованных тарифов",
+    "label": "Почему Simnetiq"
   },
   "howItWorks": {
     "title": "Как это работает",
@@ -859,7 +888,9 @@
     "step2Title": "Отсканируйте QR-код",
     "step2Desc": "Получите QR-код мгновенно и отсканируйте телефоном",
     "step3Title": "Вы подключены",
-    "step3Desc": "Интернет активируется автоматически по прибытии. Вот и всё."
+    "step3Desc": "Интернет активируется автоматически по прибытии. Вот и всё.",
+    "label": "Три простых шага",
+    "stepLabel": "Шаг"
   },
   "comparison": {
     "label": "Умный выбор",
@@ -902,18 +933,28 @@
     "support": "Персональная поддержка",
     "supportDesc": "Живые люди по email и в приложении. Никаких чат-ботов.",
     "downloadTitle": "Скачайте приложение Simnetiq",
-    "downloadDesc": "Управляйте eSIM, пополняйте данные и оставайтесь на связи — всё с телефона."
+    "downloadDesc": "Управляйте eSIM, пополняйте данные и оставайтесь на связи — всё с телефона.",
+    "countriesLabel": "200+ стран",
+    "countriesSubLabel": "стран и регионов",
+    "label": "Всё включено"
   },
   "devices": {
     "title": "Совместимость устройств",
     "notSure": "Не уверены, поддерживает ли ваше устройство eSIM?",
-    "checkFaq": "Читать FAQ"
+    "checkFaq": "Читать FAQ",
+    "google": "Google",
+    "googleModels": "Pixel 3+, all newer models",
+    "iphone": "iPhone",
+    "iphoneModels": "XS, XR, 11–16 series, SE 3rd gen",
+    "samsung": "Samsung",
+    "samsungModels": "Galaxy S20+, Z Fold/Flip, A54+"
   },
   "promoBanner": {
     "headline": "Скидка {{discount}}% на ваш первый тариф eSIM",
     "cta": "Смотреть тарифы",
     "finePrint": "Только для новых клиентов. Одно использование на аккаунт.",
-    "copied": "Скопировано!"
+    "copied": "Скопировано!",
+    "copy": "Скопировать"
   },
   "appDownload": {
     "badge": "ДОСТУПНО НА IOS",
@@ -922,14 +963,27 @@
     "bullet1": "Покупайте и активируйте eSIM",
     "bullet2": "Отслеживайте расход данных в реальном времени",
     "bullet3": "Пополняйте одним нажатием",
-    "bullet4": "Получайте QR-коды мгновенно"
+    "bullet4": "Получайте QR-коды мгновенно",
+    "appStore": "App Store",
+    "googlePlay": "Google Play",
+    "rating": "в App Store",
+    "sectionLabel": "Наша разработка",
+    "sectionTitle": "Наши приложения, созданные для путешественников",
+    "tagline": "Управляйте всем с телефона"
   },
   "dopplerCrossSell": {
     "badge": "От Simnetiq",
     "title": "Doppler VPN",
     "description": "VPN без логов на базе WireGuard + VLESS. До 10 устройств.",
     "promo": "Код LAUNCH20 — скидка 20%",
-    "cta": "Подробнее"
+    "cta": "Подробнее",
+    "appStore": "App Store",
+    "feature1": "VPN без регистрации — без email, без номера телефона",
+    "feature2": "Шифрование VLESS-Reality против цензуры",
+    "feature3": "Встроенный блокировщик рекламы и приватный DNS",
+    "feature4": "Строгая политика без логов по умолчанию",
+    "googlePlay": "Google Play",
+    "platforms": "iOS, Android и все платформы"
   },
   "socialProof": {
     "rating": "4.5",
@@ -984,5 +1038,10 @@
     "uk": "Соединённое Королевство",
     "usa": "Соединённые Штаты",
     "vietnam": "Вьетнам"
+  },
+  "travelBlogs": {
+    "subtitle": "Последние идеи для путешествий для цифровых кочевников",
+    "title": "Советы и путеводители",
+    "viewAll": "Все статьи"
   }
 }

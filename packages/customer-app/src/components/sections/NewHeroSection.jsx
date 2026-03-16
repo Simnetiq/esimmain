@@ -109,15 +109,17 @@ export default function NewHeroSection({ promo = null }) {
         const scrolled = -rect.top;
         const progress = Math.max(0, Math.min(1, scrolled / sectionHeight));
 
+        // Clamp at 45% scroll so phones stop just slightly past the image edge
+        const clamped = Math.min(progress, 0.45);
+
         if (lightPhoneRef.current) {
-          const drift = progress * sectionHeight * 0.15;
-          const scale = 1 + progress * 0.1;
-          lightPhoneRef.current.style.transform = `translateY(${drift}px) scale(${scale}) rotate(4deg)`;
+          const drift = clamped * sectionHeight * 0.06;
+          lightPhoneRef.current.style.transform = `translateY(${drift}px)`;
         }
         if (darkPhoneRef.current) {
-          const drift = progress * sectionHeight * 0.08;
-          const scale = 1 - progress * 0.08;
-          darkPhoneRef.current.style.transform = `translateY(${drift}px) scale(${scale}) rotate(-6deg)`;
+          const drift = clamped * sectionHeight * 0.1;
+          const scale = 1 + clamped * 0.08;
+          darkPhoneRef.current.style.transform = `translateY(${drift}px) scale(${scale})`;
         }
       });
     };
@@ -189,9 +191,9 @@ export default function NewHeroSection({ promo = null }) {
       )}
 
       {/* Main hero content */}
-      <div className="relative z-10 flex-1 flex flex-col justify-center px-4 py-20 lg:py-28">
+      <div className="relative z-10 flex-1 flex flex-col justify-center px-4 py-16 lg:py-0">
         <div className="w-full max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start lg:pt-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
             {/* Left column: content */}
             <div className={`flex flex-col ${isRtl ? 'items-start text-start' : 'items-center text-center lg:items-start lg:text-start'}`}>
@@ -269,16 +271,17 @@ export default function NewHeroSection({ promo = null }) {
                   source="hero_primary_cta"
                   className="w-full sm:w-auto"
                 />
-                {/* iOS — hidden on Android via CSS to avoid layout shift */}
+                {/* iOS — hidden on Android after mount via style to avoid hydration mismatch */}
                 <a
                   href={appStoreLinks.ios}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:opacity-90 rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto shadow-sm ${mounted && platform === 'android' ? 'hidden' : ''}`}
+                  className="inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:opacity-90 rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto shadow-sm"
                   style={{
                     backgroundColor: 'var(--cta-secondary-bg)',
                     color: 'var(--cta-secondary-text)',
                     border: '1px solid var(--cta-secondary-border)',
+                    display: mounted && platform === 'android' ? 'none' : undefined,
                   }}
                 >
                   <span className="flex-1 text-center">{t('hero.appStore', 'App Store')}</span>
@@ -291,16 +294,17 @@ export default function NewHeroSection({ promo = null }) {
                     </svg>
                   </span>
                 </a>
-                {/* Android — hidden on iOS via CSS to avoid layout shift */}
+                {/* Android — hidden on iOS after mount via style to avoid hydration mismatch */}
                 <a
                   href={appStoreLinks.android}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:opacity-90 rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto shadow-sm ${mounted && platform === 'ios' ? 'hidden' : ''}`}
+                  className="inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:opacity-90 rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto shadow-sm"
                   style={{
                     backgroundColor: 'var(--cta-secondary-bg)',
                     color: 'var(--cta-secondary-text)',
                     border: '1px solid var(--cta-secondary-border)',
+                    display: mounted && platform === 'ios' ? 'none' : undefined,
                   }}
                 >
                   <span className="flex-1 text-center">{t('hero.googlePlay', 'Google Play')}</span>
@@ -330,32 +334,30 @@ export default function NewHeroSection({ promo = null }) {
               </div>
             </div>
 
-            {/* Right column: multi-layered phone mockup */}
-            <div className="hidden lg:flex items-center justify-center relative" aria-hidden="true">
+            {/* Right column: background image + two phones with parallax */}
+            <div className="hidden lg:block relative" style={{ height: '600px' }} aria-hidden="true">
+              {/* Background travel image */}
+              <div className="relative w-full max-w-xl mx-auto h-full rounded-3xl overflow-hidden" style={{ border: '1px solid var(--card-border)' }}>
+                <img src="/images/hero-phuket.avif" alt="" className="w-full h-full object-cover" loading="eager" fetchPriority="low" />
+                <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(73,117,212,0.1) 0%, transparent 60%)' }} />
+              </div>
 
-              {/* Container — phones overflow this boundary for 3D depth */}
-              <div className="relative w-full max-w-xl mx-auto" style={{ height: '620px' }}>
+              {/* Light phone — behind, on the left */}
+              <div
+                ref={lightPhoneRef}
+                className="absolute will-change-transform drop-shadow-2xl"
+                style={{ zIndex: 1, bottom: '30px', left: '50%', marginLeft: '-200px', width: '240px' }}
+              >
+                <img src="/images/phone-light.png" alt="" className="w-full h-auto" loading="eager" fetchPriority="low" />
+              </div>
 
-                {/* Stacked travel photos — layered, bigger */}
-                <div className="absolute rounded-2xl overflow-hidden border border-white/[0.06] hero-photo hero-photo-1" style={{ width: '80%', height: '65%', left: '0%', top: '5%', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
-                  <img src="/images/hero-phuket.avif" alt="" className="w-full h-full object-cover" loading="eager" fetchPriority="low" />
-                </div>
-                <div className="absolute rounded-2xl overflow-hidden border border-white/[0.06] hero-photo hero-photo-2" style={{ width: '80%', height: '65%', right: '0%', top: '12%', boxShadow: '0 12px 40px rgba(0,0,0,0.25)' }}>
-                  <img src="/images/hero-phones.avif" alt="" className="w-full h-full object-cover" loading="eager" fetchPriority="low" />
-                </div>
-                <div className="absolute rounded-2xl overflow-hidden border border-white/[0.06] hero-photo hero-photo-3" style={{ width: '75%', height: '60%', right: '-5%', top: '20%', boxShadow: '0 16px 48px rgba(0,0,0,0.3)' }}>
-                  <img src="/images/hero-paris.avif" alt="" className="w-full h-full object-cover" loading="eager" fetchPriority="low" />
-                </div>
-
-                {/* Dark phone — behind, tilted left */}
-                <div ref={darkPhoneRef} className="absolute z-10 drop-shadow-2xl will-change-transform hero-phone hero-phone-1" style={{ width: '260px', left: '14%', bottom: '0' }}>
-                  <img src="/images/phone-dark.png" alt="" className="w-full h-auto" loading="eager" fetchPriority="low" />
-                </div>
-
-                {/* Light phone — in front, slightly right */}
-                <div ref={lightPhoneRef} className="absolute z-20 drop-shadow-2xl will-change-transform hero-phone hero-phone-2" style={{ width: '270px', right: '10%', bottom: '-8px' }}>
-                  <img src="/images/phone-light.png" alt="" className="w-full h-auto" loading="eager" fetchPriority="low" />
-                </div>
+              {/* Dark phone — in front, on the right, overlapping the light phone */}
+              <div
+                ref={darkPhoneRef}
+                className="absolute will-change-transform drop-shadow-2xl"
+                style={{ zIndex: 2, bottom: '50px', left: '50%', marginLeft: '-60px', width: '260px' }}
+              >
+                <img src="/images/phone-dark.png" alt="" className="w-full h-auto" loading="eager" fetchPriority="low" />
               </div>
             </div>
 

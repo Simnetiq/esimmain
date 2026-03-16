@@ -20,7 +20,8 @@
     "androidApp": "Android App",
     "userMenu": "Benutzermenü",
     "user": "Benutzer",
-    "about": "Über uns"
+    "about": "Über uns",
+    "theme": "Design"
   },
   "hero": {
     "headlinePart1": "Mobiles Internet im Ausland —",
@@ -45,7 +46,11 @@
     "searchPlaceholder": "Wohin reisen Sie?",
     "popularDestinations": "Beliebte Reiseziele",
     "noResults": "Keine Reiseziele gefunden",
-    "popular": "Beliebt"
+    "popular": "Beliebt",
+    "appStore": "App Store",
+    "explorePlans": "Tarife entdecken",
+    "googlePlay": "Google Play",
+    "tagline": "Globale eSIM-Plattform"
   },
   "coverage": {
     "exploreCTA": "Jetzt {{region}} entdecken",
@@ -99,8 +104,23 @@
       "description": "Schnelles VPN ohne Protokollierung, basierend auf WireGuard für Mobilgeräte und erweitertem VLESS über Telegram-Bot. Alle gängigen Plattformen, bis zu 10 Geräte.",
       "promo": "Startangebot: Code 20 für 20% Rabatt",
       "appStore": "Im App Store laden",
-      "learnMore": "Mehr erfahren"
-    }
+      "learnMore": "Mehr erfahren",
+      "feature1": "WireGuard-Protokoll — blitzschnell",
+      "feature2": "Strikte No-Logs-Richtlinie",
+      "feature3": "Bis zu 10 Geräte gleichzeitig",
+      "feature4": "VLESS-Reality via Telegram-Bot",
+      "platforms": "iOS & alle Plattformen",
+      "tagline": "Von Simnetiq"
+    },
+    "appStoreRating": "im App Store",
+    "appTagline": "Reisedaten, vereinfacht",
+    "feature1": "eSIMs sofort kaufen und aktivieren",
+    "feature2": "Datenverbrauch in Echtzeit überwachen",
+    "feature3": "Mit einem Tipp aufladen",
+    "feature4": "QR-Codes sofort erhalten",
+    "platforms": "iOS & Android",
+    "sectionLabel": "Unsere Apps",
+    "sectionTitle": "Alles was Sie brauchen, in Ihrer Tasche"
   },
   "footer": {
     "blog": "Blog",
@@ -815,13 +835,17 @@
       "thailand": "Thailand",
       "japan": "Japan",
       "brazil": "Brasilien",
-      "egypt": "Ägypten"
+      "egypt": "Ägypten",
+      "spain": "Spanien",
+      "usa": "USA"
     },
     "carrier": {
       "att": "AT&T / Verizon (USA)",
       "vodafoneDE": "Vodafone (Deutschland)",
       "telekomDE": "Telekom (Deutschland)",
-      "simnetiq": "Simnetiq eSIM"
+      "simnetiq": "Simnetiq eSIM",
+      "rogersCA": "Rogers (Kanada)",
+      "threeUK": "Three (Großbritannien)"
     },
     "note": {
       "dayPass": "Day Pass $12/Tag × 7",
@@ -829,7 +853,11 @@
       "reisePaket": "ReisePaket World 4 GB/Woche",
       "travelMobil": "Travel Mobil Basic 5 GB",
       "travelMobilWorld": "Travel Mobil World 5 GB",
-      "esim5gb": "5-GB-Paket"
+      "esim5gb": "5-GB-Paket",
+      "goRoam": "Go Roam $6/Tag × 7",
+      "goRoamFree": "Go Roam inklusive (EU)",
+      "goRoamWorld": "Go Roam World $8/Tag × 7",
+      "roamLikeHome": "Roam Like Home $10/Tag × 7"
     },
     "saveUpTo": "Maximale Ersparnis gegenüber Carrier-Roaming",
     "fromPriceValue": "$5",
@@ -850,7 +878,8 @@
     "languages": "18 Sprachen",
     "languagesDesc": "Support in Ihrer Sprache, egal woher Sie kommen",
     "moneyBack": "Geld-zurück-Garantie",
-    "moneyBackDesc": "7 Tage volle Rückerstattung bei ungenutzten Tarifen"
+    "moneyBackDesc": "7 Tage volle Rückerstattung bei ungenutzten Tarifen",
+    "label": "Warum Simnetiq"
   },
   "howItWorks": {
     "title": "So funktioniert es",
@@ -860,7 +889,9 @@
     "step2Title": "QR-Code scannen",
     "step2Desc": "Erhalten Sie Ihren QR-Code sofort und scannen Sie ihn mit Ihrem Telefon",
     "step3Title": "Sie sind verbunden",
-    "step3Desc": "Die Daten werden automatisch aktiviert, sobald Sie ankommen. Das war's."
+    "step3Desc": "Die Daten werden automatisch aktiviert, sobald Sie ankommen. Das war's.",
+    "label": "Drei einfache Schritte",
+    "stepLabel": "Schritt"
   },
   "comparison": {
     "label": "Die kluge Wahl",
@@ -903,18 +934,28 @@
     "support": "Persönlicher Support",
     "supportDesc": "Echter menschlicher Support per E-Mail und in der App. Keine Chatbots.",
     "downloadTitle": "Hol dir die Simnetiq App",
-    "downloadDesc": "Verwalte deine eSIMs, lade Daten auf und bleib verbunden — alles von deinem Handy."
+    "downloadDesc": "Verwalte deine eSIMs, lade Daten auf und bleib verbunden — alles von deinem Handy.",
+    "countriesLabel": "200+ Länder",
+    "countriesSubLabel": "Länder & Regionen",
+    "label": "Alles inklusive"
   },
   "devices": {
     "title": "Gerätekompatibilität",
     "notSure": "Nicht sicher, ob Ihr Gerät eSIM unterstützt?",
-    "checkFaq": "FAQ prüfen"
+    "checkFaq": "FAQ prüfen",
+    "google": "Google",
+    "googleModels": "Pixel 3+, all newer models",
+    "iphone": "iPhone",
+    "iphoneModels": "XS, XR, 11–16 series, SE 3rd gen",
+    "samsung": "Samsung",
+    "samsungModels": "Galaxy S20+, Z Fold/Flip, A54+"
   },
   "promoBanner": {
     "headline": "{{discount}}% Rabatt auf Ihren ersten eSIM-Tarif",
     "cta": "Tarife ansehen",
     "finePrint": "Gilt für Neukunden. Einmalig pro Konto einlösbar.",
-    "copied": "Kopiert!"
+    "copied": "Kopiert!",
+    "copy": "Kopieren"
   },
   "appDownload": {
     "badge": "VERFÜGBAR FÜR IOS",
@@ -923,14 +964,27 @@
     "bullet1": "eSIMs kaufen und aktivieren",
     "bullet2": "Datenverbrauch in Echtzeit überwachen",
     "bullet3": "Mit einem Tipp aufladen",
-    "bullet4": "QR-Codes sofort erhalten"
+    "bullet4": "QR-Codes sofort erhalten",
+    "appStore": "App Store",
+    "googlePlay": "Google Play",
+    "rating": "im App Store",
+    "sectionLabel": "Von uns entwickelt",
+    "sectionTitle": "Unsere Apps, gebaut für Reisende",
+    "tagline": "Alles vom Handy aus verwalten"
   },
   "dopplerCrossSell": {
     "badge": "Von Simnetiq",
     "title": "Doppler VPN",
     "description": "No-Logs-VPN mit WireGuard + VLESS. Bis zu 10 Geräte.",
     "promo": "Code LAUNCH20 für 20% Rabatt nutzen",
-    "cta": "Mehr erfahren"
+    "cta": "Mehr erfahren",
+    "appStore": "App Store",
+    "feature1": "VPN ohne Registrierung — keine E-Mail, kein Telefon",
+    "feature2": "VLESS-Reality Anti-Zensur-Verschlüsselung",
+    "feature3": "Integrierter Werbeblocker & privates DNS",
+    "feature4": "Strikte No-Logs-Richtlinie by Design",
+    "googlePlay": "Google Play",
+    "platforms": "iOS, Android & alle Plattformen"
   },
   "socialProof": {
     "rating": "4.5",
@@ -985,5 +1039,10 @@
     "uk": "Vereinigtes Königreich",
     "usa": "Vereinigte Staaten",
     "vietnam": "Vietnam"
+  },
+  "travelBlogs": {
+    "subtitle": "Neueste Reise-Insights für digitale Nomaden",
+    "title": "Reisetipps & Reiseführer",
+    "viewAll": "Alle Artikel ansehen"
   }
 }

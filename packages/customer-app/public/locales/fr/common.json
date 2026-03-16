@@ -20,7 +20,8 @@
     "androidApp": "App Android",
     "userMenu": "Menu utilisateur",
     "user": "Utilisateur",
-    "about": "À propos"
+    "about": "À propos",
+    "theme": "Thème"
   },
   "hero": {
     "headlinePart1": "Internet à l'étranger —",
@@ -45,7 +46,11 @@
     "searchPlaceholder": "Où voyagez-vous ?",
     "popularDestinations": "Destinations populaires",
     "noResults": "Aucune destination trouvée",
-    "popular": "Populaire"
+    "popular": "Populaire",
+    "appStore": "App Store",
+    "explorePlans": "Explorer les forfaits",
+    "googlePlay": "Google Play",
+    "tagline": "Plateforme eSIM mondiale"
   },
   "coverage": {
     "exploreCTA": "Explorez {{region}} maintenant",
@@ -100,8 +105,23 @@
       "description": "VPN rapide et sans journaux propulsé par WireGuard sur mobile et VLESS avancé via bot Telegram. Toutes les plateformes, jusqu'à 10 appareils.",
       "promo": "Offre de lancement : code 20 pour 20% de réduction",
       "appStore": "Télécharger sur l'App Store",
-      "learnMore": "En savoir plus"
-    }
+      "learnMore": "En savoir plus",
+      "feature1": "Protocole WireGuard — ultra-rapide",
+      "feature2": "Politique stricte de non-conservation des logs",
+      "feature3": "Jusqu'à 10 appareils simultanément",
+      "feature4": "VLESS-Reality via bot Telegram",
+      "platforms": "iOS et toutes les plateformes",
+      "tagline": "Par Simnetiq"
+    },
+    "appStoreRating": "sur l'App Store",
+    "appTagline": "Données de voyage, simplifiées",
+    "feature1": "Achetez et activez des eSIM instantanément",
+    "feature2": "Surveillez votre consommation en temps réel",
+    "feature3": "Rechargez en un seul geste",
+    "feature4": "Obtenez vos QR codes instantanément",
+    "platforms": "iOS & Android",
+    "sectionLabel": "Nos applications",
+    "sectionTitle": "Tout ce qu'il vous faut, dans votre poche"
   },
   "footer": {
     "brandName": "Simnetiq",
@@ -814,13 +834,17 @@
       "thailand": "Thaïlande",
       "japan": "Japon",
       "brazil": "Brésil",
-      "egypt": "Égypte"
+      "egypt": "Égypte",
+      "spain": "Espagne",
+      "usa": "États-Unis"
     },
     "carrier": {
       "att": "AT&T / Verizon (États-Unis)",
       "vodafoneDE": "Vodafone (Allemagne)",
       "telekomDE": "Telekom (Allemagne)",
-      "simnetiq": "Simnetiq eSIM"
+      "simnetiq": "Simnetiq eSIM",
+      "rogersCA": "Rogers (Canada)",
+      "threeUK": "Three (Royaume-Uni)"
     },
     "note": {
       "dayPass": "Day Pass $12/jour × 7",
@@ -828,7 +852,11 @@
       "reisePaket": "ReisePaket World 4 Go/semaine",
       "travelMobil": "Travel Mobil Basic 5 Go",
       "travelMobilWorld": "Travel Mobil World 5 Go",
-      "esim5gb": "Forfait 5 Go"
+      "esim5gb": "Forfait 5 Go",
+      "goRoam": "Go Roam 6 $/jour × 7",
+      "goRoamFree": "Go Roam inclus (UE)",
+      "goRoamWorld": "Go Roam World 8 $/jour × 7",
+      "roamLikeHome": "Roam Like Home 10 $/jour × 7"
     },
     "saveUpTo": "Économies max vs. roaming opérateur",
     "fromPriceValue": "$5",
@@ -849,7 +877,8 @@
     "languages": "18 langues",
     "languagesDesc": "Un support dans votre langue, où que vous soyez",
     "moneyBack": "Satisfait ou remboursé",
-    "moneyBackDesc": "Remboursement intégral sous 7 jours pour les forfaits non utilisés"
+    "moneyBackDesc": "Remboursement intégral sous 7 jours pour les forfaits non utilisés",
+    "label": "Pourquoi Simnetiq"
   },
   "howItWorks": {
     "title": "Comment ça marche",
@@ -859,7 +888,9 @@
     "step2Title": "Scannez le QR code",
     "step2Desc": "Recevez votre QR code instantanément et scannez-le avec votre téléphone",
     "step3Title": "Vous êtes connecté",
-    "step3Desc": "Les données s'activent automatiquement à votre arrivée. C'est tout."
+    "step3Desc": "Les données s'activent automatiquement à votre arrivée. C'est tout.",
+    "label": "Trois étapes simples",
+    "stepLabel": "Étape"
   },
   "comparison": {
     "label": "Le choix malin",
@@ -902,18 +933,28 @@
     "support": "Support dédié",
     "supportDesc": "Un vrai support humain par e-mail et dans l'app. Pas de chatbots.",
     "downloadTitle": "Téléchargez l'app Simnetiq",
-    "downloadDesc": "Gérez vos eSIM, rechargez vos données et restez connecté — le tout depuis votre téléphone."
+    "downloadDesc": "Gérez vos eSIM, rechargez vos données et restez connecté — le tout depuis votre téléphone.",
+    "countriesLabel": "200+ pays",
+    "countriesSubLabel": "pays et régions",
+    "label": "Tout est inclus"
   },
   "devices": {
     "title": "Compatibilité des appareils",
     "notSure": "Vous ne savez pas si votre appareil prend en charge l'eSIM ?",
-    "checkFaq": "Consultez la FAQ"
+    "checkFaq": "Consultez la FAQ",
+    "google": "Google",
+    "googleModels": "Pixel 3+, all newer models",
+    "iphone": "iPhone",
+    "iphoneModels": "XS, XR, 11–16 series, SE 3rd gen",
+    "samsung": "Samsung",
+    "samsungModels": "Galaxy S20+, Z Fold/Flip, A54+"
   },
   "promoBanner": {
     "headline": "{{discount}}% de réduction sur votre premier forfait eSIM",
     "cta": "Voir les forfaits",
     "finePrint": "Valable pour les nouveaux clients. Une utilisation par compte.",
-    "copied": "Copié !"
+    "copied": "Copié !",
+    "copy": "Copier"
   },
   "appDownload": {
     "badge": "DISPONIBLE SUR IOS",
@@ -922,14 +963,27 @@
     "bullet1": "Achetez et activez des eSIMs",
     "bullet2": "Suivez votre consommation en temps réel",
     "bullet3": "Rechargez en un clic",
-    "bullet4": "Recevez vos QR codes instantanément"
+    "bullet4": "Recevez vos QR codes instantanément",
+    "appStore": "App Store",
+    "googlePlay": "Google Play",
+    "rating": "sur l'App Store",
+    "sectionLabel": "Conçu par nous",
+    "sectionTitle": "Nos apps, conçues pour les voyageurs",
+    "tagline": "Gérez tout depuis votre téléphone"
   },
   "dopplerCrossSell": {
     "badge": "Par Simnetiq",
     "title": "Doppler VPN",
     "description": "VPN sans journaux avec WireGuard + VLESS. Jusqu'à 10 appareils.",
     "promo": "Code LAUNCH20 pour 20% de réduction",
-    "cta": "En savoir plus"
+    "cta": "En savoir plus",
+    "appStore": "App Store",
+    "feature1": "VPN sans inscription — ni email, ni téléphone",
+    "feature2": "Chiffrement VLESS-Reality anti-censure",
+    "feature3": "Bloqueur de pubs intégré et DNS privé",
+    "feature4": "Politique stricte de non-conservation des logs",
+    "googlePlay": "Google Play",
+    "platforms": "iOS, Android et toutes les plateformes"
   },
   "socialProof": {
     "rating": "4.5",
@@ -984,5 +1038,10 @@
     "uk": "Royaume-Uni",
     "usa": "États-Unis",
     "vietnam": "Vietnam"
+  },
+  "travelBlogs": {
+    "subtitle": "Les dernières tendances voyage pour les nomades numériques",
+    "title": "Conseils et Guides de Voyage",
+    "viewAll": "Voir tous les articles"
   }
 }

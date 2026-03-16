@@ -121,6 +121,16 @@ export default function CoverageStats() {
 
   return (
     <section className="max-w-7xl mx-auto px-4 py-16 lg:py-24">
+      {/* Section header */}
+      <Reveal className="mb-10 text-start">
+        <p className="text-xs font-semibold tracking-widest uppercase text-text-muted mb-3">
+          {t('coverage.label', 'Platform at a glance')}
+        </p>
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary max-w-xl">
+          {t('coverage.title', 'Global eSIM Coverage')}
+        </h2>
+      </Reveal>
+
       {/* Stats counters */}
       <Reveal className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
         {stats.map((stat, i) => (
@@ -142,8 +152,8 @@ export default function CoverageStats() {
             className="glass-card flex flex-col justify-between gap-3 hover:border-[var(--tufts-blue)] transition-colors duration-200"
           >
             <div>
-              <div className="flex items-center justify-between rtl-native-flex">
-                <p className="font-semibold text-text-primary text-start">
+              <div className="flex items-center justify-between gap-2 rtl-native-flex">
+                <p className="font-semibold text-text-primary text-start truncate min-w-0">
                   {t(region.nameKey, region.nameFallback)}
                 </p>
                 <span
@@ -155,9 +165,9 @@ export default function CoverageStats() {
                   </svg>
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 mt-3 rtl-native-flex">
+              <div className="flex items-center mt-3">
                 {region.flags.map((flag, fi) => (
-                  <div key={fi} className="flex-shrink-0">
+                  <div key={fi} className="flex-shrink-0 ring-2 ring-[var(--card-bg)] rounded-full" style={{ marginInlineStart: fi === 0 ? 0 : '-6px' }}>
                     <FlagImage code={flag.code} emoji={flag.emoji} className="w-6 h-6 rounded-full object-cover" />
                   </div>
                 ))}

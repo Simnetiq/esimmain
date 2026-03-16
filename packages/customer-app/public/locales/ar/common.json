@@ -20,7 +20,8 @@
     "androidApp": "تطبيق Android",
     "userMenu": "قائمة المستخدم",
     "user": "مستخدم",
-    "about": "حول"
+    "about": "حول",
+    "theme": "المظهر"
   },
   "hero": {
     "headlinePart1": "إنترنت في الخارج",
@@ -45,7 +46,11 @@
     "searchPlaceholder": "إلى أين تسافر؟",
     "popularDestinations": "وجهات شائعة",
     "noResults": "لم يتم العثور على وجهات",
-    "popular": "شائع"
+    "popular": "شائع",
+    "appStore": "App Store",
+    "explorePlans": "تصفّح الباقات",
+    "googlePlay": "Google Play",
+    "tagline": "منصة eSIM العالمية"
   },
   "features": {
     "title": "تواصل عالمياً",
@@ -85,8 +90,23 @@
       "description": "VPN سريع بدون سجلات يعمل بتقنية WireGuard على الهاتف و VLESS المتقدم عبر بوت Telegram. جميع المنصات الرئيسية، حتى 10 أجهزة.",
       "promo": "عرض الإطلاق: استخدم الرمز 20 للحصول على خصم 20%",
       "appStore": "تحميل من App Store",
-      "learnMore": "اعرف المزيد"
-    }
+      "learnMore": "اعرف المزيد",
+      "feature1": "بروتوكول WireGuard — سرعة فائقة",
+      "feature2": "سياسة صارمة لعدم تسجيل البيانات",
+      "feature3": "حتى 10 أجهزة في وقت واحد",
+      "feature4": "VLESS-Reality عبر بوت Telegram",
+      "platforms": "iOS وجميع المنصات",
+      "tagline": "من Simnetiq"
+    },
+    "appStoreRating": "على App Store",
+    "appTagline": "بيانات السفر، بكل بساطة",
+    "feature1": "شراء وتفعيل شرائح eSIM فوراً",
+    "feature2": "مراقبة استهلاك البيانات في الوقت الفعلي",
+    "feature3": "إعادة الشحن بنقرة واحدة",
+    "feature4": "احصل على رموز QR فوراً",
+    "platforms": "iOS & Android",
+    "sectionLabel": "تطبيقاتنا",
+    "sectionTitle": "كل ما تحتاجه في جيبك"
   },
   "footer": {
     "blog": "المدونة",
@@ -801,13 +821,17 @@
       "thailand": "تايلاند",
       "japan": "اليابان",
       "brazil": "البرازيل",
-      "egypt": "مصر"
+      "egypt": "مصر",
+      "spain": "إسبانيا",
+      "usa": "الولايات المتحدة"
     },
     "carrier": {
       "att": "AT&T / Verizon (الولايات المتحدة)",
       "vodafoneDE": "Vodafone (ألمانيا)",
       "telekomDE": "Telekom (ألمانيا)",
-      "simnetiq": "Simnetiq eSIM"
+      "simnetiq": "Simnetiq eSIM",
+      "rogersCA": "Rogers (كندا)",
+      "threeUK": "Three (المملكة المتحدة)"
     },
     "note": {
       "dayPass": "Day Pass بـ $12/يوم × 7",
@@ -815,7 +839,11 @@
       "reisePaket": "ReisePaket World 4 جيجابايت/أسبوع",
       "travelMobil": "Travel Mobil Basic 5 جيجابايت",
       "travelMobilWorld": "Travel Mobil World 5 جيجابايت",
-      "esim5gb": "باقة 5 جيجابايت"
+      "esim5gb": "باقة 5 جيجابايت",
+      "goRoam": "Go Roam $6/يوم × 7",
+      "goRoamFree": "Go Roam مشمول (الاتحاد الأوروبي)",
+      "goRoamWorld": "Go Roam World $8/يوم × 7",
+      "roamLikeHome": "Roam Like Home $10/يوم × 7"
     },
     "saveUpTo": "أقصى توفير مقارنة بتجوال المشغّل",
     "fromPriceValue": "$5",
@@ -850,7 +878,8 @@
     "languages": "18 لغة",
     "languagesDesc": "دعم بلغتك، أينما كنت",
     "moneyBack": "ضمان استرداد المال",
-    "moneyBackDesc": "استرداد كامل خلال 7 أيام للباقات غير المستخدمة"
+    "moneyBackDesc": "استرداد كامل خلال 7 أيام للباقات غير المستخدمة",
+    "label": "لماذا Simnetiq"
   },
   "howItWorks": {
     "title": "كيف يعمل",
@@ -860,7 +889,9 @@
     "step2Title": "امسح رمز QR",
     "step2Desc": "احصل على رمز QR فوراً وامسحه بهاتفك",
     "step3Title": "أنت متصل الآن",
-    "step3Desc": "تُفعّل البيانات تلقائياً عند وصولك. هذا كل شيء."
+    "step3Desc": "تُفعّل البيانات تلقائياً عند وصولك. هذا كل شيء.",
+    "label": "ثلاث خطوات بسيطة",
+    "stepLabel": "الخطوة"
   },
   "comparison": {
     "label": "الخيار الذكي",
@@ -903,18 +934,28 @@
     "support": "دعم متخصص",
     "supportDesc": "دعم بشري حقيقي عبر البريد الإلكتروني والتطبيق. بدون روبوتات.",
     "downloadTitle": "احصل على تطبيق Simnetiq",
-    "downloadDesc": "أدر شرائح eSIM الخاصة بك، واشحن البيانات، وابقَ متصلاً — كل ذلك من هاتفك."
+    "downloadDesc": "أدر شرائح eSIM الخاصة بك، واشحن البيانات، وابقَ متصلاً — كل ذلك من هاتفك.",
+    "countriesLabel": "200+ دولة",
+    "countriesSubLabel": "دولة ومنطقة",
+    "label": "كل شيء مشمول"
   },
   "devices": {
     "title": "توافق الأجهزة",
     "notSure": "غير متأكد إذا كان جهازك يدعم eSIM؟",
-    "checkFaq": "تحقق من الأسئلة الشائعة"
+    "checkFaq": "تحقق من الأسئلة الشائعة",
+    "google": "Google",
+    "googleModels": "Pixel 3+, all newer models",
+    "iphone": "iPhone",
+    "iphoneModels": "XS, XR, 11–16 series, SE 3rd gen",
+    "samsung": "Samsung",
+    "samsungModels": "Galaxy S20+, Z Fold/Flip, A54+"
   },
   "promoBanner": {
     "headline": "احصل على خصم {{discount}}% على أول باقة eSIM",
     "cta": "تسوّق الباقات الآن",
     "finePrint": "صالح للعملاء الجدد. استخدام واحد لكل حساب.",
-    "copied": "تم النسخ!"
+    "copied": "تم النسخ!",
+    "copy": "نسخ"
   },
   "appDownload": {
     "badge": "متوفر على iOS",
@@ -923,14 +964,27 @@
     "bullet1": "اشترِ وفعّل شرائح eSIM",
     "bullet2": "تابع استهلاك البيانات لحظياً",
     "bullet3": "أعد الشحن بلمسة واحدة",
-    "bullet4": "احصل على رموز QR فوراً"
+    "bullet4": "احصل على رموز QR فوراً",
+    "appStore": "App Store",
+    "googlePlay": "Google Play",
+    "rating": "على App Store",
+    "sectionLabel": "من صنعنا",
+    "sectionTitle": "تطبيقاتنا، مصممة للمسافرين",
+    "tagline": "أدِر كل شيء من هاتفك"
   },
   "dopplerCrossSell": {
     "badge": "من Simnetiq",
     "title": "Doppler VPN",
     "description": "VPN بدون سجلات مع WireGuard + VLESS. حتى 10 أجهزة.",
     "promo": "استخدم الرمز LAUNCH20 للحصول على خصم 20%",
-    "cta": "اعرف المزيد"
+    "cta": "اعرف المزيد",
+    "appStore": "App Store",
+    "feature1": "VPN بدون تسجيل — بدون بريد إلكتروني، بدون هاتف",
+    "feature2": "تشفير VLESS-Reality لمكافحة الرقابة",
+    "feature3": "مانع إعلانات مدمج و DNS خاص",
+    "feature4": "سياسة صارمة لعدم تسجيل البيانات بالتصميم",
+    "googlePlay": "Google Play",
+    "platforms": "iOS، Android وجميع المنصات"
   },
   "socialProof": {
     "rating": "4.5",
@@ -985,5 +1039,10 @@
     "uk": "المملكة المتحدة",
     "usa": "الولايات المتحدة",
     "vietnam": "فيتنام"
+  },
+  "travelBlogs": {
+    "subtitle": "أحدث رؤى السفر للرحالة الرقميين",
+    "title": "نصائح وأدلة السفر",
+    "viewAll": "عرض جميع المقالات"
   }
 }

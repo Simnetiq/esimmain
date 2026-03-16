@@ -20,7 +20,8 @@
     "androidApp": "Androidアプリ",
     "userMenu": "ユーザーメニュー",
     "user": "ユーザー",
-    "about": "Simnetiqについて"
+    "about": "Simnetiqについて",
+    "theme": "テーマ"
   },
   "hero": {
     "headlinePart1": "海外でのデータ通信が",
@@ -45,7 +46,11 @@
     "searchPlaceholder": "どこに旅行しますか？",
     "popularDestinations": "人気の旅行先",
     "noResults": "旅行先が見つかりません",
-    "popular": "人気"
+    "popular": "人気",
+    "appStore": "App Store",
+    "explorePlans": "プランを見る",
+    "googlePlay": "Google Play",
+    "tagline": "グローバルeSIMプラットフォーム"
   },
   "features": {
     "title": "世界中とつながる",
@@ -107,8 +112,23 @@
       "description": "モバイルではWireGuard、Telegramボットでは高度なVLESS技術を搭載した、高速・ログなしのVPN。すべての主要プラットフォーム対応、最大10デバイスまで。",
       "promo": "リリース記念: コード LAUNCH20 で20%オフ",
       "appStore": "App Store",
-      "learnMore": "詳しく見る"
-    }
+      "learnMore": "詳しく見る",
+      "feature1": "WireGuardプロトコル — 超高速",
+      "feature2": "厳格なノーログポリシー",
+      "feature3": "最大10デバイス同時接続",
+      "feature4": "TelegramボットによるVLESS-Reality",
+      "platforms": "iOS & 全プラットフォーム",
+      "tagline": "Simnetiq提供"
+    },
+    "appStoreRating": "App Storeで",
+    "appTagline": "旅行データを、もっとシンプルに",
+    "feature1": "eSIMを即座に購入・アクティベート",
+    "feature2": "データ使用量をリアルタイムで監視",
+    "feature3": "ワンタップでチャージ",
+    "feature4": "QRコードを即座に取得",
+    "platforms": "iOS & Android",
+    "sectionLabel": "当社のアプリ",
+    "sectionTitle": "必要なものすべてが、ポケットの中に"
   },
   "footer": {
     "brandName": "Simnetiq",
@@ -790,13 +810,17 @@
       "thailand": "タイ",
       "japan": "日本",
       "brazil": "ブラジル",
-      "egypt": "エジプト"
+      "egypt": "エジプト",
+      "spain": "スペイン",
+      "usa": "アメリカ"
     },
     "carrier": {
       "att": "AT&T / Verizon（米国）",
       "vodafoneDE": "Vodafone（ドイツ）",
       "telekomDE": "Telekom（ドイツ）",
-      "simnetiq": "Simnetiq eSIM"
+      "simnetiq": "Simnetiq eSIM",
+      "rogersCA": "Rogers（カナダ）",
+      "threeUK": "Three（イギリス）"
     },
     "note": {
       "dayPass": "Day Pass $12/日 × 7",
@@ -804,7 +828,11 @@
       "reisePaket": "ReisePaket World 4GB/週",
       "travelMobil": "Travel Mobil Basic 5GB",
       "travelMobilWorld": "Travel Mobil World 5GB",
-      "esim5gb": "5GBプラン"
+      "esim5gb": "5GBプラン",
+      "goRoam": "Go Roam $6/日 × 7",
+      "goRoamFree": "Go Roam含む（EU）",
+      "goRoamWorld": "Go Roam World $8/日 × 7",
+      "roamLikeHome": "Roam Like Home $10/日 × 7"
     },
     "saveUpTo": "キャリアローミングとの最大節約額",
     "fromPriceValue": "$5",
@@ -850,7 +878,8 @@
     "languages": "18言語対応",
     "languagesDesc": "どの国の方でも母国語でサポート",
     "moneyBack": "返金保証",
-    "moneyBackDesc": "未使用プランは7日間全額返金"
+    "moneyBackDesc": "未使用プランは7日間全額返金",
+    "label": "Simnetiqの強み"
   },
   "howItWorks": {
     "title": "ご利用の流れ",
@@ -860,7 +889,9 @@
     "step2Title": "QRコードをスキャン",
     "step2Desc": "QRコードを即座に受け取り、スマホでスキャン",
     "step3Title": "接続完了",
-    "step3Desc": "到着すると自動的にデータが使えます。それだけです。"
+    "step3Desc": "到着すると自動的にデータが使えます。それだけです。",
+    "label": "3つの簡単ステップ",
+    "stepLabel": "ステップ"
   },
   "comparison": {
     "label": "賢い選択",
@@ -903,18 +934,28 @@
     "support": "専任サポート",
     "supportDesc": "メールとアプリ内で実際のスタッフが対応。チャットボットではありません。",
     "downloadTitle": "Simnetiqアプリを入手",
-    "downloadDesc": "eSIMの管理、データチャージ、接続維持 — すべてスマホから。"
+    "downloadDesc": "eSIMの管理、データチャージ、接続維持 — すべてスマホから。",
+    "countriesLabel": "200+ヶ国",
+    "countriesSubLabel": "国と地域",
+    "label": "すべて込み"
   },
   "devices": {
     "title": "対応デバイス",
     "notSure": "お使いのデバイスがeSIMに対応しているか分からない？",
-    "checkFaq": "よくある質問を確認"
+    "checkFaq": "よくある質問を確認",
+    "google": "Google",
+    "googleModels": "Pixel 3+, all newer models",
+    "iphone": "iPhone",
+    "iphoneModels": "XS, XR, 11–16 series, SE 3rd gen",
+    "samsung": "Samsung",
+    "samsungModels": "Galaxy S20+, Z Fold/Flip, A54+"
   },
   "promoBanner": {
     "headline": "初回eSIMプランが{{discount}}%オフ",
     "cta": "プランを見る",
     "finePrint": "新規のお客様限定。1アカウントにつき1回のみ。",
-    "copied": "コピーしました！"
+    "copied": "コピーしました！",
+    "copy": "コピー"
   },
   "appDownload": {
     "badge": "iOSで配信中",
@@ -923,14 +964,27 @@
     "bullet1": "eSIMの購入とアクティベーション",
     "bullet2": "リアルタイムでデータ使用量を確認",
     "bullet3": "ワンタップでチャージ",
-    "bullet4": "QRコードを即座に取得"
+    "bullet4": "QRコードを即座に取得",
+    "appStore": "App Store",
+    "googlePlay": "Google Play",
+    "rating": "App Storeで",
+    "sectionLabel": "私たちが開発",
+    "sectionTitle": "旅行者のために作られた、私たちのアプリ",
+    "tagline": "スマホですべてを管理"
   },
   "dopplerCrossSell": {
     "badge": "Simnetiq提供",
     "title": "Doppler VPN",
     "description": "ログなしVPN。WireGuard + VLESS搭載。最大10デバイス対応。",
     "promo": "コード LAUNCH20 で20%オフ",
-    "cta": "詳しく見る"
+    "cta": "詳しく見る",
+    "appStore": "App Store",
+    "feature1": "登録不要のVPN — メールもスマホも不要",
+    "feature2": "VLESS-Reality検閲対策暗号化",
+    "feature3": "広告ブロッカー＆プライベートDNS内蔵",
+    "feature4": "設計段階からの厳格なノーログポリシー",
+    "googlePlay": "Google Play",
+    "platforms": "iOS、Android & 全プラットフォーム"
   },
   "socialProof": {
     "rating": "4.5",
@@ -985,5 +1039,10 @@
     "uk": "イギリス",
     "usa": "アメリカ合衆国",
     "vietnam": "ベトナム"
+  },
+  "travelBlogs": {
+    "subtitle": "デジタルノマドのための最新トラベルインサイト",
+    "title": "旅行のヒントとガイド",
+    "viewAll": "すべての記事を見る"
   }
 }

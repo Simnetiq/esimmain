@@ -20,7 +20,8 @@
     "androidApp": "אפליקציית Android",
     "userMenu": "תפריט משתמש",
     "user": "משתמש",
-    "about": "אודות"
+    "about": "אודות",
+    "theme": "ערכת נושא"
   },
   "hero": {
     "headlinePart1": "אינטרנט בחו״ל",
@@ -45,7 +46,11 @@
     "searchPlaceholder": "לאן אתה נוסע?",
     "popularDestinations": "יעדים פופולריים",
     "noResults": "לא נמצאו יעדים",
-    "popular": "פופולרי"
+    "popular": "פופולרי",
+    "appStore": "App Store",
+    "explorePlans": "לחבילות",
+    "googlePlay": "Google Play",
+    "tagline": "פלטפורמת eSIM עולמית"
   },
   "features": {
     "title": "התחבר גלובלית",
@@ -85,8 +90,23 @@
       "description": "VPN מהיר ללא תיעוד מבוסס WireGuard לנייד ו-VLESS מתקדם דרך בוט Telegram. כל הפלטפורמות המרכזיות, עד 10 מכשירים.",
       "promo": "מבצע השקה: קוד 20 להנחה של 20%",
       "appStore": "App Store",
-      "learnMore": "למידע נוסף"
-    }
+      "learnMore": "למידע נוסף",
+      "feature1": "פרוטוקול WireGuard — מהירות בזק",
+      "feature2": "מדיניות קפדנית של אי-שמירת לוגים",
+      "feature3": "עד 10 מכשירים בו-זמנית",
+      "feature4": "VLESS-Reality דרך בוט Telegram",
+      "platforms": "iOS וכל הפלטפורמות",
+      "tagline": "מבית Simnetiq"
+    },
+    "appStoreRating": "ב-App Store",
+    "appTagline": "נתוני נסיעות, בפשטות",
+    "feature1": "קנה והפעל eSIM באופן מיידי",
+    "feature2": "עקוב אחר צריכת הנתונים בזמן אמת",
+    "feature3": "טען מחדש בלחיצה אחת",
+    "feature4": "קבל קודי QR באופן מיידי",
+    "platforms": "iOS & Android",
+    "sectionLabel": "האפליקציות שלנו",
+    "sectionTitle": "הכל מה שאתה צריך, בכיס שלך"
   },
   "footer": {
     "blog": "בלוג",
@@ -800,13 +820,17 @@
       "thailand": "תאילנד",
       "japan": "יפן",
       "brazil": "ברזיל",
-      "egypt": "מצרים"
+      "egypt": "מצרים",
+      "spain": "ספרד",
+      "usa": "ארה״ב"
     },
     "carrier": {
       "att": "AT&T / Verizon (ארה\"ב)",
       "vodafoneDE": "Vodafone (גרמניה)",
       "telekomDE": "Telekom (גרמניה)",
-      "simnetiq": "Simnetiq eSIM"
+      "simnetiq": "Simnetiq eSIM",
+      "rogersCA": "Rogers (קנדה)",
+      "threeUK": "Three (בריטניה)"
     },
     "note": {
       "dayPass": "Day Pass $12/יום × 7",
@@ -814,7 +838,11 @@
       "reisePaket": "ReisePaket World 4GB/שבוע",
       "travelMobil": "Travel Mobil Basic 5GB",
       "travelMobilWorld": "Travel Mobil World 5GB",
-      "esim5gb": "חבילת 5GB"
+      "esim5gb": "חבילת 5GB",
+      "goRoam": "Go Roam $6/יום × 7",
+      "goRoamFree": "Go Roam כלול (EU)",
+      "goRoamWorld": "Go Roam World $8/יום × 7",
+      "roamLikeHome": "Roam Like Home $10/יום × 7"
     },
     "saveUpTo": "חיסכון מרבי לעומת נדידת מפעיל",
     "fromPriceValue": "$5",
@@ -849,7 +877,8 @@
     "languages": "18 שפות",
     "languagesDesc": "תמיכה בשפה שלך, מאיפה שלא תהיו",
     "moneyBack": "ערבות החזר כספי",
-    "moneyBackDesc": "החזר מלא תוך 7 ימים על תוכניות שלא נוצלו"
+    "moneyBackDesc": "החזר מלא תוך 7 ימים על תוכניות שלא נוצלו",
+    "label": "למה Simnetiq"
   },
   "howItWorks": {
     "title": "איך זה עובד",
@@ -859,7 +888,9 @@
     "step2Title": "סרקו קוד QR",
     "step2Desc": "קבלו את קוד ה-QR מיד וסרקו אותו עם הטלפון",
     "step3Title": "אתם מחוברים",
-    "step3Desc": "הנתונים מופעלים אוטומטית כשמגיעים ליעד. זה הכל."
+    "step3Desc": "הנתונים מופעלים אוטומטית כשמגיעים ליעד. זה הכל.",
+    "label": "שלושה צעדים פשוטים",
+    "stepLabel": "שלב"
   },
   "comparison": {
     "label": "הבחירה החכמה",
@@ -902,18 +933,28 @@
     "support": "תמיכה ייעודית",
     "supportDesc": "תמיכה אנושית אמיתית באימייל ובאפליקציה. בלי צ'אטבוטים.",
     "downloadTitle": "הורד את אפליקציית Simnetiq",
-    "downloadDesc": "נהל את כרטיסי ה-eSIM שלך, טען נתונים והישאר מחובר — הכל מהטלפון שלך."
+    "downloadDesc": "נהל את כרטיסי ה-eSIM שלך, טען נתונים והישאר מחובר — הכל מהטלפון שלך.",
+    "countriesLabel": "200+ מדינות",
+    "countriesSubLabel": "מדינות ואזורים",
+    "label": "הכל כלול"
   },
   "devices": {
     "title": "תאימות מכשירים",
     "notSure": "לא בטוחים אם המכשיר שלכם תומך ב-eSIM?",
-    "checkFaq": "בדקו את השאלות הנפוצות"
+    "checkFaq": "בדקו את השאלות הנפוצות",
+    "google": "Google",
+    "googleModels": "Pixel 3+, all newer models",
+    "iphone": "iPhone",
+    "iphoneModels": "XS, XR, 11–16 series, SE 3rd gen",
+    "samsung": "Samsung",
+    "samsungModels": "Galaxy S20+, Z Fold/Flip, A54+"
   },
   "promoBanner": {
     "headline": "קבלו {{discount}}% הנחה על תוכנית ה-eSIM הראשונה",
     "cta": "לצפייה בתוכניות",
     "finePrint": "בתוקף ללקוחות חדשים. שימוש אחד לחשבון.",
-    "copied": "הועתק!"
+    "copied": "הועתק!",
+    "copy": "העתק"
   },
   "appDownload": {
     "badge": "זמין ב-iOS",
@@ -922,14 +963,27 @@
     "bullet1": "קנו והפעילו eSIM",
     "bullet2": "עקבו אחרי שימוש בנתונים בזמן אמת",
     "bullet3": "טעינה בלחיצה אחת",
-    "bullet4": "קבלו קודי QR מיד"
+    "bullet4": "קבלו קודי QR מיד",
+    "appStore": "App Store",
+    "googlePlay": "Google Play",
+    "rating": "ב-App Store",
+    "sectionLabel": "נבנה על ידינו",
+    "sectionTitle": "האפליקציות שלנו, מותאמות לנוסעים",
+    "tagline": "נהל הכל מהטלפון שלך"
   },
   "dopplerCrossSell": {
     "badge": "מבית Simnetiq",
     "title": "Doppler VPN",
     "description": "VPN ללא תיעוד עם WireGuard + VLESS. עד 10 מכשירים.",
     "promo": "השתמשו בקוד LAUNCH20 ל-20% הנחה",
-    "cta": "למידע נוסף"
+    "cta": "למידע נוסף",
+    "appStore": "App Store",
+    "feature1": "VPN ללא הרשמה — ללא אימייל, ללא טלפון",
+    "feature2": "הצפנת VLESS-Reality נגד צנזורה",
+    "feature3": "חוסם פרסומות מובנה ו-DNS פרטי",
+    "feature4": "מדיניות קפדנית של אי-שמירת לוגים מעצם התכנון",
+    "googlePlay": "Google Play",
+    "platforms": "iOS, Android וכל הפלטפורמות"
   },
   "socialProof": {
     "rating": "4.5",
@@ -984,5 +1038,10 @@
     "uk": "הממלכה המאוחדת",
     "usa": "ארצות הברית",
     "vietnam": "ווייטנאם"
+  },
+  "travelBlogs": {
+    "subtitle": "תובנות נסיעה עדכניות לנוודים דיגיטליים",
+    "title": "טיפים ומדריכי נסיעות",
+    "viewAll": "צפה בכל המאמרים"
   }
 }

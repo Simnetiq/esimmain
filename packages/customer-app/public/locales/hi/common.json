@@ -20,7 +20,8 @@
     "androidApp": "Android ऐप",
     "userMenu": "उपयोगकर्ता मेनू",
     "user": "उपयोगकर्ता",
-    "about": "हमारे बारे में"
+    "about": "हमारे बारे में",
+    "theme": "थीम"
   },
   "hero": {
     "headlinePart1": "विदेश में इंटरनेट",
@@ -45,7 +46,11 @@
     "searchPlaceholder": "आप कहाँ यात्रा कर रहे हैं?",
     "popularDestinations": "लोकप्रिय गंतव्य",
     "noResults": "कोई गंतव्य नहीं मिला",
-    "popular": "लोकप्रिय"
+    "popular": "लोकप्रिय",
+    "appStore": "App Store",
+    "explorePlans": "प्लान देखें",
+    "googlePlay": "Google Play",
+    "tagline": "वैश्विक eSIM प्लेटफ़ॉर्म"
   },
   "features": {
     "title": "वैश्विक रूप से जुड़ें",
@@ -107,8 +112,23 @@
       "description": "मोबाइल पर WireGuard और Telegram बॉट के माध्यम से उन्नत VLESS द्वारा संचालित तेज, नो-लॉग VPN। सभी प्रमुख प्लेटफॉर्म, 10 डिवाइस तक।",
       "promo": "लॉन्च ऑफर: 20% छूट के लिए कोड LAUNCH20 का उपयोग करें",
       "appStore": "App Store",
-      "learnMore": "और जानें"
-    }
+      "learnMore": "और जानें",
+      "feature1": "WireGuard प्रोटोकॉल — अत्यंत तेज़",
+      "feature2": "सख्त नो-लॉग पॉलिसी",
+      "feature3": "एक साथ 10 डिवाइस तक",
+      "feature4": "Telegram बॉट के ज़रिए VLESS-Reality",
+      "platforms": "iOS और सभी प्लेटफ़ॉर्म",
+      "tagline": "Simnetiq द्वारा"
+    },
+    "appStoreRating": "App Store पर",
+    "appTagline": "ट्रैवल डेटा, आसान बना दिया",
+    "feature1": "eSIM तुरंत खरीदें और एक्टिवेट करें",
+    "feature2": "रियल-टाइम में डेटा उपयोग मॉनिटर करें",
+    "feature3": "एक टैप में टॉप अप करें",
+    "feature4": "QR कोड तुरंत प्राप्त करें",
+    "platforms": "iOS & Android",
+    "sectionLabel": "हमारे ऐप्स",
+    "sectionTitle": "आपकी ज़रूरत की हर चीज़, आपकी जेब में"
   },
   "footer": {
     "brandName": "Simnetiq",
@@ -790,13 +810,17 @@
       "thailand": "थाईलैंड",
       "japan": "जापान",
       "brazil": "ब्राजील",
-      "egypt": "मिस्र"
+      "egypt": "मिस्र",
+      "spain": "स्पेन",
+      "usa": "अमेरिका"
     },
     "carrier": {
       "att": "AT&T / Verizon (अमेरिका)",
       "vodafoneDE": "Vodafone (जर्मनी)",
       "telekomDE": "Telekom (जर्मनी)",
-      "simnetiq": "Simnetiq eSIM"
+      "simnetiq": "Simnetiq eSIM",
+      "rogersCA": "Rogers (कनाडा)",
+      "threeUK": "Three (ब्रिटेन)"
     },
     "note": {
       "dayPass": "Day Pass $12/दिन × 7",
@@ -804,7 +828,11 @@
       "reisePaket": "ReisePaket World 4 GB/सप्ताह",
       "travelMobil": "Travel Mobil Basic 5 GB",
       "travelMobilWorld": "Travel Mobil World 5 GB",
-      "esim5gb": "5 GB प्लान"
+      "esim5gb": "5 GB प्लान",
+      "goRoam": "Go Roam $6/दिन × 7",
+      "goRoamFree": "Go Roam शामिल (EU)",
+      "goRoamWorld": "Go Roam World $8/दिन × 7",
+      "roamLikeHome": "Roam Like Home $10/दिन × 7"
     },
     "saveUpTo": "कैरियर रोमिंग की तुलना में अधिकतम बचत",
     "fromPriceValue": "$5",
@@ -850,7 +878,8 @@
     "languages": "18 भाषाएं",
     "languagesDesc": "आप जहां से भी हों, आपकी भाषा में सहायता",
     "moneyBack": "मनी-बैक गारंटी",
-    "moneyBackDesc": "अप्रयुक्त प्लान पर 7-दिन की पूर्ण रिफंड"
+    "moneyBackDesc": "अप्रयुक्त प्लान पर 7-दिन की पूर्ण रिफंड",
+    "label": "Simnetiq क्यों"
   },
   "howItWorks": {
     "title": "यह कैसे काम करता है",
@@ -860,7 +889,9 @@
     "step2Title": "QR Code स्कैन करें",
     "step2Desc": "अपना QR Code तुरंत प्राप्त करें और फोन से स्कैन करें",
     "step3Title": "आप कनेक्ट हैं",
-    "step3Desc": "गंतव्य पहुंचने पर डेटा अपने आप एक्टिव हो जाता है। बस इतना ही।"
+    "step3Desc": "गंतव्य पहुंचने पर डेटा अपने आप एक्टिव हो जाता है। बस इतना ही।",
+    "label": "तीन आसान कदम",
+    "stepLabel": "कदम"
   },
   "comparison": {
     "label": "स्मार्ट विकल्प",
@@ -903,18 +934,28 @@
     "support": "समर्पित सहायता",
     "supportDesc": "ईमेल और ऐप-इन में वास्तविक मानव सहायता। कोई चैटबॉट नहीं।",
     "downloadTitle": "Simnetiq ऐप डाउनलोड करें",
-    "downloadDesc": "अपने eSIM प्रबंधित करें, डेटा रिचार्ज करें और जुड़े रहें — सब कुछ अपने फोन से।"
+    "downloadDesc": "अपने eSIM प्रबंधित करें, डेटा रिचार्ज करें और जुड़े रहें — सब कुछ अपने फोन से।",
+    "countriesLabel": "200+ देश",
+    "countriesSubLabel": "देश और क्षेत्र",
+    "label": "सब कुछ शामिल"
   },
   "devices": {
     "title": "डिवाइस संगतता",
     "notSure": "यकीन नहीं कि आपका डिवाइस eSIM सपोर्ट करता है?",
-    "checkFaq": "FAQ देखें"
+    "checkFaq": "FAQ देखें",
+    "google": "Google",
+    "googleModels": "Pixel 3+, all newer models",
+    "iphone": "iPhone",
+    "iphoneModels": "XS, XR, 11–16 series, SE 3rd gen",
+    "samsung": "Samsung",
+    "samsungModels": "Galaxy S20+, Z Fold/Flip, A54+"
   },
   "promoBanner": {
     "headline": "अपने पहले eSIM प्लान पर {{discount}}% छूट पाएं",
     "cta": "अभी प्लान देखें",
     "finePrint": "नए ग्राहकों के लिए मान्य। प्रति अकाउंट एक बार उपयोग।",
-    "copied": "कॉपी हो गया!"
+    "copied": "कॉपी हो गया!",
+    "copy": "कॉपी"
   },
   "appDownload": {
     "badge": "iOS पर उपलब्ध",
@@ -923,14 +964,27 @@
     "bullet1": "eSIM खरीदें और एक्टिव करें",
     "bullet2": "रीयल-टाइम में डेटा उपयोग देखें",
     "bullet3": "एक टैप से टॉप अप करें",
-    "bullet4": "QR Code तुरंत पाएं"
+    "bullet4": "QR Code तुरंत पाएं",
+    "appStore": "App Store",
+    "googlePlay": "Google Play",
+    "rating": "App Store पर",
+    "sectionLabel": "हमारे द्वारा निर्मित",
+    "sectionTitle": "हमारे ऐप्स, यात्रियों के लिए बनाए गए",
+    "tagline": "अपने फ़ोन से सब कुछ प्रबंधित करें"
   },
   "dopplerCrossSell": {
     "badge": "Simnetiq द्वारा",
     "title": "Doppler VPN",
     "description": "नो-लॉग VPN, WireGuard + VLESS के साथ। 10 डिवाइस तक।",
     "promo": "कोड LAUNCH20 से 20% छूट पाएं",
-    "cta": "और जानें"
+    "cta": "और जानें",
+    "appStore": "App Store",
+    "feature1": "बिना रजिस्ट्रेशन VPN — कोई ईमेल नहीं, कोई फ़ोन नहीं",
+    "feature2": "VLESS-Reality एंटी-सेंसरशिप एन्क्रिप्शन",
+    "feature3": "बिल्ट-इन एड ब्लॉकर और प्राइवेट DNS",
+    "feature4": "डिज़ाइन से ही सख्त नो-लॉग पॉलिसी",
+    "googlePlay": "Google Play",
+    "platforms": "iOS, Android और सभी प्लेटफ़ॉर्म"
   },
   "socialProof": {
     "rating": "4.5",
@@ -985,5 +1039,10 @@
     "uk": "यूनाइटेड किंगडम",
     "usa": "संयुक्त राज्य अमेरिका",
     "vietnam": "वियतनाम"
+  },
+  "travelBlogs": {
+    "subtitle": "डिजिटल नोमैड्स के लिए नवीनतम ट्रैवल इनसाइट्स",
+    "title": "ट्रैवल टिप्स और गाइड्स",
+    "viewAll": "सभी लेख देखें"
   }
 }

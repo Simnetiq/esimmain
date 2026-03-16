@@ -280,20 +280,22 @@ const CookieConsent = () => {
               <div className={`flex flex-col sm:flex-row gap-3 ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
                 <button
                   onClick={handleRejectAll}
-                  className="px-5 py-2.5 text-sm font-medium text-text-primary bg-[var(--subtle-bg)] rounded-xl hover:bg-[var(--hover-bg)] transition-colors"
+                  className="px-5 py-2.5 text-sm font-semibold text-text-primary rounded-full hover:bg-[var(--hover-bg)] transition-colors"
+                  style={{ backgroundColor: 'var(--subtle-bg)' }}
                 >
                   {t('rejectAll')}
                 </button>
                 <button
                   onClick={() => setShowCustomize(true)}
-                  className={`px-5 py-2.5 text-sm font-medium text-text-primary border border-[var(--card-border)] rounded-xl hover:bg-[var(--hover-bg)] transition-colors inline-flex items-center justify-center gap-2 `}
+                  className="px-5 py-2.5 text-sm font-semibold text-text-primary rounded-full hover:bg-[var(--hover-bg)] transition-colors inline-flex items-center justify-center gap-2"
+                  style={{ border: '1px solid var(--card-border)' }}
                 >
                   <SettingsIcon className="w-4 h-4" />
                   {t('customize')}
                 </button>
                 <button
                   onClick={handleAcceptAll}
-                  className={`btn-primary px-5 py-2.5 text-sm inline-flex items-center justify-center gap-2 flex-1 sm:flex-none `}
+                  className="px-5 py-2.5 text-sm font-semibold text-white rounded-full bg-tufts-blue hover:bg-tufts-blue/90 transition-colors inline-flex items-center justify-center gap-2 flex-1 sm:flex-none"
                 >
                   <CheckIcon className="w-4 h-4" />
                   {t('acceptAll')}
@@ -380,7 +382,7 @@ const CookieConsent = () => {
               {/* Save Button */}
               <button
                 onClick={handleSavePreferences}
-                className={`btn-primary w-full py-2.5 text-sm inline-flex items-center justify-center gap-2 `}
+                className="w-full py-2.5 text-sm font-semibold text-white rounded-full bg-tufts-blue hover:bg-tufts-blue/90 transition-colors inline-flex items-center justify-center gap-2"
               >
                 <CheckIcon className="w-4 h-4" />
                 {t('savePreferences')}

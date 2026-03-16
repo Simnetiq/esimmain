@@ -20,7 +20,8 @@
     "androidApp": "Android 应用",
     "userMenu": "用户菜单",
     "user": "用户",
-    "about": "关于我们"
+    "about": "关于我们",
+    "theme": "主题"
   },
   "hero": {
     "headlinePart1": "出境上网",
@@ -45,7 +46,11 @@
     "searchPlaceholder": "你要去哪里旅行？",
     "popularDestinations": "热门目的地",
     "noResults": "未找到目的地",
-    "popular": "热门"
+    "popular": "热门",
+    "appStore": "App Store",
+    "explorePlans": "浏览套餐",
+    "googlePlay": "Google Play",
+    "tagline": "全球 eSIM 平台"
   },
   "features": {
     "title": "连接全球",
@@ -107,8 +112,23 @@
       "description": "基于 WireGuard 的快速无日志 VPN，支持移动端和通过 Telegram 机器人使用的高级 VLESS。覆盖所有主流平台，最多支持 10 台设备。",
       "promo": "上线优惠：使用优惠码 LAUNCH20 享八折",
       "appStore": "App Store",
-      "learnMore": "了解更多"
-    }
+      "learnMore": "了解更多",
+      "feature1": "WireGuard 协议 — 极速连接",
+      "feature2": "严格的零日志政策",
+      "feature3": "最多 10 台设备同时使用",
+      "feature4": "通过 Telegram 机器人使用 VLESS-Reality",
+      "platforms": "iOS 及所有平台",
+      "tagline": "Simnetiq 出品"
+    },
+    "appStoreRating": "App Store 评分",
+    "appTagline": "旅行数据，化繁为简",
+    "feature1": "即买即用，立即激活 eSIM",
+    "feature2": "实时监控流量使用情况",
+    "feature3": "一键充值",
+    "feature4": "即时获取 QR Code",
+    "platforms": "iOS & Android",
+    "sectionLabel": "我们的应用",
+    "sectionTitle": "您需要的一切，尽在掌中"
   },
   "footer": {
     "brandName": "Simnetiq",
@@ -790,13 +810,17 @@
       "thailand": "泰国",
       "japan": "日本",
       "brazil": "巴西",
-      "egypt": "埃及"
+      "egypt": "埃及",
+      "spain": "西班牙",
+      "usa": "美国"
     },
     "carrier": {
       "att": "AT&T / Verizon（美国）",
       "vodafoneDE": "Vodafone（德国）",
       "telekomDE": "Telekom（德国）",
-      "simnetiq": "Simnetiq eSIM"
+      "simnetiq": "Simnetiq eSIM",
+      "rogersCA": "Rogers（加拿大）",
+      "threeUK": "Three（英国）"
     },
     "note": {
       "dayPass": "Day Pass $12/天 × 7",
@@ -804,7 +828,11 @@
       "reisePaket": "ReisePaket World 4GB/周",
       "travelMobil": "Travel Mobil Basic 5GB",
       "travelMobilWorld": "Travel Mobil World 5GB",
-      "esim5gb": "5GB 套餐"
+      "esim5gb": "5GB 套餐",
+      "goRoam": "Go Roam $6/天 × 7",
+      "goRoamFree": "Go Roam 已含（欧盟）",
+      "goRoamWorld": "Go Roam World $8/天 × 7",
+      "roamLikeHome": "Roam Like Home $10/天 × 7"
     },
     "saveUpTo": "与运营商漫游相比最大节省",
     "fromPriceValue": "$5",
@@ -850,7 +878,8 @@
     "languages": "18种语言",
     "languagesDesc": "无论您来自哪里，都有母语支持",
     "moneyBack": "退款保障",
-    "moneyBackDesc": "未使用套餐7天内全额退款"
+    "moneyBackDesc": "未使用套餐7天内全额退款",
+    "label": "为什么选择 Simnetiq"
   },
   "howItWorks": {
     "title": "使用流程",
@@ -860,7 +889,9 @@
     "step2Title": "扫描 QR Code",
     "step2Desc": "即时获取 QR Code，用手机扫描即可",
     "step3Title": "连接成功",
-    "step3Desc": "到达目的地后流量自动激活，就是这么简单。"
+    "step3Desc": "到达目的地后流量自动激活，就是这么简单。",
+    "label": "三步轻松搞定",
+    "stepLabel": "步骤"
   },
   "comparison": {
     "label": "明智之选",
@@ -903,18 +934,28 @@
     "support": "专属客服",
     "supportDesc": "真人客服通过邮件和应用内支持，非机器人。",
     "downloadTitle": "下载 Simnetiq 应用",
-    "downloadDesc": "管理您的 eSIM、充值流量、保持连接 — 一切尽在手机上。"
+    "downloadDesc": "管理您的 eSIM、充值流量、保持连接 — 一切尽在手机上。",
+    "countriesLabel": "200+ 国家",
+    "countriesSubLabel": "国家和地区",
+    "label": "一切尽含"
   },
   "devices": {
     "title": "设备兼容性",
     "notSure": "不确定您的设备是否支持 eSIM？",
-    "checkFaq": "查看常见问题"
+    "checkFaq": "查看常见问题",
+    "google": "Google",
+    "googleModels": "Pixel 3+, all newer models",
+    "iphone": "iPhone",
+    "iphoneModels": "XS, XR, 11–16 series, SE 3rd gen",
+    "samsung": "Samsung",
+    "samsungModels": "Galaxy S20+, Z Fold/Flip, A54+"
   },
   "promoBanner": {
     "headline": "首次购买 eSIM 立享{{discount}}%折扣",
     "cta": "立即选购",
     "finePrint": "仅限新用户，每个账户使用一次。",
-    "copied": "已复制！"
+    "copied": "已复制！",
+    "copy": "复制"
   },
   "appDownload": {
     "badge": "iOS 版现已上线",
@@ -923,14 +964,27 @@
     "bullet1": "购买和激活 eSIM",
     "bullet2": "实时监控流量使用",
     "bullet3": "一键充值",
-    "bullet4": "即时获取 QR Code"
+    "bullet4": "即时获取 QR Code",
+    "appStore": "App Store",
+    "googlePlay": "Google Play",
+    "rating": "App Store 评分",
+    "sectionLabel": "我们的作品",
+    "sectionTitle": "我们的应用，为旅行者而生",
+    "tagline": "在手机上管理一切"
   },
   "dopplerCrossSell": {
     "badge": "Simnetiq 出品",
     "title": "Doppler VPN",
     "description": "零日志 VPN，采用 WireGuard + VLESS 技术。最多支持10台设备。",
     "promo": "使用优惠码 LAUNCH20 享八折优惠",
-    "cta": "了解更多"
+    "cta": "了解更多",
+    "appStore": "App Store",
+    "feature1": "无需注册的 VPN — 无需邮箱，无需手机号",
+    "feature2": "VLESS-Reality 反审查加密",
+    "feature3": "内置广告拦截器和私有 DNS",
+    "feature4": "设计之初即遵循严格零日志政策",
+    "googlePlay": "Google Play",
+    "platforms": "iOS、Android 及所有平台"
   },
   "socialProof": {
     "rating": "4.5",
@@ -985,5 +1039,10 @@
     "uk": "英国",
     "usa": "美国",
     "vietnam": "越南"
+  },
+  "travelBlogs": {
+    "subtitle": "数字游民的最新旅行资讯",
+    "title": "旅行攻略与指南",
+    "viewAll": "查看所有文章"
   }
 }

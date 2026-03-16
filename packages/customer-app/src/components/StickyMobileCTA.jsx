@@ -36,18 +36,21 @@ export default function StickyMobileCTA() {
     >
       <Link
         href={esimPlansUrl}
-        className="pointer-events-auto inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold text-white shadow-lg shadow-tufts-blue/30 transition-transform duration-200 active:scale-95"
+        className="pointer-events-auto inline-flex items-center rounded-full text-sm font-semibold transition-transform duration-200 active:scale-95 rtl-native-flex ps-6 pe-1.5 py-1.5"
         style={{
-          backgroundColor: 'var(--tufts-blue, #4975D4)',
-          boxShadow: '0 8px 32px rgba(73, 117, 212, 0.4)',
+          backgroundColor: 'var(--cta-primary-bg, var(--tufts-blue, #4975D4))',
+          color: 'var(--cta-primary-text, #fff)',
         }}
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10" />
-          <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
-          <path d="M2 12h20" />
-        </svg>
-        {t('hero.explorePlans', 'Explore Plans')}
+        <span className="flex-1 text-center">{t('hero.explorePlans', 'Explore Plans')}</span>
+        <span
+          className="ms-3 flex-shrink-0 inline-flex items-center justify-center rounded-full w-9 h-9 rtl-native-flex"
+          style={{ backgroundColor: 'var(--cta-primary-circle-bg, rgba(255,255,255,0.2))' }}
+        >
+          <svg className="w-4 h-4 rtl:-scale-x-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--cta-primary-circle-text, #fff)' }}>
+            <path d="M7 17 17 7"/><path d="M7 7h10v10"/>
+          </svg>
+        </span>
       </Link>
     </div>
   );

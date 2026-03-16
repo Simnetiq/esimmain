@@ -149,8 +149,8 @@ function CarrierBar({ carrier, maxPrice, isVisible, index, t }) {
           {isSimnetiq ? (
             <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 665 831" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
               <g>
-                <path d="M137.5 133.5V689C289.804 689 527.5 689 527.5 689V267L405 133.5H137.5Z" className="fill-tufts-blue" />
-                <path d="M137.5 133.5V689C289.804 689 527.5 689 527.5 689V267L405 133.5H137.5Z" className="stroke-tufts-blue" strokeWidth="131" strokeLinejoin="round" />
+                <path d="M137.5 133.5V689C289.804 689 527.5 689 527.5 689V267L405 133.5H137.5Z" className="fill-text-primary" />
+                <path d="M137.5 133.5V689C289.804 689 527.5 689 527.5 689V267L405 133.5H137.5Z" className="stroke-text-primary" strokeWidth="131" strokeLinejoin="round" />
               </g>
               <path d="M242.302 649.7C226.102 649.7 211.802 646.8 199.402 641C187.002 635.2 177.302 626.9 170.302 616.1C163.302 605.3 159.802 592.3 159.802 577.1V568.7H198.802V577.1C198.802 589.7 202.702 599.2 210.502 605.6C218.302 611.8 228.902 614.9 242.302 614.9C255.902 614.9 266.002 612.2 272.602 606.8C279.402 601.4 282.802 594.5 282.802 586.1C282.802 580.3 281.102 575.6 277.702 572C274.502 568.4 269.702 565.5 263.302 563.3C257.102 560.9 249.502 558.7 240.502 556.7L233.602 555.2C219.202 552 206.802 548 196.402 543.2C186.202 538.2 178.302 531.7 172.702 523.7C167.302 515.7 164.602 505.3 164.602 492.5C164.602 479.7 167.602 468.8 173.602 459.8C179.802 450.6 188.402 443.6 199.402 438.8C210.602 433.8 223.702 431.3 238.702 431.3C253.702 431.3 267.002 433.9 278.602 439.1C290.402 444.1 299.602 451.7 306.202 461.9C313.002 471.9 316.402 484.5 316.402 499.7V508.7H277.402V499.7C277.402 491.7 275.802 485.3 272.602 480.5C269.602 475.5 265.202 471.9 259.402 469.7C253.602 467.3 246.702 466.1 238.702 466.1C226.702 466.1 217.802 468.4 212.002 473C206.402 477.4 203.602 483.5 203.602 491.3C203.602 496.5 204.902 500.9 207.502 504.5C210.302 508.1 214.402 511.1 219.802 513.5C225.202 515.9 232.102 518 240.502 519.8L247.402 521.3C262.402 524.5 275.402 528.6 286.402 533.6C297.602 538.6 306.302 545.2 312.502 553.4C318.702 561.6 321.802 572.1 321.802 584.9C321.802 597.7 318.502 609 311.902 618.8C305.502 628.4 296.302 636 284.302 641.6C272.502 647 258.502 649.7 242.302 649.7ZM352.535 645.5V496.7H389.735V516.2H395.135C397.535 511 402.035 506.1 408.635 501.5C415.235 496.7 425.235 494.3 438.635 494.3C450.235 494.3 460.335 497 468.935 502.4C477.735 507.6 484.535 514.9 489.335 524.3C494.135 533.5 496.535 544.3 496.535 556.7V645.5H458.735V559.7C458.735 548.5 455.935 540.1 450.335 534.5C444.935 528.9 437.135 526.1 426.935 526.1C415.335 526.1 406.335 530 399.935 537.8C393.535 545.4 390.335 556.1 390.335 569.9V645.5H352.535ZM399.635 479.9L421.835 435.5H464.435L432.635 479.9H399.635Z" fill="white" />
             </svg>
@@ -179,9 +179,9 @@ function CarrierBar({ carrier, maxPrice, isVisible, index, t }) {
           ${carrier.price}
         </span>
       </div>
-      <div className="w-full h-3.5 bg-[var(--subtle-bg)] overflow-hidden">
+      <div className="w-full h-3.5 rounded-full bg-[var(--subtle-bg)] overflow-hidden">
         <div
-          className={`h-full transition-all duration-700 ease-out ${isSimnetiq ? 'bg-tufts-blue' : ''}`}
+          className={`h-full rounded-full transition-all duration-700 ease-out ${isSimnetiq ? 'bg-tufts-blue' : ''}`}
           style={{
             ...(!isSimnetiq ? { backgroundColor: 'var(--text-muted)' } : {}),
             width: isVisible ? `${widthPct}%` : '0%',
@@ -279,7 +279,7 @@ export default function RoamingComparison() {
               {t('roaming.chartTitle', '1-week trip · 5GB data')}
             </p>
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold text-[var(--accent-success)]" style={{ backgroundColor: 'color-mix(in srgb, var(--accent-success) 10%, transparent)' }}>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold text-tufts-blue" style={{ backgroundColor: 'rgba(73, 117, 212, 0.1)', border: '1px solid rgba(73, 117, 212, 0.2)' }}>
                 {t('roaming.saveLabel', 'Save up to')} {savingsPercent}%
               </span>
             </div>
