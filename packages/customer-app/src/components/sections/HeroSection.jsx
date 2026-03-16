@@ -89,7 +89,7 @@ export default function HeroSection() {
   const subtitleText = t('hero.subtitle', 'Get eSIM data plans for 200+ countries. Activate in minutes — no SIM card, no roaming fees.');
 
   return (
-    <div className="hero-section relative min-h-screen flex flex-col bg-white" lang={detectedLanguage}>
+    <div className="hero-section relative min-h-screen flex flex-col bg-white" lang={detectedLanguage} suppressHydrationWarning>
       {/* SVG dot grid with routes — zero JS, zero TBT impact */}
       <div className="absolute inset-0 flex items-center justify-center overflow-hidden" aria-hidden="true" style={{ maskImage: 'radial-gradient(ellipse 60% 55% at 50% 50%, black 40%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse 60% 55% at 50% 50%, black 40%, transparent 100%)' }}>
         <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
@@ -138,7 +138,7 @@ export default function HeroSection() {
       </div>
 
       <div className="relative flex-1 flex flex-col">
-        <div className="relative flex-1 flex flex-col items-center justify-center px-4 py-20 lg:py-24">
+        <div className="relative flex-1 flex flex-col items-center justify-center px-4 pb-24 lg:pb-28">
           <div className="mx-auto w-full max-w-7xl">
             <div className="px-4 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl text-center">
 

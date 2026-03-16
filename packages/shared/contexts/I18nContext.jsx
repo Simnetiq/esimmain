@@ -44,26 +44,35 @@ const getLanguageFromPathname = (pathname) => {
 
 export const I18nProvider = ({ children }) => {
   const pathname = usePathname();
-  const initialLocale = getLanguageFromPathname(pathname);
-  
-  const [locale, setLocale] = useState(initialLocale);
-  // Always start with empty translations to match server render (server never has cache).
-  // Translations load in useEffect to avoid hydration mismatches.
+  const pathnameLocale = getLanguageFromPathname(pathname);
+
+  const [locale, setLocale] = useState(pathnameLocale);
   const [translations, setTranslations] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  // Track which locale the current translations belong to so we can detect
+  // stale state even when locale === pathnameLocale (e.g. navigating away and
+  // back to the same locale — useState keeps old translations but server has {}).
+  const [translationsLocale, setTranslationsLocale] = useState(null);
+
+  // Synchronous state reset during render — the provider persists in the layout
+  // so useState does NOT re-initialize on navigation. Reset whenever the URL
+  // locale changes OR translations are stale (loaded for a previous locale).
+  if (locale !== pathnameLocale || (translationsLocale && translationsLocale !== pathnameLocale)) {
+    setLocale(pathnameLocale);
+    setTranslations({});
+    setTranslationsLocale(null);
+    setIsLoading(true);
+  }
 
   useEffect(() => {
     const currentLocale = getLanguageFromPathname(pathname);
-    
-    if (currentLocale !== locale) {
-      setLocale(currentLocale);
-    }
-    
-    if (!translationCache[currentLocale]) {
-      loadTranslations(currentLocale);
-    } else if (translations !== translationCache[currentLocale]) {
+
+    if (translationCache[currentLocale]) {
       setTranslations(translationCache[currentLocale]);
+      setTranslationsLocale(currentLocale);
       setIsLoading(false);
+    } else {
+      loadTranslations(currentLocale);
     }
   }, [pathname]);
 
@@ -73,18 +82,20 @@ export const I18nProvider = ({ children }) => {
       
       if (translationCache[localeToLoad]) {
         setTranslations(translationCache[localeToLoad]);
+        setTranslationsLocale(localeToLoad);
         setIsLoading(false);
         return;
       }
-      
+
       const response = await fetch(`/locales/${localeToLoad}/common.json`, {
         cache: 'force-cache',
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         translationCache[localeToLoad] = data;
         setTranslations(data);
+        setTranslationsLocale(localeToLoad);
       }
     } catch (error) {
       console.error(`Failed to load translations for ${localeToLoad}:`, error);
