@@ -1,20 +1,29 @@
 import { NextResponse } from 'next/server';
+import { timingSafeEqual } from 'crypto';
 import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 
 function isAuthorized(request) {
   const apiKey = process.env.BLOG_API_KEY;
   if (!apiKey) return false;
 
+  const expected = Buffer.from(apiKey);
+
   // Allow calls with BLOG_API_KEY (external/n8n)
   const auth = request.headers.get('authorization');
-  if (auth?.startsWith('Bearer ') && auth.slice(7) === apiKey) {
-    return true;
+  if (auth?.startsWith('Bearer ')) {
+    const provided = Buffer.from(auth.slice(7));
+    if (provided.length === expected.length && timingSafeEqual(provided, expected)) {
+      return true;
+    }
   }
 
   // Allow calls with internal header (from admin app on same origin)
   const internalKey = request.headers.get('x-internal-key');
-  if (internalKey && internalKey === apiKey) {
-    return true;
+  if (internalKey) {
+    const provided = Buffer.from(internalKey);
+    if (provided.length === expected.length && timingSafeEqual(provided, expected)) {
+      return true;
+    }
   }
 
   return false;

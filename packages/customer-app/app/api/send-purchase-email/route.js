@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { render } from '@react-email/render';
 import { sendEmail } from '@esim/shared/lib/email';
+import { verifyAdminKey } from '@esim/shared/lib/apiAuth';
 import PurchaseConfirmationEmail from '../../../emails/PurchaseConfirmationEmail';
 
 /**
@@ -8,6 +9,9 @@ import PurchaseConfirmationEmail from '../../../emails/PurchaseConfirmationEmail
  * Supports multiple languages
  */
 export async function POST(request) {
+  const authError = verifyAdminKey(request);
+  if (authError) return authError;
+
   try {
     const { 
       email, 

@@ -1,12 +1,16 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 import { getUserFraudStats } from '@esim/shared/services/fraudDetectionService';
+import { verifyAdminKey } from '@esim/shared/lib/apiAuth';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function GET(request) {
   try {
+    const authError = verifyAdminKey(request);
+    if (authError) return authError;
+
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
 

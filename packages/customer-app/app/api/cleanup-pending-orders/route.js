@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
+import { verifyAdminKey } from '@esim/shared/lib/apiAuth';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request) {
   try {
+    const authError = verifyAdminKey(request);
+    if (authError) return authError;
+
     const { searchParams } = new URL(request.url);
     const hoursOld = parseInt(searchParams.get('hours') || '24', 10);
     const dryRun = searchParams.get('dryRun') === 'true';
@@ -125,6 +129,9 @@ export async function POST(request) {
 
 export async function GET(request) {
   try {
+    const authError = verifyAdminKey(request);
+    if (authError) return authError;
+
     const { searchParams } = new URL(request.url);
     const hoursOld = parseInt(searchParams.get('hours') || '24', 10);
     const specificUserId = searchParams.get('userId');

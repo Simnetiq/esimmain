@@ -41,7 +41,11 @@
     "promoPrefix": "استخدم الرمز",
     "promoSuffix": "للحصول على خصم {{discount}}% على أول eSIM",
     "fiveStarRated": "تقييم 5 نجوم",
-    "sevenDayRefund": "استرداد خلال 7 أيام"
+    "sevenDayRefund": "استرداد خلال 7 أيام",
+    "searchPlaceholder": "إلى أين تسافر؟",
+    "popularDestinations": "وجهات شائعة",
+    "noResults": "لم يتم العثور على وجهات",
+    "popular": "شائع"
   },
   "features": {
     "title": "تواصل عالمياً",
@@ -895,7 +899,9 @@
     "multiLanguage": "متعدد اللغات",
     "multiLanguageDesc": "دعم كامل بـ 18 لغة تشمل العربية والعبرية واليابانية وغيرها",
     "support": "دعم متخصص",
-    "supportDesc": "دعم بشري حقيقي عبر البريد الإلكتروني والتطبيق. بدون روبوتات."
+    "supportDesc": "دعم بشري حقيقي عبر البريد الإلكتروني والتطبيق. بدون روبوتات.",
+    "downloadTitle": "احصل على تطبيق Simnetiq",
+    "downloadDesc": "أدر شرائح eSIM الخاصة بك، واشحن البيانات، وابقَ متصلاً — كل ذلك من هاتفك."
   },
   "devices": {
     "title": "توافق الأجهزة",

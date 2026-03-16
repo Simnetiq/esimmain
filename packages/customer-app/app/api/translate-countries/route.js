@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
+import { verifyAdminKey } from '@esim/shared/lib/apiAuth';
 
 const SUPPORTED_LANGUAGES = [
   { code: 'en', name: 'English' },
@@ -64,6 +65,9 @@ async function translateCountryName(openaiApiKey, countryName, targetLanguage) {
 
 export async function POST(request) {
   try {
+    const authError = verifyAdminKey(request);
+    if (authError) return authError;
+
     const { countryCode, countryName, targetLanguages, translateAll } = await request.json();
 
     const supabase = getSupabaseAdmin();

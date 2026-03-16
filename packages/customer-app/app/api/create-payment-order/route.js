@@ -205,21 +205,21 @@ export async function POST(request) {
     // JWT verification for mobile clients
     // Mobile sends: Authorization: Bearer <supabase_jwt>
     // Web uses session cookies (no Authorization header) — backward compatible
-    let userId = bodyUserId || null;
+    let userId;
     const authHeader = request.headers.get('authorization') || request.headers.get('Authorization');
     if (authHeader?.startsWith('Bearer ')) {
+      // Mobile flow — require valid JWT
       const token = authHeader.slice(7);
-      try {
-        const { data: { user }, error: jwtError } = await supabase.auth.getUser(token);
-        if (!jwtError && user) {
-          // JWT valid — use the server-verified user ID, not the client-supplied one
-          userId = user.id;
-        } else {
-          console.warn('[create-payment-order] JWT verification failed:', jwtError?.message);
-          // Don't reject — fall back to body userId (web flow uses session, not bearer token)
-        }
-      } catch (jwtErr) {
-        console.warn('[create-payment-order] JWT parse error:', jwtErr.message);
+      const { data: { user }, error: jwtError } = await supabase.auth.getUser(token);
+      if (jwtError || !user) {
+        return NextResponse.json({ error: 'Authentication required', code: 'AUTH_REQUIRED' }, { status: 401 });
+      }
+      userId = user.id;
+    } else {
+      // Web flow — use body userId (validated by Stripe checkout session later)
+      userId = bodyUserId || null;
+      if (userId) {
+        console.warn('[create-payment-order] Web flow using body userId without JWT verification:', userId);
       }
     }
     // SECURITY: domain is always derived server-side — never trust client value.

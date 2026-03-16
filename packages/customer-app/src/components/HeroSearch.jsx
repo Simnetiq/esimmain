@@ -58,17 +58,21 @@ export default function HeroSearch({ esimPlansUrl }) {
   const dropdownRef = useRef(null);
 
   const filtered = useMemo(() => {
-    if (!query.trim()) return POPULAR_COUNTRIES.slice(0, 8); // Show popular when empty
+    const withDisplay = POPULAR_COUNTRIES.map(c => ({
+      ...c,
+      displayName: t(c.nameKey, c.name),
+    }));
+    if (!query.trim()) return withDisplay.slice(0, 8);
     const q = query.toLowerCase();
-    return POPULAR_COUNTRIES.filter(c =>
-      c.name.toLowerCase().includes(q)
+    return withDisplay.filter(c =>
+      c.name.toLowerCase().includes(q) || c.displayName.toLowerCase().includes(q)
     ).slice(0, 8);
-  }, [query]);
+  }, [query, t]);
 
-  const navigateToCountry = useCallback((countryName) => {
+  const navigateToCountry = useCallback((country) => {
     setIsOpen(false);
     setQuery('');
-    router.push(`${esimPlansUrl}?country=${encodeURIComponent(countryName)}`);
+    router.push(`${esimPlansUrl}?country=${encodeURIComponent(country.code)}`);
   }, [router, esimPlansUrl]);
 
   const handleKeyDown = useCallback((e) => {
@@ -82,7 +86,7 @@ export default function HeroSearch({ esimPlansUrl }) {
     } else if (e.key === 'Enter') {
       e.preventDefault();
       if (highlightIndex >= 0 && filtered[highlightIndex]) {
-        navigateToCountry(filtered[highlightIndex].name);
+        navigateToCountry(filtered[highlightIndex]);
       } else if (query.trim()) {
         router.push(`${esimPlansUrl}?search=${encodeURIComponent(query.trim())}`);
         setIsOpen(false);
@@ -111,7 +115,7 @@ export default function HeroSearch({ esimPlansUrl }) {
   }, [query]);
 
   return (
-    <div className="relative w-full sm:max-w-md mb-8">
+    <div className="relative w-full sm:max-w-md mb-6">
       {/* Search input */}
       <div
         className="flex items-center gap-3 px-4 py-3 rounded-full transition-all duration-200 rtl-native-flex"
@@ -177,7 +181,7 @@ export default function HeroSearch({ esimPlansUrl }) {
                 key={country.code}
                 role="option"
                 aria-selected={idx === highlightIndex}
-                onClick={() => navigateToCountry(country.name)}
+                onClick={() => navigateToCountry(country)}
                 onMouseEnter={() => setHighlightIndex(idx)}
                 className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm text-start transition-colors rtl-native-flex ${
                   idx === highlightIndex
@@ -191,7 +195,7 @@ export default function HeroSearch({ esimPlansUrl }) {
                   className="w-6 h-6 rounded-full object-cover flex-shrink-0"
                   loading="lazy"
                 />
-                <span className="font-medium">{country.name}</span>
+                <span className="font-medium">{country.displayName}</span>
               </button>
             ))}
           </div>

@@ -33,14 +33,10 @@ const CountriesGrid = ({
     setMounted(true);
   }, []);
 
-  // Language detection with fallback
+  // Language detection — pathname-based for SSR safety, locale after i18n loads
   const detectedLanguage = useMemo(() => {
     try {
       if (i18nLoading) {
-        if (typeof window !== 'undefined') {
-          const savedLanguage = localStorage.getItem('Simnetiq-language');
-          if (savedLanguage) return savedLanguage;
-        }
         return detectLanguageFromPath(pathname) || 'en';
       }
       return locale || 'en';

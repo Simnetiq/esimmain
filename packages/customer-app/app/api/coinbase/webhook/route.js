@@ -18,12 +18,14 @@ export async function POST(request) {
     }
 
     const crypto = await import('crypto');
-    const { createHmac } = crypto;
+    const { createHmac, timingSafeEqual } = crypto;
     const computedSignature = createHmac('sha256', COINBASE_WEBHOOK_SECRET)
       .update(rawBody)
       .digest('hex');
 
-    if (computedSignature !== signature) {
+    const sigA = Buffer.from(computedSignature);
+    const sigB = Buffer.from(signature);
+    if (sigA.length !== sigB.length || !timingSafeEqual(sigA, sigB)) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
 

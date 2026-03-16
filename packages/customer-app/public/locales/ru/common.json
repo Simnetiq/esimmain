@@ -41,7 +41,11 @@
     "promoPrefix": "Используйте код",
     "promoSuffix": "и получите скидку {{discount}}% на первый eSIM",
     "fiveStarRated": "Оценка 5 звёзд",
-    "sevenDayRefund": "Возврат за 7 дней"
+    "sevenDayRefund": "Возврат за 7 дней",
+    "searchPlaceholder": "Куда вы путешествуете?",
+    "popularDestinations": "Популярные направления",
+    "noResults": "Направления не найдены",
+    "popular": "Популярные"
   },
   "QRCodeModal": {},
   "features": {
@@ -894,7 +898,9 @@
     "multiLanguage": "Мультиязычность",
     "multiLanguageDesc": "Полная поддержка на 18 языках: арабский, иврит, японский и другие",
     "support": "Персональная поддержка",
-    "supportDesc": "Живые люди по email и в приложении. Никаких чат-ботов."
+    "supportDesc": "Живые люди по email и в приложении. Никаких чат-ботов.",
+    "downloadTitle": "Скачайте приложение Simnetiq",
+    "downloadDesc": "Управляйте eSIM, пополняйте данные и оставайтесь на связи — всё с телефона."
   },
   "devices": {
     "title": "Совместимость устройств",

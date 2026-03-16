@@ -7,11 +7,15 @@ import {
   FRAUD_SIGNALS_CONFIG
 } from '@esim/shared/services/fraudSignalsService';
 import { checkBlocklist } from '@esim/shared/services/fraudDetectionService';
+import { verifyAdminKey } from '@esim/shared/lib/apiAuth';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request) {
   try {
+    const authError = verifyAdminKey(request);
+    if (authError) return authError;
+
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
     const email = searchParams.get('email');
@@ -93,6 +97,9 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
+    const authError = verifyAdminKey(request);
+    if (authError) return authError;
+
     const body = await request.json();
     const { userId, email, cardFingerprint } = body;
 

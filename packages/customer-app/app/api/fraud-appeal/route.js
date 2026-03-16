@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 import { submitBlockAppeal, getFraudStats } from '@esim/shared/services/fraudSignalsService';
+import { verifyUserJWT, verifyAdminKey } from '@esim/shared/lib/apiAuth';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request) {
   try {
+    const { userId: authUserId, error: authError } = await verifyUserJWT(request);
+    if (authError) return authError;
+
     const body = await request.json();
     const { userId, email, contactEmail, contactPhone, reason, additionalInfo } = body;
 
@@ -74,6 +78,9 @@ export async function POST(request) {
 
 export async function GET(request) {
   try {
+    const authError = verifyAdminKey(request);
+    if (authError) return authError;
+
     const { searchParams } = new URL(request.url);
     const appealId = searchParams.get('appealId');
     const email = searchParams.get('email');

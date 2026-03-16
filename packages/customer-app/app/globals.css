@@ -136,14 +136,7 @@
     text-align: start;
   }
 
-  [dir="rtl"] .flex,
-  [dir="rtl"] .inline-flex {
-    flex-direction: row-reverse;
-  }
-
-  [dir="rtl"] .flex-col {
-    flex-direction: column;
-  }
+  /* RTL flex overrides moved to rtl.css — do not duplicate here */
 
   /* NOTE: justify-start/end and items-start/end are NOT flipped here.
      - justify-start/end: already handled by flex-direction: row-reverse above
@@ -410,6 +403,45 @@
     }
     .animate-reveal { opacity: 1; transform: none; }
     .animate-bar { width: var(--bar-width) !important; }
+  }
+
+  /* Hero photo staggered fade-in */
+  @keyframes hero-photo-in {
+    from { opacity: 0; transform: translateY(24px) rotate(var(--hero-rotate, 0deg)); }
+    to { opacity: 1; transform: translateY(0) rotate(var(--hero-rotate, 0deg)); }
+  }
+  .hero-photo {
+    opacity: 0;
+    animation: hero-photo-in 0.8s ease-out forwards;
+  }
+  .hero-photo-1 { --hero-rotate: -8deg; animation-delay: 0ms; }
+  .hero-photo-2 { --hero-rotate: 5deg; animation-delay: 200ms; }
+  .hero-photo-3 { --hero-rotate: 12deg; animation-delay: 400ms; }
+
+  /* Hero phone slide-up */
+  @keyframes hero-phone-in {
+    from { opacity: 0; transform: translateY(40px) rotate(var(--hero-rotate, 0deg)) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) rotate(var(--hero-rotate, 0deg)) scale(1); }
+  }
+  .hero-phone {
+    opacity: 0;
+    animation: hero-phone-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .hero-phone-1 { --hero-rotate: -6deg; animation-delay: 500ms; }
+  .hero-phone-2 { --hero-rotate: 4deg; animation-delay: 700ms; }
+
+  /* Hero country chip staggered pop-in */
+  @keyframes hero-chip-in {
+    from { opacity: 0; transform: translateY(8px) scale(0.9); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .hero-chip {
+    opacity: 0;
+    animation: hero-chip-in 0.4s ease-out forwards;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-photo, .hero-phone, .hero-chip { opacity: 1; animation: none; }
   }
 
   /* Hero route pulse animation — pure CSS, zero TBT */

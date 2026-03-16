@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { timingSafeEqual } from 'crypto';
 import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 
 async function processStuckOrder(supabase, orderId, orderData) {
@@ -63,7 +64,9 @@ async function handleRequest(adminKey) {
   if (!expectedAdminKey) {
     return NextResponse.json({ error: 'Server misconfiguration: ADMIN_SECRET_KEY not set' }, { status: 503 });
   }
-  if (adminKey !== expectedAdminKey) {
+  const a = Buffer.from(adminKey || '');
+  const b = Buffer.from(expectedAdminKey);
+  if (a.length !== b.length || !timingSafeEqual(a, b)) {
     return NextResponse.json({ error: 'Unauthorized - Invalid admin key' }, { status: 401 });
   }
 

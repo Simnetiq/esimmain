@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
+import { verifyUserJWT } from '@esim/shared/lib/apiAuth';
 
 export async function POST(request) {
   try {
+    const { userId, error: authError } = await verifyUserJWT(request);
+    if (authError) return authError;
+
     const body = await request.json();
     const { orderId, country_code, country_region } = body;
 
@@ -19,7 +23,8 @@ export async function POST(request) {
         country_region: country_region || null,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', orderId);
+      .eq('id', orderId)
+      .eq('user_id', userId);
 
     if (error) {
       console.error('[orders/update-country] Supabase error:', error);

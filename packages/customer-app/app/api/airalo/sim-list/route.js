@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
+import { verifyAdminKey } from '@esim/shared/lib/apiAuth';
 
 // Get list of eSIMs
 // GET /v2/sims
 export async function GET(request) {
+  const authError = verifyAdminKey(request);
+  if (authError) return authError;
+
   try {
     const { searchParams } = new URL(request.url);
     
@@ -112,6 +116,9 @@ export async function GET(request) {
 
 // Also support POST for clients that prefer POST
 export async function POST(request) {
+  const authError = verifyAdminKey(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     

@@ -49,7 +49,8 @@
     "noResults": "여행지를 찾을 수 없습니다",
     "explorePlans": "요금제 살펴보기",
     "appStore": "App Store",
-    "googlePlay": "Google Play"
+    "googlePlay": "Google Play",
+    "popular": "인기"
   },
   "features": {
     "title": "전 세계와 연결하세요",
@@ -905,7 +906,9 @@
     "multiLanguage": "다국어 지원",
     "multiLanguageDesc": "아랍어, 히브리어, 일본어 등 18개 언어 완벽 지원",
     "support": "전담 고객지원",
-    "supportDesc": "이메일과 앱 내 실제 사람이 지원합니다. 챗봇 없음."
+    "supportDesc": "이메일과 앱 내 실제 사람이 지원합니다. 챗봇 없음.",
+    "downloadTitle": "Simnetiq 앱 다운로드",
+    "downloadDesc": "eSIM 관리, 데이터 충전, 연결 유지 — 모두 휴대폰에서."
   },
   "coverage": {
     "title": "글로벌 커버리지",

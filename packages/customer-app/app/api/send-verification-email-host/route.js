@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server';
 import { render } from '@react-email/render';
 import { sendEmail } from '@esim/shared/lib/email';
+import { verifyAdminKey } from '@esim/shared/lib/apiAuth';
 import VerificationEmail from '../../../emails/VerificationEmail';
 
 export async function POST(request) {
+  const authError = verifyAdminKey(request);
+  if (authError) return authError;
+
   try {
     const { email, userName, otpCode } = await request.json();
 

@@ -41,7 +41,11 @@
     "promoPrefix": "השתמש בקוד",
     "promoSuffix": "לקבלת {{discount}}% הנחה על ה-eSIM הראשון שלך",
     "fiveStarRated": "דירוג 5 כוכבים",
-    "sevenDayRefund": "החזר תוך 7 ימים"
+    "sevenDayRefund": "החזר תוך 7 ימים",
+    "searchPlaceholder": "לאן אתה נוסע?",
+    "popularDestinations": "יעדים פופולריים",
+    "noResults": "לא נמצאו יעדים",
+    "popular": "פופולרי"
   },
   "features": {
     "title": "התחבר גלובלית",
@@ -894,7 +898,9 @@
     "multiLanguage": "רב-לשוני",
     "multiLanguageDesc": "תמיכה מלאה ב-18 שפות כולל ערבית, עברית, יפנית ועוד",
     "support": "תמיכה ייעודית",
-    "supportDesc": "תמיכה אנושית אמיתית באימייל ובאפליקציה. בלי צ'אטבוטים."
+    "supportDesc": "תמיכה אנושית אמיתית באימייל ובאפליקציה. בלי צ'אטבוטים.",
+    "downloadTitle": "הורד את אפליקציית Simnetiq",
+    "downloadDesc": "נהל את כרטיסי ה-eSIM שלך, טען נתונים והישאר מחובר — הכל מהטלפון שלך."
   },
   "devices": {
     "title": "תאימות מכשירים",

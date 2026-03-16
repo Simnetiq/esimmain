@@ -1,22 +1,31 @@
 import { NextResponse } from 'next/server';
+import { timingSafeEqual } from 'crypto';
 import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 import { blockUser, unblockUser, getFraudStats } from '@esim/shared/services/fraudSignalsService';
 
 export const dynamic = 'force-dynamic';
 
+function checkAdminAuth(request) {
+  const authHeader = request.headers.get('authorization');
+  const adminApiKey = process.env.ADMIN_API_KEY;
+  if (!adminApiKey) {
+    return NextResponse.json({ error: 'Server misconfiguration: ADMIN_API_KEY not set', code: 'SERVER_ERROR' }, { status: 503 });
+  }
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return NextResponse.json({ error: 'Unauthorized', code: 'UNAUTHORIZED' }, { status: 401 });
+  }
+  const provided = Buffer.from(authHeader.slice(7));
+  const expected = Buffer.from(adminApiKey);
+  if (provided.length !== expected.length || !timingSafeEqual(provided, expected)) {
+    return NextResponse.json({ error: 'Unauthorized', code: 'UNAUTHORIZED' }, { status: 401 });
+  }
+  return null; // authorized
+}
+
 export async function GET(request) {
   try {
-    const authHeader = request.headers.get('authorization');
-    const adminApiKey = process.env.ADMIN_API_KEY;
-
-    if (process.env.NODE_ENV === 'production' && adminApiKey) {
-      if (!authHeader || authHeader !== `Bearer ${adminApiKey}`) {
-        return NextResponse.json(
-          { error: 'Unauthorized', code: 'UNAUTHORIZED' },
-          { status: 401 }
-        );
-      }
-    }
+    const authError = checkAdminAuth(request);
+    if (authError) return authError;
 
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type') || 'all';
@@ -146,17 +155,8 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const authHeader = request.headers.get('authorization');
-    const adminApiKey = process.env.ADMIN_API_KEY;
-
-    if (process.env.NODE_ENV === 'production' && adminApiKey) {
-      if (!authHeader || authHeader !== `Bearer ${adminApiKey}`) {
-        return NextResponse.json(
-          { error: 'Unauthorized', code: 'UNAUTHORIZED' },
-          { status: 401 }
-        );
-      }
-    }
+    const authError = checkAdminAuth(request);
+    if (authError) return authError;
 
     const supabase = getSupabaseAdmin();
     const body = await request.json();
@@ -286,17 +286,8 @@ export async function POST(request) {
 
 export async function DELETE(request) {
   try {
-    const authHeader = request.headers.get('authorization');
-    const adminApiKey = process.env.ADMIN_API_KEY;
-
-    if (process.env.NODE_ENV === 'production' && adminApiKey) {
-      if (!authHeader || authHeader !== `Bearer ${adminApiKey}`) {
-        return NextResponse.json(
-          { error: 'Unauthorized', code: 'UNAUTHORIZED' },
-          { status: 401 }
-        );
-      }
-    }
+    const authError = checkAdminAuth(request);
+    if (authError) return authError;
 
     const supabase = getSupabaseAdmin();
     const { searchParams } = new URL(request.url);

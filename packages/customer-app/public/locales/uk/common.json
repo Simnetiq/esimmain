@@ -41,7 +41,11 @@
     "promoPrefix": "Використайте код",
     "promoSuffix": "та отримайте знижку {{discount}}% на перший eSIM",
     "fiveStarRated": "Оцінка 5 зірок",
-    "sevenDayRefund": "Повернення за 7 днів"
+    "sevenDayRefund": "Повернення за 7 днів",
+    "searchPlaceholder": "Куди ви подорожуєте?",
+    "popularDestinations": "Популярні напрямки",
+    "noResults": "Напрямки не знайдено",
+    "popular": "Популярні"
   },
   "features": {
     "title": "Зв'язок по всьому світу",
@@ -895,7 +899,9 @@
     "multiLanguage": "Багатомовність",
     "multiLanguageDesc": "Повна підтримка 18 мовами: арабська, іврит, японська та інші",
     "support": "Персональна підтримка",
-    "supportDesc": "Живі люди через email та в додатку. Жодних чат-ботів."
+    "supportDesc": "Живі люди через email та в додатку. Жодних чат-ботів.",
+    "downloadTitle": "Завантажте додаток Simnetiq",
+    "downloadDesc": "Керуйте eSIM, поповнюйте дані та залишайтесь на зв'язку — усе з телефону."
   },
   "devices": {
     "title": "Сумісність пристроїв",

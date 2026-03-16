@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { timingSafeEqual } from 'crypto';
 import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 
 function requireApiKey(request) {
@@ -7,7 +8,10 @@ function requireApiKey(request) {
 
   const auth = request.headers.get('authorization');
   if (!auth || !auth.startsWith('Bearer ')) return false;
-  return auth.slice(7) === apiKey;
+  const provided = Buffer.from(auth.slice(7));
+  const expected = Buffer.from(apiKey);
+  if (provided.length !== expected.length) return false;
+  return timingSafeEqual(provided, expected);
 }
 
 export async function GET(request) {

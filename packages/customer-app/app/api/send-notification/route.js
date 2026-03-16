@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
 import { sendFCMMessage, sendFCMToMultiple, sendFCMToTopic } from '@esim/shared/lib/fcm';
+import { verifyAdminKey } from '@esim/shared/lib/apiAuth';
 
 export async function POST(request) {
   try {
+    const authError = verifyAdminKey(request);
+    if (authError) return authError;
+
     const requestBody = await request.json();
     const {
       title,

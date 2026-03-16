@@ -64,7 +64,8 @@
 [dir="rtl"] .space-x-4 > * + * { margin-left: 0; margin-right: 1rem; }
 
 /* Flex direction - row layouts reverse in RTL */
-[dir="rtl"] .flex:not(.flex-col):not(.flex-col-reverse) {
+[dir="rtl"] .flex:not(.flex-col):not(.flex-col-reverse),
+[dir="rtl"] .inline-flex:not(.flex-col):not(.flex-col-reverse) {
   flex-direction: row-reverse;
 }
 

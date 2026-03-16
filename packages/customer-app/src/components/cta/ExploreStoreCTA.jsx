@@ -1,7 +1,10 @@
 'use client';
 
+import { useMemo } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useI18n } from '@esim/shared/contexts/I18nContext';
+import { detectLanguageFromPath } from '@esim/shared/utils/languageUtils';
 import { trackCustomFacebookEvent } from '@esim/shared/utils/facebookPixel';
 
 // Arrow icon (45 degrees up-right)
@@ -28,9 +31,11 @@ export default function ExploreStoreCTA({
   className = '',
   source = 'hero_secondary_cta'
 }) {
-  const { t, locale } = useI18n();
-
-  const esimPlansUrl = locale && locale !== 'en' ? `/${locale}/esim-plans` : '/esim-plans';
+  const { t } = useI18n();
+  const pathname = usePathname();
+  // Use pathname-based locale for SSR consistency (avoids hydration mismatch)
+  const ssrSafeLanguage = useMemo(() => detectLanguageFromPath(pathname) || 'en', [pathname]);
+  const esimPlansUrl = ssrSafeLanguage && ssrSafeLanguage !== 'en' ? `/${ssrSafeLanguage}/esim-plans` : '/esim-plans';
 
   const handleClick = () => {
     trackCustomFacebookEvent('ExploreStore', {

@@ -49,7 +49,8 @@
     "noResults": "Geen bestemmingen gevonden",
     "explorePlans": "Bundels bekijken",
     "appStore": "App Store",
-    "googlePlay": "Google Play"
+    "googlePlay": "Google Play",
+    "popular": "Populair"
   },
   "features": {
     "title": "Wereldwijd verbonden",
@@ -905,7 +906,9 @@
     "multiLanguage": "Meertalig",
     "multiLanguageDesc": "Volledige ondersteuning in 18 talen inclusief Arabisch, Hebreeuws, Japans en meer",
     "support": "Toegewijde ondersteuning",
-    "supportDesc": "Echte menselijke ondersteuning via e-mail en in de app. Geen chatbots."
+    "supportDesc": "Echte menselijke ondersteuning via e-mail en in de app. Geen chatbots.",
+    "downloadTitle": "Download de Simnetiq-app",
+    "downloadDesc": "Beheer je eSIM's, laad data bij en blijf verbonden — allemaal vanaf je telefoon."
   },
   "coverage": {
     "title": "Wereldwijde dekking",

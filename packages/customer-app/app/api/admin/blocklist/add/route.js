@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 import { addToBlocklist } from '@esim/shared/services/fraudDetectionService';
+import { verifyAdminKey } from '@esim/shared/lib/apiAuth';
 
 export async function POST(request) {
   try {
+    const authError = verifyAdminKey(request);
+    if (authError) return authError;
+
     const body = await request.json();
     const { userId, email, reason, adminId } = body;
 

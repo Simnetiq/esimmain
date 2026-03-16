@@ -41,7 +41,11 @@
     "promoPrefix": "कोड इस्तेमाल करें",
     "promoSuffix": "और अपनी पहली eSIM पर {{discount}}% छूट पाएं",
     "fiveStarRated": "5-स्टार रेटिंग",
-    "sevenDayRefund": "7-दिन रिफंड"
+    "sevenDayRefund": "7-दिन रिफंड",
+    "searchPlaceholder": "आप कहाँ यात्रा कर रहे हैं?",
+    "popularDestinations": "लोकप्रिय गंतव्य",
+    "noResults": "कोई गंतव्य नहीं मिला",
+    "popular": "लोकप्रिय"
   },
   "features": {
     "title": "वैश्विक रूप से जुड़ें",
@@ -895,7 +899,9 @@
     "multiLanguage": "बहुभाषी सहायता",
     "multiLanguageDesc": "अरबी, हिब्रू, जापानी सहित 18 भाषाओं में पूर्ण सहायता",
     "support": "समर्पित सहायता",
-    "supportDesc": "ईमेल और ऐप-इन में वास्तविक मानव सहायता। कोई चैटबॉट नहीं।"
+    "supportDesc": "ईमेल और ऐप-इन में वास्तविक मानव सहायता। कोई चैटबॉट नहीं।",
+    "downloadTitle": "Simnetiq ऐप डाउनलोड करें",
+    "downloadDesc": "अपने eSIM प्रबंधित करें, डेटा रिचार्ज करें और जुड़े रहें — सब कुछ अपने फोन से।"
   },
   "devices": {
     "title": "डिवाइस संगतता",

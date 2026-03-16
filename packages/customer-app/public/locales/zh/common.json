@@ -41,7 +41,11 @@
     "promoPrefix": "使用优惠码",
     "promoSuffix": "首次购买 eSIM 立享{{discount}}%折扣",
     "fiveStarRated": "五星好评",
-    "sevenDayRefund": "7天退款"
+    "sevenDayRefund": "7天退款",
+    "searchPlaceholder": "你要去哪里旅行？",
+    "popularDestinations": "热门目的地",
+    "noResults": "未找到目的地",
+    "popular": "热门"
   },
   "features": {
     "title": "连接全球",
@@ -895,7 +899,9 @@
     "multiLanguage": "多语言支持",
     "multiLanguageDesc": "完整支持18种语言，包括阿拉伯语、希伯来语、日语等",
     "support": "专属客服",
-    "supportDesc": "真人客服通过邮件和应用内支持，非机器人。"
+    "supportDesc": "真人客服通过邮件和应用内支持，非机器人。",
+    "downloadTitle": "下载 Simnetiq 应用",
+    "downloadDesc": "管理您的 eSIM、充值流量、保持连接 — 一切尽在手机上。"
   },
   "devices": {
     "title": "设备兼容性",

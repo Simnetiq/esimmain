@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { timingSafeEqual } from 'crypto';
 import { revalidatePath } from 'next/cache';
 
 const SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'ar', 'he', 'hi', 'it', 'ja', 'ko', 'nl', 'pl', 'pt', 'ru', 'th', 'tr', 'uk', 'zh'];
@@ -9,7 +10,10 @@ function requireApiKey(request) {
 
   const auth = request.headers.get('authorization');
   if (!auth || !auth.startsWith('Bearer ')) return false;
-  return auth.slice(7) === apiKey;
+  const provided = Buffer.from(auth.slice(7));
+  const expected = Buffer.from(apiKey);
+  if (provided.length !== expected.length) return false;
+  return timingSafeEqual(provided, expected);
 }
 
 export async function POST(request) {

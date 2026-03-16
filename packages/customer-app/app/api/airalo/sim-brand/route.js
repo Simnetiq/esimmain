@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
+import { verifyUserJWT } from '@esim/shared/lib/apiAuth';
 
 // Update eSIM brand settings
 // PUT /v2/sims/{sim_iccid}/brand
 export async function PUT(request) {
+  const { userId, error: authError } = await verifyUserJWT(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const { iccid, brand_settings_name } = body;
@@ -13,6 +17,12 @@ export async function PUT(request) {
         error: 'ICCID is required'
       }, { status: 400 });
     }
+
+    // Verify user owns this ICCID
+    const { getSupabaseAdmin } = await import('@esim/shared/lib/supabaseAdmin');
+    const supabaseAuth = getSupabaseAdmin();
+    const { data: ownerCheck } = await supabaseAuth.from('orders').select('id').eq('user_id', userId).eq('iccid', iccid).limit(1);
+    if (!ownerCheck?.length) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
     // Get Airalo credentials
     const clientId = process.env.AIRALO_CLIENT_ID;
@@ -102,6 +112,7 @@ export async function PUT(request) {
 
 // Also support POST for easier client integration
 export async function POST(request) {
+  // PUT already handles auth, just delegate
   return PUT(request);
 }
 

@@ -41,7 +41,11 @@
     "promoPrefix": "Użyj kodu",
     "promoSuffix": "i otrzymaj {{discount}}% zniżki na pierwszą kartę eSIM",
     "fiveStarRated": "Ocena 5 gwiazdek",
-    "sevenDayRefund": "7 dni na zwrot"
+    "sevenDayRefund": "7 dni na zwrot",
+    "searchPlaceholder": "Dokąd podróżujesz?",
+    "popularDestinations": "Popularne kierunki",
+    "noResults": "Nie znaleziono kierunków",
+    "popular": "Popularne"
   },
   "features": {
     "title": "Łącz się globalnie",
@@ -57,7 +61,7 @@
       "tag": "NATYCHMIASTOWA AKTYWACJA",
       "title": "Natychmiastowa aktywacja",
       "description": "Połącz się natychmiast dzięki aktywacji kodem QR. Bez czekania, bez opóźnień. Idealne dla podróżników, którzy potrzebują natychmiastowego dostępu do internetu po przylocie.",
-      "readyInSeconds": "\u2713 Gotowe w kilka sekund"
+      "readyInSeconds": "✓ Gotowe w kilka sekund"
     },
     "securePayment": {
       "tag": "BEZPIECZNA PŁATNOŚĆ",
@@ -895,7 +899,9 @@
     "multiLanguage": "Wielojęzyczność",
     "multiLanguageDesc": "Pełne wsparcie w 18 językach, w tym arabskim, hebrajskim, japońskim i innych",
     "support": "Dedykowane wsparcie",
-    "supportDesc": "Prawdziwe wsparcie od ludzi przez e-mail i w aplikacji. Bez chatbotów."
+    "supportDesc": "Prawdziwe wsparcie od ludzi przez e-mail i w aplikacji. Bez chatbotów.",
+    "downloadTitle": "Pobierz aplikację Simnetiq",
+    "downloadDesc": "Zarządzaj swoimi eSIM, doładuj dane i bądź w kontakcie — wszystko z telefonu."
   },
   "devices": {
     "title": "Kompatybilność urządzeń",

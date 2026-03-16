@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getAdminDb } from '@esim/shared/lib/supabaseServiceClient';
+import { getAdminDb } from '@esim/shared/lib/supabaseAdmin';
 
 export async function POST(request) {
   try {

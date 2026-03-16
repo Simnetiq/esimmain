@@ -284,24 +284,6 @@ const EsimPlans = ({ isHomePage = false }) => {
         if (region) setSelectedRegion(region);
     }, [searchParams]);
 
-    // Auto-open bottom sheet when ?country=slug is in URL
-    useEffect(() => {
-        if (!isMounted || countriesLoading) return;
-        const countrySlug = searchParams.get('country');
-        if (!countrySlug) return;
-        // Find matching country by slug or name (case-insensitive)
-        const match = countries.find(c =>
-            (c.slug || '').toLowerCase() === countrySlug.toLowerCase() ||
-            (c.name || '').toLowerCase() === countrySlug.toLowerCase()
-        );
-        if (match) {
-            handleCountrySelect(match);
-        } else {
-            // Fallback: use slug as search term so user sees filtered results
-            setSearchTerm(countrySlug);
-        }
-    }, [isMounted, countriesLoading, countries, searchParams, handleCountrySelect]);
-
     // Fetch Regional Plans from Supabase (with cancellation to prevent race conditions)
     useEffect(() => {
         let cancelled = false;
@@ -353,6 +335,25 @@ const EsimPlans = ({ isHomePage = false }) => {
             setLoadingSheetPlans(false);
         }
     }, []);
+
+    // Auto-open bottom sheet when ?country=slug is in URL
+    useEffect(() => {
+        if (!isMounted || countriesLoading) return;
+        const countrySlug = searchParams.get('country');
+        if (!countrySlug) return;
+        // Find matching country by slug, name, or country code (case-insensitive)
+        const match = countries.find(c =>
+            (c.slug || '').toLowerCase() === countrySlug.toLowerCase() ||
+            (c.name || '').toLowerCase() === countrySlug.toLowerCase() ||
+            (c.code || c.country_code || '').toLowerCase() === countrySlug.toLowerCase()
+        );
+        if (match) {
+            handleCountrySelect(match);
+        } else {
+            // Fallback: use slug as search term so user sees filtered results
+            setSearchTerm(countrySlug);
+        }
+    }, [isMounted, countriesLoading, countries, searchParams, handleCountrySelect]);
 
     // Handler for "Show All" regional plans button
     const handleShowAllRegionalPlans = useCallback(() => {

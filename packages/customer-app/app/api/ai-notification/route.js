@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { sendFCMMessage } from '@esim/shared/lib/fcm';
 import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
+import { verifyAdminKey } from '@esim/shared/lib/apiAuth';
 
 async function generateNotificationWithAI(prompt, config) {
   const response = await fetch(`${config.baseUrl}/chat/completions`, {
@@ -35,6 +36,9 @@ async function generateNotificationWithAI(prompt, config) {
 
 export async function POST(request) {
   try {
+    const authError = verifyAdminKey(request);
+    if (authError) return authError;
+
     const body = await request.json();
     const { prompt, title, userIds = [], aiConfig, testMode = false } = body;
 

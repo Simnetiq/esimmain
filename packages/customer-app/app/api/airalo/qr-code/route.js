@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { verifyUserJWT } from '@esim/shared/lib/apiAuth';
 
 // Generate mock QR code data for sandbox mode
 function generateMockQR() {
@@ -27,6 +28,9 @@ function generateMockQR() {
 }
 
 export async function POST(request) {
+  const { userId, error: authError } = await verifyUserJWT(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const { orderId, airaloOrderId, isTestMode, mockSimData } = body;
@@ -39,6 +43,12 @@ export async function POST(request) {
     }
 
     const orderIdToUse = airaloOrderId || orderId;
+
+    // Verify user owns the ICCID (orderIdToUse is the ICCID for sim lookups)
+    const { getSupabaseAdmin } = await import('@esim/shared/lib/supabaseAdmin');
+    const supabaseAuth = getSupabaseAdmin();
+    const { data: ownerCheck } = await supabaseAuth.from('orders').select('id').eq('user_id', userId).eq('iccid', orderIdToUse).limit(1);
+    if (!ownerCheck?.length) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
     // SANDBOX/TEST MODE - Return mock QR code
     if (isTestMode) {

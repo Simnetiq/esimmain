@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { verifyAdminKey, verifyCronSecret } from '@esim/shared/lib/apiAuth';
 
 // All config from environment — no hardcoded values
 function getEnvOrFail(key: string): string {
@@ -269,14 +270,10 @@ async function handleSync(source: string) {
 
 // GET for Vercel cron
 export async function GET(request: NextRequest) {
-  try {
-    // Verify cron secret if set (Vercel sends CRON_SECRET header)
-    const authHeader = request.headers.get('authorization');
-    const cronSecret = process.env.CRON_SECRET;
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  const cronError = verifyCronSecret(request);
+  if (cronError) return cronError;
 
+  try {
     const result = await handleSync('cron');
     return NextResponse.json(result);
   } catch (err: unknown) {
@@ -288,6 +285,9 @@ export async function GET(request: NextRequest) {
 
 // POST for manual triggers
 export async function POST(request: NextRequest) {
+  const authError = verifyAdminKey(request);
+  if (authError) return authError;
+
   try {
     const result = await handleSync('manual');
     return NextResponse.json(result);

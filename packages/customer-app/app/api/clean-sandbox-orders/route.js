@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { timingSafeEqual } from 'crypto';
 import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 
 export async function GET(request) {
@@ -10,7 +11,9 @@ export async function GET(request) {
     if (!expectedAdminKey) {
       return NextResponse.json({ error: 'Server misconfiguration: ADMIN_SECRET_KEY not set' }, { status: 503 });
     }
-    if (adminKey !== expectedAdminKey) {
+    const a1 = Buffer.from(adminKey || '');
+    const b1 = Buffer.from(expectedAdminKey);
+    if (a1.length !== b1.length || !timingSafeEqual(a1, b1)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -76,7 +79,9 @@ export async function POST(request) {
     if (!expectedAdminKey) {
       return NextResponse.json({ error: 'Server misconfiguration: ADMIN_SECRET_KEY not set' }, { status: 503 });
     }
-    if (adminKey !== expectedAdminKey) {
+    const a2 = Buffer.from(adminKey || '');
+    const b2 = Buffer.from(expectedAdminKey);
+    if (a2.length !== b2.length || !timingSafeEqual(a2, b2)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

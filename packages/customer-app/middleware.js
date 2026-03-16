@@ -31,9 +31,32 @@ function detectLanguageFromHeader(acceptLanguage) {
   return defaultLanguage;
 }
 
+// Protected routes that require authentication
+const protectedPaths = ['/dashboard', '/payment-success', '/settings'];
+const SUPABASE_PROJECT_REF = 'eujmomonscnlmwcbkbfy';
+
 export function middleware(request) {
   const { pathname } = request.nextUrl;
-  
+
+  // --- Auth guard for protected routes ---
+  // Strip locale prefix to get the base path
+  const segments = pathname.split('/').filter(Boolean);
+  const hasLocalePrefix = segments.length > 0 && languagesWithFolders.includes(segments[0]);
+  const basePath = hasLocalePrefix ? '/' + segments.slice(1).join('/') : pathname;
+  const localePrefix = hasLocalePrefix ? '/' + segments[0] : '';
+
+  if (protectedPaths.some(p => basePath === p || basePath.startsWith(p + '/'))) {
+    const authCookie = request.cookies.get(`sb-${SUPABASE_PROJECT_REF}-auth-token`);
+    // Supabase may also store as base64 chunks: sb-{ref}-auth-token.0, .1, etc.
+    const authCookieChunk = request.cookies.get(`sb-${SUPABASE_PROJECT_REF}-auth-token.0`);
+
+    if (!authCookie && !authCookieChunk) {
+      const url = request.nextUrl.clone();
+      url.pathname = `${localePrefix}/login`;
+      return NextResponse.redirect(url);
+    }
+  }
+
   // Only redirect root path based on browser language
   if (pathname === '/') {
     // Don't redirect search engine crawlers — they should see English content at /

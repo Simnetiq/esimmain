@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server';
+import { verifyUserJWT } from '@esim/shared/lib/apiAuth';
 
 // Get eSIM package history (including top-ups)
 // GET /v2/sims/{iccid}/packages
 // Rate limit: 1 request per 15 minutes per ICCID
 export async function GET(request) {
+  const { userId, error: authError } = await verifyUserJWT(request);
+  if (authError) return authError;
+
   try {
     const { searchParams } = new URL(request.url);
     const iccid = searchParams.get('iccid');
@@ -14,6 +18,12 @@ export async function GET(request) {
         error: 'ICCID is required'
       }, { status: 400 });
     }
+
+    // Verify user owns this ICCID
+    const { getSupabaseAdmin } = await import('@esim/shared/lib/supabaseAdmin');
+    const supabaseAuth = getSupabaseAdmin();
+    const { data: ownerCheck } = await supabaseAuth.from('orders').select('id').eq('user_id', userId).eq('iccid', iccid).limit(1);
+    if (!ownerCheck?.length) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
     return fetchPackageHistory(iccid);
   } catch (error) {
@@ -26,6 +36,9 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
+  const { userId, error: authError } = await verifyUserJWT(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const { iccid } = body;
@@ -36,6 +49,12 @@ export async function POST(request) {
         error: 'ICCID is required'
       }, { status: 400 });
     }
+
+    // Verify user owns this ICCID
+    const { getSupabaseAdmin } = await import('@esim/shared/lib/supabaseAdmin');
+    const supabaseAuth = getSupabaseAdmin();
+    const { data: ownerCheck } = await supabaseAuth.from('orders').select('id').eq('user_id', userId).eq('iccid', iccid).limit(1);
+    if (!ownerCheck?.length) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
     return fetchPackageHistory(iccid);
   } catch (error) {

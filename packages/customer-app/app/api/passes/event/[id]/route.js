@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseServer, verifySupabaseToken } from '@esim/shared/lib/supabaseServer';
+import { getSupabaseAdmin, verifySupabaseToken } from '@esim/shared/lib/supabaseAdmin';
 import { generateEventPass, validatePassConfiguration } from '@esim/shared/lib/passkit';
 
 export const dynamic = 'force-dynamic';
@@ -64,7 +64,7 @@ export async function GET(request, { params }) {
     }
 
     const userId = user.id;
-    const supabase = getSupabaseServer();
+    const supabase = getSupabaseAdmin();
 
     // Get event details
     const { data: event, error: eventError } = await supabase

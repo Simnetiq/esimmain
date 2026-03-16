@@ -84,9 +84,11 @@ export default function NewHeroSection({ promo = null }) {
   const heroRef = useRef(null);
   const rafId = useRef(0);
 
-  // Platform detection — show both on SSR, hide irrelevant on client
+  // Platform detection — show both on SSR, hide irrelevant on client after mount
   const [platform, setPlatform] = useState('both'); // 'ios' | 'android' | 'both'
+  const [mounted, setMounted] = useState(false);
   useEffect(() => {
+    setMounted(true);
     const ua = navigator.userAgent || '';
     if (/iPhone|iPad|iPod/i.test(ua)) setPlatform('ios');
     else if (/Android/i.test(ua)) setPlatform('android');
@@ -109,12 +111,12 @@ export default function NewHeroSection({ promo = null }) {
         if (lightPhoneRef.current) {
           const drift = progress * sectionHeight * 0.15;
           const scale = 1 + progress * 0.1;
-          lightPhoneRef.current.style.transform = `translateY(${drift}px) scale(${scale}) rotate(3deg)`;
+          lightPhoneRef.current.style.transform = `translateY(${drift}px) scale(${scale}) rotate(4deg)`;
         }
         if (darkPhoneRef.current) {
           const drift = progress * sectionHeight * 0.08;
           const scale = 1 - progress * 0.08;
-          darkPhoneRef.current.style.transform = `translateY(${drift}px) scale(${scale}) rotate(-4deg)`;
+          darkPhoneRef.current.style.transform = `translateY(${drift}px) scale(${scale}) rotate(-6deg)`;
         }
       });
     };
@@ -179,12 +181,8 @@ export default function NewHeroSection({ promo = null }) {
               {t('hero.promoPrefix', 'Use code')}
               {' '}
               <span className="font-bold">{promo.code}</span>
-              {' '}
-              —
-              {' '}
-              {promo.message || `${promo.discount} off`}
-              {' '}
-              {t('hero.promoSuffix', 'for {{discount}}% off your first eSIM')}
+              {' — '}
+              {promo.message || t('hero.promoSuffix', '{{discount}}% off your first eSIM', { discount: promo.discount })}
             </p>
           </div>
         </div>
@@ -196,7 +194,7 @@ export default function NewHeroSection({ promo = null }) {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start lg:pt-8">
 
             {/* Left column: content */}
-            <div className="flex flex-col items-center text-center lg:items-start lg:text-start">
+            <div className={`flex flex-col ${isRtl ? 'items-start text-start' : 'items-center text-center lg:items-start lg:text-start'}`}>
 
               {/* Tagline badge */}
               <div
@@ -230,9 +228,9 @@ export default function NewHeroSection({ promo = null }) {
 
               {/* h1 — LCP element. Renders immediately; no state dependencies. */}
               <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-text-primary leading-[1.1] mb-6">
-                <span className="block">{headlinePart1}</span>
-                <span className={`block text-tufts-blue${!isRtl ? ' italic' : ''}`}>{headlineHighlight}</span>
-                <span className="block text-text-muted">{headlinePart2}</span>
+                {headlinePart1}{' '}
+                <span className={`text-tufts-blue${!isRtl ? ' italic' : ''}`}>{headlineHighlight}</span>{' '}
+                <span className="text-text-muted">{headlinePart2}</span>
               </h1>
 
               <p className="text-sm sm:text-base lg:text-lg text-text-muted mb-6 max-w-xl leading-relaxed">
@@ -243,16 +241,17 @@ export default function NewHeroSection({ promo = null }) {
               <HeroSearch esimPlansUrl={esimPlansUrl} />
 
               {/* Popular country chips */}
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 mb-6 rtl-native-flex">
-                <span className="text-xs text-text-muted">{t('hero.popular', 'Popular')}:</span>
-                {POPULAR_COUNTRIES.map((country) => (
+              <div className="flex flex-nowrap items-center justify-start gap-2 mb-6 overflow-x-auto scrollbar-hide w-full rtl-native-flex">
+                <span className="text-xs text-text-muted flex-shrink-0">{t('hero.popular', 'Popular')}:</span>
+                {POPULAR_COUNTRIES.map((country, idx) => (
                   <Link
                     key={country.code}
                     href={countryUrl(country.slug)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium text-text-muted transition-colors duration-150 hover:text-text-primary rtl-native-flex"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium text-text-muted transition-colors duration-150 hover:text-text-primary rtl-native-flex flex-shrink-0 whitespace-nowrap hero-chip"
                     style={{
                       backgroundColor: 'var(--bg-primary)',
                       border: '1px solid var(--card-border)',
+                      animationDelay: `${idx * 80}ms`,
                     }}
                   >
                     <FlagImage code={country.code} className="w-4 h-4 rounded-full object-cover" />
@@ -262,7 +261,7 @@ export default function NewHeroSection({ promo = null }) {
               </div>
 
               {/* CTAs — all 3 in one row, same pill-with-circle design, same size */}
-              <div className="flex flex-col sm:flex-row items-center lg:items-start gap-3 mb-6 w-full sm:w-auto rtl-native-flex-sm">
+              <div className={`flex flex-col sm:flex-row ${isRtl ? 'items-start' : 'items-center lg:items-start'} gap-3 mb-6 w-full sm:w-auto rtl-native-flex-sm`}>
                 {/* Explore Plans */}
                 <ExploreStoreCTA
                   variant="themed"
@@ -276,7 +275,7 @@ export default function NewHeroSection({ promo = null }) {
                   target="_blank"
                   rel="noopener noreferrer"
                   suppressHydrationWarning
-                  className={`inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:opacity-90 rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto shadow-sm ${platform === 'android' ? 'hidden' : ''}`}
+                  className={`inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:opacity-90 rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto shadow-sm ${mounted && platform === 'android' ? 'hidden' : ''}`}
                   style={{
                     backgroundColor: 'var(--cta-secondary-bg)',
                     color: 'var(--cta-secondary-text)',
@@ -299,7 +298,7 @@ export default function NewHeroSection({ promo = null }) {
                   target="_blank"
                   rel="noopener noreferrer"
                   suppressHydrationWarning
-                  className={`inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:opacity-90 rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto shadow-sm ${platform === 'ios' ? 'hidden' : ''}`}
+                  className={`inline-flex items-center rounded-full font-semibold transition-all duration-200 hover:opacity-90 rtl-native-flex ps-5 pe-1 py-1 text-sm w-full sm:w-auto shadow-sm ${mounted && platform === 'ios' ? 'hidden' : ''}`}
                   style={{
                     backgroundColor: 'var(--cta-secondary-bg)',
                     color: 'var(--cta-secondary-text)',
@@ -320,7 +319,7 @@ export default function NewHeroSection({ promo = null }) {
 
               {/* Trust badges — plain checkmark list */}
               <div
-                className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 text-xs text-text-muted rtl-native-flex"
+                className={`flex flex-wrap items-center ${isRtl ? 'justify-start' : 'justify-center lg:justify-start'} gap-x-6 gap-y-2 text-xs text-text-muted rtl-native-flex`}
                 role="list"
                 aria-label="Trust indicators"
               >
@@ -340,23 +339,23 @@ export default function NewHeroSection({ promo = null }) {
               <div className="relative w-full max-w-xl mx-auto" style={{ height: '620px' }}>
 
                 {/* Stacked travel photos — layered, bigger */}
-                <div className="absolute rounded-2xl overflow-hidden border border-white/[0.06]" style={{ width: '80%', height: '65%', left: '0%', top: '5%', transform: 'rotate(-3deg)', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
+                <div className="absolute rounded-2xl overflow-hidden border border-white/[0.06] hero-photo hero-photo-1" style={{ width: '80%', height: '65%', left: '0%', top: '5%', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
                   <img src="/images/hero-phuket.avif" alt="" className="w-full h-full object-cover" loading="eager" fetchPriority="low" />
                 </div>
-                <div className="absolute rounded-2xl overflow-hidden border border-white/[0.06]" style={{ width: '80%', height: '65%', right: '0%', top: '12%', transform: 'rotate(2deg)', boxShadow: '0 12px 40px rgba(0,0,0,0.25)' }}>
+                <div className="absolute rounded-2xl overflow-hidden border border-white/[0.06] hero-photo hero-photo-2" style={{ width: '80%', height: '65%', right: '0%', top: '12%', boxShadow: '0 12px 40px rgba(0,0,0,0.25)' }}>
                   <img src="/images/hero-phones.avif" alt="" className="w-full h-full object-cover" loading="eager" fetchPriority="low" />
                 </div>
-                <div className="absolute rounded-2xl overflow-hidden border border-white/[0.06]" style={{ width: '75%', height: '60%', right: '-5%', top: '20%', transform: 'rotate(5deg)', boxShadow: '0 16px 48px rgba(0,0,0,0.3)' }}>
+                <div className="absolute rounded-2xl overflow-hidden border border-white/[0.06] hero-photo hero-photo-3" style={{ width: '75%', height: '60%', right: '-5%', top: '20%', boxShadow: '0 16px 48px rgba(0,0,0,0.3)' }}>
                   <img src="/images/hero-paris.avif" alt="" className="w-full h-full object-cover" loading="eager" fetchPriority="low" />
                 </div>
 
                 {/* Dark phone — behind, tilted left */}
-                <div ref={darkPhoneRef} className="absolute z-10 drop-shadow-2xl will-change-transform" style={{ width: '220px', left: '18%', bottom: '0', transform: 'rotate(-4deg)' }}>
+                <div ref={darkPhoneRef} className="absolute z-10 drop-shadow-2xl will-change-transform hero-phone hero-phone-1" style={{ width: '260px', left: '14%', bottom: '0' }}>
                   <img src="/images/phone-dark.png" alt="" className="w-full h-auto" loading="eager" fetchPriority="low" />
                 </div>
 
                 {/* Light phone — in front, slightly right */}
-                <div ref={lightPhoneRef} className="absolute z-20 drop-shadow-2xl will-change-transform" style={{ width: '230px', right: '15%', bottom: '-8px', transform: 'rotate(3deg)' }}>
+                <div ref={lightPhoneRef} className="absolute z-20 drop-shadow-2xl will-change-transform hero-phone hero-phone-2" style={{ width: '270px', right: '10%', bottom: '-8px' }}>
                   <img src="/images/phone-light.png" alt="" className="w-full h-auto" loading="eager" fetchPriority="low" />
                 </div>
               </div>

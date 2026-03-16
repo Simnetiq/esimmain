@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
+import { verifyAdminKey } from '@esim/shared/lib/apiAuth';
 
 async function getAiraloAccessToken(clientId, clientSecret, baseUrl) {
   const authResponse = await fetch(`${baseUrl}/v2/token`, {
@@ -61,8 +62,16 @@ async function fetchAllPackages(baseUrl, accessToken, includeTopup = true) {
   return allPackages;
 }
 
-export async function GET(request) { return handleSync(request, 'cron'); }
-export async function POST(request) { return handleSync(request, 'manual'); }
+export async function GET(request) {
+  const authError = verifyAdminKey(request);
+  if (authError) return authError;
+  return handleSync(request, 'cron');
+}
+export async function POST(request) {
+  const authError = verifyAdminKey(request);
+  if (authError) return authError;
+  return handleSync(request, 'manual');
+}
 
 async function handleSync(request, source = 'manual') {
   const startTime = Date.now();

@@ -41,7 +41,11 @@
     "promoPrefix": "コード",
     "promoSuffix": "で初回eSIMが{{discount}}%オフ",
     "fiveStarRated": "5つ星評価",
-    "sevenDayRefund": "7日間返金保証"
+    "sevenDayRefund": "7日間返金保証",
+    "searchPlaceholder": "どこに旅行しますか？",
+    "popularDestinations": "人気の旅行先",
+    "noResults": "旅行先が見つかりません",
+    "popular": "人気"
   },
   "features": {
     "title": "世界中とつながる",
@@ -895,7 +899,9 @@
     "multiLanguage": "多言語対応",
     "multiLanguageDesc": "アラビア語、ヘブライ語、日本語など18言語を完全サポート",
     "support": "専任サポート",
-    "supportDesc": "メールとアプリ内で実際のスタッフが対応。チャットボットではありません。"
+    "supportDesc": "メールとアプリ内で実際のスタッフが対応。チャットボットではありません。",
+    "downloadTitle": "Simnetiqアプリを入手",
+    "downloadDesc": "eSIMの管理、データチャージ、接続維持 — すべてスマホから。"
   },
   "devices": {
     "title": "対応デバイス",

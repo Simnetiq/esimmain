@@ -41,7 +41,11 @@
     "promoPrefix": "Use o código",
     "promoSuffix": "e ganhe {{discount}}% de desconto no seu primeiro eSIM",
     "fiveStarRated": "Avaliação 5 Estrelas",
-    "sevenDayRefund": "Reembolso em 7 Dias"
+    "sevenDayRefund": "Reembolso em 7 Dias",
+    "searchPlaceholder": "Para onde você está viajando?",
+    "popularDestinations": "Destinos populares",
+    "noResults": "Nenhum destino encontrado",
+    "popular": "Popular"
   },
   "features": {
     "title": "Conecte-se globalmente",
@@ -895,7 +899,9 @@
     "multiLanguage": "Multi-Idiomas",
     "multiLanguageDesc": "Suporte completo em 18 idiomas, incluindo árabe, hebraico, japonês e mais",
     "support": "Suporte Dedicado",
-    "supportDesc": "Atendimento humano real por e-mail e no app. Sem chatbots."
+    "supportDesc": "Atendimento humano real por e-mail e no app. Sem chatbots.",
+    "downloadTitle": "Baixe o app Simnetiq",
+    "downloadDesc": "Gerencie seus eSIMs, recarregue dados e fique conectado — tudo pelo celular."
   },
   "devices": {
     "title": "Compatibilidade de Dispositivos",

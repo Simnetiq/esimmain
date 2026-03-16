@@ -10,15 +10,9 @@ const RegionTabs = ({ selectedRegion, onRegionChange }) => {
   const { locale, isLoading: i18nLoading } = useI18n();
   const { regions, isLoading } = useRegions(locale);
 
-  // Language detection with fallback
+  // Language detection — avoid localStorage in render to prevent hydration mismatch
   const detectedLanguage = useMemo(() => {
-    if (i18nLoading) {
-      if (typeof window !== 'undefined') {
-        const savedLanguage = localStorage.getItem('Simnetiq-language');
-        if (savedLanguage) return savedLanguage;
-      }
-      return 'en';
-    }
+    if (i18nLoading) return 'en';
     return locale || 'en';
   }, [locale, i18nLoading]);
 

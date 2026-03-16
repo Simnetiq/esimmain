@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
+import { verifyAdminKey } from '@esim/shared/lib/apiAuth';
 
 export async function GET(request) {
   try {
+    const authError = verifyAdminKey(request);
+    if (authError) return authError;
+
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
     const limitParam = parseInt(searchParams.get('limit')) || 100;

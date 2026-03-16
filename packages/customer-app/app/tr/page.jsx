@@ -5,7 +5,6 @@ import HomePageWrapper from '../../src/components/HomePageWrapper';
 
 const loadingFallback = <div className="h-96 bg-[var(--card-bg)] animate-pulse mx-4" />;
 
-const SocialProof = dynamic(() => import('../../src/components/sections/SocialProof'), { loading: () => loadingFallback });
 const HowItWorks = dynamic(() => import('../../src/components/sections/HowItWorks'), { loading: () => loadingFallback });
 const RoamingComparison = dynamic(() => import('../../src/components/sections/RoamingComparison'), { loading: () => loadingFallback });
 const CoverageStats = dynamic(() => import('../../src/components/sections/CoverageStats'), { loading: () => loadingFallback });
@@ -23,7 +22,6 @@ export default async function HomePage() {
       <RoamingComparison />
       <CoverageStats />
       <FeaturesBento />
-      <SocialProof />
       <HowItWorks />
       <AppDownload />
       <FAQSection />

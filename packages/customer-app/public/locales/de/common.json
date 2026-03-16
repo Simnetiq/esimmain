@@ -41,7 +41,11 @@
     "promoPrefix": "Code nutzen",
     "promoSuffix": "für {{discount}}% Rabatt auf Ihre erste eSIM",
     "fiveStarRated": "5-Sterne-Bewertung",
-    "sevenDayRefund": "7-Tage-Rückgabe"
+    "sevenDayRefund": "7-Tage-Rückgabe",
+    "searchPlaceholder": "Wohin reisen Sie?",
+    "popularDestinations": "Beliebte Reiseziele",
+    "noResults": "Keine Reiseziele gefunden",
+    "popular": "Beliebt"
   },
   "coverage": {
     "exploreCTA": "Jetzt {{region}} entdecken",
@@ -895,7 +899,9 @@
     "multiLanguage": "Mehrsprachig",
     "multiLanguageDesc": "Voller Support in 18 Sprachen, darunter Arabisch, Hebräisch, Japanisch und mehr",
     "support": "Persönlicher Support",
-    "supportDesc": "Echter menschlicher Support per E-Mail und in der App. Keine Chatbots."
+    "supportDesc": "Echter menschlicher Support per E-Mail und in der App. Keine Chatbots.",
+    "downloadTitle": "Hol dir die Simnetiq App",
+    "downloadDesc": "Verwalte deine eSIMs, lade Daten auf und bleib verbunden — alles von deinem Handy."
   },
   "devices": {
     "title": "Gerätekompatibilität",

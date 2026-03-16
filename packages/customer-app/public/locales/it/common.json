@@ -49,7 +49,8 @@
     "noResults": "Nessuna destinazione trovata",
     "explorePlans": "Esplora i piani",
     "appStore": "App Store",
-    "googlePlay": "Google Play"
+    "googlePlay": "Google Play",
+    "popular": "Popolari"
   },
   "features": {
     "title": "Connettiti globalmente",
@@ -905,7 +906,9 @@
     "multiLanguage": "Multilingue",
     "multiLanguageDesc": "Supporto completo in 18 lingue tra cui arabo, ebraico, giapponese e altro",
     "support": "Supporto dedicato",
-    "supportDesc": "Supporto umano reale via email e in-app. Nessun chatbot."
+    "supportDesc": "Supporto umano reale via email e in-app. Nessun chatbot.",
+    "downloadTitle": "Scarica l'app Simnetiq",
+    "downloadDesc": "Gestisci le tue eSIM, ricarica i dati e resta connesso — tutto dal tuo telefono."
   },
   "coverage": {
     "title": "Copertura globale",

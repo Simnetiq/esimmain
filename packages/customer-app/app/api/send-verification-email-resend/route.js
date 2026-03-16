@@ -1,9 +1,13 @@
 import { Resend } from 'resend';
 import { NextResponse } from 'next/server';
+import { verifyAdminKey } from '@esim/shared/lib/apiAuth';
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
 export async function POST(request) {
+  const authError = verifyAdminKey(request);
+  if (authError) return authError;
+
   try {
     const { email, userName, otpCode } = await request.json();
 
@@ -179,20 +183,5 @@ Need help? Contact us at support@simnetiq.store
       { status: 500 }
     );
   }
-}
-
-// Handle OPTIONS request for CORS
-export async function OPTIONS() {
-  return NextResponse.json(
-    {},
-    {
-      status: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-      },
-    }
-  );
 }
 

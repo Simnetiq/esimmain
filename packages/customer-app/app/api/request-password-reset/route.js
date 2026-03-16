@@ -2,8 +2,25 @@ import { NextResponse } from 'next/server';
 import { render } from '@react-email/render';
 import { sendEmail } from '@esim/shared/lib/email';
 import PasswordResetEmail from '../../../emails/PasswordResetEmail';
-import { getAdminDb } from '@esim/shared/lib/supabaseServiceClient';
+import { getAdminDb } from '@esim/shared/lib/supabaseAdmin';
 import crypto from 'crypto';
+
+// Rate limiting: 3 requests per hour per email
+const rateLimitMap = new Map();
+const RATE_LIMIT = { maxRequests: 3, windowMs: 60 * 60 * 1000 };
+
+function checkRateLimit(email) {
+  const now = Date.now();
+  const key = email.toLowerCase();
+  const entry = rateLimitMap.get(key);
+  if (!entry || now - entry.firstRequest > RATE_LIMIT.windowMs) {
+    rateLimitMap.set(key, { firstRequest: now, count: 1 });
+    return true;
+  }
+  if (entry.count >= RATE_LIMIT.maxRequests) return false;
+  entry.count++;
+  return true;
+}
 
 export async function POST(request) {
   try {
@@ -13,6 +30,13 @@ export async function POST(request) {
       return NextResponse.json(
         { error: 'Email is required' },
         { status: 400 }
+      );
+    }
+
+    if (!checkRateLimit(email)) {
+      return NextResponse.json(
+        { error: 'Too many requests. Try again later.' },
+        { status: 429 }
       );
     }
 

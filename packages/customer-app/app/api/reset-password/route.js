@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getAdminDb, getAdminAuth } from '@esim/shared/lib/supabaseServiceClient';
+import { getAdminDb, getAdminAuth } from '@esim/shared/lib/supabaseAdmin';
 
 export async function POST(request) {
   try {
@@ -12,9 +12,9 @@ export async function POST(request) {
       );
     }
 
-    if (newPassword.length < 6) {
+    if (newPassword.length < 8) {
       return NextResponse.json(
-        { error: 'Password must be at least 6 characters long' },
+        { error: 'Password must be at least 8 characters long' },
         { status: 400 }
       );
     }

@@ -906,7 +906,9 @@
     "multiLanguage": "Multi-Language",
     "multiLanguageDesc": "Full support in 18 languages including Arabic, Hebrew, Japanese, and more",
     "support": "Dedicated Support",
-    "supportDesc": "Real human support via email and in-app. No chatbots."
+    "supportDesc": "Real human support via email and in-app. No chatbots.",
+    "downloadTitle": "Get the Simnetiq app",
+    "downloadDesc": "Manage your eSIMs, top up data, and stay connected — all from your phone."
   },
   "coverage": {
     "title": "Global Coverage",

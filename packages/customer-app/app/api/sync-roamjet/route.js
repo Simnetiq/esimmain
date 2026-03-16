@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
+import { verifyAdminKey } from '@esim/shared/lib/apiAuth';
 
 export async function POST(request) {
+  const authError = verifyAdminKey(request);
+  if (authError) return authError;
+
   try {
     const { countries_only } = await request.json().catch(() => ({}));
     

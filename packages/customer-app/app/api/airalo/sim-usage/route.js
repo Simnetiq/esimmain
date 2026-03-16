@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
+import { verifyUserJWT } from '@esim/shared/lib/apiAuth';
 
 // In-memory token cache to reduce auth requests
 let tokenCache = {
@@ -9,6 +10,9 @@ let tokenCache = {
 };
 
 export async function POST(request) {
+  const { userId, error: authError } = await verifyUserJWT(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const { iccid } = body;
@@ -19,6 +23,11 @@ export async function POST(request) {
         error: 'ICCID is required'
       }, { status: 400 });
     }
+
+    // Verify user owns this ICCID
+    const supabaseAuth = getSupabaseAdmin();
+    const { data: ownerCheck } = await supabaseAuth.from('orders').select('id').eq('user_id', userId).eq('iccid', iccid).limit(1);
+    if (!ownerCheck?.length) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
     const airaloMode = process.env.AIRALO_MODE || 'production';
     const isSandbox = airaloMode === 'sandbox' || airaloMode === 'test';

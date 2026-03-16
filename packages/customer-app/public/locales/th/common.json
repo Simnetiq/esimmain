@@ -49,7 +49,8 @@
     "noResults": "ไม่พบจุดหมายปลายทาง",
     "explorePlans": "สำรวจแผน",
     "appStore": "App Store",
-    "googlePlay": "Google Play"
+    "googlePlay": "Google Play",
+    "popular": "ยอดนิยม"
   },
   "features": {
     "title": "เชื่อมต่อทั่วโลก",
@@ -905,7 +906,9 @@
     "multiLanguage": "หลายภาษา",
     "multiLanguageDesc": "สนับสนุนเต็มรูปแบบใน 18 ภาษา รวมถึงอาหรับ ฮีบรู ญี่ปุ่น และอื่นๆ",
     "support": "สนับสนุนเฉพาะทาง",
-    "supportDesc": "ฝ่ายสนับสนุนจริงผ่านอีเมลและในแอป ไม่ใช่แชทบอท"
+    "supportDesc": "ฝ่ายสนับสนุนจริงผ่านอีเมลและในแอป ไม่ใช่แชทบอท",
+    "downloadTitle": "ดาวน์โหลดแอป Simnetiq",
+    "downloadDesc": "จัดการ eSIM เติมข้อมูล และเชื่อมต่อตลอดเวลา — ทั้งหมดจากโทรศัพท์ของคุณ"
   },
   "coverage": {
     "title": "ครอบคลุมทั่วโลก",
