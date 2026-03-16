@@ -37,7 +37,7 @@ const RecentOrders = ({ orders, loading, onViewQRCode, usageCache = {}, loadingU
       <div className="mx-auto w-full max-w-9xl">
         <div className="mx-auto w-full max-w-7xl">
           <div className="px-4 py-8 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-            <h2 className={`text-xl sm:text-2xl font-semibold text-eerie-black mb-6 ${isRTL ? 'text-right' : 'text-left'}`}>
+            <h2 className="text-xl sm:text-2xl font-semibold text-eerie-black mb-6 text-start">
               {t('dashboard.recentOrders', 'Recent Orders')}
             </h2>
 

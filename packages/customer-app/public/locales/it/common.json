@@ -330,6 +330,8 @@
     "failedToGetEsimUsage": "Impossibile ottenere il consumo eSIM: {{error}}",
     "countryInfoUpdated": "Informazioni paese aggiornate: {{name}} ({{code}})",
     "failedToUpdateCountryInfo": "Impossibile aggiornare le informazioni paese: {{error}}",
+    "tabEsims": "Le mie eSIM",
+    "tabAccount": "Account",
     "recentOrders": "Ordini recenti",
     "noOrders": "Nessun ordine ancora",
     "unknownPlan": "Piano sconosciuto",

@@ -145,7 +145,13 @@ async function createAiraloEsim(orderId, orderData, supabase) {
   const accessToken = authData.data?.access_token;
   if (!accessToken) throw new Error('No access token received from Airalo');
 
-  const orderResponse = await fetch(`${airaloBaseUrl}/v2/orders`, { method: 'POST', headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify({ package_id: packageId, quantity: 1, type: 'sim', description: `Order ${orderId} for ${orderData.customer_email || 'customer'}` }) });
+  // Airalo requires multipart/form-data for order submission
+  const orderFormData = new FormData();
+  orderFormData.append('package_id', packageId);
+  orderFormData.append('quantity', '1');
+  orderFormData.append('type', 'sim');
+  orderFormData.append('description', `Order ${orderId} for ${orderData.customer_email || 'customer'}`);
+  const orderResponse = await fetch(`${airaloBaseUrl}/v2/orders`, { method: 'POST', headers: { 'Authorization': `Bearer ${accessToken}`, 'Accept': 'application/json' }, body: orderFormData });
   if (!orderResponse.ok) throw new Error(`Airalo order creation failed: ${await orderResponse.text()}`);
 
   const airaloOrderResult = await orderResponse.json();
@@ -291,17 +297,15 @@ async function handleTopupPayment(metadata, paidAmountCents, stripeObjectId, str
     const accessToken = authData.data?.access_token;
     if (!accessToken) throw new Error('No access token from Airalo');
 
-    // Submit top-up order
-    const orderResponse = await fetch(`${airaloBaseUrl}/v2/orders`, {
+    // Submit top-up order — Airalo uses /v2/orders/topups with multipart/form-data
+    const topupFormData = new FormData();
+    topupFormData.append('package_id', topup.airalo_package_id);
+    topupFormData.append('iccid', topup.iccid);
+    topupFormData.append('description', `Top-up for ICCID ${topup.iccid}`);
+    const orderResponse = await fetch(`${airaloBaseUrl}/v2/orders/topups`, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({
-        package_id: topup.airalo_package_id,
-        quantity: 1,
-        type: 'sim',
-        iccid: topup.iccid,
-        description: `Top-up for ICCID ${topup.iccid}`,
-      }),
+      headers: { 'Authorization': `Bearer ${accessToken}`, 'Accept': 'application/json' },
+      body: topupFormData,
     });
 
     if (!orderResponse.ok) {

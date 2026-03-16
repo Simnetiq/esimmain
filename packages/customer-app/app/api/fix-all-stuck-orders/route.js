@@ -21,7 +21,13 @@ async function processStuckOrder(supabase, orderId, orderData) {
     const accessToken = authData.data?.access_token;
     if (!accessToken) throw new Error('No access token received');
 
-    const orderResponse = await fetch(`${airaloBaseUrl}/v2/orders`, { method: 'POST', headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify({ package_id: packageId, quantity: 1, type: 'sim', description: `Auto-fix order ${orderId}` }) });
+    // Airalo requires multipart/form-data for order submission
+    const orderFormData = new FormData();
+    orderFormData.append('package_id', packageId);
+    orderFormData.append('quantity', '1');
+    orderFormData.append('type', 'sim');
+    orderFormData.append('description', `Auto-fix order ${orderId}`);
+    const orderResponse = await fetch(`${airaloBaseUrl}/v2/orders`, { method: 'POST', headers: { 'Authorization': `Bearer ${accessToken}`, 'Accept': 'application/json' }, body: orderFormData });
     if (!orderResponse.ok) throw new Error(`Order creation failed: ${await orderResponse.text()}`);
 
     const airaloOrderResult = await orderResponse.json();

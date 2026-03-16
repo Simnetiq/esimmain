@@ -310,6 +310,8 @@
     "failedToGetEsimUsage": "获取 eSIM 使用情况失败：{{error}}",
     "countryInfoUpdated": "国家信息已更新：{{name}} ({{code}})",
     "failedToUpdateCountryInfo": "更新国家信息失败：{{error}}",
+    "tabEsims": "我的eSIM",
+    "tabAccount": "账户",
     "recentOrders": "最近订单",
     "noOrders": "暂无订单",
     "unknownPlan": "未知套餐",

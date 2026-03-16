@@ -12,10 +12,13 @@ const StickyMobileCTA = dynamic(() => import('./StickyMobileCTA'), { ssr: false 
 export default function HomePageWrapper({ children }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { locale } = useI18n();
+  const { locale, isLoading: i18nLoading } = useI18n();
   const { currentUser, loading: authLoading } = useAuth();
 
-  const currentLanguage = locale || detectLanguageFromPath(pathname) || 'en';
+  // SSR-safe: always use pathname-based detection for initial render to match server HTML.
+  // After i18n finishes loading, switch to context locale.
+  const ssrSafeLanguage = detectLanguageFromPath(pathname) || 'en';
+  const currentLanguage = i18nLoading ? ssrSafeLanguage : (locale || ssrSafeLanguage);
   const isRTL = getLanguageDirection(currentLanguage) === 'rtl';
 
   // Redirect authenticated users to dashboard (non-blocking)

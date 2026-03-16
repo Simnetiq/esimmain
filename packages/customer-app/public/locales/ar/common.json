@@ -316,6 +316,8 @@
     "failedToGetEsimUsage": "فشل في الحصول على استخدام eSIM: {{error}}",
     "countryInfoUpdated": "تم تحديث معلومات البلد: {{name}} ({{code}})",
     "failedToUpdateCountryInfo": "فشل في تحديث معلومات البلد: {{error}}",
+    "tabEsims": "شرائح eSIM الخاصة بي",
+    "tabAccount": "الحساب",
     "recentOrders": "الطلبات الأخيرة",
     "noOrders": "لا توجد طلبات بعد",
     "unknownPlan": "خطة غير معروفة",

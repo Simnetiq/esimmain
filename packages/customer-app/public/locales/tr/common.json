@@ -330,6 +330,8 @@
     "failedToGetEsimUsage": "eSIM kullanımı alınamadı: {{error}}",
     "countryInfoUpdated": "Ülke bilgisi güncellendi: {{name}} ({{code}})",
     "failedToUpdateCountryInfo": "Ülke bilgisi güncellenemedi: {{error}}",
+    "tabEsims": "eSIM'lerim",
+    "tabAccount": "Hesap",
     "recentOrders": "Son Siparişler",
     "noOrders": "Henüz sipariş yok",
     "unknownPlan": "Bilinmeyen Plan",

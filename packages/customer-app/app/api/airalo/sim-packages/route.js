@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { verifyUserJWT } from '@esim/shared/lib/apiAuth';
+import { getAiraloToken, getAiraloCredentials } from '@esim/shared/lib/airaloToken';
 
 // Get eSIM package history (including top-ups)
 // GET /v2/sims/{iccid}/packages
@@ -13,13 +14,9 @@ export async function GET(request) {
     const iccid = searchParams.get('iccid');
 
     if (!iccid) {
-      return NextResponse.json({
-        success: false,
-        error: 'ICCID is required'
-      }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'ICCID is required' }, { status: 400 });
     }
 
-    // Verify user owns this ICCID
     const { getSupabaseAdmin } = await import('@esim/shared/lib/supabaseAdmin');
     const supabaseAuth = getSupabaseAdmin();
     const { data: ownerCheck } = await supabaseAuth.from('orders').select('id').eq('user_id', userId).eq('iccid', iccid).limit(1);
@@ -28,10 +25,7 @@ export async function GET(request) {
     return fetchPackageHistory(iccid);
   } catch (error) {
     console.error('[Airalo Package History] Error:', error);
-    return NextResponse.json({
-      success: false,
-      error: error.message
-    }, { status: 500 });
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
 
@@ -44,13 +38,9 @@ export async function POST(request) {
     const { iccid } = body;
 
     if (!iccid) {
-      return NextResponse.json({
-        success: false,
-        error: 'ICCID is required'
-      }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'ICCID is required' }, { status: 400 });
     }
 
-    // Verify user owns this ICCID
     const { getSupabaseAdmin } = await import('@esim/shared/lib/supabaseAdmin');
     const supabaseAuth = getSupabaseAdmin();
     const { data: ownerCheck } = await supabaseAuth.from('orders').select('id').eq('user_id', userId).eq('iccid', iccid).limit(1);
@@ -59,53 +49,14 @@ export async function POST(request) {
     return fetchPackageHistory(iccid);
   } catch (error) {
     console.error('[Airalo Package History] Error:', error);
-    return NextResponse.json({
-      success: false,
-      error: error.message
-    }, { status: 500 });
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
 
 async function fetchPackageHistory(iccid) {
-  // Get Airalo credentials
-  const clientId = process.env.AIRALO_CLIENT_ID;
-  const clientSecret = process.env.AIRALO_CLIENT_SECRET;
-  const baseUrl = process.env.AIRALO_BASE_URL || 'https://partners-api.airalo.com';
-  
-  if (!clientId || !clientSecret) {
-    return NextResponse.json({
-      success: false,
-      error: 'Airalo credentials not configured'
-    }, { status: 500 });
-  }
+  const { clientId, clientSecret, baseUrl } = getAiraloCredentials();
+  const accessToken = await getAiraloToken(baseUrl, clientId, clientSecret);
 
-  // Authenticate with Airalo API
-  const authResponse = await fetch(`${baseUrl}/v2/token`, {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: new URLSearchParams({
-      client_id: clientId,
-      client_secret: clientSecret,
-      grant_type: 'client_credentials'
-    })
-  });
-
-  if (!authResponse.ok) {
-    const errorText = await authResponse.text();
-    throw new Error(`Authentication failed: ${errorText}`);
-  }
-
-  const authData = await authResponse.json();
-  const accessToken = authData.data?.access_token;
-
-  if (!accessToken) {
-    throw new Error('No access token received from Airalo API');
-  }
-
-  // Fetch eSIM package history
   const packagesResponse = await fetch(`${baseUrl}/v2/sims/${iccid}/packages`, {
     method: 'GET',
     headers: {
@@ -116,24 +67,20 @@ async function fetchPackageHistory(iccid) {
 
   if (!packagesResponse.ok) {
     const errorText = await packagesResponse.text();
-    
+
     if (packagesResponse.status === 404) {
-      return NextResponse.json({
-        success: false,
-        error: 'eSIM not found with provided ICCID'
-      }, { status: 404 });
+      return NextResponse.json({ success: false, error: 'eSIM not found with provided ICCID' }, { status: 404 });
     }
-    
+
     if (packagesResponse.status === 429) {
-      // Rate limit - check Retry-After header
       const retryAfter = packagesResponse.headers.get('Retry-After');
       return NextResponse.json({
         success: false,
         error: 'Rate limit exceeded. Please wait before checking again.',
-        retryAfter: retryAfter ? parseInt(retryAfter) : 900 // Default 15 min
+        retryAfter: retryAfter ? parseInt(retryAfter) : 900
       }, { status: 429 });
     }
-    
+
     return NextResponse.json({
       success: false,
       error: `Failed to fetch package history: ${packagesResponse.statusText} - ${errorText}`
@@ -143,11 +90,10 @@ async function fetchPackageHistory(iccid) {
   const packagesData = await packagesResponse.json();
   const packages = packagesData.data || [];
 
-  // Process and normalize the response
   const normalizedPackages = packages.map(pkg => ({
     id: pkg.id,
     status: pkg.status,
-    remaining: pkg.remaining, // Remaining data in MB
+    remaining: pkg.remaining,
     activated_at: pkg.activated_at,
     expired_at: pkg.expired_at,
     finished_at: pkg.finished_at,
@@ -165,7 +111,6 @@ async function fetchPackageHistory(iccid) {
     } : null
   }));
 
-  // Calculate total remaining across all active packages
   const activePackages = normalizedPackages.filter(p => p.status === 'ACTIVE' || p.status === 'active');
   const totalRemaining = activePackages.reduce((sum, p) => sum + (p.remaining || 0), 0);
 
@@ -176,11 +121,10 @@ async function fetchPackageHistory(iccid) {
       total_packages: normalizedPackages.length,
       active_packages: activePackages.length,
       total_remaining_mb: totalRemaining,
-      total_remaining_formatted: totalRemaining >= 1024 
-        ? `${(totalRemaining / 1024).toFixed(2)} GB` 
+      total_remaining_formatted: totalRemaining >= 1024
+        ? `${(totalRemaining / 1024).toFixed(2)} GB`
         : `${totalRemaining} MB`
     },
     message: 'Package history retrieved successfully'
   });
 }
-

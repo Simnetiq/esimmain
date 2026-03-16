@@ -310,6 +310,8 @@
     "failedToGetEsimUsage": "eSIM使用量の取得に失敗しました: {{error}}",
     "countryInfoUpdated": "国情報が更新されました: {{name}} ({{code}})",
     "failedToUpdateCountryInfo": "国情報の更新に失敗しました: {{error}}",
+    "tabEsims": "マイeSIM",
+    "tabAccount": "アカウント",
     "recentOrders": "最近の注文",
     "noOrders": "まだ注文はありません",
     "unknownPlan": "不明なプラン",

@@ -133,19 +133,19 @@ export async function POST(request) {
     }
 
     // Create order with Airalo
+    // Airalo requires multipart/form-data for order submission
+    const orderFormData = new FormData();
+    orderFormData.append('package_id', package_id);
+    orderFormData.append('quantity', String(parseInt(quantity)));
+    orderFormData.append('type', 'sim');
+    orderFormData.append('description', description || `eSIM order ${orderId || ''} for ${to_email || 'customer'}`);
     const orderResponse = await fetch(`${airaloBaseUrl}/v2/orders`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      body: JSON.stringify({
-        package_id: package_id,
-        quantity: parseInt(quantity),
-        type: 'sim',
-        description: description || `eSIM order ${orderId || ''} for ${to_email || 'customer'}`
-      })
+      body: orderFormData
     });
 
     if (!orderResponse.ok) {

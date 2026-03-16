@@ -330,6 +330,8 @@
     "failedToGetEsimUsage": "eSIM-verbruik ophalen mislukt: {{error}}",
     "countryInfoUpdated": "Landinformatie bijgewerkt: {{name}} ({{code}})",
     "failedToUpdateCountryInfo": "Landinformatie bijwerken mislukt: {{error}}",
+    "tabEsims": "Mijn eSIMs",
+    "tabAccount": "Account",
     "recentOrders": "Recente bestellingen",
     "noOrders": "Nog geen bestellingen",
     "unknownPlan": "Onbekende bundel",

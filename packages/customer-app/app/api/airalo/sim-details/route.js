@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 import { verifyUserJWT } from '@esim/shared/lib/apiAuth';
+import { getAiraloToken, getAiraloCredentials } from '@esim/shared/lib/airaloToken';
 
 export async function POST(request) {
   const { userId, error: authError } = await verifyUserJWT(request);
@@ -22,73 +23,8 @@ export async function POST(request) {
     const { data: ownerCheck } = await supabaseAuth.from('orders').select('id').eq('user_id', userId).eq('iccid', iccid).limit(1);
     if (!ownerCheck?.length) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-    // Determine Airalo mode (sandbox vs production)
-    const airaloMode = process.env.AIRALO_MODE || 'production';
-    const isSandbox = airaloMode === 'sandbox' || airaloMode === 'test';
-    
-    // Get Airalo credentials based on mode
-    let clientId = isSandbox
-      ? (process.env.AIRALO_CLIENT_ID_SANDBOX || process.env.AIRALO_CLIENT_ID)
-      : process.env.AIRALO_CLIENT_ID;
-      
-    let clientSecret = isSandbox
-      ? (process.env.AIRALO_CLIENT_SECRET_SANDBOX || process.env.AIRALO_CLIENT_SECRET)
-      : process.env.AIRALO_CLIENT_SECRET;
-    
-    const baseUrl = isSandbox 
-      ? (process.env.AIRALO_BASE_URL_SANDBOX || 'https://sandbox-partners-api.airalo.com')
-      : (process.env.AIRALO_BASE_URL || 'https://partners-api.airalo.com');
-    
-    // Fallback to Supabase config if env vars not set
-    if (!clientId || !clientSecret) {
-      const supabase = getSupabaseAdmin();
-      const { data: configData } = await supabase
-        .from('app_config')
-        .select('*')
-        .eq('id', 'airalo')
-        .single();
-      
-      if (configData) {
-        clientId = clientId || configData.client_id || configData.api_key;
-        clientSecret = clientSecret || configData.client_secret;
-      }
-    }
-    
-    if (!clientId || !clientSecret) {
-      return NextResponse.json({
-        success: false,
-        error: 'Airalo credentials not configured. Please set AIRALO_CLIENT_ID and AIRALO_CLIENT_SECRET environment variables.'
-      }, { status: 500 });
-    }
-
-    // Authenticate with Airalo API
-    const authResponse = await fetch(`${baseUrl}/v2/token`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        client_id: clientId,
-        client_secret: clientSecret,
-        grant_type: 'client_credentials'
-      })
-    });
-
-    if (!authResponse.ok) {
-      return NextResponse.json({
-        success: false,
-        error: 'Unable to connect to eSIM provider. Please try again later.',
-        statusCode: 401
-      }, { status: 401 });
-    }
-
-    const authData = await authResponse.json();
-    const accessToken = authData.data?.access_token;
-
-    if (!accessToken) {
-      throw new Error('No access token received from Airalo API');
-    }
+    const { clientId, clientSecret, baseUrl } = getAiraloCredentials();
+    const accessToken = await getAiraloToken(baseUrl, clientId, clientSecret);
 
     // Get eSIM details using ICCID
     const simResponse = await fetch(`${baseUrl}/v2/sims/${iccid}`, {
@@ -101,7 +37,7 @@ export async function POST(request) {
 
     if (!simResponse.ok) {
       const errorText = await simResponse.text();
-      
+
       if (simResponse.status === 404) {
         return NextResponse.json({
           success: false,
@@ -125,28 +61,28 @@ export async function POST(request) {
 
     const simDetails = await simResponse.json();
     const simData = simDetails.data;
-    const lpaString = simData?.qrcode || simData?.lpa || simData?.qr_code;
-    const appleInstallUrl = simData?.direct_apple_installation_url || 
+    // Airalo returns: qrcode, lpa, qrcode_url, direct_apple_installation_url, matching_id
+    const lpaString = simData?.lpa || simData?.qrcode;
+    const appleInstallUrl = simData?.direct_apple_installation_url ||
       (lpaString ? `https://esimsetup.apple.com/esim_qrcode_provisioning?carddata=${encodeURIComponent(lpaString)}` : null);
-    
+
     const qrCodeData = {
       qr_code: lpaString,
-      qr_code_url: simData?.qrcode_url || simData?.qr_code_url,
+      qr_code_url: simData?.qrcode_url,
       direct_apple_installation_url: appleInstallUrl,
       matching_id: simData?.matching_id,
-      activation_code: simData?.activation_code,
+      activation_code: simData?.confirmation_code,
       qrCode: lpaString,
-      qrCodeUrl: simData?.qrcode_url || simData?.qr_code_url,
-      activationCode: simData?.activation_code,
+      qrCodeUrl: simData?.qrcode_url,
+      activationCode: simData?.confirmation_code,
       iccid: simData?.iccid,
-      lpa: lpaString,
+      lpa: simData?.lpa,
       directAppleInstallationUrl: appleInstallUrl,
       matchingId: simData?.matching_id,
-      status: simData?.status,
-      packageName: simData?.package?.title,
-      packageDetails: simData?.package,
-      country_code: simData?.package?.country_code,
-      country_name: simData?.package?.country?.name || simData?.package?.country_name
+      status: simData?.simable?.status?.slug,
+      packageName: simData?.simable?.package,
+      packageDetails: simData?.simable,
+      country_code: simData?.simable?.package_id,
     };
 
     return NextResponse.json({

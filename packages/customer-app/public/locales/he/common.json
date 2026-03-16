@@ -315,6 +315,8 @@
     "failedToGetEsimUsage": "נכשל בקבלת שימוש eSIM: {{error}}",
     "countryInfoUpdated": "מידע מדינה עודכן: {{name}} ({{code}})",
     "failedToUpdateCountryInfo": "נכשל בעדכון מידע מדינה: {{error}}",
+    "tabEsims": "ה-eSIM שלי",
+    "tabAccount": "חשבון",
     "recentOrders": "הזמנות אחרונות",
     "noOrders": "אין הזמנות עדיין",
     "unknownPlan": "תוכנית לא ידועה",

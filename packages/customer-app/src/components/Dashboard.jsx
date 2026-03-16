@@ -1157,7 +1157,7 @@ const Dashboard = () => {
         <div className="mx-auto w-full max-w-9xl">
           <div className="mx-auto w-full max-w-7xl">
             <div className="px-4 mb-6 mx-auto sm:max-w-2xl lg:max-w-5xl 2xl:max-w-7xl">
-              <div className="flex gap-2">
+              <div className="flex gap-2 rtl-native-flex">
                 <button
                   onClick={() => setActiveTab('esims')}
                   className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${

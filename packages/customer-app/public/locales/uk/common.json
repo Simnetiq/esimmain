@@ -310,6 +310,8 @@
     "failedToGetEsimUsage": "Не вдалося отримати дані використання eSIM: {{error}}",
     "countryInfoUpdated": "Інформація про країну оновлена: {{name}} ({{code}})",
     "failedToUpdateCountryInfo": "Не вдалося оновити інформацію про країну: {{error}}",
+    "tabEsims": "Мої eSIM",
+    "tabAccount": "Акаунт",
     "recentOrders": "Останні замовлення",
     "noOrders": "Замовлень поки немає",
     "unknownPlan": "Невідомий тариф",

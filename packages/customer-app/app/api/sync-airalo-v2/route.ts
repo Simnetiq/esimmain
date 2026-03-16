@@ -256,6 +256,27 @@ async function handleSync(source: string) {
   }
 
   const durationMs = Date.now() - startTime;
+  const now = new Date().toISOString();
+
+  // Record last_synced_at so we can monitor sync health
+  try {
+    await supabase.from('app_config').upsert({
+      id: 'airalo_sync',
+      key: 'airalo_sync',
+      value: {
+        last_synced_at: now,
+        packages_synced: synced,
+        topups_synced: topups,
+        deactivated,
+        total_from_api: allPackages.length,
+        duration_seconds: parseFloat((durationMs / 1000).toFixed(2)),
+        source,
+      },
+      updated_at: now,
+    });
+  } catch (e) {
+    console.warn('[Airalo Sync v2] Failed to record last_synced_at:', (e as Error).message);
+  }
 
   return {
     success: true,
@@ -264,6 +285,7 @@ async function handleSync(source: string) {
     deactivated,
     total_from_api: allPackages.length,
     duration_seconds: (durationMs / 1000).toFixed(2),
+    last_synced_at: now,
     source,
   };
 }

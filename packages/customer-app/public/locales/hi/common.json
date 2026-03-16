@@ -310,6 +310,8 @@
     "failedToGetEsimUsage": "eSIM उपयोग प्राप्त करने में विफल: {{error}}",
     "countryInfoUpdated": "देश की जानकारी अपडेट हुई: {{name}} ({{code}})",
     "failedToUpdateCountryInfo": "देश की जानकारी अपडेट करने में विफल: {{error}}",
+    "tabEsims": "मेरी eSIMs",
+    "tabAccount": "खाता",
     "recentOrders": "हाल के ऑर्डर",
     "noOrders": "अभी कोई ऑर्डर नहीं",
     "unknownPlan": "अज्ञात प्लान",

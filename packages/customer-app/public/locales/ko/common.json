@@ -330,6 +330,8 @@
     "failedToGetEsimUsage": "eSIM 사용량 조회 실패: {{error}}",
     "countryInfoUpdated": "국가 정보 업데이트됨: {{name}} ({{code}})",
     "failedToUpdateCountryInfo": "국가 정보 업데이트 실패: {{error}}",
+    "tabEsims": "내 eSIM",
+    "tabAccount": "계정",
     "recentOrders": "최근 주문",
     "noOrders": "아직 주문이 없습니다",
     "unknownPlan": "알 수 없는 요금제",

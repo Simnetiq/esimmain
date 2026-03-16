@@ -160,10 +160,16 @@ export async function POST(request) {
         const accessToken = authData.data?.access_token;
         if (!accessToken) throw new Error('No access token received from Airalo');
         
+        // Airalo requires multipart/form-data for order submission
+        const orderFormData = new FormData();
+        orderFormData.append('package_id', orderData.plan_id || orderData.package_id);
+        orderFormData.append('quantity', '1');
+        orderFormData.append('type', 'sim');
+        orderFormData.append('description', `eSIM order ${orderId} for ${customerEmail}`);
         const orderResponse = await fetch(`${airaloBaseUrl}/v2/orders`, {
           method: 'POST',
-          headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({ package_id: orderData.plan_id || orderData.package_id, quantity: 1, type: 'sim', description: `eSIM order ${orderId} for ${customerEmail}` })
+          headers: { 'Authorization': `Bearer ${accessToken}`, 'Accept': 'application/json' },
+          body: orderFormData,
         });
         
         if (!orderResponse.ok) throw new Error(`Order creation failed: ${await orderResponse.text()}`);

@@ -315,6 +315,8 @@
     "failedToGetEsimUsage": "Error al obtener uso de eSIM: {{error}}",
     "countryInfoUpdated": "Información del país actualizada: {{name}} ({{code}})",
     "failedToUpdateCountryInfo": "Error al actualizar información del país: {{error}}",
+    "tabEsims": "Mis eSIMs",
+    "tabAccount": "Cuenta",
     "recentOrders": "Pedidos recientes",
     "noOrders": "Aún no hay pedidos",
     "unknownPlan": "Plan desconocido",
