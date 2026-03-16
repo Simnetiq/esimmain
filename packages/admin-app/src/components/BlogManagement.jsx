@@ -47,10 +47,15 @@ const BlogManagement = () => {
     { code: 'ar', name: 'Arabic', flag: '🇸🇦' },
     { code: 'he', name: 'Hebrew', flag: '🇮🇱' },
     { code: 'hi', name: 'Hindi', flag: '🇮🇳' },
+    { code: 'it', name: 'Italian', flag: '🇮🇹' },
     { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
+    { code: 'ko', name: 'Korean', flag: '🇰🇷' },
+    { code: 'nl', name: 'Dutch', flag: '🇳🇱' },
     { code: 'pl', name: 'Polish', flag: '🇵🇱' },
     { code: 'pt', name: 'Portuguese', flag: '🇵🇹' },
     { code: 'ru', name: 'Russian', flag: '🇷🇺' },
+    { code: 'th', name: 'Thai', flag: '🇹🇭' },
+    { code: 'tr', name: 'Turkish', flag: '🇹🇷' },
     { code: 'uk', name: 'Ukrainian', flag: '🇺🇦' },
     { code: 'zh', name: 'Chinese', flag: '🇨🇳' }
   ];

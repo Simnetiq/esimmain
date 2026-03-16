@@ -98,6 +98,21 @@ const transformTranslations = (translations) => {
   return result;
 };
 
+/**
+ * Language codes supported by the blog_language_code Supabase enum.
+ * Languages not in this set will fall back to 'en' for blog queries.
+ */
+const BLOG_ENUM_LANGUAGES = new Set([
+  'en', 'es', 'fr', 'de', 'ar', 'he', 'ru', 'pt', 'zh', 'pl', 'uk', 'ja', 'hi'
+]);
+
+/**
+ * Return a blog-safe language code. If the requested language is not in
+ * the blog_language_code Supabase enum, fall back to 'en' to avoid
+ * "invalid input value for enum blog_language_code" errors.
+ */
+const toBlogLanguage = (lang) => BLOG_ENUM_LANGUAGES.has(lang) ? lang : 'en';
+
 export const blogServiceSupabase = {
   /**
    * Get all published blog posts with language support
@@ -105,7 +120,7 @@ export const blogServiceSupabase = {
    *
    * @param {number} limitCount - Maximum number of posts to fetch
    * @param {number} offset - Offset for pagination
-   * @param {string} language - Language code (en, es, fr, de, ar, he, ru)
+   * @param {string} language - Language code (en, es, fr, de, ar, he, ru, etc.)
    * @returns {Promise<{posts: Array, hasMore: boolean}>}
    */
   async getPublishedPosts(limitCount = 10, offset = 0, language = 'en') {
@@ -122,7 +137,7 @@ export const blogServiceSupabase = {
 
       const { data, error } = await supabase
         .rpc('get_published_blog_posts', {
-          p_language: language || 'en',
+          p_language: toBlogLanguage(language || 'en'),
           p_limit: limitCount || 10,
           p_offset: safeOffset,
           p_category: null
@@ -241,7 +256,7 @@ export const blogServiceSupabase = {
         .from('blog_post_translations')
         .select('*')
         .eq('post_id', postId)
-        .eq('language', language)
+        .eq('language', toBlogLanguage(language))
         .single();
 
       if (error) {
@@ -405,7 +420,7 @@ export const blogServiceSupabase = {
       const { data, error } = await supabase
         .rpc('get_blog_post_by_slug', {
           p_slug: slug,
-          p_language: language
+          p_language: toBlogLanguage(language)
         });
 
       if (error) {
@@ -762,7 +777,7 @@ export const blogServiceSupabase = {
 
       const { data, error } = await supabase
         .rpc('get_published_blog_posts', {
-          p_language: language,
+          p_language: toBlogLanguage(language),
           p_limit: limitCount,
           p_offset: 0,
           p_category: category
@@ -796,7 +811,7 @@ export const blogServiceSupabase = {
       const { data, error } = await supabase
         .rpc('search_blog_posts', {
           p_search_term: searchTerm,
-          p_language: language,
+          p_language: toBlogLanguage(language),
           p_limit: limitCount
         });
 
