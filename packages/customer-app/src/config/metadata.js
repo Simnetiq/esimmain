@@ -519,6 +519,213 @@ export const metadata = {
       title: 'eSIM voor Reizen — Simnetiq | Mobiele Data Zonder Roaming',
       description: 'Vergeet dure roaming. Simnetiq eSIM: internet in 200+ landen, directe activering, abonnementen vanaf $3.',
     }
+  },
+
+  vi: {
+    title: {
+      default: 'eSIM Du Lịch — Simnetiq | Internet Di Động Không Cần Roaming',
+      template: '%s | Simnetiq'
+    },
+    description: 'Quên đi cước roaming đắt đỏ. Simnetiq eSIM: internet tại 200+ quốc gia, kích hoạt ngay lập tức, gói từ $3. Hoàn hảo cho du khách và nomad số.',
+    keywords: [
+      'mua esim online',
+      'esim du lịch',
+      'internet nước ngoài không roaming',
+      'esim châu âu du lịch',
+      'esim nhật bản du lịch',
+      'esim thái lan',
+      'esim mỹ du khách',
+      'cách cài esim iphone',
+      'tiết kiệm cước roaming'
+    ],
+    openGraph: {
+      title: 'eSIM Du Lịch — Simnetiq | Internet Di Động Không Cần Roaming',
+      description: 'Quên đi cước roaming đắt đỏ. Simnetiq eSIM: internet tại 200+ quốc gia, kích hoạt ngay lập tức, gói từ $3.',
+    }
+  },
+
+  id: {
+    title: {
+      default: 'eSIM untuk Perjalanan — Simnetiq | Data Seluler Tanpa Roaming',
+      template: '%s | Simnetiq'
+    },
+    description: 'Lupakan biaya roaming mahal. Simnetiq eSIM: internet di 200+ negara, aktivasi instan, paket mulai $3. Sempurna untuk wisatawan dan digital nomad.',
+    keywords: [
+      'beli esim online',
+      'esim perjalanan',
+      'internet luar negeri tanpa roaming',
+      'esim eropa perjalanan',
+      'esim jepang wisatawan',
+      'esim thailand',
+      'esim amerika wisatawan',
+      'cara pasang esim iphone',
+      'hemat biaya roaming'
+    ],
+    openGraph: {
+      title: 'eSIM untuk Perjalanan — Simnetiq | Data Seluler Tanpa Roaming',
+      description: 'Lupakan biaya roaming mahal. Simnetiq eSIM: internet di 200+ negara, aktivasi instan, paket mulai $3.',
+    }
+  },
+
+  sv: {
+    title: {
+      default: 'eSIM för Resor — Simnetiq | Mobildata Utan Roaming',
+      template: '%s | Simnetiq'
+    },
+    description: 'Glöm dyr roaming. Simnetiq eSIM: internet i 200+ länder, omedelbar aktivering, paket från $3. Perfekt för resenärer och digitala nomader.',
+    keywords: [
+      'köp esim online',
+      'esim resa',
+      'internet utomlands utan roaming',
+      'esim europa resa',
+      'esim japan turist',
+      'esim thailand',
+      'esim usa turist',
+      'aktivera esim iphone',
+      'spara på roaming'
+    ],
+    openGraph: {
+      title: 'eSIM för Resor — Simnetiq | Mobildata Utan Roaming',
+      description: 'Glöm dyr roaming. Simnetiq eSIM: internet i 200+ länder, omedelbar aktivering, paket från $3.',
+    }
+  },
+
+  cs: {
+    title: {
+      default: 'eSIM na Cestování — Simnetiq | Mobilní Data Bez Roamingu',
+      template: '%s | Simnetiq'
+    },
+    description: 'Zapomeňte na drahý roaming. Simnetiq eSIM: internet ve 200+ zemích, okamžitá aktivace, tarify od $3. Ideální pro cestovatele a digitální nomády.',
+    keywords: [
+      'koupit esim online',
+      'esim cestování',
+      'internet v zahraničí bez roamingu',
+      'esim evropa cestování',
+      'esim japonsko turista',
+      'esim thajsko',
+      'esim usa turista',
+      'jak nastavit esim iphone',
+      'ušetřit na roamingu'
+    ],
+    openGraph: {
+      title: 'eSIM na Cestování — Simnetiq | Mobilní Data Bez Roamingu',
+      description: 'Zapomeňte na drahý roaming. Simnetiq eSIM: internet ve 200+ zemích, okamžitá aktivace, tarify od $3.',
+    }
+  },
+
+  el: {
+    title: {
+      default: 'eSIM για Ταξίδια — Simnetiq | Κινητό Ίντερνετ Χωρίς Roaming',
+      template: '%s | Simnetiq'
+    },
+    description: 'Ξεχάστε το ακριβό roaming. Simnetiq eSIM: ίντερνετ σε 200+ χώρες, άμεση ενεργοποίηση, πακέτα από $3. Ιδανικό για ταξιδιώτες και ψηφιακούς νομάδες.',
+    keywords: [
+      'αγορά esim online',
+      'esim ταξίδι',
+      'ίντερνετ εξωτερικό χωρίς roaming',
+      'esim ευρώπη ταξίδι',
+      'esim ιαπωνία τουρίστας',
+      'esim ταϊλάνδη',
+      'esim αμερική τουρίστας',
+      'ρύθμιση esim iphone',
+      'εξοικονόμηση roaming'
+    ],
+    openGraph: {
+      title: 'eSIM για Ταξίδια — Simnetiq | Κινητό Ίντερνετ Χωρίς Roaming',
+      description: 'Ξεχάστε το ακριβό roaming. Simnetiq eSIM: ίντερνετ σε 200+ χώρες, άμεση ενεργοποίηση, πακέτα από $3.',
+    }
+  },
+
+  ro: {
+    title: {
+      default: 'eSIM pentru Călătorii — Simnetiq | Date Mobile Fără Roaming',
+      template: '%s | Simnetiq'
+    },
+    description: 'Uită de roaming scump. Simnetiq eSIM: internet în 200+ țări, activare instantanee, planuri de la $3. Perfect pentru călători și nomazi digitali.',
+    keywords: [
+      'cumpără esim online',
+      'esim călătorii',
+      'internet în străinătate fără roaming',
+      'esim europa călătorie',
+      'esim japonia turist',
+      'esim thailanda',
+      'esim sua turist',
+      'configurare esim iphone',
+      'economisire roaming'
+    ],
+    openGraph: {
+      title: 'eSIM pentru Călătorii — Simnetiq | Date Mobile Fără Roaming',
+      description: 'Uită de roaming scump. Simnetiq eSIM: internet în 200+ țări, activare instantanee, planuri de la $3.',
+    }
+  },
+
+  da: {
+    title: {
+      default: 'eSIM til Rejser — Simnetiq | Mobildata Uden Roaming',
+      template: '%s | Simnetiq'
+    },
+    description: 'Glem dyr roaming. Simnetiq eSIM: internet i 200+ lande, øjeblikkelig aktivering, pakker fra $3. Perfekt til rejsende og digitale nomader.',
+    keywords: [
+      'køb esim online',
+      'esim rejse',
+      'internet i udlandet uden roaming',
+      'esim europa rejse',
+      'esim japan turist',
+      'esim thailand',
+      'esim usa turist',
+      'aktivere esim iphone',
+      'spare på roaming'
+    ],
+    openGraph: {
+      title: 'eSIM til Rejser — Simnetiq | Mobildata Uden Roaming',
+      description: 'Glem dyr roaming. Simnetiq eSIM: internet i 200+ lande, øjeblikkelig aktivering, pakker fra $3.',
+    }
+  },
+
+  fi: {
+    title: {
+      default: 'eSIM Matkustamiseen — Simnetiq | Mobiilidata Ilman Roamingia',
+      template: '%s | Simnetiq'
+    },
+    description: 'Unohda kallis roaming. Simnetiq eSIM: internet yli 200 maassa, välitön aktivointi, paketit alkaen $3. Täydellinen matkaajille ja digitaalisille nomadeille.',
+    keywords: [
+      'osta esim verkosta',
+      'esim matkailu',
+      'internet ulkomailla ilman roamingia',
+      'esim eurooppa matka',
+      'esim japani turisti',
+      'esim thaimaa',
+      'esim usa turisti',
+      'esim iphone asennus',
+      'säästää roamingkuluissa'
+    ],
+    openGraph: {
+      title: 'eSIM Matkustamiseen — Simnetiq | Mobiilidata Ilman Roamingia',
+      description: 'Unohda kallis roaming. Simnetiq eSIM: internet yli 200 maassa, välitön aktivointi, paketit alkaen $3.',
+    }
+  },
+
+  nb: {
+    title: {
+      default: 'eSIM for Reiser — Simnetiq | Mobildata Uten Roaming',
+      template: '%s | Simnetiq'
+    },
+    description: 'Glem dyr roaming. Simnetiq eSIM: internett i 200+ land, øyeblikkelig aktivering, pakker fra $3. Perfekt for reisende og digitale nomader.',
+    keywords: [
+      'kjøp esim online',
+      'esim reise',
+      'internett i utlandet uten roaming',
+      'esim europa reise',
+      'esim japan turist',
+      'esim thailand',
+      'esim usa turist',
+      'aktivere esim iphone',
+      'spare på roaming'
+    ],
+    openGraph: {
+      title: 'eSIM for Reiser — Simnetiq | Mobildata Uten Roaming',
+      description: 'Glem dyr roaming. Simnetiq eSIM: internett i 200+ land, øyeblikkelig aktivering, pakker fra $3.',
+    }
   }
 };
 
@@ -529,7 +736,7 @@ export function getMetadataByLanguage(lang = 'en') {
 
 // Generate alternates for all languages
 export function generateAlternates(basePath = '/') {
-  const languages = ['en', 'ar', 'de', 'es', 'fr', 'he', 'hi', 'it', 'ja', 'ko', 'nb', 'nl', 'pl', 'pt', 'ru', 'th', 'tr', 'uk', 'zh'];
+  const languages = ['en', 'ar', 'cs', 'da', 'de', 'el', 'es', 'fi', 'fr', 'he', 'hi', 'id', 'it', 'ja', 'ko', 'nb', 'nl', 'pl', 'pt', 'ro', 'ru', 'sv', 'th', 'tr', 'uk', 'vi', 'zh'];
   const alternates = {
     canonical: basePath === '/' ? '/' : basePath,
     languages: {}
