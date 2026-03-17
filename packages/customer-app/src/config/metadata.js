@@ -529,7 +529,7 @@ export function getMetadataByLanguage(lang = 'en') {
 
 // Generate alternates for all languages
 export function generateAlternates(basePath = '/') {
-  const languages = ['en', 'ar', 'de', 'es', 'fr', 'he', 'hi', 'it', 'ja', 'ko', 'nl', 'pl', 'pt', 'ru', 'th', 'tr', 'uk', 'zh'];
+  const languages = ['en', 'ar', 'de', 'es', 'fr', 'he', 'hi', 'it', 'ja', 'ko', 'nb', 'nl', 'pl', 'pt', 'ru', 'th', 'tr', 'uk', 'zh'];
   const alternates = {
     canonical: basePath === '/' ? '/' : basePath,
     languages: {}

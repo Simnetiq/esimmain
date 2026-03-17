@@ -29,6 +29,15 @@ const localeConfig = {
   nl: { label: 'NL', countryCode: 'nl', name: 'Nederlands' },
   th: { label: 'ไท', countryCode: 'th', name: 'ไทย' },
   tr: { label: 'TR', countryCode: 'tr', name: 'Türkçe' },
+  vi: { label: 'VI', countryCode: 'vn', name: 'Tiếng Việt' },
+  id: { label: 'ID', countryCode: 'id', name: 'Bahasa Indonesia' },
+  sv: { label: 'SV', countryCode: 'se', name: 'Svenska' },
+  cs: { label: 'CS', countryCode: 'cz', name: 'Čeština' },
+  el: { label: 'ΕΛ', countryCode: 'gr', name: 'Ελληνικά' },
+  ro: { label: 'RO', countryCode: 'ro', name: 'Română' },
+  da: { label: 'DA', countryCode: 'dk', name: 'Dansk' },
+  fi: { label: 'FI', countryCode: 'fi', name: 'Suomi' },
+  nb: { label: 'NO', countryCode: 'no', name: 'Norsk' },
 };
 
 const supportedLocales = Object.keys(localeConfig);
@@ -121,11 +130,11 @@ const LanguageSelector = ({ variant = 'desktop', onClose }) => {
   const getLocalizedPath = useCallback((langCode) => {
     // Blog URLs
     if (pathname.includes('/blog')) {
-      const langBlogPost = pathname.match(/^\/(he|ar|ru|de|fr|es|pt|ja|zh|pl|uk|hi|it|ko|nl|th|tr)\/blog\/(.+)$/);
+      const langBlogPost = pathname.match(/^\/(he|ar|ru|de|fr|es|pt|ja|zh|pl|uk|hi|it|ko|nl|th|tr|vi|id|sv|cs|el|ro|da|fi|nb)\/blog\/(.+)$/);
       if (langBlogPost) return getLocalizedBlogUrl(langBlogPost[2], langCode);
       const blogPost = pathname.match(/^\/blog\/(.+)$/);
       if (blogPost) return getLocalizedBlogUrl(blogPost[1], langCode);
-      if (pathname.match(/^\/(he|ar|ru|de|fr|es|pt|ja|zh|pl|uk|hi|it|ko|nl|th|tr)\/blog\/?$/) || pathname === '/blog' || pathname === '/blog/') {
+      if (pathname.match(/^\/(he|ar|ru|de|fr|es|pt|ja|zh|pl|uk|hi|it|ko|nl|th|tr|vi|id|sv|cs|el|ro|da|fi|nb)\/blog\/?$/) || pathname === '/blog' || pathname === '/blog/') {
         return getLocalizedBlogListUrl(langCode);
       }
     }
@@ -133,7 +142,7 @@ const LanguageSelector = ({ variant = 'desktop', onClose }) => {
     // Strip existing language prefix
     let cleanPath = pathname;
     const prefixes = ['/he', '/ar', '/ru', '/de', '/fr', '/es', '/pt', '/ja', '/zh', '/pl', '/uk', '/hi',
-      '/it', '/ko', '/nl', '/th', '/tr',
+      '/it', '/ko', '/nl', '/th', '/tr', '/vi', '/id', '/sv', '/cs', '/el', '/ro', '/da', '/fi', '/nb',
       '/hebrew', '/arabic', '/russian', '/german', '/french', '/spanish'];
     for (const pfx of prefixes) {
       if (cleanPath === pfx || cleanPath.startsWith(pfx + '/')) {

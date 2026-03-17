@@ -20,7 +20,16 @@ const SUPPORTED_LANGUAGES = [
   { code: 'th', name: 'Thai' },
   { code: 'tr', name: 'Turkish' },
   { code: 'uk', name: 'Ukrainian' },
-  { code: 'zh', name: 'Chinese' }
+  { code: 'zh', name: 'Chinese' },
+  { code: 'vi', name: 'Vietnamese' },
+  { code: 'id', name: 'Indonesian' },
+  { code: 'sv', name: 'Swedish' },
+  { code: 'cs', name: 'Czech' },
+  { code: 'el', name: 'Greek' },
+  { code: 'ro', name: 'Romanian' },
+  { code: 'da', name: 'Danish' },
+  { code: 'fi', name: 'Finnish' },
+  { code: 'nb', name: 'Norwegian' }
 ];
 
 async function translateCountryName(openaiApiKey, countryName, targetLanguage) {

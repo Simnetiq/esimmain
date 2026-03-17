@@ -36,7 +36,17 @@ export const supportedLanguages = [
   { code: 'ko', name: 'Korean', nativeName: '한국어', flag: '🇰🇷', isRTL: false },
   { code: 'nl', name: 'Dutch', nativeName: 'Nederlands', flag: '🇳🇱', isRTL: false },
   { code: 'th', name: 'Thai', nativeName: 'ไทย', flag: '🇹🇭', isRTL: false },
-  { code: 'tr', name: 'Turkish', nativeName: 'Türkçe', flag: '🇹🇷', isRTL: false }
+  { code: 'tr', name: 'Turkish', nativeName: 'Türkçe', flag: '🇹🇷', isRTL: false },
+  // Added languages (2026-03-17)
+  { code: 'vi', name: 'Vietnamese', nativeName: 'Tiếng Việt', flag: '🇻🇳', isRTL: false },
+  { code: 'id', name: 'Indonesian', nativeName: 'Bahasa Indonesia', flag: '🇮🇩', isRTL: false },
+  { code: 'sv', name: 'Swedish', nativeName: 'Svenska', flag: '🇸🇪', isRTL: false },
+  { code: 'cs', name: 'Czech', nativeName: 'Čeština', flag: '🇨🇿', isRTL: false },
+  { code: 'el', name: 'Greek', nativeName: 'Ελληνικά', flag: '🇬🇷', isRTL: false },
+  { code: 'ro', name: 'Romanian', nativeName: 'Română', flag: '🇷🇴', isRTL: false },
+  { code: 'da', name: 'Danish', nativeName: 'Dansk', flag: '🇩🇰', isRTL: false },
+  { code: 'fi', name: 'Finnish', nativeName: 'Suomi', flag: '🇫🇮', isRTL: false },
+  { code: 'nb', name: 'Norwegian', nativeName: 'Norsk', flag: '🇳🇴', isRTL: false }
 ];
 
 /**

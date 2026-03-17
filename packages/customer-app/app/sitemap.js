@@ -9,7 +9,7 @@ function getSupabase() {
 
 export default async function sitemap() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.simnetiq.store';
-  const languages = ['en', 'es', 'fr', 'de', 'ar', 'he', 'hi', 'it', 'ja', 'ko', 'nl', 'pl', 'pt', 'ru', 'th', 'tr', 'uk', 'zh'];
+  const languages = ['en', 'es', 'fr', 'de', 'ar', 'he', 'hi', 'it', 'ja', 'ko', 'nl', 'pl', 'pt', 'ru', 'th', 'tr', 'uk', 'zh', 'vi', 'id', 'sv', 'cs', 'el', 'ro', 'da', 'fi', 'nb'];
   const now = new Date().toISOString();
 
   // Helper: generate a single sitemap entry with hreflang alternates for all 18 languages.

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 // Note: English (en) uses root-level pages, other languages have their own folders
-const languagesWithFolders = ['ar', 'de', 'es', 'fr', 'he', 'hi', 'it', 'ja', 'ko', 'nl', 'pl', 'pt', 'ru', 'th', 'tr', 'uk', 'zh'];
+const languagesWithFolders = ['ar', 'cs', 'da', 'de', 'el', 'es', 'fi', 'fr', 'he', 'hi', 'id', 'it', 'ja', 'ko', 'nb', 'nl', 'pl', 'pt', 'ro', 'ru', 'sv', 'th', 'tr', 'uk', 'vi', 'zh'];
 const supportedLanguages = ['en', ...languagesWithFolders];
 const defaultLanguage = 'en';
 
@@ -99,7 +99,16 @@ export function middleware(request) {
                   pathname.startsWith('/tr') ? 'tr' :
                   pathname.startsWith('/it') ? 'it' :
                   pathname.startsWith('/th') ? 'th' :
-                  pathname.startsWith('/nl') ? 'nl' : 'en';
+                  pathname.startsWith('/nl') ? 'nl' :
+                  pathname.startsWith('/vi') ? 'vi' :
+                  pathname.startsWith('/id') ? 'id' :
+                  pathname.startsWith('/sv') ? 'sv' :
+                  pathname.startsWith('/cs') ? 'cs' :
+                  pathname.startsWith('/el') ? 'el' :
+                  pathname.startsWith('/ro') ? 'ro' :
+                  pathname.startsWith('/da') ? 'da' :
+                  pathname.startsWith('/fi') ? 'fi' :
+                  pathname.startsWith('/nb') ? 'nb' : 'en';
   
   response.headers.set('x-language', language);
   

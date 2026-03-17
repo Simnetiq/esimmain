@@ -43,6 +43,15 @@ function getLocaleCode(lang) {
     tr: 'tr_TR',
     uk: 'uk_UA',
     zh: 'zh_CN',
+    vi: 'vi_VN',
+    id: 'id_ID',
+    sv: 'sv_SE',
+    cs: 'cs_CZ',
+    el: 'el_GR',
+    ro: 'ro_RO',
+    da: 'da_DK',
+    fi: 'fi_FI',
+    nb: 'nb_NO',
   }
   return locales[lang] || 'en_US'
 }
