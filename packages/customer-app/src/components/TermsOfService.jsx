@@ -10,9 +10,8 @@ import BlogAppDownload from './BlogAppDownload';
 
 const TermsOfService = () => {
   const pathname = usePathname();
-  const { locale } = useI18n();
-  
-  // Get current language for RTL detection
+  const { locale, t } = useI18n();
+
   const getCurrentLanguage = () => {
     if (locale) return locale;
     if (typeof window !== 'undefined') {
@@ -28,152 +27,152 @@ const TermsOfService = () => {
   const sections = [
     {
       icon: UserCheck,
-      title: "1. Acceptance and Scope",
+      title: t('termsPage.s1_title', "1. Acceptance and Scope"),
       content: [
-        "By creating an account, downloading our app, or using our services, you agree to be bound by these Terms of Service",
-        "These terms apply to all users of Simnetiq services, including website visitors, app users, and customers",
-        "If you do not agree to these terms, you must not use our services",
-        "We may update these terms from time to time. Continued use constitutes acceptance of updated terms",
-        "You must be at least 13 years old to use our services (as required by Stripe and other third-party providers)",
-        "Users under 18 must have parental consent and supervision"
+        t('termsPage.s1_p1', "By creating an account, downloading our app, or using our services, you agree to be bound by these Terms of Service"),
+        t('termsPage.s1_p2', "These terms apply to all users of Simnetiq services, including website visitors, app users, and customers"),
+        t('termsPage.s1_p3', "If you do not agree to these terms, you must not use our services"),
+        t('termsPage.s1_p4', "We may update these terms from time to time. Continued use constitutes acceptance of updated terms"),
+        t('termsPage.s1_p5', "You must be at least 13 years old to use our services (as required by Stripe and other third-party providers)"),
+        t('termsPage.s1_p6', "Users under 18 must have parental consent and supervision"),
       ]
     },
     {
       icon: Smartphone,
-      title: "2. Service Description",
+      title: t('termsPage.s2_title', "2. Service Description"),
       content: [
-        "Simnetiq provides eSIM data plans and mobile connectivity solutions for international travel",
-        "Our services include eSIM profile downloads, data plan activation, and customer support",
-        "Service availability varies by destination and is subject to local network coverage",
-        "We partner with Airalo and other mobile network operators worldwide to provide connectivity services",
-        "Data plans are delivered digitally and activated on compatible eSIM-enabled devices"
+        t('termsPage.s2_p1', "Simnetiq provides eSIM data plans and mobile connectivity solutions for international travel"),
+        t('termsPage.s2_p2', "Our services include eSIM profile downloads, data plan activation, and customer support"),
+        t('termsPage.s2_p3', "Service availability varies by destination and is subject to local network coverage"),
+        t('termsPage.s2_p4', "We partner with Airalo and other mobile network operators worldwide to provide connectivity services"),
+        t('termsPage.s2_p5', "Data plans are delivered digitally and activated on compatible eSIM-enabled devices"),
       ]
     },
     {
       icon: Users,
-      title: "3. Account Registration and Management",
+      title: t('termsPage.s3_title', "3. Account Registration and Management"),
       content: [
-        "You must provide accurate, current, and complete information during registration",
-        "You are responsible for maintaining the security of your account credentials",
-        "You must notify us immediately of any unauthorized use of your account",
-        "One account per person - sharing accounts is prohibited",
-        "We reserve the right to suspend or terminate accounts that violate these terms"
+        t('termsPage.s3_p1', "You must provide accurate, current, and complete information during registration"),
+        t('termsPage.s3_p2', "You are responsible for maintaining the security of your account credentials"),
+        t('termsPage.s3_p3', "You must notify us immediately of any unauthorized use of your account"),
+        t('termsPage.s3_p4', "One account per person - sharing accounts is prohibited"),
+        t('termsPage.s3_p5', "We reserve the right to suspend or terminate accounts that violate these terms"),
       ]
     },
     {
       icon: CreditCard,
-      title: "4. Pricing, Payments, and Third-Party Payment Processing",
+      title: t('termsPage.s4_title', "4. Pricing, Payments, and Third-Party Payment Processing"),
       content: [
-        "All prices are displayed in USD and may include applicable taxes and fees",
-        "Payment is required in full before service activation",
-        "We use Stripe, Inc. ('Stripe') as our payment processor (https://stripe.com/legal). By using our services, you agree to Stripe's Terms of Service (https://stripe.com/legal/ssa) and Privacy Policy (https://stripe.com/privacy), and authorize data sharing for payment processing",
-        "Stripe processes all payment card details, billing information, and IP addresses. We do not store payment card information",
-        "Payment processing fees may apply and are non-refundable",
-        "All sales are final - no refunds or exchanges (see Section 8 for details)",
-        "We reserve the right to change prices with 30 days notice to existing customers",
-        "Failed payments may result in service suspension or account termination",
-        "We are not liable for payment processing failures, declined transactions, or issues arising from Stripe's services"
+        t('termsPage.s4_p1', "All prices are displayed in USD and may include applicable taxes and fees"),
+        t('termsPage.s4_p2', "Payment is required in full before service activation"),
+        t('termsPage.s4_p3', "We use Stripe, Inc. ('Stripe') as our payment processor (https://stripe.com/legal). By using our services, you agree to Stripe's Terms of Service and Privacy Policy, and authorize data sharing for payment processing"),
+        t('termsPage.s4_p4', "Stripe processes all payment card details, billing information, and IP addresses. We do not store payment card information"),
+        t('termsPage.s4_p5', "Payment processing fees may apply and are non-refundable"),
+        t('termsPage.s4_p6', "All sales are final - no refunds or exchanges (see Section 8 for details)"),
+        t('termsPage.s4_p7', "We reserve the right to change prices with 30 days notice to existing customers"),
+        t('termsPage.s4_p8', "Failed payments may result in service suspension or account termination"),
+        t('termsPage.s4_p9', "We are not liable for payment processing failures, declined transactions, or issues arising from Stripe's services"),
       ]
     },
     {
       icon: Shield,
-      title: "5. Acceptable Use Policy and Third-Party Service Restrictions",
+      title: t('termsPage.s5_title', "5. Acceptable Use Policy and Third-Party Service Restrictions"),
       content: [
-        "You may only use our services for lawful purposes and in compliance with local laws",
-        "Prohibited activities include: illegal content, spam, hacking, or network abuse",
-        "You may not resell, redistribute, or share eSIM profiles with others",
-        "Excessive usage that impacts network performance may result in service limitation",
-        "You are responsible for all activity that occurs under your account",
-        "You agree to comply with Airalo's Terms of Service when using eSIM services provided through their platform",
-        "You agree to comply with Stripe's Acceptable Use Policy for payment processing",
-        "Reverse engineering, decompiling, or attempting to extract API keys or service credentials is strictly prohibited",
-        "You must not violate terms of our third-party providers, including Airalo (https://www.airalo.com/terms-conditions), Stripe (https://stripe.com/legal/ssa), Meta (https://www.facebook.com/legal/terms), and Google (https://policies.google.com/terms)"
+        t('termsPage.s5_p1', "You may only use our services for lawful purposes and in compliance with local laws"),
+        t('termsPage.s5_p2', "Prohibited activities include: illegal content, spam, hacking, or network abuse"),
+        t('termsPage.s5_p3', "You may not resell, redistribute, or share eSIM profiles with others"),
+        t('termsPage.s5_p4', "Excessive usage that impacts network performance may result in service limitation"),
+        t('termsPage.s5_p5', "You are responsible for all activity that occurs under your account"),
+        t('termsPage.s5_p6', "You agree to comply with Airalo's Terms of Service when using eSIM services provided through their platform"),
+        t('termsPage.s5_p7', "You agree to comply with Stripe's Acceptable Use Policy for payment processing"),
+        t('termsPage.s5_p8', "Reverse engineering, decompiling, or attempting to extract API keys or service credentials is strictly prohibited"),
+        t('termsPage.s5_p9', "You must not violate terms of our third-party providers, including Airalo, Stripe, Meta, and Google"),
       ]
     },
     {
       icon: Globe,
-      title: "6. Service Availability and Performance",
+      title: t('termsPage.s6_title', "6. Service Availability and Performance"),
       content: [
-        "Service coverage depends on local network infrastructure and may vary by location",
-        "Data speeds are subject to network conditions and local operator limitations",
-        "We do not guarantee specific data speeds or uninterrupted service",
-        "Service may be temporarily unavailable due to maintenance or technical issues",
-        "Emergency services (911, etc.) may not be available through our eSIM services",
-        "Service availability is subject to Airalo's network coverage and service terms"
+        t('termsPage.s6_p1', "Service coverage depends on local network infrastructure and may vary by location"),
+        t('termsPage.s6_p2', "Data speeds are subject to network conditions and local operator limitations"),
+        t('termsPage.s6_p3', "We do not guarantee specific data speeds or uninterrupted service"),
+        t('termsPage.s6_p4', "Service may be temporarily unavailable due to maintenance or technical issues"),
+        t('termsPage.s6_p5', "Emergency services (911, etc.) may not be available through our eSIM services"),
+        t('termsPage.s6_p6', "Service availability is subject to Airalo's network coverage and service terms"),
       ]
     },
     {
       icon: Lock,
-      title: "7. Privacy, Data Protection, and Tracking Consent",
+      title: t('termsPage.s7_title', "7. Privacy, Data Protection, and Tracking Consent"),
       content: [
-        "Your privacy is important to us - see our Privacy Policy for detailed information",
-        "We collect and process personal data necessary to provide our services in compliance with GDPR",
-        "We implement appropriate security measures to protect your information",
-        "We share data with third-party service providers (Airalo, Stripe, Meta, Google) as necessary to provide services",
-        "You have rights regarding your personal data as outlined in our Privacy Policy",
-        "By using our services, you acknowledge our Privacy Policy, which details use of Meta Pixel and Google Tags for analytics/advertising. These require your explicit opt-in consent (Art. 6(1)(a) GDPR)",
-        "Data shared with Airalo includes profiles/purchase details; with Stripe, payment/billing/IP data; with Meta/Google, event/behavior data for legitimate interests (Art. 6(1)(f) GDPR) where consented",
-        "You may revoke tracking consent at any time through your account settings or cookie preferences",
-        "We require explicit opt-in consent before loading non-essential tracking pixels and tags (GDPR-compliant)",
-        "If you do not consent to tracking, certain features may be limited or unavailable",
-        "Our Privacy Policy expands on processors, transfers (e.g., US via Data Privacy Framework), and your rights"
+        t('termsPage.s7_p1', "Your privacy is important to us - see our Privacy Policy for detailed information"),
+        t('termsPage.s7_p2', "We collect and process personal data necessary to provide our services in compliance with GDPR"),
+        t('termsPage.s7_p3', "We implement appropriate security measures to protect your information"),
+        t('termsPage.s7_p4', "We share data with third-party service providers (Airalo, Stripe, Meta, Google) as necessary to provide services"),
+        t('termsPage.s7_p5', "You have rights regarding your personal data as outlined in our Privacy Policy"),
+        t('termsPage.s7_p6', "By using our services, you acknowledge our Privacy Policy, which details use of Meta Pixel and Google Tags for analytics/advertising. These require your explicit opt-in consent (Art. 6(1)(a) GDPR)"),
+        t('termsPage.s7_p7', "Data shared with Airalo includes profiles/purchase details; with Stripe, payment/billing/IP data; with Meta/Google, event/behavior data for legitimate interests (Art. 6(1)(f) GDPR) where consented"),
+        t('termsPage.s7_p8', "You may revoke tracking consent at any time through your account settings or cookie preferences"),
+        t('termsPage.s7_p9', "We require explicit opt-in consent before loading non-essential tracking pixels and tags (GDPR-compliant)"),
+        t('termsPage.s7_p10', "If you do not consent to tracking, certain features may be limited or unavailable"),
+        t('termsPage.s7_p11', "Our Privacy Policy expands on processors, transfers (e.g., US via Data Privacy Framework), and your rights"),
       ]
     },
     {
       icon: RefreshCw,
-      title: "8. Refunds and Cancellations",
+      title: t('termsPage.s8_title', "8. Refunds and Cancellations"),
       content: [
-        "All eSIM purchases are final sale with no refunds or exchanges",
-        "Due to the digital nature of eSIM products, all sales are considered final upon purchase",
-        "Unused data does not roll over and expires according to plan terms",
-        "Technical support is available for activation issues, but no monetary refunds are provided",
-        "In exceptional circumstances, we may provide service credits at our sole discretion",
-        "Refund requests related to payment processing issues should be directed to Stripe in accordance with their policies"
+        t('termsPage.s8_p1', "All eSIM purchases are final sale with no refunds or exchanges"),
+        t('termsPage.s8_p2', "Due to the digital nature of eSIM products, all sales are considered final upon purchase"),
+        t('termsPage.s8_p3', "Unused data does not roll over and expires according to plan terms"),
+        t('termsPage.s8_p4', "Technical support is available for activation issues, but no monetary refunds are provided"),
+        t('termsPage.s8_p5', "In exceptional circumstances, we may provide service credits at our sole discretion"),
+        t('termsPage.s8_p6', "Refund requests related to payment processing issues should be directed to Stripe in accordance with their policies"),
       ]
     },
     {
       icon: MessageSquare,
-      title: "9. SMS and Text Message Communications",
+      title: t('termsPage.s9_title', "9. SMS and Text Message Communications"),
       content: [
-        "By providing your phone number, you consent to receive SMS/text messages from Simnetiq",
-        "Message frequency varies based on your account activity and service updates",
-        "Message and data rates may apply based on your mobile carrier's plan",
-        "Text STOP to opt-out of SMS communications at any time",
-        "Text HELP for customer support assistance via SMS",
-        "We may send transactional messages (order confirmations, eSIM activation codes) even if you opt-out of marketing",
-        "Carriers are not liable for delayed or undelivered messages",
-        "We reserve the right to modify or discontinue SMS services with notice"
+        t('termsPage.s9_p1', "By providing your phone number, you consent to receive SMS/text messages from Simnetiq"),
+        t('termsPage.s9_p2', "Message frequency varies based on your account activity and service updates"),
+        t('termsPage.s9_p3', "Message and data rates may apply based on your mobile carrier's plan"),
+        t('termsPage.s9_p4', "Text STOP to opt-out of SMS communications at any time"),
+        t('termsPage.s9_p5', "Text HELP for customer support assistance via SMS"),
+        t('termsPage.s9_p6', "We may send transactional messages (order confirmations, eSIM activation codes) even if you opt-out of marketing"),
+        t('termsPage.s9_p7', "Carriers are not liable for delayed or undelivered messages"),
+        t('termsPage.s9_p8', "We reserve the right to modify or discontinue SMS services with notice"),
       ]
     },
     {
       icon: Mail,
-      title: "10. Email Marketing and Communications",
+      title: t('termsPage.s10_title', "10. Email Marketing and Communications"),
       content: [
-        "By providing your email address, you consent to receive promotional and marketing emails from Simnetiq",
-        "We may send you newsletters, special offers, product updates, and travel tips",
-        "Email frequency may vary but typically ranges from weekly to monthly communications",
-        "You can unsubscribe from marketing emails at any time by clicking the 'Unsubscribe' link in any email",
-        "Transactional emails (receipts, eSIM delivery, account notifications) cannot be opted out of",
-        "We will not sell, rent, or share your email address with third parties for their marketing purposes",
-        "Your email preferences can be managed in your account settings",
-        "Even after unsubscribing from marketing emails, we may still send service-related communications"
+        t('termsPage.s10_p1', "By providing your email address, you consent to receive promotional and marketing emails from Simnetiq"),
+        t('termsPage.s10_p2', "We may send you newsletters, special offers, product updates, and travel tips"),
+        t('termsPage.s10_p3', "Email frequency may vary but typically ranges from weekly to monthly communications"),
+        t('termsPage.s10_p4', "You can unsubscribe from marketing emails at any time by clicking the 'Unsubscribe' link in any email"),
+        t('termsPage.s10_p5', "Transactional emails (receipts, eSIM delivery, account notifications) cannot be opted out of"),
+        t('termsPage.s10_p6', "We will not sell, rent, or share your email address with third parties for their marketing purposes"),
+        t('termsPage.s10_p7', "Your email preferences can be managed in your account settings"),
+        t('termsPage.s10_p8', "Even after unsubscribing from marketing emails, we may still send service-related communications"),
       ]
     },
     {
       icon: AlertTriangle,
-      title: "11. Limitation of Liability",
+      title: t('termsPage.s11_title', "11. Limitation of Liability"),
       content: [
-        "We are not liable for third-party service failures (Airalo networks, Stripe payments, Meta/Google tracking)",
-        "Total liability limited to amount paid in last 12 months",
-        "No liability for indirect damages or service interruptions"
+        t('termsPage.s11_p1', "We are not liable for third-party service failures (Airalo networks, Stripe payments, Meta/Google tracking)"),
+        t('termsPage.s11_p2', "Total liability limited to amount paid in last 12 months"),
+        t('termsPage.s11_p3', "No liability for indirect damages or service interruptions"),
       ]
     },
     {
       icon: UserX,
-      title: "12. Termination",
+      title: t('termsPage.s12_title', "12. Termination"),
       content: [
-        "We may terminate for violations of these terms or provider policies",
-        "You may terminate anytime; no refunds for digital eSIMs"
+        t('termsPage.s12_p1', "We may terminate for violations of these terms or provider policies"),
+        t('termsPage.s12_p2', "You may terminate anytime; no refunds for digital eSIMs"),
       ]
     }
   ];
@@ -186,20 +185,19 @@ const TermsOfService = () => {
           <div className="text-center">
             <h2 className="text-center text-xl font-semibold text-tufts-blue">
               <span>{'{ '}</span>
-              Legal Information
+              {t('termsPage.tagline', 'Legal Information')}
               <span>{' }'}</span>
             </h2>
             <p className="mx-auto mt-12 max-w-4xl text-center text-4xl font-semibold tracking-tight text-eerie-black sm:text-5xl">
-              Terms of Service
+              {t('termsPage.title', 'Terms of Service')}
             </p>
             <p className="mx-auto mt-6 max-w-2xl text-center text-lg text-cool-black">
-              These Terms of Service govern your use of Simnetiq&apos;s eSIM services and platform. 
-              Please read them carefully as they contain important information about your rights and obligations.
+              {t('termsPage.subtitle', "These Terms of Service govern your use of Simnetiq's eSIM services and platform. Please read them carefully as they contain important information about your rights and obligations.")}
             </p>
             <div className="flex items-center justify-center mt-8">
               <FileText className="w-8 h-8 text-tufts-blue mr-2" />
               <p className="text-sm text-cool-black">
-                Effective Date: August 1, 2025 | Last Updated: December 19, 2025
+                {t('termsPage.effectiveDate', 'Effective Date: August 1, 2025 | Last Updated: December 19, 2025')}
               </p>
             </div>
           </div>
@@ -209,33 +207,28 @@ const TermsOfService = () => {
       {/* Content Section */}
       <section className="bg-[var(--bg-primary)]">
         <div className="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8 mt-6">
-          
+
           {/* Introduction */}
           <div className="relative mb-8">
             <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
-                <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Agreement Overview</h2>
+                <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">
+                  {t('termsPage.agreementTitle', 'Agreement Overview')}
+                </h2>
                 <p className="text-cool-black leading-relaxed mb-4">
-                  These Terms of Service (&quot;Terms&quot;, &quot;Agreement&quot;) govern your use of the eSIM services, 
-                  website, and mobile applications provided by Simnetiq Ltd, a company incorporated in the United Kingdom 
-                  (&quot;Simnetiq&quot;, &quot;Company&quot;, &quot;we&quot;, &quot;our&quot;, or &quot;us&quot;).
+                  {t('termsPage.agreement_p1', 'These Terms of Service ("Terms", "Agreement") govern your use of the eSIM services, website, and mobile applications provided by Simnetiq Ltd, a company incorporated in the United Kingdom ("Simnetiq", "Company", "we", "our", or "us").')}
                 </p>
                 <p className="text-cool-black leading-relaxed mb-4">
-                  By accessing our website, using our mobile application, or purchasing our eSIM services, 
-                  you (&quot;User&quot;, &quot;Customer&quot;, &quot;you&quot;) agree to be bound by these Terms and our Privacy Policy, 
-                  which is incorporated herein by reference.
+                  {t('termsPage.agreement_p2', 'By accessing our website, using our mobile application, or purchasing our eSIM services, you ("User", "Customer", "you") agree to be bound by these Terms and our Privacy Policy, which is incorporated herein by reference.')}
                 </p>
                 <p className="text-cool-black leading-relaxed mb-4">
-                  Our services include digital eSIM profiles, international data plans, mobile connectivity solutions, 
-                  customer support, and related telecommunications services for travelers and mobile users worldwide.
+                  {t('termsPage.agreement_p3', 'Our services include digital eSIM profiles, international data plans, mobile connectivity solutions, customer support, and related telecommunications services for travelers and mobile users worldwide.')}
                 </p>
                 <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-lg mt-4">
                   <p className="text-blue-800 text-sm">
-                    <strong>Important:</strong> By using our services, you also agree to the terms and conditions 
-                    of our third-party service providers, including but not limited to Airalo (eSIM services), 
-                    Stripe (payment processing), Meta (advertising), and Google (analytics). These providers' 
-                    terms are incorporated by reference.
+                    <strong>{t('common.important', 'Important')}:</strong>{' '}
+                    {t('termsPage.agreement_note', "By using our services, you also agree to the terms and conditions of our third-party service providers, including but not limited to Airalo (eSIM services), Stripe (payment processing), Meta (advertising), and Google (analytics). These providers' terms are incorporated by reference.")}
                   </p>
                 </div>
               </div>
@@ -248,10 +241,7 @@ const TermsOfService = () => {
             {sections.map((section, index) => {
               const IconComponent = section.icon;
               return (
-                <div
-                  key={index}
-                  className="relative"
-                >
+                <div key={index} className="relative">
                   <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
                   <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
                     <div className="px-8 pt-8 pb-8">
@@ -284,82 +274,46 @@ const TermsOfService = () => {
               <div className="px-8 pt-8 pb-8">
                 <div className="flex items-center mb-4">
                   <Globe className="w-8 h-8 text-tufts-blue mr-3" />
-                  <h2 className="text-2xl font-medium tracking-tight text-eerie-black">11. Third-Party Service Providers</h2>
+                  <h2 className="text-2xl font-medium tracking-tight text-eerie-black">
+                    {t('termsPage.thirdPartyTitle', '13. Third-Party Service Providers')}
+                  </h2>
                 </div>
                 <div className="space-y-4 text-cool-black">
                   <div>
-                    <p className="font-semibold mb-2">Airalo API Integration</p>
-                    <p className="mb-2">
-                      Our eSIM services are provided through integration with Airalo, a Singapore-based eSIM provider. 
-                      By using our services, you agree to Airalo&apos;s Terms of Service and Privacy Policy. 
-                      We share necessary user data (profiles, purchase details, contact information) with Airalo 
-                      to facilitate eSIM delivery and activation.
-                    </p>
-                    <p>
-                      <strong>Your consent:</strong> By purchasing an eSIM, you consent to this data sharing as 
-                      required for service delivery. Airalo acts as a data processor for eSIM services.
-                    </p>
+                    <p className="font-semibold mb-2">{t('termsPage.airaloTitle', 'Airalo API Integration')}</p>
+                    <p className="mb-2">{t('termsPage.airalo_p1', "Our eSIM services are provided through integration with Airalo, a Singapore-based eSIM provider. By using our services, you agree to Airalo's Terms of Service and Privacy Policy. We share necessary user data (profiles, purchase details, contact information) with Airalo to facilitate eSIM delivery and activation.")}</p>
+                    <p>{t('termsPage.airalo_p2', 'Your consent: By purchasing an eSIM, you consent to this data sharing as required for service delivery. Airalo acts as a data processor for eSIM services.')}</p>
                   </div>
-                  
+
                   <div>
-                    <p className="font-semibold mb-2">Stripe Payment Processing</p>
-                    <p className="mb-2">
-                      We use Stripe, Inc. as our payment processor. Stripe handles all payment card details, 
-                      billing information, and IP addresses in accordance with their Data Processing Agreement (DPA) 
-                      and Privacy Policy. We do not store payment card information on our servers.
-                    </p>
-                    <p className="mb-2">
-                      <strong>Data Controller/Processor:</strong> We are the data controller, and Stripe is the 
-                      data processor for payment processing. Stripe processes payments in compliance with PCI DSS 
-                      standards and applicable data protection laws.
-                    </p>
+                    <p className="font-semibold mb-2">{t('termsPage.stripeTitle', 'Stripe Payment Processing')}</p>
+                    <p className="mb-2">{t('termsPage.stripe_p1', "We use Stripe, Inc. as our payment processor. Stripe handles all payment card details, billing information, and IP addresses in accordance with their Data Processing Agreement (DPA) and Privacy Policy. We do not store payment card information on our servers.")}</p>
+                    <p className="mb-2">{t('termsPage.stripe_p2', "Data Controller/Processor: We are the data controller, and Stripe is the data processor for payment processing. Stripe processes payments in compliance with PCI DSS standards and applicable data protection laws.")}</p>
                     <p>
-                      <strong>Links:</strong> Stripe&apos;s DPA: <a href="https://stripe.com/legal/dpa" target="_blank" rel="noopener noreferrer" className="text-tufts-blue underline">https://stripe.com/legal/dpa</a> | 
-                      Privacy Policy: <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer" className="text-tufts-blue underline">https://stripe.com/privacy</a>
+                      <strong>{t('termsPage.stripe_links', "Links: Stripe's DPA and Privacy Policy")}: </strong>
+                      <a href="https://stripe.com/legal/dpa" target="_blank" rel="noopener noreferrer" className="text-tufts-blue underline">https://stripe.com/legal/dpa</a>{' | '}
+                      <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer" className="text-tufts-blue underline">https://stripe.com/privacy</a>
                     </p>
                   </div>
 
                   <div>
-                    <p className="font-semibold mb-2">Meta Pixel (Facebook/Instagram)</p>
-                    <p className="mb-2">
-                      We use Meta Pixel for advertising and conversion tracking. Meta Pixel collects data about 
-                      page views, purchases, and other events, which is sent to Meta (Ireland/US). 
-                      This data is used for ad targeting, measurement, and optimization.
-                    </p>
-                    <p className="mb-2">
-                      <strong>Consent Required:</strong> We require your explicit opt-in consent before loading 
-                      Meta Pixel. If you do not consent, Meta Pixel will not be loaded (GDPR-compliant). 
-                      You can revoke consent at any time through your cookie preferences.
-                    </p>
-                    <p>
-                      <strong>CCPA Notice:</strong> California residents have the right to opt-out of the 
-                      sale of personal information. Meta Pixel may constitute a sale under CCPA.
-                    </p>
+                    <p className="font-semibold mb-2">{t('termsPage.metaTitle', 'Meta Pixel (Facebook/Instagram)')}</p>
+                    <p className="mb-2">{t('termsPage.meta_p1', "We use Meta Pixel for advertising and conversion tracking. Meta Pixel collects data about page views, purchases, and other events, which is sent to Meta (Ireland/US). This data is used for ad targeting, measurement, and optimization.")}</p>
+                    <p className="mb-2">{t('termsPage.meta_p2', "Consent Required: We require your explicit opt-in consent before loading Meta Pixel. If you do not consent, Meta Pixel will not be loaded (GDPR-compliant). You can revoke consent at any time through your cookie preferences.")}</p>
+                    <p>{t('termsPage.meta_p3', "CCPA Notice: California residents have the right to opt-out of the sale of personal information. Meta Pixel may constitute a sale under CCPA.")}</p>
                   </div>
 
                   <div>
-                      <p className="font-semibold mb-2">Google Tags (Analytics/Tag Manager)</p>
-                    <p className="mb-2">
-                      We use Google Analytics and Google Tag Manager for website analytics. These services collect 
-                      data including IP addresses, device IDs, and user behavior. Google acts as a data processor.
-                    </p>
-                    <p className="mb-2">
-                      <strong>Consent Required:</strong> Non-essential Google Tags require your consent. 
-                      We enable restricted data processing mode where available. You can manage consent through 
-                      cookie preferences.
-                    </p>
-                    <p>
-                      <strong>Data Processing:</strong> Google processes data in accordance with their Data 
-                      Processing Terms. Some data may be transferred to the United States under appropriate 
-                      safeguards (Data Privacy Framework or Standard Contractual Clauses).
-                    </p>
+                    <p className="font-semibold mb-2">{t('termsPage.googleTitle', 'Google Tags (Analytics/Tag Manager)')}</p>
+                    <p className="mb-2">{t('termsPage.google_p1', "We use Google Analytics and Google Tag Manager for website analytics. These services collect data including IP addresses, device IDs, and user behavior. Google acts as a data processor.")}</p>
+                    <p className="mb-2">{t('termsPage.google_p2', "Consent Required: Non-essential Google Tags require your consent. We enable restricted data processing mode where available. You can manage consent through cookie preferences.")}</p>
+                    <p>{t('termsPage.google_p3', "Data Processing: Google processes data in accordance with their Data Processing Terms. Some data may be transferred to the United States under appropriate safeguards (Data Privacy Framework or Standard Contractual Clauses).")}</p>
                   </div>
 
                   <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-lg mt-4">
                     <p className="text-amber-800 text-sm">
-                      <strong>Limitation of Liability:</strong> We are not liable for failures, errors, or 
-                      issues arising from third-party services (Airalo, Stripe, Meta, Google). Your use of 
-                      these services is subject to their respective terms and conditions.
+                      <strong>{t('common.limitationOfLiability', 'Limitation of Liability')}:</strong>{' '}
+                      {t('termsPage.thirdParty_note', 'We are not liable for failures, errors, or issues arising from third-party services (Airalo, Stripe, Meta, Google). Your use of these services is subject to their respective terms and conditions.')}
                     </p>
                   </div>
                 </div>
@@ -373,17 +327,17 @@ const TermsOfService = () => {
             <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
-                <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">12. Intellectual Property Rights</h2>
+                <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">
+                  {t('termsPage.ipTitle', '14. Intellectual Property Rights')}
+                </h2>
                 <p className="text-cool-black leading-relaxed mb-4">
-                  All content, features, and functionality of our services, including but not limited to 
-                  text, graphics, logos, images, and software, are owned by Simnetiq Ltd or our licensors 
-                  and are protected by copyright, trademark, and other intellectual property laws.
+                  {t('termsPage.ip_p1', 'All content, features, and functionality of our services, including but not limited to text, graphics, logos, images, and software, are owned by Simnetiq Ltd or our licensors and are protected by copyright, trademark, and other intellectual property laws.')}
                 </p>
                 <ul className="space-y-2 text-cool-black">
-                  <li>• You may not reproduce, distribute, or create derivative works without permission</li>
-                  <li>• Our trademarks and service marks may not be used without prior written consent</li>
-                  <li>• Any feedback or suggestions you provide may be used by us without compensation</li>
-                  <li>• You may not reverse-engineer, decompile, or attempt to extract API keys or credentials from our services</li>
+                  <li>• {t('termsPage.ip_b1', 'You may not reproduce, distribute, or create derivative works without permission')}</li>
+                  <li>• {t('termsPage.ip_b2', 'Our trademarks and service marks may not be used without prior written consent')}</li>
+                  <li>• {t('termsPage.ip_b3', 'Any feedback or suggestions you provide may be used by us without compensation')}</li>
+                  <li>• {t('termsPage.ip_b4', 'You may not reverse-engineer, decompile, or attempt to extract API keys or credentials from our services')}</li>
                 </ul>
               </div>
             </div>
@@ -395,22 +349,21 @@ const TermsOfService = () => {
             <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
-                <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">13. Device Compatibility and Technical Requirements</h2>
+                <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">
+                  {t('termsPage.deviceTitle', '15. Device Compatibility and Technical Requirements')}
+                </h2>
                 <div className="space-y-4 text-cool-black">
-                  <p>
-                    Our eSIM services require compatible devices and software. You are responsible for ensuring 
-                    your device meets the following requirements:
-                  </p>
+                  <p>{t('termsPage.device_p1', 'Our eSIM services require compatible devices and software. You are responsible for ensuring your device meets the following requirements:')}</p>
                   <ul className="space-y-2 ml-4">
-                    <li>• eSIM-enabled smartphone or tablet with carrier unlock capability</li>
-                    <li>• Compatible operating system (iOS 12.1+ or Android 9+)</li>
-                    <li>• Active internet connection for eSIM profile download and activation</li>
-                    <li>• Device must not be reported as lost, stolen, or blocked by any carrier</li>
+                    <li>• {t('termsPage.device_b1', 'eSIM-enabled smartphone or tablet with carrier unlock capability')}</li>
+                    <li>• {t('termsPage.device_b2', 'Compatible operating system (iOS 12.1+ or Android 9+)')}</li>
+                    <li>• {t('termsPage.device_b3', 'Active internet connection for eSIM profile download and activation')}</li>
+                    <li>• {t('termsPage.device_b4', 'Device must not be reported as lost, stolen, or blocked by any carrier')}</li>
                   </ul>
                   <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-lg">
                     <p className="text-amber-800 text-sm">
-                      <strong>Note:</strong> We are not responsible for compatibility issues or technical problems 
-                      arising from device limitations, software conflicts, or network restrictions.
+                      <strong>{t('common.note', 'Note')}:</strong>{' '}
+                      {t('termsPage.device_note', 'We are not responsible for compatibility issues or technical problems arising from device limitations, software conflicts, or network restrictions.')}
                     </p>
                   </div>
                 </div>
@@ -426,36 +379,21 @@ const TermsOfService = () => {
               <div className="px-8 pt-8 pb-8">
                 <div className="flex items-center mb-4">
                   <Scale className="w-8 h-8 text-tufts-blue mr-3" />
-                  <h2 className="text-2xl font-medium tracking-tight text-eerie-black">14. Limitation of Liability and Disclaimers</h2>
+                  <h2 className="text-2xl font-medium tracking-tight text-eerie-black">
+                    {t('termsPage.liabilityTitle', '16. Limitation of Liability and Disclaimers')}
+                  </h2>
                 </div>
                 <div className="space-y-4 text-cool-black">
-                  <p>
-                    <strong>Service Disclaimers:</strong> Our services are provided &quot;as is&quot; without warranties of any kind. 
-                    We do not guarantee uninterrupted service, specific data speeds, or coverage in all areas.
-                  </p>
-                  <p>
-                    <strong>Third-Party Service Disclaimers:</strong> We are not liable for failures, errors, 
-                    data breaches, or issues arising from third-party services including but not limited to Airalo, 
-                    Stripe, Meta, or Google. Your use of these services is at your own risk.
-                  </p>
-                  <p>
-                    <strong>Limitation of Liability:</strong> To the maximum extent permitted by law, Simnetiq Ltd&apos;s 
-                    total liability shall not exceed the amount you paid for the specific service giving rise to the claim.
-                  </p>
-                  <p>
-                    <strong>Excluded Damages:</strong> We shall not be liable for indirect, incidental, special, 
-                    consequential, or punitive damages, including loss of profits, data, or business opportunities.
-                  </p>
-                  <p>
-                    <strong>Indemnification:</strong> You agree to indemnify and hold harmless Simnetiq Ltd, its 
-                    officers, directors, employees, and agents from any claims, damages, losses, or expenses 
-                    (including legal fees) arising from your violation of these Terms or any third-party service provider terms.
-                  </p>
+                  <p>{t('termsPage.liability_p1', 'Service Disclaimers: Our services are provided "as is" without warranties of any kind. We do not guarantee uninterrupted service, specific data speeds, or coverage in all areas.')}</p>
+                  <p>{t('termsPage.liability_p2', 'Third-Party Service Disclaimers: We are not liable for failures, errors, data breaches, or issues arising from third-party services including but not limited to Airalo, Stripe, Meta, or Google. Your use of these services is at your own risk.')}</p>
+                  <p>{t('termsPage.liability_p3', "Limitation of Liability: To the maximum extent permitted by law, Simnetiq Ltd's total liability shall not exceed the amount you paid for the specific service giving rise to the claim.")}</p>
+                  <p>{t('termsPage.liability_p4', 'Excluded Damages: We shall not be liable for indirect, incidental, special, consequential, or punitive damages, including loss of profits, data, or business opportunities.')}</p>
+                  <p>{t('termsPage.liability_p5', 'Indemnification: You agree to indemnify and hold harmless Simnetiq Ltd, its officers, directors, employees, and agents from any claims, damages, losses, or expenses (including legal fees) arising from your violation of these Terms or any third-party service provider terms.')}</p>
                 </div>
                 <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg mt-4">
                   <p className="text-red-800 text-sm">
-                    <strong>Important:</strong> Emergency services (911, 112, etc.) may not be available through 
-                    our eSIM services. Always ensure you have alternative means to contact emergency services when traveling.
+                    <strong>{t('common.important', 'Important')}:</strong>{' '}
+                    {t('termsPage.liability_note', 'Emergency services (911, 112, etc.) may not be available through our eSIM services. Always ensure you have alternative means to contact emergency services when traveling.')}
                   </p>
                 </div>
               </div>
@@ -470,29 +408,21 @@ const TermsOfService = () => {
               <div className="px-8 pt-8 pb-8">
                 <div className="flex items-center mb-4">
                   <Ban className="w-8 h-8 text-tufts-blue mr-3" />
-                  <h2 className="text-2xl font-medium tracking-tight text-eerie-black">15. Termination</h2>
+                  <h2 className="text-2xl font-medium tracking-tight text-eerie-black">
+                    {t('termsPage.terminationTitle', '17. Termination')}
+                  </h2>
                 </div>
                 <div className="space-y-4 text-cool-black">
-                  <p>
-                    <strong>Termination by You:</strong> You may terminate your account at any time by contacting 
-                    customer support or using account deletion features in your account settings.
-                  </p>
-                  <p>
-                    <strong>Termination by Us:</strong> We reserve the right to suspend or terminate your account 
-                    immediately, without prior notice, if you:
-                  </p>
+                  <p>{t('termsPage.termination_you', 'Termination by You: You may terminate your account at any time by contacting customer support or using account deletion features in your account settings.')}</p>
+                  <p>{t('termsPage.termination_us', 'Termination by Us: We reserve the right to suspend or terminate your account immediately, without prior notice, if you:')}</p>
                   <ul className="space-y-2 ml-4">
-                    <li>• Violate these Terms of Service or any third-party service provider terms</li>
-                    <li>• Engage in fraudulent, illegal, or abusive activity</li>
-                    <li>• Fail to comply with payment obligations</li>
-                    <li>• Misuse our services or third-party integrations</li>
-                    <li>• Reverse-engineer or attempt to extract API credentials</li>
+                    <li>• {t('termsPage.termination_b1', 'Violate these Terms of Service or any third-party service provider terms')}</li>
+                    <li>• {t('termsPage.termination_b2', 'Engage in fraudulent, illegal, or abusive activity')}</li>
+                    <li>• {t('termsPage.termination_b3', 'Fail to comply with payment obligations')}</li>
+                    <li>• {t('termsPage.termination_b4', 'Misuse our services or third-party integrations')}</li>
+                    <li>• {t('termsPage.termination_b5', 'Reverse-engineer or attempt to extract API credentials')}</li>
                   </ul>
-                  <p>
-                    <strong>Effect of Termination:</strong> Upon termination, your right to use our services 
-                    will immediately cease. We may delete your account data in accordance with our Privacy Policy 
-                    and applicable data retention requirements.
-                  </p>
+                  <p>{t('termsPage.termination_effect', "Effect of Termination: Upon termination, your right to use our services will immediately cease. We may delete your account data in accordance with our Privacy Policy and applicable data retention requirements.")}</p>
                 </div>
               </div>
             </div>
@@ -504,31 +434,15 @@ const TermsOfService = () => {
             <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
-                <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">16. Governing Law and Dispute Resolution</h2>
+                <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">
+                  {t('termsPage.governingTitle', '18. Governing Law and Dispute Resolution')}
+                </h2>
                 <div className="space-y-4 text-cool-black">
-                  <p>
-                    <strong>Governing Law:</strong> These Terms are governed by and construed in accordance with 
-                    the laws of the United Kingdom, without regard to conflict of law principles. As a United Kingdom-based company, 
-                    we are subject to United Kingdom data protection laws including GDPR.
-                  </p>
-                  <p>
-                    <strong>Jurisdiction:</strong> The courts of the United Kingdom shall have exclusive jurisdiction 
-                    over any disputes arising from these Terms or our services, subject to mandatory consumer 
-                    protection laws in your jurisdiction.
-                  </p>
-                  <p>
-                    <strong>Dispute Resolution:</strong> Before initiating any legal proceedings, you agree to first 
-                    contact our customer support team to attempt resolution. We are committed to resolving disputes 
-                    fairly and efficiently.
-                  </p>
-                  <p>
-                    <strong>Consumer Rights:</strong> Nothing in these Terms affects your statutory consumer rights 
-                    under applicable consumer protection laws, including EU consumer protection directives.
-                  </p>
-                  <p>
-                    <strong>GDPR Rights:</strong> If you are located in the EEA, you have specific rights under GDPR 
-                    regarding your personal data. See our Privacy Policy for details on exercising these rights.
-                  </p>
+                  <p>{t('termsPage.governing_p1', 'Governing Law: These Terms are governed by and construed in accordance with the laws of the United Kingdom, without regard to conflict of law principles. As a United Kingdom-based company, we are subject to United Kingdom data protection laws including GDPR.')}</p>
+                  <p>{t('termsPage.governing_p2', 'Jurisdiction: The courts of the United Kingdom shall have exclusive jurisdiction over any disputes arising from these Terms or our services, subject to mandatory consumer protection laws in your jurisdiction.')}</p>
+                  <p>{t('termsPage.governing_p3', 'Dispute Resolution: Before initiating any legal proceedings, you agree to first contact our customer support team to attempt resolution. We are committed to resolving disputes fairly and efficiently.')}</p>
+                  <p>{t('termsPage.governing_p4', 'Consumer Rights: Nothing in these Terms affects your statutory consumer rights under applicable consumer protection laws, including EU consumer protection directives.')}</p>
+                  <p>{t('termsPage.governing_p5', 'GDPR Rights: If you are located in the EEA, you have specific rights under GDPR regarding your personal data. See our Privacy Policy for details on exercising these rights.')}</p>
                 </div>
               </div>
             </div>
@@ -540,12 +454,11 @@ const TermsOfService = () => {
             <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
-                <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">17. Contact Information</h2>
+                <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">
+                  {t('termsPage.contactTitle', '19. Contact Information')}
+                </h2>
                 <div className="space-y-4 text-cool-black">
-                  <p>
-                    If you have any questions about these Terms of Service or need to contact us regarding 
-                    our services, please reach out through the following channels:
-                  </p>
+                  <p>{t('termsPage.contact_p1', 'If you have any questions about these Terms of Service or need to contact us regarding our services, please reach out through the following channels:')}</p>
                   <div className="bg-[var(--bg-secondary)] p-6 rounded-lg">
                     <div className="space-y-3">
                       <div>
@@ -553,7 +466,7 @@ const TermsOfService = () => {
                         <strong>Address:</strong> 2 Frederick Street, Kings Cross<br />
                                 London<br />
                                 WC1X 0ND<br />
-                                United Kingdom <br />
+                                United Kingdom<br />
                         <strong>Email:</strong> support@simnetiq.store<br />
                         <strong>Customer Support:</strong> support@simnetiq.store
                       </div>
@@ -574,40 +487,38 @@ const TermsOfService = () => {
             <div className="absolute inset-px rounded-xl bg-[var(--bg-primary)]"></div>
             <div className="relative flex h-full flex-col overflow-hidden rounded-xl">
               <div className="px-8 pt-8 pb-8">
-                <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">Related Legal Documents</h2>
+                <h2 className="text-2xl font-medium tracking-tight text-eerie-black mb-4">
+                  {t('termsPage.relatedTitle', 'Related Legal Documents')}
+                </h2>
                 <div className="space-y-4 text-cool-black">
-                  <p>
-                    These Terms of Service should be read in conjunction with our other legal documents. 
-                    Together, they form the complete legal framework governing your use of Simnetiq services:
-                  </p>
+                  <p>{t('termsPage.related_p1', 'These Terms of Service should be read in conjunction with our other legal documents. Together, they form the complete legal framework governing your use of Simnetiq services:')}</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-                    <Link 
+                    <Link
                       href="/privacy-policy"
                       className="flex items-center space-x-3 px-4 py-3 bg-tufts-blue text-white rounded-lg hover:bg-blue-700 transition-colors"
                     >
                       <Shield className="w-5 h-5" />
-                      <span>Privacy Policy</span>
+                      <span>{t('termsPage.privacyPolicy', 'Privacy Policy')}</span>
                     </Link>
-                    <Link 
+                    <Link
                       href="/return-policy"
                       className="flex items-center space-x-3 px-4 py-3 bg-[var(--subtle-bg)] text-text-primary rounded-lg hover:bg-[var(--hover-bg)] transition-colors"
                     >
                       <RefreshCw className="w-5 h-5" />
-                      <span>Return Policy</span>
+                      <span>{t('termsPage.returnPolicy', 'Return Policy')}</span>
                     </Link>
-                    <Link 
+                    <Link
                       href="/cookie-policy"
                       className="flex items-center space-x-3 px-4 py-3 bg-[var(--subtle-bg)] text-text-primary rounded-lg hover:bg-[var(--hover-bg)] transition-colors"
                     >
                       <FileText className="w-5 h-5" />
-                      <span>Cookie Policy</span>
+                      <span>{t('termsPage.cookiePolicy', 'Cookie Policy')}</span>
                     </Link>
                   </div>
                   <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-lg mt-6">
                     <p className="text-blue-800 text-sm">
-                      <strong>Legal Notice:</strong> By using our services, you acknowledge that you have read,
-                      understood, and agree to be bound by all of these legal documents. If you have any questions
-                      about these terms, please contact our legal team before using our services.
+                      <strong>{t('common.legalNotice', 'Legal Notice')}:</strong>{' '}
+                      {t('termsPage.related_note', 'By using our services, you acknowledge that you have read, understood, and agree to be bound by all of these legal documents. If you have any questions about these terms, please contact our legal team before using our services.')}
                     </p>
                   </div>
                 </div>
@@ -618,16 +529,13 @@ const TermsOfService = () => {
 
           {/* Doppler VPN Card */}
           <div className="relative isolate overflow-hidden rounded-2xl mb-8">
-            {/* Blurry gradient background - indigo/purple theme for VPN */}
             <div className="absolute inset-0 -z-10">
-              {/* Base gradient */}
               <div
                 className="absolute inset-0"
                 style={{
                  background: 'linear-gradient(135deg, #5374CD 0%,rgb(129, 157, 234) 30%, #D4DCF4 50%, #F0F3FA 70%, #FFFFFF 85%, #5374CD 100%)'
                 }}
               />
-              {/* Blur overlay for softer effect */}
               <div
                 className="absolute inset-0 backdrop-blur-3xl"
                 style={{
@@ -638,7 +546,6 @@ const TermsOfService = () => {
 
             <div className="px-6 py-12 md:px-12 md:py-16">
               <div className="mx-auto max-w-2xl text-center">
-                {/* Logo */}
                 <div className="mx-auto mb-6 w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
                   <img
                     src="/WhiteLogoDoppler.png"
@@ -655,14 +562,14 @@ const TermsOfService = () => {
                     className="group inline-flex items-center gap-3 rounded-full bg-[var(--login-bg)] px-6 py-3 text-sm font-medium text-[var(--login-text)] shadow-lg transition-all duration-200 hover:opacity-90 hover:scale-105"
                   >
                     <FileText className="h-5 w-5" />
-                    <span className="text-base">VPN Terms of Service</span>
+                    <span className="text-base">{t('termsPage.dopplerVpnTerms', 'VPN Terms of Service')}</span>
                   </Link>
                   <Link
                     href="/doppler-vpn-privacy-policy"
                     className="group inline-flex items-center gap-3 rounded-full bg-[var(--bg-primary)] px-6 py-3 text-sm font-medium text-text-primary ring-1 ring-[var(--card-border)] shadow-sm transition-all duration-200 hover:bg-[var(--hover-bg)] hover:scale-105"
                   >
                     <Shield className="h-5 w-5" />
-                    <span className="text-base">VPN Privacy Policy</span>
+                    <span className="text-base">{t('termsPage.dopplerVpnPrivacy', 'VPN Privacy Policy')}</span>
                   </Link>
                 </div>
               </div>

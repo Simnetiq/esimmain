@@ -13,8 +13,8 @@ import { join } from 'path';
  */
 
 const SUPPORTED_LOCALES = new Set([
-  'en', 'ar', 'de', 'es', 'fr', 'he', 'hi', 'it', 'ja', 'ko',
-  'nl', 'pl', 'pt', 'ru', 'th', 'tr', 'uk', 'zh',
+  'en', 'ar', 'cs', 'da', 'de', 'el', 'es', 'fi', 'fr', 'he', 'hi', 'id', 'it', 'ja', 'ko',
+  'nb', 'nl', 'pl', 'pt', 'ro', 'ru', 'sv', 'th', 'tr', 'uk', 'vi', 'zh',
 ]);
 
 /** @type {Map<string, Record<string, unknown>>} */

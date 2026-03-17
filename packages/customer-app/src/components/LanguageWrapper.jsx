@@ -11,6 +11,7 @@ const LanguageWrapper = ({ children, initialTranslations, initialLocale }) => {
     '/',
     // Language-code routes
     '/he', '/ar', '/ru', '/de', '/fr', '/es', '/pt', '/ja', '/hi', '/zh', '/pl', '/uk', '/it', '/ko', '/nl', '/th', '/tr',
+    '/vi', '/id', '/sv', '/cs', '/el', '/ro', '/da', '/fi', '/nb',
     // Old language routes (for backward compatibility)
     '/hebrew', '/arabic', '/russian', '/german', '/french', '/spanish',
     // Other translated pages
@@ -46,6 +47,15 @@ const LanguageWrapper = ({ children, initialTranslations, initialLocale }) => {
                     pathname.startsWith('/nl/blog') ||
                     pathname.startsWith('/th/blog') ||
                     pathname.startsWith('/tr/blog') ||
+                    pathname.startsWith('/vi/blog') ||
+                    pathname.startsWith('/id/blog') ||
+                    pathname.startsWith('/sv/blog') ||
+                    pathname.startsWith('/cs/blog') ||
+                    pathname.startsWith('/el/blog') ||
+                    pathname.startsWith('/ro/blog') ||
+                    pathname.startsWith('/da/blog') ||
+                    pathname.startsWith('/fi/blog') ||
+                    pathname.startsWith('/nb/blog') ||
                     // Old language blog routes (for backward compatibility)
                     pathname.startsWith('/hebrew/blog') ||
                     pathname.startsWith('/arabic/blog') ||
@@ -72,6 +82,15 @@ const LanguageWrapper = ({ children, initialTranslations, initialLocale }) => {
                                 pathname.startsWith('/nl/') ||
                                 pathname.startsWith('/th/') ||
                                 pathname.startsWith('/tr/') ||
+                                pathname.startsWith('/vi/') ||
+                                pathname.startsWith('/id/') ||
+                                pathname.startsWith('/sv/') ||
+                                pathname.startsWith('/cs/') ||
+                                pathname.startsWith('/el/') ||
+                                pathname.startsWith('/ro/') ||
+                                pathname.startsWith('/da/') ||
+                                pathname.startsWith('/fi/') ||
+                                pathname.startsWith('/nb/') ||
                                 // Old language routes (for backward compatibility)
                                 pathname.startsWith('/hebrew/') ||
                                 pathname.startsWith('/arabic/') ||
