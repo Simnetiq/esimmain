@@ -746,7 +746,7 @@
     }
   },
   "countryPage": {
-    "title": "eSIM for {{country}}",
+    "title": "eSIM til {{country}}",
     "subtitle": "Hold deg tilkoblet med umiddelbare eSIM-dataplaner",
     "plansAvailable": "Planer tilgjengelig",
     "startingFrom": "Fra",
