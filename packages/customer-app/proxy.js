@@ -35,7 +35,7 @@ function detectLanguageFromHeader(acceptLanguage) {
 const protectedPaths = ['/dashboard', '/payment-success', '/settings'];
 const SUPABASE_PROJECT_REF = 'eujmomonscnlmwcbkbfy';
 
-export function middleware(request) {
+export function proxy(request) {
   const { pathname } = request.nextUrl;
 
   // --- Auth guard for protected routes ---
