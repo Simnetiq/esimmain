@@ -1,1 +1,1 @@
-export { default } from '../../../../help/install-esim/page';
+export { default } from '../../../help/install-esim/page';

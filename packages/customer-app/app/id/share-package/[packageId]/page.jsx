@@ -1,1 +1,1 @@
-export { default } from '../../../../share-package/[packageId]/page';
+export { default } from '../../../share-package/[packageId]/page';

@@ -1,1 +1,1 @@
-export { default } from '../../../../topup-processing/[topupId]/page';
+export { default } from '../../../topup-processing/[topupId]/page';
