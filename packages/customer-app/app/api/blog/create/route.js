@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { timingSafeEqual } from 'crypto';
 import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 import { revalidatePath } from 'next/cache';
+import { after } from 'next/server';
 
 const SUPPORTED_LANGUAGES = ['es', 'fr', 'de', 'ar', 'he', 'hi', 'it', 'ja', 'ko', 'nl', 'pl', 'pt', 'ru', 'th', 'tr', 'uk', 'zh'];
 
@@ -227,140 +228,114 @@ export async function POST(request) {
     );
   }
 
-  // Auto-translate
+  // Auto-translate in the background after response is sent
   const targetLangs =
     body.auto_translate !== false
       ? body.target_languages || SUPPORTED_LANGUAGES
       : [];
 
-  const results = { completed: ['en'], failed: [], errors: [] };
   const baseUrl =
     process.env.NEXT_PUBLIC_BASE_URL || 'https://www.simnetiq.store';
 
+  const enUrl = `${baseUrl}/blog/${slug}`;
+
   if (targetLangs.length > 0) {
-    let openaiKey;
-    try {
-      openaiKey = await getOpenAIKey(supabase);
-    } catch (err) {
-      // Translations will all fail but post is created
-      results.errors.push({
-        language: 'all',
-        error: err.message,
-      });
-      targetLangs.length = 0; // Skip translation loop
-    }
-
-    for (const lang of targetLangs) {
-      if (!SUPPORTED_LANGUAGES.includes(lang)) continue;
-
+    after(async () => {
+      const bgSupabase = getSupabaseAdmin();
+      let openaiKey;
       try {
-        // Log translation job
-        const { data: job } = await supabase
-          .from('translation_jobs')
-          .insert({
-            entity_type: 'blog_post',
-            entity_id: post.id,
-            target_languages: [lang],
-            status: 'processing',
-            source_language: 'en',
-            triggered_by: 'api',
-            started_at: new Date().toISOString(),
-          })
-          .select()
-          .single();
+        openaiKey = await getOpenAIKey(bgSupabase);
+      } catch (err) {
+        console.error('[blog/create] Failed to get OpenAI key for translations:', err);
+        return;
+      }
 
-        const translated = await translateContent(
-          title,
-          content,
-          lang,
-          openaiKey
-        );
+      for (const lang of targetLangs) {
+        if (!SUPPORTED_LANGUAGES.includes(lang)) continue;
 
-        const translatedExcerpt = translated.content
-          .replace(/<[^>]*>/g, '')
-          .replace(/[#*_~`>\-|]/g, '')
-          .substring(0, 160)
-          .trim();
-
-        await supabase.from('blog_post_translations').insert({
-          post_id: post.id,
-          language: lang,
-          title: translated.title,
-          slug, // Same slug for all languages
-          content: translated.content,
-          excerpt: translatedExcerpt,
-          seo_title: translated.seo_title || translated.title.slice(0, 70),
-          seo_description: translated.seo_description || translatedExcerpt.slice(0, 220),
-          og_title: translated.og_title || null,
-          og_description: translated.og_description || null,
-        });
-
-        // Update job status
-        if (job) {
-          await supabase
+        try {
+          const { data: job } = await bgSupabase
             .from('translation_jobs')
-            .update({
-              status: 'completed',
-              languages_completed: [lang],
-              completed_at: new Date().toISOString(),
+            .insert({
+              entity_type: 'blog_post',
+              entity_id: post.id,
+              target_languages: [lang],
+              status: 'processing',
+              source_language: 'en',
+              triggered_by: 'api',
+              started_at: new Date().toISOString(),
             })
-            .eq('id', job.id);
+            .select()
+            .single();
+
+          const translated = await translateContent(
+            title,
+            content,
+            lang,
+            openaiKey
+          );
+
+          const translatedExcerpt = translated.content
+            .replace(/<[^>]*>/g, '')
+            .replace(/[#*_~`>\-|]/g, '')
+            .substring(0, 160)
+            .trim();
+
+          await bgSupabase.from('blog_post_translations').insert({
+            post_id: post.id,
+            language: lang,
+            title: translated.title,
+            slug,
+            content: translated.content,
+            excerpt: translatedExcerpt,
+            seo_title: translated.seo_title || translated.title.slice(0, 70),
+            seo_description: translated.seo_description || translatedExcerpt.slice(0, 220),
+            og_title: translated.og_title || null,
+            og_description: translated.og_description || null,
+          });
+
+          if (job) {
+            await bgSupabase
+              .from('translation_jobs')
+              .update({
+                status: 'completed',
+                languages_completed: [lang],
+                completed_at: new Date().toISOString(),
+              })
+              .eq('id', job.id);
+          }
+
+          console.log(`[blog/create] Translated to ${lang}`);
+        } catch (err) {
+          console.error(`[blog/create] Translation to ${lang} failed:`, err);
         }
 
-        results.completed.push(lang);
-      } catch (err) {
-        console.error(`[blog/create] Translation to ${lang} failed:`, err);
-        results.failed.push(lang);
-        results.errors.push({ language: lang, error: err.message });
+        // Rate limit protection between translations
+        if (targetLangs.indexOf(lang) < targetLangs.length - 1) {
+          await new Promise((r) => setTimeout(r, 1000));
+        }
       }
 
-      // Rate limit protection between translations
-      if (targetLangs.indexOf(lang) < targetLangs.length - 1) {
-        await new Promise((r) => setTimeout(r, 1000));
+      // Revalidate ISR paths after all translations complete
+      try {
+        revalidatePath('/blog');
+        revalidatePath(`/blog/${slug}`);
+        for (const lang of SUPPORTED_LANGUAGES) {
+          revalidatePath(`/${lang}/blog`);
+          revalidatePath(`/${lang}/blog/${slug}`);
+        }
+      } catch {
+        // ISR revalidation is best-effort
       }
-    }
+    });
   }
 
-  // Build URLs
-  const urls = {};
-  results.completed.forEach((lang) => {
-    const prefix = lang === 'en' ? '' : `/${lang}`;
-    urls[lang] = `${baseUrl}${prefix}/blog/${slug}`;
-  });
-
-  // Revalidate ISR paths
+  // Revalidate English blog paths immediately
   try {
     revalidatePath('/blog');
-    results.completed.forEach((lang) => {
-      const prefix = lang === 'en' ? '' : `/${lang}`;
-      revalidatePath(`${prefix}/blog/${slug}`);
-      if (lang !== 'en') revalidatePath(`${prefix}/blog`);
-    });
+    revalidatePath(`/blog/${slug}`);
   } catch {
-    // ISR revalidation is best-effort
-  }
-
-  // Webhook callback
-  if (body.webhook_url) {
-    try {
-      await fetch(body.webhook_url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          post_id: post.id,
-          slug,
-          urls,
-          translations: {
-            completed: results.completed,
-            failed: results.failed,
-          },
-          translation_complete: results.failed.length === 0,
-          errors: results.errors,
-        }),
-      });
-    } catch {
-      // Webhook failure is non-fatal
-    }
+    // best-effort
   }
 
   return NextResponse.json(
@@ -368,14 +343,12 @@ export async function POST(request) {
       success: true,
       post_id: post.id,
       slug,
-      urls,
+      blog_id: post.id,
+      urls: { en: enUrl },
       translations: {
-        completed: results.completed,
-        failed: results.failed,
-        pending: [],
+        completed: ['en'],
+        pending: targetLangs,
       },
-      translation_complete: results.failed.length === 0,
-      errors: results.errors,
     },
     { status: 201 }
   );
