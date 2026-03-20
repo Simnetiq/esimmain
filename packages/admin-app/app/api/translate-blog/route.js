@@ -3,15 +3,21 @@ import { createClient } from '@supabase/supabase-js';
 
 const LANGUAGE_NAMES = {
   es: 'Spanish', fr: 'French', de: 'German', ar: 'Arabic',
-  he: 'Hebrew', hi: 'Hindi', ja: 'Japanese', pl: 'Polish',
-  pt: 'Portuguese', ru: 'Russian', uk: 'Ukrainian', zh: 'Chinese',
+  he: 'Hebrew', hi: 'Hindi', it: 'Italian', ja: 'Japanese',
+  ko: 'Korean', nl: 'Dutch', pl: 'Polish', pt: 'Portuguese',
+  ru: 'Russian', th: 'Thai', tr: 'Turkish', uk: 'Ukrainian',
+  zh: 'Chinese',
 };
 
-function getSupabase() {
+// TODO: Add session-based auth to all admin API routes (translate-blog,
+// translate-countries, translate-regions, sync-airalo, etc.)
+// Currently protected by admin panel login only.
+
+function getSupabaseAdmin() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!supabaseUrl || !supabaseServiceKey) {
-    throw new Error('Supabase environment variables not configured');
+    throw new Error('Supabase environment variables not configured. SUPABASE_SERVICE_ROLE_KEY is required.');
   }
   return createClient(supabaseUrl, supabaseServiceKey);
 }
@@ -31,7 +37,7 @@ async function getOpenAIKey(supabase) {
 
 export async function POST(request) {
   try {
-    const { title, content, targetLanguage } = await request.json();
+    const { title, content, targetLanguage, postId, baseSlug } = await request.json();
 
     if (!title || !content || !targetLanguage) {
       return NextResponse.json(
@@ -40,7 +46,7 @@ export async function POST(request) {
       );
     }
 
-    const supabase = getSupabase();
+    const supabase = getSupabaseAdmin();
     const openaiApiKey = await getOpenAIKey(supabase);
 
     const targetLanguageName = LANGUAGE_NAMES[targetLanguage] || targetLanguage;
@@ -111,16 +117,47 @@ ${isRTL ? '- For RTL languages: translate naturally, the app handles RTL renderi
       .replace(/\n{3,}/g, '\n\n')
       .trim();
 
+    const translation = {
+      title: translatedContent.title,
+      content: cleanContent,
+      seo_title: (translatedContent.seo_title || translatedContent.title).slice(0, 70),
+      seo_description: (translatedContent.seo_description || '').slice(0, 220),
+      og_title: (translatedContent.og_title || translatedContent.seo_title || translatedContent.title).slice(0, 70),
+      og_description: (translatedContent.og_description || translatedContent.seo_description || '').slice(0, 200)
+    };
+
+    // If postId is provided, save the translation directly via service role
+    if (postId) {
+      const excerpt = cleanContent.substring(0, 160).replace(/<[^>]*>/g, '').replace(/[#*_~`>\-|]/g, '');
+      const slug = baseSlug || '';
+
+      const { error: upsertError } = await supabase
+        .from('blog_post_translations')
+        .upsert({
+          post_id: postId,
+          language: targetLanguage,
+          title: translation.title,
+          slug,
+          content: translation.content,
+          excerpt,
+          seo_title: translation.seo_title,
+          seo_description: translation.seo_description,
+          og_title: translation.og_title || null,
+          og_description: translation.og_description || null,
+        }, {
+          onConflict: 'post_id,language',
+          ignoreDuplicates: false,
+        });
+
+      if (upsertError) {
+        console.error('Translation save error:', upsertError);
+        throw new Error(`Failed to save translation: ${upsertError.message}`);
+      }
+    }
+
     return NextResponse.json({
       success: true,
-      translation: {
-        title: translatedContent.title,
-        content: cleanContent,
-        seo_title: (translatedContent.seo_title || translatedContent.title).slice(0, 70),
-        seo_description: (translatedContent.seo_description || '').slice(0, 220),
-        og_title: (translatedContent.og_title || translatedContent.seo_title || translatedContent.title).slice(0, 70),
-        og_description: (translatedContent.og_description || translatedContent.seo_description || '').slice(0, 200)
-      }
+      translation,
     });
 
   } catch (error) {

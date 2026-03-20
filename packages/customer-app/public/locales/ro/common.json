@@ -763,7 +763,8 @@
     "benefit3": "Fara taxe de roaming sau costuri neasteptate",
     "benefit4": "Pastreaza numarul principal activ in timp ce folosesti date in strainatate",
     "benefit5": "Asistenta pentru clienti 24/7",
-    "regionalPlans": "Planuri regionale {{{region}}}"
+    "regionalPlans": "Planuri regionale {{region}}",
+    "coversCountry": "covers {{country}}"
   },
   "about": {
     "sectionLabel": "Despre noi",

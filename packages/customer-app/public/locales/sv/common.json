@@ -763,7 +763,8 @@
     "benefit3": "Inga roamingavgifter eller dolda kostnader",
     "benefit4": "Behåll ditt vanliga nummer medan du surfar utomlands",
     "benefit5": "Kundsupport dygnet runt",
-    "regionalPlans": "{{{region}}} Regionala paket"
+    "regionalPlans": "{{region}} Regionala paket",
+    "coversCountry": "covers {{country}}"
   },
   "about": {
     "sectionLabel": "Om oss",

@@ -763,7 +763,8 @@
     "benefit3": "Tanpa biaya roaming atau biaya tak terduga",
     "benefit4": "Tetap gunakan nomor utama Anda saat menggunakan data di luar negeri",
     "benefit5": "Dukungan pelanggan 24/7",
-    "regionalPlans": "Paket Regional {{{region}}}"
+    "regionalPlans": "Paket Regional {{region}}",
+    "coversCountry": "covers {{country}}"
   },
   "about": {
     "sectionLabel": "Tentang Kami",

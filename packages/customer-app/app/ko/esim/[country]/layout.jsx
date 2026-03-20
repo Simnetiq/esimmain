@@ -1,7 +1,7 @@
 import { generateCountryMetadata } from '../../../../lib/countryMetadata';
 
 export async function generateMetadata({ params }) {
-  const { country } = params;
+  const { country } = await params;
   return generateCountryMetadata(country, 'ko');
 }
 

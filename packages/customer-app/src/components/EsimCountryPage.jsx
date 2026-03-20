@@ -123,7 +123,14 @@ const PlanCard = ({ plan, t, isRTL, onClick, variant }) => {
 };
 
 /* ── Main Component ────────────────────────────────────────────────────── */
-export default function EsimCountryPage() {
+export default function EsimCountryPage({
+  initialCountry = null,
+  initialCountryName = '',
+  initialPlans = [],
+  initialRegionalPlans = [],
+  initialRegionName = '',
+  initialRelatedCountries = [],
+}) {
   const params = useParams();
   const router = useRouter();
   const { t, locale } = useI18n();
@@ -132,14 +139,18 @@ export default function EsimCountryPage() {
   const currentLanguage = locale || 'en';
   const isRTL = getLanguageDirection(currentLanguage) === 'rtl';
 
-  const [country, setCountry] = useState(null);
-  const [countryName, setCountryName] = useState('');
-  const [plans, setPlans] = useState([]);
-  const [regionalPlans, setRegionalPlans] = useState([]);
-  const [regionName, setRegionName] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [country, setCountry] = useState(initialCountry);
+  const [countryName, setCountryName] = useState(initialCountryName);
+  const [plans, setPlans] = useState(initialPlans);
+  const [regionalPlans, setRegionalPlans] = useState(initialRegionalPlans);
+  const [regionName, setRegionName] = useState(initialRegionName);
+  const [relatedCountries] = useState(initialRelatedCountries);
+  const [loading, setLoading] = useState(!initialCountry);
 
+  // Only fetch client-side if no server data was provided (fallback)
   useEffect(() => {
+    if (initialCountry) return; // Server data already provided
+
     async function loadCountry() {
       const supabase = getSupabase();
       if (!supabase) return;
@@ -200,7 +211,6 @@ export default function EsimCountryPage() {
 
         if (regData && regData.length > 0) {
           setRegionalPlans(regData.map(transformPlanToViewModel));
-          // Use region_id from country or first plan's region_id for the section title
           setRegionName(countryData.region_id || regData[0].region_id || 'global');
         }
       } catch (err) {
@@ -210,7 +220,7 @@ export default function EsimCountryPage() {
       setLoading(false);
     }
     loadCountry();
-  }, [countrySlug, router, currentLanguage]);
+  }, [countrySlug, router, currentLanguage, initialCountry]);
 
   const handlePlanClick = (plan) => {
     if (typeof trackCustomFacebookEvent === 'function') {
@@ -406,6 +416,50 @@ export default function EsimCountryPage() {
           />
         </div>
       </div>
+
+      {/* ── Related Countries ──────────────────────────────────────────── */}
+      {relatedCountries.length > 0 && (
+        <>
+          <div className="w-full h-px" style={{ backgroundColor: 'var(--divider)' }} />
+          <div className="w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+            <h2 className="text-lg sm:text-xl font-semibold text-eerie-black mb-6 text-start">
+              {t('countryPage.relatedCountries', 'Other destinations in {{region}}').replace('{{region}}', localizedRegionName)}
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+              {relatedCountries.map((rc) => {
+                const rcUrl = (currentLanguage === 'en' || !currentLanguage)
+                  ? `/esim/${rc.slug}`
+                  : `/${currentLanguage}/esim/${rc.slug}`;
+                return (
+                  <a
+                    key={rc.slug}
+                    href={rcUrl}
+                    className="bg-[var(--card-bg)] border border-[var(--card-border)] p-4 hover:border-[rgba(73,117,212,0.3)] transition-all duration-300 flex flex-col items-center text-center gap-2"
+                  >
+                    {rc.imageUrl && (
+                      <div className="relative w-10 h-7 overflow-hidden flex-shrink-0 border border-[var(--card-border)]">
+                        <Image
+                          src={rc.imageUrl}
+                          alt={rc.name}
+                          fill
+                          className="object-cover"
+                          sizes="40px"
+                        />
+                      </div>
+                    )}
+                    <span className="text-sm font-medium text-text-primary truncate w-full">{rc.name}</span>
+                    {rc.minPrice && (
+                      <span className="text-xs text-text-muted">
+                        {t('countryPage.fromPrice', 'From ${{price}}').replace('{{price}}', rc.minPrice)}
+                      </span>
+                    )}
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -12,10 +12,15 @@ const LANGUAGE_NAMES = {
   ar: 'Arabic',
   he: 'Hebrew',
   hi: 'Hindi',
+  it: 'Italian',
   ja: 'Japanese',
+  ko: 'Korean',
+  nl: 'Dutch',
   pl: 'Polish',
   pt: 'Portuguese',
   ru: 'Russian',
+  th: 'Thai',
+  tr: 'Turkish',
   uk: 'Ukrainian',
   zh: 'Chinese',
 };
@@ -225,7 +230,7 @@ export async function POST(request) {
         .trim();
 
       // Upsert translation (handles both insert and update for force mode)
-      await supabase
+      const { error: upsertError } = await supabase
         .from('blog_post_translations')
         .upsert(
           {
@@ -243,6 +248,10 @@ export async function POST(request) {
           },
           { onConflict: 'post_id,language' }
         );
+
+      if (upsertError) {
+        throw new Error(`Upsert failed for ${lang}: ${upsertError.message}`);
+      }
 
       if (job) {
         await supabase

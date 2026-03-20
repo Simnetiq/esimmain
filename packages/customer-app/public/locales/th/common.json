@@ -763,7 +763,8 @@
     "benefit3": "ไม่มีค่าโรมมิ่งหรือค่าใช้จ่ายที่ไม่คาดคิด",
     "benefit4": "ใช้หมายเลขหลักของคุณต่อไปขณะใช้ข้อมูลในต่างประเทศ",
     "benefit5": "บริการลูกค้าตลอด 24 ชั่วโมง",
-    "regionalPlans": "แผนภูมิภาค {{{region}}}"
+    "regionalPlans": "แผนภูมิภาค {{region}}",
+    "coversCountry": "covers {{country}}"
   },
   "about": {
     "sectionLabel": "เกี่ยวกับเรา",

@@ -10,8 +10,11 @@ const HowItWorks = dynamic(() => import('../src/components/sections/HowItWorks')
 const RoamingComparison = dynamic(() => import('../src/components/sections/RoamingComparison'), { loading: () => loadingFallback });
 const CoverageStats = dynamic(() => import('../src/components/sections/CoverageStats'), { loading: () => loadingFallback });
 const FeaturesBento = dynamic(() => import('../src/components/sections/FeaturesBento'), { loading: () => loadingFallback });
+const SocialProof = dynamic(() => import('../src/components/sections/SocialProof'), { loading: () => loadingFallback });
+const TrustIndicators = dynamic(() => import('../src/components/sections/TrustIndicators'), { loading: () => loadingFallback });
 const AppDownload = dynamic(() => import('../src/components/sections/AppDownload'), { loading: () => loadingFallback });
 const FAQSection = dynamic(() => import('../src/components/sections/FAQSection'), { loading: () => loadingFallback });
+const DeviceCompatibility = dynamic(() => import('../src/components/sections/DeviceCompatibility'), { loading: () => loadingFallback });
 const TravelBlogsSection = dynamic(() => import('../src/components/sections/TravelBlogsSection'), { loading: () => loadingFallback });
 
 export default async function HomePage() {
@@ -23,9 +26,12 @@ export default async function HomePage() {
       <RoamingComparison />
       <CoverageStats />
       <FeaturesBento />
+      <SocialProof />
+      <TrustIndicators />
       <HowItWorks />
       <AppDownload />
       <FAQSection />
+      <DeviceCompatibility />
       <TravelBlogsSection />
     </HomePageWrapper>
   );

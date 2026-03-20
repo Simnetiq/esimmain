@@ -763,7 +763,8 @@
     "benefit3": "Ingen roaming-gebyrer eller overraskende omkostninger",
     "benefit4": "Behold dit hovednummer aktivt, mens du bruger data i udlandet",
     "benefit5": "Kundesupport 24/7",
-    "regionalPlans": "{{{region}}} regionale planer"
+    "regionalPlans": "{{region}} regionale planer",
+    "coversCountry": "covers {{country}}"
   },
   "about": {
     "sectionLabel": "Om os",

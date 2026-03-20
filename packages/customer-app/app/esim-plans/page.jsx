@@ -1,7 +1,15 @@
-'use client';
-
 import React, { Suspense } from 'react';
 import EsimPlans from '../../src/components/EsimPlans';
+
+export const metadata = {
+  title: 'eSIM Plans — Data Plans for 200+ Countries | Simnetiq',
+  description: 'Browse affordable eSIM data plans for over 200 countries. Instant activation, no roaming charges. Find the perfect plan for your next trip with Simnetiq.',
+  openGraph: {
+    title: 'eSIM Plans — Data Plans for 200+ Countries | Simnetiq',
+    description: 'Browse affordable eSIM data plans for over 200 countries. Instant activation, no roaming charges.',
+    type: 'website',
+  },
+};
 
 export default function EsimPlansPage() {
   return (

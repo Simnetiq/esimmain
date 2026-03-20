@@ -18,7 +18,7 @@ export async function generateMetadata({ params }) {
       card: 'summary_large_image',
       title: langMetadata.openGraph.title,
       description: langMetadata.openGraph.description,
-      images: ['/images/og-image.svg'],
+      images: ['/images/og-image.png'],
     },
   }
 }

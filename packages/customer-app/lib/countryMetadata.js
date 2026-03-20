@@ -1,11 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
-
-function getSupabase() {
-  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) return null;
-  return createClient(url, key);
-}
+import { getSupabaseServer } from './supabaseServer';
 
 const BASE = 'https://www.simnetiq.store';
 
@@ -101,6 +94,51 @@ const SEO = {
     desc: (n, c, p) => `购买${n}的 eSIM 数据套餐。${c}种套餐可选，低至 $${p}。即时激活，无漫游费用。使用 Simnetiq 畅连全球。`,
     fallbackCount: '多',
   },
+  cs: {
+    title: (n, p) => `eSIM pro ${n} — Od $${p} | Simnetiq`,
+    desc: (n, c, p) => `Kupte si datové tarify eSIM pro ${n}. ${c} tarifů od $${p}. Okamžitá aktivace, žádné poplatky za roaming. Zůstaňte připojeni se Simnetiq.`,
+    fallbackCount: 'Více',
+  },
+  da: {
+    title: (n, p) => `eSIM til ${n} — Fra $${p} | Simnetiq`,
+    desc: (n, c, p) => `Køb eSIM-dataplaner til ${n}. ${c} planer tilgængelige fra $${p}. Øjeblikkelig aktivering, ingen roaminggebyrer. Hold forbindelsen med Simnetiq.`,
+    fallbackCount: 'Flere',
+  },
+  el: {
+    title: (n, p) => `eSIM για ${n} — Από $${p} | Simnetiq`,
+    desc: (n, c, p) => `Αγοράστε πακέτα δεδομένων eSIM για ${n}. ${c} πακέτα διαθέσιμα από $${p}. Άμεση ενεργοποίηση, χωρίς χρεώσεις περιαγωγής. Μείνετε συνδεδεμένοι με το Simnetiq.`,
+    fallbackCount: 'Πολλά',
+  },
+  fi: {
+    title: (n, p) => `eSIM kohteeseen ${n} — Alkaen $${p} | Simnetiq`,
+    desc: (n, c, p) => `Osta eSIM-datapaketit kohteeseen ${n}. ${c} pakettia alkaen $${p}. Välitön aktivointi, ei roaming-maksuja. Pysy yhteydessä Simnetiqin avulla.`,
+    fallbackCount: 'Useita',
+  },
+  id: {
+    title: (n, p) => `eSIM untuk ${n} — Mulai $${p} | Simnetiq`,
+    desc: (n, c, p) => `Beli paket data eSIM untuk ${n}. ${c} paket tersedia mulai $${p}. Aktivasi instan, tanpa biaya roaming. Tetap terhubung dengan Simnetiq.`,
+    fallbackCount: 'Beberapa',
+  },
+  nb: {
+    title: (n, p) => `eSIM for ${n} — Fra $${p} | Simnetiq`,
+    desc: (n, c, p) => `Kjøp eSIM-dataplaner for ${n}. ${c} planer tilgjengelig fra $${p}. Umiddelbar aktivering, ingen roamingkostnader. Hold kontakten med Simnetiq.`,
+    fallbackCount: 'Flere',
+  },
+  ro: {
+    title: (n, p) => `eSIM pentru ${n} — De la $${p} | Simnetiq`,
+    desc: (n, c, p) => `Cumpărați planuri de date eSIM pentru ${n}. ${c} planuri disponibile de la $${p}. Activare instantanee, fără taxe de roaming. Rămâneți conectat cu Simnetiq.`,
+    fallbackCount: 'Mai multe',
+  },
+  sv: {
+    title: (n, p) => `eSIM för ${n} — Från $${p} | Simnetiq`,
+    desc: (n, c, p) => `Köp eSIM-datapaket för ${n}. ${c} paket tillgängliga från $${p}. Omedelbar aktivering, inga roamingavgifter. Håll kontakten med Simnetiq.`,
+    fallbackCount: 'Flera',
+  },
+  vi: {
+    title: (n, p) => `eSIM cho ${n} — Từ $${p} | Simnetiq`,
+    desc: (n, c, p) => `Mua gói dữ liệu eSIM cho ${n}. ${c} gói có sẵn từ $${p}. Kích hoạt tức thì, không phí chuyển vùng. Kết nối cùng Simnetiq.`,
+    fallbackCount: 'Nhiều',
+  },
 };
 
 /**
@@ -109,7 +147,7 @@ const SEO = {
  * @param {string} locale - ISO language code (e.g. 'de', 'ja')
  */
 export async function generateCountryMetadata(countrySlug, locale) {
-  const supabase = getSupabase();
+  const supabase = getSupabaseServer();
   if (!supabase) return { title: 'eSIM Plans | Simnetiq' };
 
   const { data: country } = await supabase
@@ -181,6 +219,15 @@ export async function generateCountryMetadata(countrySlug, locale) {
         'tr': `${BASE}/tr/esim/${country.slug}`,
         'uk': `${BASE}/uk/esim/${country.slug}`,
         'zh': `${BASE}/zh/esim/${country.slug}`,
+        'vi': `${BASE}/vi/esim/${country.slug}`,
+        'id': `${BASE}/id/esim/${country.slug}`,
+        'sv': `${BASE}/sv/esim/${country.slug}`,
+        'cs': `${BASE}/cs/esim/${country.slug}`,
+        'el': `${BASE}/el/esim/${country.slug}`,
+        'ro': `${BASE}/ro/esim/${country.slug}`,
+        'da': `${BASE}/da/esim/${country.slug}`,
+        'fi': `${BASE}/fi/esim/${country.slug}`,
+        'nb': `${BASE}/nb/esim/${country.slug}`,
       },
     },
   };

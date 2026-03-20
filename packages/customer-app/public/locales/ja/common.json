@@ -763,7 +763,8 @@
     "benefit3": "ローミング料金や予期しない費用なし",
     "benefit4": "海外でデータを使用しながらメインの番号を維持",
     "benefit5": "24時間年中無休のカスタマーサポート",
-    "regionalPlans": "{{{region}}}地域プラン"
+    "regionalPlans": "{{region}}地域プラン",
+    "coversCountry": "covers {{country}}"
   },
   "about": {
     "sectionLabel": "Simnetiqについて",

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { COUNTRY_TO_REGION } from '../../../lib/country-region-mapping.js';
 
 function getSupabaseAdmin() {
   return createClient(
@@ -204,6 +205,7 @@ export async function POST(request) {
                 syncStats.countries.updated++;
               } else {
                 payload.created_at = new Date().toISOString();
+                payload.region_id = COUNTRY_TO_REGION[country.slug] || null;
                 await supabaseAdmin.from('countries').insert(payload);
                 syncStats.countries.added++;
               }
@@ -272,6 +274,7 @@ export async function POST(request) {
               syncStats.countries.updated++;
             } else {
               payload.created_at = new Date().toISOString();
+              payload.region_id = COUNTRY_TO_REGION[country.slug] || null;
               await supabaseAdmin.from('countries').insert(payload);
               syncStats.countries.added++;
             }

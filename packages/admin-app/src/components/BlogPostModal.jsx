@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { generateSlug } from '@esim/shared/services/blogServiceSupabase';
-import Image from 'next/image';
 import { X, Languages } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -334,12 +333,10 @@ const BlogPostModal = ({
                 {(imagePreview || formData.featuredImage) && (
                   <div className="mb-4">
                     <div className="relative inline-block">
-                      <Image
+                      <img
                         src={imagePreview || formData.featuredImage}
                         alt="Preview"
                         className="w-32 h-32 object-cover rounded-lg border border-gray-300"
-                        width={256}
-                        height={256}
                       />
                       <button
                         type="button"
@@ -576,7 +573,7 @@ const BlogPostModal = ({
           </button>
           <button
             onClick={onSave}
-            disabled={loading || !formData.translations[editingTranslation]?.title || !formData.translations[editingTranslation]?.content}
+            disabled={loading || !formData.translations?.en?.title || !formData.translations?.en?.content}
             className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:bg-gray-400 transition-colors"
           >
             {loading ? 'Saving...' : (isEdit ? 'Update Post' : 'Create Post')}

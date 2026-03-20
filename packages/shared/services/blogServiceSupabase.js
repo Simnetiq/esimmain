@@ -18,12 +18,15 @@ import { getSupabase, isSupabaseAvailable } from '../lib/supabase';
  */
 export const generateSlug = (title) => {
   if (!title) return '';
-  return title
+  const slug = title
     .toLowerCase()
-    .replace(/[^a-z0-9 -]/g, '') // Remove special characters
-    .replace(/\s+/g, '-') // Replace spaces with hyphens
-    .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
-    .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+    .replace(/[^a-z0-9\u00C0-\u024F\u0400-\u04FF\u0600-\u06FF\u0590-\u05FF\u3000-\u9FFF\uAC00-\uD7AF\u0E00-\u0E7F\u0900-\u097F -]/g, '') // Keep Latin, Cyrillic, Arabic, Hebrew, CJK, Korean, Thai, Devanagari
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+  // If slug is empty after processing (e.g. all special chars), return empty
+  // The caller should fall back to baseSlug in this case
+  return slug;
 };
 
 /**
@@ -103,7 +106,8 @@ const transformTranslations = (translations) => {
  * Languages not in this set will fall back to 'en' for blog queries.
  */
 const BLOG_ENUM_LANGUAGES = new Set([
-  'en', 'es', 'fr', 'de', 'ar', 'he', 'ru', 'pt', 'zh', 'pl', 'uk', 'ja', 'hi'
+  'en', 'es', 'fr', 'de', 'ar', 'he', 'ru', 'pt', 'zh', 'pl', 'uk', 'ja', 'hi',
+  'it', 'ko', 'nl', 'th', 'tr'
 ]);
 
 /**
@@ -585,19 +589,20 @@ export const blogServiceSupabase = {
 
       // Update or create translations
       if (postData.translations) {
+        // Fetch baseSlug once before the loop to avoid N+1 queries
+        const { data: basePostData } = await supabase
+          .from('blog_posts')
+          .select('base_slug')
+          .eq('id', id)
+          .single();
+        const cachedBaseSlug = basePostData?.base_slug;
+
         for (const [langCode, translation] of Object.entries(postData.translations)) {
           if (!translation.title || !translation.content) {
             continue; // Skip empty translations
           }
 
-          // Get baseSlug for this post
-          const { data: basePost } = await supabase
-            .from('blog_posts')
-            .select('base_slug')
-            .eq('id', id)
-            .single();
-
-          const slug = translation.slug || basePost?.base_slug || generateSlug(translation.title);
+          const slug = translation.slug || cachedBaseSlug || generateSlug(translation.title);
 
           const translationData = {
             post_id: id,
@@ -817,7 +822,7 @@ export const blogServiceSupabase = {
 
       if (error) throw error;
 
-      return (data || []).map(row => ({
+      const posts = (data || []).map(row => ({
         id: row.id,
         baseSlug: row.base_slug,
         author: row.author,
@@ -831,6 +836,28 @@ export const blogServiceSupabase = {
         excerpt: row.excerpt,
         language: row.language
       }));
+
+      // Fetch available languages for each post
+      if (posts.length > 0) {
+        const postIds = posts.map(p => p.id);
+        const { data: langData } = await supabase
+          .from('blog_post_translations')
+          .select('post_id, language')
+          .in('post_id', postIds);
+
+        if (langData) {
+          const langMap = {};
+          for (const row of langData) {
+            if (!langMap[row.post_id]) langMap[row.post_id] = [];
+            langMap[row.post_id].push(row.language);
+          }
+          for (const post of posts) {
+            post.availableLanguages = langMap[post.id] || [];
+          }
+        }
+      }
+
+      return posts;
     } catch (error) {
       console.error('[searchPosts] Error:', error);
       throw error;

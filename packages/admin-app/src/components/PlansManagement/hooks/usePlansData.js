@@ -25,19 +25,13 @@ export const usePlansData = (t) => {
     totalPages: 0
   });
 
-  // Legacy data state
-  const [allPlans, setAllPlans] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [availableCountries, setAvailableCountries] = useState([]);
-
   // Airalo data state
   const [airaloPlans, setAiraloPlans] = useState([]);
   const [airaloCountries, setAiraloCountries] = useState([]);
   const [loadingAiralo, setLoadingAiralo] = useState(false);
 
-  // Topups data state
-  const [topups, setTopups] = useState([]);
-  const [loadingTopups, setLoadingTopups] = useState(false);
+  // Loading state for mutations
+  const [loading, setLoading] = useState(false);
 
   // Filtering state (UI state - not applied until "Apply" is clicked)
   const [searchTerm, setSearchTerm] = useState('');
@@ -276,52 +270,6 @@ export const usePlansData = (t) => {
     }
   }, []);
 
-  const loadAllPlans = useCallback(async () => {
-    try {
-      setLoading(true);
-      const { data: plansData, error } = await supabase
-        .from('dataplans')
-        .select('*');
-
-      if (error) throw error;
-
-      setAllPlans(plansData || []);
-
-      // Extract unique countries from plans
-      const countries = new Set();
-      (plansData || [])
-        .filter(plan => plan.type !== 'topup' && plan.is_topup !== true)
-        .forEach(plan => {
-          (plan.country_codes || []).forEach(code => countries.add(code));
-          (plan.country_ids || []).forEach(code => countries.add(code));
-        });
-
-      const sortedCountries = Array.from(countries).sort();
-      setAvailableCountries(sortedCountries);
-    } catch (error) {
-      console.error('Error loading plans:', error);
-      toast.error(t?.('plansManagement.errorLoadingPlans', 'Failed to load plans') || 'Failed to load plans');
-    } finally {
-      setLoading(false);
-    }
-  }, [t]);
-
-  const loadTopups = useCallback(async () => {
-    try {
-      setLoadingTopups(true);
-      const { data: topupsData, error } = await supabase
-        .from('topups')
-        .select('*');
-      if (error) throw error;
-      setTopups(topupsData || []);
-    } catch (error) {
-      console.error('Error loading topups:', error);
-      toast.error(t?.('plansManagement.errorLoadingTopups', 'Failed to load topups') || 'Failed to load topups');
-    } finally {
-      setLoadingTopups(false);
-    }
-  }, [t]);
-
   const loadSyncStatus = useCallback(async () => {
     try {
       const response = await fetch('/api/sync-airalo');
@@ -373,14 +321,14 @@ export const usePlansData = (t) => {
       if (error) throw error;
 
       toast.success(t?.('plansManagement.priceUpdated', 'Price updated to ${{price}}!', { price: newPrice }) || `Price updated to $${newPrice}!`);
-      await loadAllPlans();
+      await loadSupabasePlans();
     } catch (error) {
       console.error('Error updating price:', error);
       toast.error(t?.('plansManagement.errorUpdatingPrice', 'Failed to update price') || 'Failed to update price');
     } finally {
       setLoading(false);
     }
-  }, [loadAllPlans, t]);
+  }, [loadSupabasePlans, t]);
 
   const deletePlan = useCallback(async (planId, planName) => {
     if (!window.confirm(t?.('plansManagement.confirmDelete', 'Are you sure you want to delete "{{planName}}"? This action cannot be undone.', { planName }) || `Are you sure you want to delete "${planName}"?`)) {
@@ -392,14 +340,14 @@ export const usePlansData = (t) => {
       const { error } = await supabase.from('dataplans').delete().eq('id', planId);
       if (error) throw error;
       toast.success(t?.('plansManagement.planDeleted', 'Plan "{{planName}}" deleted successfully!', { planName }) || `Plan "${planName}" deleted!`);
-      await loadAllPlans();
+      await loadSupabasePlans();
     } catch (error) {
       console.error('Error deleting plan:', error);
       toast.error(t?.('plansManagement.errorDeletingPlan', 'Failed to delete plan') || 'Failed to delete plan');
     } finally {
       setLoading(false);
     }
-  }, [loadAllPlans, t]);
+  }, [loadSupabasePlans, t]);
 
   // ============================================
   // FILTERING LOGIC (CLIENT-SIDE FOR NON-SUPABASE)
@@ -411,24 +359,8 @@ export const usePlansData = (t) => {
       return supabasePlans;
     }
 
-    // Select data source
-    let plansToFilter;
-    if (dataSource === DATA_SOURCES.TOPUPS) {
-      plansToFilter = topups;
-    } else if (dataSource === DATA_SOURCES.AIRALO) {
-      plansToFilter = airaloPlans;
-    } else {
-      plansToFilter = allPlans;
-    }
-
-    let filtered = [...plansToFilter];
-
-    // Filter out topups from non-topup views
-    if (dataSource !== DATA_SOURCES.TOPUPS) {
-      filtered = filtered.filter(plan =>
-        plan.type !== 'topup' && plan.is_topup !== true
-      );
-    }
+    // Airalo tab uses client-side filtering
+    let filtered = [...airaloPlans];
 
     // Use UI filters for non-Supabase (real-time filtering)
     if (selectedCategory !== 'all') {
@@ -489,7 +421,7 @@ export const usePlansData = (t) => {
     }
 
     return filtered;
-  }, [dataSource, supabasePlans, topups, airaloPlans, allPlans, selectedCategory, hasSmsFilter, hasVoiceFilter, searchTerm, selectedCountry, sortColumn, sortDirection]);
+  }, [dataSource, supabasePlans, airaloPlans, selectedCategory, hasSmsFilter, hasVoiceFilter, searchTerm, selectedCountry, sortColumn, sortDirection]);
 
   // ============================================
   // PAGE CHANGE HANDLER (auto-fetch)
@@ -587,20 +519,10 @@ export const usePlansData = (t) => {
         loadSyncStatus(),
         loadSupabaseCountries()
       ]);
-
-      // Load legacy data in background (for legacy tab support)
-      loadAllPlans();
     };
 
     initialize();
   }, []);
-
-  // Load topups when switching to topups tab
-  useEffect(() => {
-    if (dataSource === DATA_SOURCES.TOPUPS && topups.length === 0 && !loadingTopups) {
-      loadTopups();
-    }
-  }, [dataSource, topups.length, loadingTopups, loadTopups]);
 
   // Clear selection when changing data source
   useEffect(() => {
@@ -625,12 +547,6 @@ export const usePlansData = (t) => {
     supabaseStatus,
     loadSupabaseStatus,
     supabaseCountries,
-
-    // Legacy data
-    allPlans,
-    loading,
-    availableCountries,
-    loadAllPlans,
     syncStatus,
     loadSyncStatus,
 
@@ -640,10 +556,8 @@ export const usePlansData = (t) => {
     loadingAiralo,
     loadAiraloData,
 
-    // Topups data
-    topups,
-    loadingTopups,
-    loadTopups,
+    // Loading state for mutations
+    loading,
 
     // Filters (UI state)
     searchTerm,

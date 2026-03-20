@@ -763,7 +763,8 @@
     "benefit3": "无漫游费或意外收费",
     "benefit4": "在国外使用数据的同时保持主号码可用",
     "benefit5": "7x24 小时客服支持",
-    "regionalPlans": "{{{region}}}区域套餐"
+    "regionalPlans": "{{region}}区域套餐",
+    "coversCountry": "covers {{country}}"
   },
   "about": {
     "sectionLabel": "关于我们",

@@ -763,7 +763,8 @@
     "benefit3": "Χωρίς χρεώσεις roaming ή απρόβλεπτες χρεώσεις",
     "benefit4": "Κρατήστε τον κύριο αριθμό σας ενεργό ενώ χρησιμοποιείτε δεδομένα στο εξωτερικό",
     "benefit5": "Υποστήριξη πελατών 24/7",
-    "regionalPlans": "Περιφερειακά πακέτα {{{region}}}"
+    "regionalPlans": "Περιφερειακά πακέτα {{region}}",
+    "coversCountry": "covers {{country}}"
   },
   "about": {
     "sectionLabel": "Σχετικά με εμάς",

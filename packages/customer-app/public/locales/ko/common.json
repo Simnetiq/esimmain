@@ -763,7 +763,8 @@
     "benefit3": "로밍 요금이나 추가 비용 없음",
     "benefit4": "해외에서 데이터를 사용하면서 기존 번호 유지",
     "benefit5": "24시간 연중무휴 고객지원",
-    "regionalPlans": "{{{region}}} 지역 요금제"
+    "regionalPlans": "{{region}} 지역 요금제",
+    "coversCountry": "covers {{country}}"
   },
   "about": {
     "sectionLabel": "회사 소개",

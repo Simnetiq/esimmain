@@ -763,7 +763,8 @@
     "benefit3": "Sem cobranças de roaming ou taxas surpresa",
     "benefit4": "Mantenha seu numero principal ativo enquanto usa dados no exterior",
     "benefit5": "Suporte ao cliente 24/7",
-    "regionalPlans": "Planos Regionais {{{region}}}"
+    "regionalPlans": "Planos Regionais {{region}}",
+    "coversCountry": "covers {{country}}"
   },
   "about": {
     "sectionLabel": "Sobre Nos",

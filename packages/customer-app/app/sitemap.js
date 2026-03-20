@@ -15,7 +15,9 @@ export default async function sitemap() {
   // Helper: generate a single sitemap entry with hreflang alternates for all 18 languages.
   // This is the correct approach — one entry per path with hreflang pointing to all locale variants.
   function withAlternates(path, lastmod, changefreq, priority) {
-    const alternates = {};
+    const alternates = {
+      'x-default': `${baseUrl}${path}`,
+    };
     languages.forEach(lang => {
       alternates[lang] = lang === 'en'
         ? `${baseUrl}${path}`

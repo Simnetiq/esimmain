@@ -15,10 +15,15 @@ const LANGUAGE_NAMES = {
   ar: 'Arabic',
   he: 'Hebrew',
   hi: 'Hindi',
+  it: 'Italian',
   ja: 'Japanese',
+  ko: 'Korean',
+  nl: 'Dutch',
   pl: 'Polish',
   pt: 'Portuguese',
   ru: 'Russian',
+  th: 'Thai',
+  tr: 'Turkish',
   uk: 'Ukrainian',
   zh: 'Chinese',
 };
@@ -283,7 +288,7 @@ export async function POST(request) {
             .substring(0, 160)
             .trim();
 
-          await bgSupabase.from('blog_post_translations').insert({
+          const { error: insertError } = await bgSupabase.from('blog_post_translations').insert({
             post_id: post.id,
             language: lang,
             title: translated.title,
@@ -295,6 +300,10 @@ export async function POST(request) {
             og_title: translated.og_title || null,
             og_description: translated.og_description || null,
           });
+
+          if (insertError) {
+            throw new Error(`Insert failed for ${lang}: ${insertError.message}`);
+          }
 
           if (job) {
             await bgSupabase

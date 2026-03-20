@@ -763,7 +763,8 @@
     "benefit3": "No roaming charges or surprise fees",
     "benefit4": "Keep your main number active while using data abroad",
     "benefit5": "24/7 customer support",
-    "regionalPlans": "{{{region}}} Regional Plans"
+    "regionalPlans": "{{region}} Regional Plans",
+    "coversCountry": "covers {{country}}"
   },
   "about": {
     "sectionLabel": "About Us",

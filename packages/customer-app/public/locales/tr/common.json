@@ -763,7 +763,8 @@
     "benefit3": "Dolaşım ücreti veya sürpriz ücret yok",
     "benefit4": "Yurt dışında veri kullanırken ana numaranızı aktif tutun",
     "benefit5": "7/24 müşteri desteği",
-    "regionalPlans": "{{{region}}} Bölgesel Planları"
+    "regionalPlans": "{{region}} Bölgesel Planları",
+    "coversCountry": "covers {{country}}"
   },
   "about": {
     "sectionLabel": "Hakkımızda",

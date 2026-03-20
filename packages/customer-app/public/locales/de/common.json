@@ -788,7 +788,8 @@
     "benefit3": "Keine Roaming-Gebühren oder Überraschungskosten",
     "benefit4": "Behalten Sie Ihre Hauptnummer, während Sie Daten im Ausland nutzen",
     "benefit5": "Kundensupport rund um die Uhr",
-    "regionalPlans": "{{{region}}} Regionaltarife"
+    "regionalPlans": "{{region}} Regionaltarife",
+    "coversCountry": "covers {{country}}"
   },
   "about": {
     "sectionLabel": "Über uns",

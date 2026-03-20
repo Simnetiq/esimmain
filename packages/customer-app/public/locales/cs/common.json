@@ -763,7 +763,8 @@
     "benefit3": "Žádné poplatky za roaming ani neočekávané poplatky",
     "benefit4": "Ponechte si své hlavní číslo aktivní při používání dat v zahraničí",
     "benefit5": "Zákaznická podpora 24/7",
-    "regionalPlans": "Regionální tarify pro {{{region}}}"
+    "regionalPlans": "Regionální tarify pro {{region}}",
+    "coversCountry": "covers {{country}}"
   },
   "about": {
     "sectionLabel": "O nás",

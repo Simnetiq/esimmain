@@ -773,7 +773,8 @@
     "benefit3": "Без роуминговых сборов и скрытых платежей",
     "benefit4": "Сохраняйте основной номер при использовании данных за рубежом",
     "benefit5": "Поддержка клиентов 24/7",
-    "regionalPlans": "Региональные тарифы {{{region}}}"
+    "regionalPlans": "Региональные тарифы {{region}}",
+    "coversCountry": "covers {{country}}"
   },
   "about": {
     "sectionLabel": "О нас",

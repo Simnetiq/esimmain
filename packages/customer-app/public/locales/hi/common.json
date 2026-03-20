@@ -763,7 +763,8 @@
     "benefit3": "कोई रोमिंग शुल्क या अचानक फीस नहीं",
     "benefit4": "विदेश में डेटा उपयोग करते हुए अपना मुख्य नंबर सक्रिय रखें",
     "benefit5": "24/7 ग्राहक सहायता",
-    "regionalPlans": "{{{region}}} क्षेत्रीय प्लान"
+    "regionalPlans": "{{region}} क्षेत्रीय प्लान",
+    "coversCountry": "covers {{country}}"
   },
   "about": {
     "sectionLabel": "हमारे बारे में",

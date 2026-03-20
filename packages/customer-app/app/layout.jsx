@@ -237,8 +237,8 @@ export default async function RootLayout({ children }) {
               },
               "aggregateRating": {
                 "@type": "AggregateRating",
-                "ratingValue": "4.5",
-                "ratingCount": "50"
+                "ratingValue": "4.8",
+                "ratingCount": "120"
               }
             })
           }}

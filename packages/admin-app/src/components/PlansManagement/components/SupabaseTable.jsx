@@ -28,7 +28,18 @@ const SortableHeader = ({ column, label, sortColumn, sortDirection, onSort, dens
 );
 
 /**
- * Supabase-specific table with all columns, sorting, and selection
+ * Format data amount for display, showing FUP cap context for unlimited plans
+ */
+const formatDataCell = (plan) => {
+  if (plan.is_unlimited && plan.data_amount_mb > 0) {
+    const gb = (plan.data_amount_mb / 1024).toFixed(1);
+    return <span className="text-amber-600" title="Fair usage policy cap">FUP: {gb} GB</span>;
+  }
+  return plan.data_amount_mb || '-';
+};
+
+/**
+ * Supabase-specific table with cleaned-up columns, sorting, and selection
  */
 const SupabaseTable = ({
   plans,
@@ -42,6 +53,7 @@ const SupabaseTable = ({
   emptyRows
 }) => {
   const isRowSelected = (id) => selectedRows.indexOf(id) !== -1;
+  const colCount = 27;
 
   return (
     <>
@@ -101,16 +113,14 @@ const SupabaseTable = ({
               <SortableHeader column="id" label="ID" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
               <SortableHeader column="name" label="Name" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
               <SortableHeader column="title" label="Title" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
-              <SortableHeader column="type" label="Type" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
               <SortableHeader column="plan_category" label="Category" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
-              <SortableHeader column="country_id" label="Country ID" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
               <SortableHeader column="country_name" label="Country" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
               <SortableHeader column="country_iso" label="ISO" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
               <SortableHeader column="region_id" label="Region" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
               <SortableHeader column="is_regional" label="Regional?" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
               <SortableHeader column="covered_countries_count" label="Covered" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
               <SortableHeader column="data_display" label="Data Display" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
-              <SortableHeader column="data_amount_mb" label="Data (MB)" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
+              <SortableHeader column="data_amount_mb" label="Data / FUP Cap" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
               <SortableHeader column="is_unlimited" label="Unlimited?" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
               <SortableHeader column="validity_days" label="Validity" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
               <SortableHeader column="has_voice" label="Voice?" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
@@ -120,18 +130,11 @@ const SupabaseTable = ({
               <SortableHeader column="price" label="Price" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
               <SortableHeader column="net_price" label="Net Price" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
               <SortableHeader column="currency" label="Currency" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
-              <SortableHeader column="operator_id" label="Op. ID" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
               <SortableHeader column="operator_name" label="Operator" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
-              <SortableHeader column="operator_style" label="Op. Style" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
-              <SortableHeader column="operator_gradient_start" label="Gradient Start" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
-              <SortableHeader column="operator_gradient_end" label="Gradient End" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
               <SortableHeader column="activation_policy" label="Activation" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
               <SortableHeader column="fair_usage_policy" label="Fair Usage" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
-              <SortableHeader column="short_info" label="Short Info" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
-              <SortableHeader column="apn_type" label="APN Type" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
-              <SortableHeader column="apn_value" label="APN Value" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
               <SortableHeader column="status" label="Status" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
-              <SortableHeader column="enabled" label="Enabled?" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
+              <SortableHeader column="is_enabled" label="Enabled?" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
               <SortableHeader column="provider" label="Provider" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
               <SortableHeader column="synced_at" label="Synced At" sortColumn={sortColumn} sortDirection={sortDirection} onSort={onSort} denseMode={denseMode} />
             </tr>
@@ -177,10 +180,6 @@ const SupabaseTable = ({
                         {plan.title || '-'}
                       </div>
                     </td>
-                    {/* Type */}
-                    <td className={`${denseMode ? 'px-2 py-1' : 'px-3 py-2'} whitespace-nowrap text-gray-600`}>
-                      {plan.type || '-'}
-                    </td>
                     {/* Plan Category */}
                     <td className={`${denseMode ? 'px-2 py-1' : 'px-3 py-2'} whitespace-nowrap`}>
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
@@ -190,10 +189,6 @@ const SupabaseTable = ({
                       }`}>
                         {plan.plan_category || 'country'}
                       </span>
-                    </td>
-                    {/* Country ID */}
-                    <td className={`${denseMode ? 'px-2 py-1' : 'px-3 py-2'} whitespace-nowrap text-xs text-gray-600`}>
-                      {plan.country_id || '-'}
                     </td>
                     {/* Country Name */}
                     <td className={`${denseMode ? 'px-2 py-1' : 'px-3 py-2'} whitespace-nowrap text-gray-900`}>
@@ -219,9 +214,9 @@ const SupabaseTable = ({
                     <td className={`${denseMode ? 'px-2 py-1' : 'px-3 py-2'} whitespace-nowrap text-gray-900`}>
                       {plan.data_display || '-'}
                     </td>
-                    {/* Data Amount MB */}
+                    {/* Data Amount MB / FUP Cap */}
                     <td className={`${denseMode ? 'px-2 py-1' : 'px-3 py-2'} whitespace-nowrap text-right text-gray-600`}>
-                      {plan.data_amount_mb || '-'}
+                      {formatDataCell(plan)}
                     </td>
                     {/* Is Unlimited */}
                     <td className={`${denseMode ? 'px-2 py-1' : 'px-3 py-2'} whitespace-nowrap text-center`}>
@@ -259,37 +254,11 @@ const SupabaseTable = ({
                     <td className={`${denseMode ? 'px-2 py-1' : 'px-3 py-2'} whitespace-nowrap text-gray-600`}>
                       {plan.currency || 'USD'}
                     </td>
-                    {/* Operator ID */}
-                    <td className={`${denseMode ? 'px-2 py-1' : 'px-3 py-2'} whitespace-nowrap text-xs text-gray-600`}>
-                      {plan.operator_id || '-'}
-                    </td>
                     {/* Operator Name */}
                     <td className={`${denseMode ? 'px-2 py-1' : 'px-3 py-2'} whitespace-nowrap`}>
                       <div className="text-gray-900 max-w-[100px] truncate" title={plan.operator_name}>
                         {plan.operator_name || '-'}
                       </div>
-                    </td>
-                    {/* Operator Style */}
-                    <td className={`${denseMode ? 'px-2 py-1' : 'px-3 py-2'} whitespace-nowrap text-xs text-gray-600 max-w-[80px] truncate`} title={plan.operator_style}>
-                      {plan.operator_style || '-'}
-                    </td>
-                    {/* Gradient Start */}
-                    <td className={`${denseMode ? 'px-2 py-1' : 'px-3 py-2'} whitespace-nowrap`}>
-                      {plan.operator_gradient_start ? (
-                        <div className="flex items-center gap-1">
-                          <div className="w-4 h-4 rounded border" style={{ backgroundColor: plan.operator_gradient_start }} />
-                          <span className="text-xs text-gray-600">{plan.operator_gradient_start}</span>
-                        </div>
-                      ) : <span className="text-gray-400">-</span>}
-                    </td>
-                    {/* Gradient End */}
-                    <td className={`${denseMode ? 'px-2 py-1' : 'px-3 py-2'} whitespace-nowrap`}>
-                      {plan.operator_gradient_end ? (
-                        <div className="flex items-center gap-1">
-                          <div className="w-4 h-4 rounded border" style={{ backgroundColor: plan.operator_gradient_end }} />
-                          <span className="text-xs text-gray-600">{plan.operator_gradient_end}</span>
-                        </div>
-                      ) : <span className="text-gray-400">-</span>}
                     </td>
                     {/* Activation Policy */}
                     <td className={`${denseMode ? 'px-2 py-1' : 'px-3 py-2'} whitespace-nowrap text-xs text-gray-600 max-w-[100px] truncate`} title={plan.activation_policy}>
@@ -299,29 +268,19 @@ const SupabaseTable = ({
                     <td className={`${denseMode ? 'px-2 py-1' : 'px-3 py-2'} whitespace-nowrap text-xs text-gray-600 max-w-[100px] truncate`} title={plan.fair_usage_policy}>
                       {plan.fair_usage_policy || '-'}
                     </td>
-                    {/* Short Info */}
-                    <td className={`${denseMode ? 'px-2 py-1' : 'px-3 py-2'} whitespace-nowrap text-xs text-gray-600 max-w-[150px] truncate`} title={plan.short_info}>
-                      {plan.short_info || '-'}
-                    </td>
-                    {/* APN Type */}
-                    <td className={`${denseMode ? 'px-2 py-1' : 'px-3 py-2'} whitespace-nowrap text-gray-600`}>
-                      {plan.apn_type || '-'}
-                    </td>
-                    {/* APN Value */}
-                    <td className={`${denseMode ? 'px-2 py-1' : 'px-3 py-2'} whitespace-nowrap text-gray-600 max-w-[80px] truncate`} title={plan.apn_value}>
-                      {plan.apn_value || '-'}
-                    </td>
                     {/* Status */}
                     <td className={`${denseMode ? 'px-2 py-1' : 'px-3 py-2'} whitespace-nowrap`}>
                       <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                        plan.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                        plan.status === 'active' ? 'bg-green-100 text-green-800' :
+                        plan.status === 'out_of_stock' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-gray-100 text-gray-800'
                       }`}>
                         {plan.status}
                       </span>
                     </td>
                     {/* Enabled */}
                     <td className={`${denseMode ? 'px-2 py-1' : 'px-3 py-2'} whitespace-nowrap text-center`}>
-                      {plan.enabled ? <span className="text-green-600">Yes</span> : <span className="text-gray-400">No</span>}
+                      {plan.is_enabled ? <span className="text-green-600">Yes</span> : <span className="text-gray-400">No</span>}
                     </td>
                     {/* Provider */}
                     <td className={`${denseMode ? 'px-2 py-1' : 'px-3 py-2'} whitespace-nowrap text-gray-600`}>
@@ -336,7 +295,7 @@ const SupabaseTable = ({
               })
             ) : (
               <tr>
-                <td colSpan="37" className="px-6 py-12 text-center">
+                <td colSpan={colCount} className="px-6 py-12 text-center">
                   <div className="text-gray-500">
                     <Database className="w-12 h-12 mx-auto mb-4 text-gray-300" />
                     <p className="text-lg font-medium">No plans found</p>
@@ -348,7 +307,7 @@ const SupabaseTable = ({
             {/* Empty rows to prevent layout jump */}
             {emptyRows > 0 && (
               <tr style={{ height: (denseMode ? 33 : 53) * emptyRows }}>
-                <td colSpan="37" />
+                <td colSpan={colCount} />
               </tr>
             )}
           </tbody>

@@ -15,7 +15,6 @@ import {
   Languages,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import Image from 'next/image';
 import BlogPostModal from './BlogPostModal';
 
 const BlogManagement = () => {
@@ -212,13 +211,13 @@ const BlogManagement = () => {
   // Debounced slug checking
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (formData.slug) {
-        checkSlugAvailability(formData.slug, selectedPost?.id);
+      if (formData.baseSlug) {
+        checkSlugAvailability(formData.baseSlug, selectedPost?.id);
       }
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [formData.slug, selectedPost?.id]);
+  }, [formData.baseSlug, selectedPost?.id]);
 
   // Handle image upload
   const handleImageUpload = async (file) => {
@@ -468,7 +467,7 @@ const BlogManagement = () => {
         });
 
         try {
-          // Call translation API
+          // Call translation API — it translates AND saves via service role
           const response = await fetch('/api/translate-blog', {
             method: 'POST',
             headers: {
@@ -477,7 +476,9 @@ const BlogManagement = () => {
             body: JSON.stringify({
               title: englishTitle,
               content: englishContent,
-              targetLanguage: targetLang
+              targetLanguage: targetLang,
+              postId: post.id,
+              baseSlug: baseSlug,
             })
           });
 
@@ -486,23 +487,6 @@ const BlogManagement = () => {
           if (!result.success) {
             throw new Error(result.error || 'Translation failed');
           }
-
-          // Update the post with only the new translation
-          const excerpt = result.translation.content.substring(0, 160).replace(/<[^>]*>/g, '').replace(/[#*_~`>\-|]/g, '');
-          await blogServiceSupabase.updatePost(post.id, {
-            translations: {
-              [targetLang]: {
-                title: result.translation.title,
-                slug: baseSlug,
-                content: result.translation.content,
-                excerpt,
-                seoTitle: result.translation.seo_title || result.translation.title.slice(0, 70),
-                seoDescription: result.translation.seo_description || excerpt.slice(0, 220),
-                ogTitle: result.translation.og_title || '',
-                ogDescription: result.translation.og_description || ''
-              }
-            }
-          });
 
           successCount++;
           toast.success(`✅ Translated to ${langName}`);
@@ -647,12 +631,10 @@ const BlogManagement = () => {
                       <td className="px-6 py-4">
                         <div className="flex items-center">
                           {post.featuredImage && (
-                            <Image
+                            <img
                               src={post.featuredImage}
                               alt={post.title}
                               className="w-12 h-12 rounded-lg object-cover mr-4"
-                              width={256}
-                              height={256}
                             />
                           )}
                           <div>

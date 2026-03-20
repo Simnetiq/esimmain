@@ -763,7 +763,8 @@
     "benefit3": "Bez opłat roamingowych i ukrytych kosztów",
     "benefit4": "Zachowaj swój główny numer, korzystając z danych za granicą",
     "benefit5": "Wsparcie klienta 24/7",
-    "regionalPlans": "Plany regionalne — {{{region}}}"
+    "regionalPlans": "Plany regionalne — {{region}}",
+    "coversCountry": "covers {{country}}"
   },
   "about": {
     "sectionLabel": "O nas",

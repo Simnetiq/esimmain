@@ -763,7 +763,8 @@
     "benefit3": "Không phí roaming hay phí phát sinh",
     "benefit4": "Giữ số chính hoạt động trong khi dùng data ở nước ngoài",
     "benefit5": "Hỗ trợ khách hàng 24/7",
-    "regionalPlans": "Gói cước khu vực {{{region}}}"
+    "regionalPlans": "Gói cước khu vực {{region}}",
+    "coversCountry": "covers {{country}}"
   },
   "about": {
     "sectionLabel": "Giới thiệu",

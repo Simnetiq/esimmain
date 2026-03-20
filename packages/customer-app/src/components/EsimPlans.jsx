@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';

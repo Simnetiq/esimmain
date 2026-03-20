@@ -763,7 +763,8 @@
     "benefit3": "Nessun costo di roaming o tariffe a sorpresa",
     "benefit4": "Mantieni il tuo numero principale attivo mentre usi i dati all'estero",
     "benefit5": "Supporto clienti 24/7",
-    "regionalPlans": "Piani regionali {{{region}}}"
+    "regionalPlans": "Piani regionali {{region}}",
+    "coversCountry": "covers {{country}}"
   },
   "about": {
     "sectionLabel": "Chi siamo",

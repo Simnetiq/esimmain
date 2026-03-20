@@ -763,7 +763,8 @@
     "benefit3": "Geen roamingkosten of onverwachte toeslagen",
     "benefit4": "Behoud uw hoofdnummer terwijl u data in het buitenland gebruikt",
     "benefit5": "24/7 klantenservice",
-    "regionalPlans": "{{{region}}} Regionale bundels"
+    "regionalPlans": "{{region}} Regionale bundels",
+    "coversCountry": "covers {{country}}"
   },
   "about": {
     "sectionLabel": "Over ons",

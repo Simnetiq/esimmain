@@ -27,7 +27,7 @@ export async function generateMetadata({ params }) {
     const postUrl = `${baseUrl}/blog/${slug}`;
     const imageUrl = post.featuredImage ?
       (post.featuredImage.startsWith('http') ? post.featuredImage : `${baseUrl}${post.featuredImage}`) :
-      `${baseUrl}/images/og-image.svg`;
+      `${baseUrl}/images/og-image.png`;
 
     // Fallback cascade: og_* -> seo_* -> content fields
     const seoTitle = post.seoTitle || post.title;
@@ -118,7 +118,7 @@ export default async function BlogPostPage({ params }) {
     <>
       <BlogJsonLd post={post} locale="en" />
       <Suspense fallback={<Loading />}>
-        <BlogPost slug={id} />
+        <BlogPost slug={id} initialPost={post} />
       </Suspense>
     </>
   )

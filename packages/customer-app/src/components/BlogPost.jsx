@@ -60,7 +60,7 @@ const showToast = async (message) => {
   toast.success(message);
 };
 
-const BlogPost = ({ slug }) => {
+const BlogPost = ({ slug, initialPost = null }) => {
   const pathname = usePathname();
   const { locale, t, isLoading: i18nLoading } = useI18n();
   const [mounted, setMounted] = useState(false);
@@ -88,8 +88,8 @@ const BlogPost = ({ slug }) => {
   const direction = mounted ? getLanguageDirection(detectedLanguage) : 'ltr';
   const isRTL = direction === 'rtl';
   
-  const [post, setPost] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [post, setPost] = useState(initialPost);
+  const [loading, setLoading] = useState(!initialPost);
   const [error, setError] = useState(null);
   const [showShareModal, setShowShareModal] = useState(false);
 
@@ -116,20 +116,29 @@ const BlogPost = ({ slug }) => {
     }
   }, [post?.content]);
 
-  // Load blog post
+  // Load blog post (skip fetch if server-provided initialPost and default language)
   useEffect(() => {
     const loadBlogPost = async () => {
       try {
-        setLoading(true);
-        setError(null);
-        
         if (!slug) {
           setError('No blog post specified');
           return;
         }
 
+        // Use server-provided data for default language, only re-fetch for translations
+        if (post && detectedLanguage === 'en') {
+          setLoading(false);
+          await blogServiceSupabase.incrementViews(post.id);
+          const source = detectTrafficSource();
+          trackBlogPostView(post, source);
+          return;
+        }
+
+        setLoading(true);
+        setError(null);
+
         const postData = await blogServiceSupabase.getPostBySlug(slug, detectedLanguage);
-        
+
         if (postData) {
           setPost(postData);
           await blogServiceSupabase.incrementViews(postData.id);
@@ -158,43 +167,6 @@ const BlogPost = ({ slug }) => {
       if (cleanupTime) cleanupTime();
     };
   }, [post]);
-
-  // Structured data for SEO
-  const structuredData = useMemo(() => {
-    if (!post) return null;
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.simnetiq.store';
-    const postUrl = `${baseUrl}/blog/${slug}`;
-    const imageUrl = post.featuredImage?.startsWith('http') 
-      ? post.featuredImage 
-      : `${baseUrl}${post.featuredImage || '/images/og-image.svg'}`;
-
-    return {
-      "@context": "https://schema.org",
-      "@type": "BlogPosting",
-      "headline": post.title,
-      "description": post.excerpt || post.seoDescription,
-      "image": imageUrl,
-      "author": { "@type": "Person", "name": post.author || "Simnetiq Team" },
-      "publisher": {
-        "@type": "Organization",
-        "name": "Simnetiq",
-        "logo": { "@type": "ImageObject", "url": `${baseUrl}/images/logo_icon/logo.png` }
-      },
-      "datePublished": post.publishedAt?.toISOString(),
-      "dateModified": post.updatedAt?.toISOString(),
-      "mainEntityOfPage": { "@type": "WebPage", "@id": postUrl },
-      "articleSection": post.category,
-      "keywords": post.tags?.join(', '),
-      "url": postUrl
-    };
-  }, [post, slug]);
-
-  // Update document title
-  useEffect(() => {
-    if (post?.title) {
-      document.title = `${post.title} | Simnetiq Blog`;
-    }
-  }, [post?.title]);
 
   const handleShare = useCallback(() => setShowShareModal(true), []);
   const closeShareModal = useCallback(() => setShowShareModal(false), []);
@@ -268,14 +240,6 @@ const BlogPost = ({ slug }) => {
 
   return (
     <>
-      {/* Structured Data for SEO */}
-      {structuredData && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-        />
-      )}
-      
       <div className="bg-[var(--bg-primary)] min-h-screen flex flex-col" dir={direction} lang={detectedLanguage}>
         <div className="relative isolate flex-1 flex flex-col">
           {/* Grid Patterns */}

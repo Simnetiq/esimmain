@@ -115,7 +115,7 @@
     "cookiePolicy": "מדיניות עוגיות",
     "allRightsReserved": "כל הזכויות שמורות",
     "brandName": "Simnetiq",
-    "tagline": "הישאר מחובר לכל מקום שתיסע. הפעלת eSIM מיידית ליותר מ-150 מדינות.",
+    "tagline": "הישאר מחובר לכל מקום שתיסע. הפעלת eSIM מיידית ליותר מ-200 מדינות.",
     "product": "מוצר",
     "esimPlans": "תוכניות eSIM",
     "appStore": "אפליקציית iOS",
@@ -773,7 +773,8 @@
     "benefit3": "ללא חיובי נדידה או עמלות מפתיעות",
     "benefit4": "שמור על המספר הראשי שלך בזמן שימוש בנתונים בחו\"ל",
     "benefit5": "תמיכת לקוחות 24/7",
-    "regionalPlans": "תוכניות אזוריות ל{{{region}}}"
+    "regionalPlans": "תוכניות אזוריות ל{{region}}",
+    "coversCountry": "covers {{country}}"
   },
   "about": {
     "sectionLabel": "אודותינו",

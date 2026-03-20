@@ -115,7 +115,7 @@
     "cookiePolicy": "سياسة ملفات تعريف الارتباط",
     "allRightsReserved": "جميع الحقوق محفوظة",
     "brandName": "Simnetiq",
-    "tagline": "ابق متصلاً أينما سافرت. تفعيل eSIM فوري لأكثر من 150 دولة.",
+    "tagline": "ابق متصلاً أينما سافرت. تفعيل eSIM فوري لأكثر من 200 دولة.",
     "product": "المنتج",
     "esimPlans": "خطط eSIM",
     "appStore": "تطبيق iOS",
@@ -774,7 +774,8 @@
     "benefit3": "بدون رسوم تجوال أو رسوم مفاجئة",
     "benefit4": "احتفظ برقمك الأساسي أثناء استخدام البيانات في الخارج",
     "benefit5": "دعم عملاء على مدار الساعة",
-    "regionalPlans": "خطط {{{region}}} الإقليمية"
+    "regionalPlans": "خطط {{region}} الإقليمية",
+    "coversCountry": "covers {{country}}"
   },
   "about": {
     "sectionLabel": "من نحن",

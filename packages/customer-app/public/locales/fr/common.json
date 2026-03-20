@@ -787,7 +787,8 @@
     "benefit3": "Pas de frais d'itinérance ni de frais surprises",
     "benefit4": "Gardez votre numéro principal actif tout en utilisant les données à l'étranger",
     "benefit5": "Support client 24/7",
-    "regionalPlans": "Forfaits régionaux {{{region}}}"
+    "regionalPlans": "Forfaits régionaux {{region}}",
+    "coversCountry": "covers {{country}}"
   },
   "about": {
     "sectionLabel": "À propos",

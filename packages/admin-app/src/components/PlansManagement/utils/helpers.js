@@ -91,9 +91,7 @@ export const planHasVoice = (plan) => {
  */
 export const DATA_SOURCES = {
   SUPABASE: 'supabase',
-  LEGACY: 'legacy',
-  AIRALO: 'airalo',
-  TOPUPS: 'topups'
+  AIRALO: 'airalo'
 };
 
 /**
@@ -122,16 +120,14 @@ export const SUPABASE_COLUMNS = [
   { key: 'id', label: 'ID', width: '120px' },
   { key: 'name', label: 'Name', width: '150px' },
   { key: 'title', label: 'Title', width: '150px' },
-  { key: 'type', label: 'Type' },
   { key: 'plan_category', label: 'Category' },
-  { key: 'country_id', label: 'Country ID' },
   { key: 'country_name', label: 'Country' },
   { key: 'country_iso', label: 'ISO' },
   { key: 'region_id', label: 'Region' },
   { key: 'is_regional', label: 'Regional?' },
   { key: 'covered_countries_count', label: 'Covered' },
   { key: 'data_display', label: 'Data Display' },
-  { key: 'data_amount_mb', label: 'Data (MB)' },
+  { key: 'data_amount_mb', label: 'Data / FUP Cap' },
   { key: 'is_unlimited', label: 'Unlimited?' },
   { key: 'validity_days', label: 'Validity' },
   { key: 'has_voice', label: 'Voice?' },
@@ -141,18 +137,11 @@ export const SUPABASE_COLUMNS = [
   { key: 'price', label: 'Price' },
   { key: 'net_price', label: 'Net Price' },
   { key: 'currency', label: 'Currency' },
-  { key: 'operator_id', label: 'Op. ID' },
   { key: 'operator_name', label: 'Operator' },
-  { key: 'operator_style', label: 'Op. Style' },
-  { key: 'operator_gradient_start', label: 'Gradient Start' },
-  { key: 'operator_gradient_end', label: 'Gradient End' },
   { key: 'activation_policy', label: 'Activation' },
   { key: 'fair_usage_policy', label: 'Fair Usage' },
-  { key: 'short_info', label: 'Short Info' },
-  { key: 'apn_type', label: 'APN Type' },
-  { key: 'apn_value', label: 'APN Value' },
   { key: 'status', label: 'Status' },
-  { key: 'enabled', label: 'Enabled?' },
+  { key: 'is_enabled', label: 'Enabled?' },
   { key: 'provider', label: 'Provider' },
   { key: 'synced_at', label: 'Synced At' }
 ];

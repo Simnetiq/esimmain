@@ -170,7 +170,7 @@ const Footer = () => {
                   </span>
                 </Link>
                 <p className="text-text-muted text-sm max-w-xs mb-6 leading-relaxed text-start">
-                  {t('footer.tagline', 'Stay connected wherever you travel. Instant eSIM activation for 150+ countries.')}
+                  {t('footer.tagline', 'Stay connected wherever you travel. Instant eSIM activation for 200+ countries.')}
                 </p>
                 {/* Social Icons */}
                 <div className="flex gap-1 rtl-native-flex">

@@ -763,7 +763,8 @@
     "benefit3": "Ei roaming-maksuja tai yllätyskuluja",
     "benefit4": "Pidä päänumerosi aktiivisena käyttäessäsi dataa ulkomailla",
     "benefit5": "Asiakastuki 24/7",
-    "regionalPlans": "{{{region}}} alueelliset paketit"
+    "regionalPlans": "{{region}} alueelliset paketit",
+    "coversCountry": "covers {{country}}"
   },
   "about": {
     "sectionLabel": "Meistä",

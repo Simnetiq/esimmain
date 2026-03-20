@@ -10,17 +10,14 @@ import toast from 'react-hot-toast';
 // Components
 import PlansHeader from './components/PlansHeader';
 import PlansStatusBanner from './components/PlansStatusBanner';
-import DataSourceTabs from './components/DataSourceTabs';
-import PlansFilters from './components/PlansFilters';
 import PlansSearch from './components/PlansSearch';
 import SupabaseTable from './components/SupabaseTable';
-import StandardTable from './components/StandardTable';
 import PlansPagination from './components/PlansPagination';
-import { AiraloSyncModal, SupabaseSyncModal } from './components/SyncModals';
+import { AiraloSyncModal } from './components/SyncModals';
 
 // Hooks and utilities
 import usePlansData from './hooks/usePlansData';
-import { DATA_SOURCES, PAGINATION } from './utils/helpers';
+import { DATA_SOURCES } from './utils/helpers';
 
 /**
  * Plans Management - Main Component
@@ -47,22 +44,15 @@ const PlansManagement = () => {
   const currentLanguage = getCurrentLanguage();
   const isRTL = getLanguageDirection(currentLanguage) === 'rtl';
 
-  // Modal states
+  // Modal state
   const [showSyncModal, setShowSyncModal] = useState(false);
-  const [showSupabaseModal, setShowSupabaseModal] = useState(false);
 
-  // Sync states
+  // Sync state
   const [syncing, setSyncing] = useState(false);
   const [syncResult, setSyncResult] = useState(null);
-  const [syncingSupabase, setSyncingSupabase] = useState(false);
-  const [supabaseSyncResult, setSupabaseSyncResult] = useState(null);
 
   // Use the plans data hook
   const {
-    // Data source
-    dataSource,
-    setDataSource,
-
     // Supabase data (primary)
     supabasePlans,
     loadingSupabase,
@@ -71,25 +61,8 @@ const PlansManagement = () => {
     supabaseStatus,
     loadSupabaseStatus,
     supabaseCountries,
-
-    // Airalo data
-    allPlans,
-    loading,
-    availableCountries,
-    loadAllPlans,
     syncStatus,
     loadSyncStatus,
-
-    // Airalo data
-    airaloPlans,
-    airaloCountries,
-    loadingAiralo,
-    loadAiraloData,
-
-    // Topups data
-    topups,
-    loadingTopups,
-    loadTopups,
 
     // Filters (UI state)
     searchTerm,
@@ -125,19 +98,6 @@ const PlansManagement = () => {
     setSelectedRows,
     denseMode,
     setDenseMode,
-
-    // Price editing
-    editingPrices,
-    setEditingPrices,
-    pendingPriceChanges,
-    setPendingPriceChanges,
-    updatePlanPrice,
-
-    // Mutations
-    deletePlan,
-
-    // Computed
-    filteredPlans
   } = usePlansData(t);
 
   // ============================================
@@ -166,7 +126,7 @@ const PlansManagement = () => {
       if (result.success) {
         toast.success(result.message);
         if (!dryRun) {
-          await loadAllPlans();
+          await loadSupabasePlans({ showToast: true });
           await loadSyncStatus();
         }
       } else {
@@ -178,42 +138,7 @@ const PlansManagement = () => {
     } finally {
       setSyncing(false);
     }
-  }, [loadAllPlans, loadSyncStatus]);
-
-  const runSupabaseSync = useCallback(async (options = {}) => {
-    const { dryRun = false } = options;
-
-    try {
-      setSyncingSupabase(true);
-      setSupabaseSyncResult(null);
-
-      const params = new URLSearchParams();
-      if (dryRun) params.append('dry_run', 'true');
-
-      const response = await fetch(`/api/sync-to-supabase?${params.toString()}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      const result = await response.json();
-      setSupabaseSyncResult(result);
-
-      if (result.success) {
-        toast.success(result.message);
-        if (!dryRun) {
-          await loadSupabaseStatus();
-          await loadSupabasePlans({ showToast: true });
-        }
-      } else {
-        toast.error(result.error || 'Supabase sync failed');
-      }
-    } catch (error) {
-      toast.error('Failed to sync to Supabase');
-      setSupabaseSyncResult({ success: false, error: error.message });
-    } finally {
-      setSyncingSupabase(false);
-    }
-  }, [loadSupabaseStatus, loadSupabasePlans]);
+  }, [loadSupabasePlans, loadSyncStatus]);
 
   // ============================================
   // TABLE HANDLERS
@@ -221,8 +146,7 @@ const PlansManagement = () => {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const currentPlans = getCurrentPagePlans();
-      const newSelected = currentPlans.map((plan) => plan.id);
+      const newSelected = supabasePlans.map((plan) => plan.id);
       setSelectedRows(newSelected);
       return;
     }
@@ -254,82 +178,14 @@ const PlansManagement = () => {
   };
 
   // ============================================
-  // PRICE EDITING HANDLERS
+  // PAGINATION
   // ============================================
 
-  const handlePriceChange = (planId, newPrice) => {
-    setPendingPriceChanges(prev => ({
-      ...prev,
-      [planId]: parseFloat(newPrice) || 0
-    }));
-  };
-
-  const savePriceChange = async (planId) => {
-    const newPrice = pendingPriceChanges[planId];
-    if (newPrice !== undefined) {
-      await updatePlanPrice(planId, newPrice);
-      setEditingPrices(prev => ({ ...prev, [planId]: false }));
-      setPendingPriceChanges(prev => ({ ...prev, [planId]: undefined }));
-    }
-  };
-
-  const cancelPriceChange = (planId) => {
-    setEditingPrices(prev => ({ ...prev, [planId]: false }));
-    setPendingPriceChanges(prev => ({ ...prev, [planId]: undefined }));
-  };
-
-  const startEditingPrice = (planId) => {
-    setEditingPrices(prev => ({ ...prev, [planId]: true }));
-  };
-
-  // ============================================
-  // PAGINATION CALCULATIONS
-  // ============================================
-
-  const effectiveRowsPerPage = dataSource === DATA_SOURCES.SUPABASE ? rowsPerPage : PAGINATION.DEFAULT_ROWS_PER_PAGE;
-
-  const getCurrentPagePlans = () => {
-    if (dataSource === DATA_SOURCES.SUPABASE) {
-      return supabasePlans;
-    }
-    const indexOfLastPlan = currentPage * effectiveRowsPerPage;
-    const indexOfFirstPlan = indexOfLastPlan - effectiveRowsPerPage;
-    return filteredPlans.slice(indexOfFirstPlan, indexOfLastPlan);
-  };
-
-  const getTotalPages = () => {
-    if (dataSource === DATA_SOURCES.SUPABASE) {
-      return supabasePagination.totalPages;
-    }
-    return Math.ceil(filteredPlans.length / effectiveRowsPerPage);
-  };
-
-  const getTotalItems = () => {
-    if (dataSource === DATA_SOURCES.SUPABASE) {
-      return supabasePagination.total;
-    }
-    return filteredPlans.length;
-  };
-
-  const currentPlans = getCurrentPagePlans();
-  const totalPages = getTotalPages();
-  const totalItems = getTotalItems();
-
+  const totalPages = supabasePagination.totalPages;
+  const totalItems = supabasePagination.total;
   const emptyRows = currentPage > 1
-    ? Math.max(0, currentPage * effectiveRowsPerPage - totalItems)
+    ? Math.max(0, currentPage * rowsPerPage - totalItems)
     : 0;
-
-  // ============================================
-  // STATUS REFRESH
-  // ============================================
-
-  const handleRefreshStatus = () => {
-    if (dataSource === DATA_SOURCES.SUPABASE) {
-      loadSupabaseStatus();
-    } else {
-      loadSyncStatus();
-    }
-  };
 
   // ============================================
   // RENDER
@@ -340,20 +196,18 @@ const PlansManagement = () => {
   }
 
   return (
-    <div className="space-y-6" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="space-y-4" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Header */}
       <PlansHeader
         onOpenAiraloSync={() => setShowSyncModal(true)}
-        onOpenSupabaseSync={() => setShowSupabaseModal(true)}
       />
 
       {/* Status Banner */}
       <PlansStatusBanner
         syncStatus={syncStatus}
         supabaseStatus={supabaseStatus}
-        allPlansCount={allPlans.length}
-        onRefreshStatus={handleRefreshStatus}
-        dataSource={dataSource}
+        onRefreshStatus={loadSupabaseStatus}
+        dataSource="supabase"
       />
 
       {/* Airalo Sync Modal */}
@@ -363,7 +217,7 @@ const PlansManagement = () => {
           setShowSyncModal(false);
           setSyncResult(null);
         }}
-        allPlansCount={allPlans.length}
+        allPlansCount={supabasePagination.total || 0}
         syncStatus={syncStatus}
         syncing={syncing}
         syncResult={syncResult}
@@ -371,38 +225,7 @@ const PlansManagement = () => {
         onFullSync={() => runSync({ dryRun: false, removeDeprecated: true })}
       />
 
-      {/* Supabase Sync Modal */}
-      <SupabaseSyncModal
-        isOpen={showSupabaseModal}
-        onClose={() => {
-          setShowSupabaseModal(false);
-          setSupabaseSyncResult(null);
-        }}
-        supabaseStatus={supabaseStatus}
-        syncingSupabase={syncingSupabase}
-        supabaseSyncResult={supabaseSyncResult}
-        onDryRun={() => runSupabaseSync({ dryRun: true })}
-        onFullSync={() => runSupabaseSync({ dryRun: false })}
-      />
-
-      {/* Data Source Tabs */}
-      <DataSourceTabs
-        dataSource={dataSource}
-        onDataSourceChange={setDataSource}
-        allPlansCount={allPlans.length}
-        airaloPlansCount={airaloPlans.length}
-        topupsCount={topups.length}
-        supabasePlansCount={supabasePagination.total || supabasePlans.length}
-        loadingAiralo={loadingAiralo}
-        loadingTopups={loadingTopups}
-        loadingSupabase={loadingSupabase}
-        onLoadAiralo={loadAiraloData}
-        onLoadTopups={loadTopups}
-        onLoadSupabase={() => loadSupabasePlans({ showToast: true })}
-        isRTL={isRTL}
-      />
-
-      {/* Search and Filters (Combined for Supabase) */}
+      {/* Search and Filters */}
       <PlansSearch
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
@@ -414,94 +237,57 @@ const PlansManagement = () => {
         onSmsFilterChange={setHasSmsFilter}
         hasVoiceFilter={hasVoiceFilter}
         onVoiceFilterChange={setHasVoiceFilter}
-        // Countries lists
-        availableCountries={availableCountries}
-        airaloCountries={airaloCountries}
+        availableCountries={[]}
+        airaloCountries={[]}
         supabaseCountries={supabaseCountries}
-        // Filter state
         filtersChanged={filtersChanged}
         appliedFilters={appliedFilters}
         onApplyFilters={applyFilters}
         onClearFilters={clearFilters}
-        // Loading
         loading={loadingSupabase}
-        // Context
-        dataSource={dataSource}
+        dataSource="supabase"
         isRTL={isRTL}
         t={t}
-      />
-
-      {/* Category Filters (for non-Supabase views) */}
-      <PlansFilters
-        selectedCategory={selectedCategory}
-        onCategoryChange={setSelectedCategory}
-        hasSmsFilter={hasSmsFilter}
-        onSmsFilterChange={setHasSmsFilter}
-        hasVoiceFilter={hasVoiceFilter}
-        onVoiceFilterChange={setHasVoiceFilter}
-        filteredCount={totalItems}
-        dataSource={dataSource}
       />
 
       {/* Plans Table */}
       <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-        {dataSource === DATA_SOURCES.SUPABASE ? (
-          <SupabaseTable
-            plans={currentPlans}
-            selectedRows={selectedRows}
-            onRowClick={handleRowClick}
-            onSelectAllClick={handleSelectAllClick}
-            sortColumn={sortColumn}
-            sortDirection={sortDirection}
-            onSort={handleSortChange}
-            denseMode={denseMode}
-            emptyRows={emptyRows}
-          />
-        ) : (
-          <StandardTable
-            plans={currentPlans}
-            dataSource={dataSource}
-            loading={loading}
-            editingPrices={editingPrices}
-            pendingPriceChanges={pendingPriceChanges}
-            onStartEditingPrice={startEditingPrice}
-            onPriceChange={handlePriceChange}
-            onSavePrice={savePriceChange}
-            onCancelPriceEdit={cancelPriceChange}
-            onDeletePlan={deletePlan}
-            isRTL={isRTL}
-            t={t}
-          />
-        )}
+        <SupabaseTable
+          plans={supabasePlans}
+          selectedRows={selectedRows}
+          onRowClick={handleRowClick}
+          onSelectAllClick={handleSelectAllClick}
+          sortColumn={sortColumn}
+          sortDirection={sortDirection}
+          onSort={handleSortChange}
+          denseMode={denseMode}
+          emptyRows={emptyRows}
+        />
       </div>
 
-      {/* Dense Mode Toggle (Supabase only) */}
-      {dataSource === DATA_SOURCES.SUPABASE && (
-        <div className="flex items-center justify-end gap-4">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={denseMode}
-              onChange={(e) => setDenseMode(e.target.checked)}
-              className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
-            />
-            <span className="text-sm text-gray-600">Dense padding</span>
-          </label>
-        </div>
-      )}
-
-      {/* Pagination */}
-      <PlansPagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={totalItems}
-        rowsPerPage={effectiveRowsPerPage}
-        onPageChange={handlePageChange}
-        onRowsPerPageChange={handleRowsPerPageChange}
-        dataSource={dataSource}
-        isRTL={isRTL}
-        t={t}
-      />
+      {/* Pagination + Dense toggle */}
+      <div className="flex items-center justify-between">
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={denseMode}
+            onChange={(e) => setDenseMode(e.target.checked)}
+            className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
+          />
+          <span className="text-sm text-gray-500">Dense</span>
+        </label>
+        <PlansPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          rowsPerPage={rowsPerPage}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
+          dataSource="supabase"
+          isRTL={isRTL}
+          t={t}
+        />
+      </div>
     </div>
   );
 };
