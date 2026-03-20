@@ -4,6 +4,8 @@ import { getSupabaseAdmin } from '@esim/shared/lib/supabaseAdmin';
 import { revalidatePath } from 'next/cache';
 import { after } from 'next/server';
 
+export const maxDuration = 300;
+
 const SUPPORTED_LANGUAGES = ['es', 'fr', 'de', 'ar', 'he', 'hi', 'it', 'ja', 'ko', 'nl', 'pl', 'pt', 'ru', 'th', 'tr', 'uk', 'zh'];
 
 const LANGUAGE_NAMES = {
