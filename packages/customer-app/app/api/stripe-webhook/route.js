@@ -490,7 +490,18 @@ async function handlePaymentIntentFailed(paymentIntent) {
     const supabase = getSupabase();
     const now = new Date().toISOString();
 
-    const wasBlockedByRadar = paymentIntent.last_payment_error?.type === 'card_error' && (paymentIntent.last_payment_error?.decline_code === 'fraudulent' || paymentIntent.last_payment_error?.decline_code === 'merchant_blacklist' || paymentIntent.charges?.data?.[0]?.outcome?.type === 'blocked');
+    const declineCode = paymentIntent.last_payment_error?.decline_code;
+    const errorCode = paymentIntent.last_payment_error?.code;
+    const errorMessage = paymentIntent.last_payment_error?.message || 'Payment failed';
+    const errorType = paymentIntent.last_payment_error?.type;
+
+    const wasBlockedByRadar = errorType === 'card_error' && (declineCode === 'fraudulent' || declineCode === 'merchant_blacklist' || paymentIntent.charges?.data?.[0]?.outcome?.type === 'blocked');
+
+    // Detect authentication failures (3DS failures, card_declined with auth reasons)
+    const isAuthFailure = errorCode === 'payment_intent_authentication_failure' ||
+      declineCode === 'authentication_required' ||
+      declineCode === 'card_declined' ||
+      (errorMessage && errorMessage.toLowerCase().includes('authentication'));
 
     let cardFingerprint = null, cardLast4 = null, cardBrand = null;
     if (paymentIntent.last_payment_error?.payment_method?.card) {
@@ -501,17 +512,59 @@ async function handlePaymentIntentFailed(paymentIntent) {
       try { const pm = await stripe.paymentMethods.retrieve(paymentIntent.payment_method); if (pm.card) { cardFingerprint = pm.card.fingerprint; cardLast4 = pm.card.last4; cardBrand = pm.card.brand; } } catch (e) { /* ignore */ }
     }
 
-    if (wasBlockedByRadar || paymentIntent.last_payment_error?.decline_code === 'do_not_honor') {
-      await recordBlockedPayment(supabase, { userId, email, cardFingerprint, cardLast4, cardBrand, stripePaymentIntentId: paymentIntent.id, blockReason: paymentIntent.last_payment_error?.decline_code || 'payment_failed', riskLevel: wasBlockedByRadar ? 'highest' : 'high', riskScore: wasBlockedByRadar ? 100 : 70, metadata: { orderId, errorType: paymentIntent.last_payment_error?.type, errorCode: paymentIntent.last_payment_error?.code, declineCode: paymentIntent.last_payment_error?.decline_code, errorMessage: paymentIntent.last_payment_error?.message } });
+    // Record blocked payment for Radar blocks, auth failures, and do_not_honor
+    if (wasBlockedByRadar || declineCode === 'do_not_honor' || isAuthFailure) {
+      const riskLevel = wasBlockedByRadar ? 'highest' : (isAuthFailure ? 'high' : 'high');
+      const riskScore = wasBlockedByRadar ? 100 : (isAuthFailure ? 75 : 70);
+
+      await recordBlockedPayment(supabase, {
+        userId, email, cardFingerprint, cardLast4, cardBrand,
+        stripePaymentIntentId: paymentIntent.id,
+        blockReason: declineCode || errorCode || 'payment_failed',
+        riskLevel, riskScore,
+        metadata: { orderId, errorType, errorCode, declineCode, errorMessage }
+      });
+    }
+
+    // Auto-block user after 5+ failed orders (authentication failures)
+    if (userId && isAuthFailure) {
+      const { count: failedCount } = await supabase
+        .from('orders')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .in('status', ['failed', 'blocked', 'fraud_blocked']);
+
+      // +1 for the current failure being processed
+      if ((failedCount || 0) + 1 >= 5) {
+        // Check if not already blocked
+        const { data: userData } = await supabase.from('users').select('is_blocked').eq('id', userId).single();
+        if (userData && !userData.is_blocked) {
+          await supabase.from('users').update({
+            is_blocked: true,
+            block_reason: `Auto-blocked: ${(failedCount || 0) + 1} repeated payment failures (authentication)`,
+            updated_at: now,
+          }).eq('id', userId);
+
+          console.warn(`[webhook] Auto-blocked user ${userId} after ${(failedCount || 0) + 1} failed payment attempts`);
+        }
+      }
     }
 
     if (!orderId) return;
     const { data: orderData } = await supabase.from('orders').select('*').eq('id', orderId).single();
     if (!orderData) return;
 
-    await supabase.from('orders').update({ status: wasBlockedByRadar ? 'blocked' : 'failed', payment_status: wasBlockedByRadar ? 'blocked' : 'failed', failure_reason: paymentIntent.last_payment_error?.message || 'Payment failed', failure_code: paymentIntent.last_payment_error?.code, decline_code: paymentIntent.last_payment_error?.decline_code, was_blocked_by_radar: wasBlockedByRadar, blocked_card: cardFingerprint ? `${cardBrand} ****${cardLast4}` : null, updated_at: now }).eq('id', orderId);
+    await supabase.from('orders').update({ status: wasBlockedByRadar ? 'blocked' : 'failed', payment_status: wasBlockedByRadar ? 'blocked' : 'failed', failure_reason: errorMessage, failure_code: errorCode, decline_code: declineCode, was_blocked_by_radar: wasBlockedByRadar, blocked_card: cardFingerprint ? `${cardBrand} ****${cardLast4}` : null, payment_method_fingerprint: cardFingerprint, payment_method_last4: cardLast4, payment_method_brand: cardBrand, updated_at: now }).eq('id', orderId);
 
-    await trackFailedPurchase(supabase, { attemptId: orderData.fraud_check?.attemptId, failureReason: paymentIntent.last_payment_error?.message || 'Payment failed', metadata: { orderId, stripePaymentIntentId: paymentIntent.id, failureCode: paymentIntent.last_payment_error?.code, wasBlockedByRadar, cardFingerprint } });
+    // Track the failed purchase — write to fraud_tracking_attempts even without attemptId
+    await trackFailedPurchase(supabase, {
+      attemptId: orderData.fraud_check?.attemptId,
+      userId: orderData.user_id,
+      email: orderData.customer_email,
+      orderId,
+      failureReason: errorMessage,
+      metadata: { orderId, stripePaymentIntentId: paymentIntent.id, failureCode: errorCode, declineCode, wasBlockedByRadar, cardFingerprint }
+    });
 
     // Release promo reservation — payment failed, return the slot
     await releasePromoReservation(supabase, orderId);

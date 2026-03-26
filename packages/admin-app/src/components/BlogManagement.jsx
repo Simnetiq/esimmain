@@ -5,6 +5,7 @@ import { useAuth } from '@esim/shared/contexts/AuthContext';
 import { useAdmin } from '@esim/shared/contexts/AdminContext';
 import blogServiceSupabase from '@esim/shared/services/blogServiceSupabase';
 import imageUploadService from '@esim/shared/services/imageUploadService';
+import { getSupabase } from '@esim/shared/lib/supabase';
 import { 
   Plus, 
   Edit, 
@@ -404,14 +405,29 @@ const BlogManagement = () => {
   const handleDeletePost = async () => {
     try {
       setLoading(true);
-      await blogServiceSupabase.deletePost(postToDelete.id);
+      const supabase = getSupabase();
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error('Not authenticated');
+      const res = await fetch('/api/blog/delete', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ id: postToDelete.id }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Delete failed');
+      }
       toast.success('Blog post deleted successfully!');
       setShowDeleteModal(false);
       setPostToDelete(null);
       loadPosts();
     } catch (error) {
       console.error('Error deleting post:', error);
-      toast.error('Error deleting blog post');
+      toast.error('Error deleting blog post: ' + error.message);
     } finally {
       setLoading(false);
     }

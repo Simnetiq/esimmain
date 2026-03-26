@@ -31,7 +31,7 @@ function hashEmail(email) {
  */
 export async function getFraudSignal(db, userId, email) {
   try {
-    const supabase = getSupabase();
+    const supabase = db || getSupabase();
     if (userId) {
       const { data } = await supabase.from('fraud_signals').select('*').eq('user_id', userId).maybeSingle();
       if (data) return data;
@@ -47,7 +47,7 @@ export async function getFraudSignal(db, userId, email) {
 
 export async function upsertFraudSignal(db, data) {
   try {
-    const supabase = getSupabase();
+    const supabase = db || getSupabase();
 
     const existing = await getFraudSignal(db, data.userId, data.email);
 
@@ -99,7 +99,7 @@ export async function upsertFraudSignal(db, data) {
 
 export async function recordBlockedPayment(db, data) {
   try {
-    const supabase = getSupabase();
+    const supabase = db || getSupabase();
 
     await supabase.from('fraud_blocked_payments').insert({
       id: data.stripePaymentIntentId || `blocked_${Date.now()}`,
@@ -141,7 +141,7 @@ export async function recordBlockedPayment(db, data) {
 
 export async function blockUser(db, userId, email, options = {}) {
   try {
-    const supabase = getSupabase();
+    const supabase = db || getSupabase();
 
     const existing = await getFraudSignal(db, userId, email);
     let temporaryBlockCount = (existing?.temporary_block_count || 0) + 1;
@@ -208,7 +208,7 @@ export async function blockUser(db, userId, email, options = {}) {
 
 export async function checkUserBlocked(db, userId, email, cardFingerprint = null, ipAddress = null) {
   try {
-    const supabase = getSupabase();
+    const supabase = db || getSupabase();
     const fraudSignal = await getFraudSignal(db, userId, email);
 
     if (fraudSignal && fraudSignal.blocked) {
@@ -255,7 +255,7 @@ export async function checkUserBlocked(db, userId, email, cardFingerprint = null
 
 export async function unblockUser(db, userId, email) {
   try {
-    const supabase = getSupabase();
+    const supabase = db || getSupabase();
 
     const existing = await getFraudSignal(db, userId, email);
     if (existing) {
@@ -312,7 +312,7 @@ export async function getFraudStats(db, userId, email) {
 
 export async function syncToStripeRadar(db, stripe) {
   try {
-    const supabase = getSupabase();
+    const supabase = db || getSupabase();
     const lists = await stripe.radar.valueLists.list({ limit: 100 });
     let blocklist = lists.data.find(list => list.alias === 'fraud_card_fingerprints' || list.name === 'Fraud Card Fingerprints');
 
@@ -357,7 +357,7 @@ export async function syncToStripeRadar(db, stripe) {
 
 export async function submitBlockAppeal(db, data) {
   try {
-    const supabase = getSupabase();
+    const supabase = db || getSupabase();
     const { data: result, error } = await supabase
       .from('fraud_appeals')
       .insert({

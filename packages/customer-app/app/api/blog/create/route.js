@@ -67,19 +67,24 @@ async function translateContent(title, content, targetLanguage, openaiKey) {
   const languageName = LANGUAGE_NAMES[targetLanguage] || targetLanguage;
   const isRTL = ['ar', 'he'].includes(targetLanguage);
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${openaiKey}`,
-    },
-    body: JSON.stringify({
-      model: 'gpt-4o-mini',
-      response_format: { type: 'json_object' },
-      messages: [
-        {
-          role: 'system',
-          content: `You are a professional translator for an eSIM technology blog. Translate the blog post from English to ${languageName}.
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 60000);
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${openaiKey}`,
+      },
+      signal: controller.signal,
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        response_format: { type: 'json_object' },
+        messages: [
+          {
+            role: 'system',
+            content: `You are a professional translator for an eSIM technology blog. Translate the blog post from English to ${languageName}.
 
 Rules:
 - Output MUST be pure Markdown format - NO HTML tags
@@ -93,40 +98,62 @@ ${isRTL ? '- For RTL languages: translate naturally, the app handles RTL renderi
 - og_title: max 70 chars, engaging title for social media sharing
 - og_description: max 200 chars, social media preview description
 - Do NOT add commentary - return ONLY the JSON object`,
-        },
-        {
-          role: 'user',
-          content: JSON.stringify({ title, content }),
-        },
-      ],
-      temperature: 0.3,
-      max_tokens: 4096,
-    }),
-  });
+          },
+          {
+            role: 'user',
+            content: JSON.stringify({ title, content }),
+          },
+        ],
+        temperature: 0.3,
+        max_tokens: 4096,
+      }),
+    });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error?.message || 'OpenAI API error');
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.error?.message || `OpenAI API error (${response.status})`);
+    }
+
+    const data = await response.json();
+    const raw = data.choices?.[0]?.message?.content;
+    if (!raw) {
+      throw new Error(`OpenAI returned empty content for ${targetLanguage}`);
+    }
+
+    let result;
+    try {
+      result = JSON.parse(raw);
+    } catch (parseErr) {
+      const match = raw.match(/\{[\s\S]*\}/);
+      if (match) {
+        result = JSON.parse(match[0]);
+      } else {
+        throw new Error(`Failed to parse translation JSON for ${targetLanguage}: ${raw.slice(0, 100)}`);
+      }
+    }
+
+    if (!result.title || !result.content) {
+      throw new Error(`Translation for ${targetLanguage} missing required fields`);
+    }
+
+    // Strip any HTML tags the model may have introduced
+    let cleanContent = result.content
+      .replace(/<[^>]+>/g, '')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+
+    return {
+      title: result.title,
+      content: cleanContent,
+      seo_title: (result.seo_title || result.title).slice(0, 70),
+      seo_description: (result.seo_description || '').slice(0, 220),
+      og_title: (result.og_title || result.seo_title || result.title).slice(0, 70),
+      og_description: (result.og_description || result.seo_description || '').slice(0, 200),
+      tokens_used: data.usage?.total_tokens || null,
+    };
+  } finally {
+    clearTimeout(timeout);
   }
-
-  const data = await response.json();
-  const result = JSON.parse(data.choices[0].message.content);
-
-  // Strip any HTML tags the model may have introduced
-  let cleanContent = result.content
-    .replace(/<[^>]+>/g, '')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
-
-  return {
-    title: result.title,
-    content: cleanContent,
-    seo_title: (result.seo_title || result.title).slice(0, 70),
-    seo_description: (result.seo_description || '').slice(0, 220),
-    og_title: (result.og_title || result.seo_title || result.title).slice(0, 70),
-    og_description: (result.og_description || result.seo_description || '').slice(0, 200),
-    tokens_used: data.usage?.total_tokens || null,
-  };
 }
 
 export async function POST(request) {
@@ -199,6 +226,7 @@ export async function POST(request) {
       featured_image: body.featured_image || null,
       status,
       seo_keywords: body.seo_keywords || [],
+      source_urls: body.source_urls || [],
       published_at: status === 'published' ? new Date().toISOString() : null,
     })
     .select()
@@ -257,75 +285,109 @@ export async function POST(request) {
         return;
       }
 
-      for (const lang of targetLangs) {
-        if (!SUPPORTED_LANGUAGES.includes(lang)) continue;
+      const validLangs = targetLangs.filter((l) => SUPPORTED_LANGUAGES.includes(l));
+      const BATCH_SIZE = 5;
+      const completedLangs = [];
+      const failedLangs = [];
 
-        try {
-          const { data: job } = await bgSupabase
-            .from('translation_jobs')
-            .insert({
-              entity_type: 'blog_post',
-              entity_id: post.id,
-              target_languages: [lang],
-              status: 'processing',
-              source_language: 'en',
-              triggered_by: 'api',
-              started_at: new Date().toISOString(),
-            })
-            .select()
-            .single();
+      for (let i = 0; i < validLangs.length; i += BATCH_SIZE) {
+        const batch = validLangs.slice(i, i + BATCH_SIZE);
+        console.log(`[blog/create] Translating batch ${Math.floor(i / BATCH_SIZE) + 1}: ${batch.join(', ')}`);
 
-          const translated = await translateContent(
-            title,
-            content,
-            lang,
-            openaiKey
-          );
+        const results = await Promise.allSettled(
+          batch.map(async (lang) => {
+            let jobId = null;
+            try {
+              const { data: job } = await bgSupabase
+                .from('translation_jobs')
+                .insert({
+                  entity_type: 'blog_post',
+                  entity_id: post.id,
+                  target_languages: [lang],
+                  status: 'processing',
+                  source_language: 'en',
+                  triggered_by: 'api',
+                  started_at: new Date().toISOString(),
+                })
+                .select()
+                .single();
+              jobId = job?.id;
 
-          const translatedExcerpt = translated.content
-            .replace(/<[^>]*>/g, '')
-            .replace(/[#*_~`>\-|]/g, '')
-            .substring(0, 160)
-            .trim();
+              const translated = await translateContent(
+                title,
+                content,
+                lang,
+                openaiKey
+              );
 
-          const { error: insertError } = await bgSupabase.from('blog_post_translations').insert({
-            post_id: post.id,
-            language: lang,
-            title: translated.title,
-            slug,
-            content: translated.content,
-            excerpt: translatedExcerpt,
-            seo_title: translated.seo_title || translated.title.slice(0, 70),
-            seo_description: translated.seo_description || translatedExcerpt.slice(0, 220),
-            og_title: translated.og_title || null,
-            og_description: translated.og_description || null,
-          });
+              const translatedExcerpt = translated.content
+                .replace(/<[^>]*>/g, '')
+                .replace(/[#*_~`>\-|]/g, '')
+                .substring(0, 160)
+                .trim();
 
-          if (insertError) {
-            throw new Error(`Insert failed for ${lang}: ${insertError.message}`);
+              const { error: insertError } = await bgSupabase.from('blog_post_translations').insert({
+                post_id: post.id,
+                language: lang,
+                title: translated.title,
+                slug,
+                content: translated.content,
+                excerpt: translatedExcerpt,
+                seo_title: translated.seo_title || translated.title.slice(0, 70),
+                seo_description: translated.seo_description || translatedExcerpt.slice(0, 220),
+                og_title: translated.og_title || null,
+                og_description: translated.og_description || null,
+              });
+
+              if (insertError) {
+                throw new Error(`Insert failed for ${lang}: ${insertError.message}`);
+              }
+
+              if (jobId) {
+                await bgSupabase
+                  .from('translation_jobs')
+                  .update({
+                    status: 'completed',
+                    languages_completed: [lang],
+                    completed_at: new Date().toISOString(),
+                  })
+                  .eq('id', jobId);
+              }
+
+              return lang;
+            } catch (err) {
+              if (jobId) {
+                await bgSupabase
+                  .from('translation_jobs')
+                  .update({
+                    status: 'failed',
+                    completed_at: new Date().toISOString(),
+                  })
+                  .eq('id', jobId)
+                  .catch(() => {});
+              }
+              throw err;
+            }
+          })
+        );
+
+        for (const result of results) {
+          if (result.status === 'fulfilled') {
+            completedLangs.push(result.value);
+            console.log(`[blog/create] Translated to ${result.value}`);
+          } else {
+            failedLangs.push(result.reason?.message || 'unknown');
+            console.error(`[blog/create] Translation failed:`, result.reason);
           }
-
-          if (job) {
-            await bgSupabase
-              .from('translation_jobs')
-              .update({
-                status: 'completed',
-                languages_completed: [lang],
-                completed_at: new Date().toISOString(),
-              })
-              .eq('id', job.id);
-          }
-
-          console.log(`[blog/create] Translated to ${lang}`);
-        } catch (err) {
-          console.error(`[blog/create] Translation to ${lang} failed:`, err);
         }
 
-        // Rate limit protection between translations
-        if (targetLangs.indexOf(lang) < targetLangs.length - 1) {
-          await new Promise((r) => setTimeout(r, 1000));
+        // Brief pause between batches to avoid rate limits
+        if (i + BATCH_SIZE < validLangs.length) {
+          await new Promise((r) => setTimeout(r, 500));
         }
       }
+
+      console.log(`[blog/create] Translations done: ${completedLangs.length}/${validLangs.length} succeeded, ${failedLangs.length} failed`);
 
       // Revalidate ISR paths after all translations complete
       try {

@@ -83,7 +83,7 @@ export async function checkFraudRules(db, userId, email, metadata = {}) {
 
 async function getUserPurchaseCount(userId, startTime) {
   try {
-    const supabase = getSupabase();
+    const supabase = db || getSupabase();
     const { count, error } = await supabase
       .from('fraud_tracking_purchases')
       .select('*', { count: 'exact', head: true })
@@ -97,7 +97,7 @@ async function getUserPurchaseCount(userId, startTime) {
 
 async function getEmailPurchaseCount(email, startTime) {
   try {
-    const supabase = getSupabase();
+    const supabase = db || getSupabase();
     const { count, error } = await supabase
       .from('fraud_tracking_purchases')
       .select('*', { count: 'exact', head: true })
@@ -111,7 +111,7 @@ async function getEmailPurchaseCount(email, startTime) {
 
 async function getCardPurchaseCount(cardFingerprint, startTime) {
   try {
-    const supabase = getSupabase();
+    const supabase = db || getSupabase();
     const { count, error } = await supabase
       .from('fraud_tracking_purchases')
       .select('*', { count: 'exact', head: true })
@@ -125,7 +125,7 @@ async function getCardPurchaseCount(cardFingerprint, startTime) {
 
 async function getFailedAttempts(userId, email, startTime) {
   try {
-    const supabase = getSupabase();
+    const supabase = db || getSupabase();
     let total = 0;
     if (userId) {
       const { count } = await supabase
@@ -151,7 +151,7 @@ async function getFailedAttempts(userId, email, startTime) {
 
 export async function trackPurchaseAttempt(db, data) {
   try {
-    const supabase = getSupabase();
+    const supabase = db || getSupabase();
     const { data: result, error } = await supabase
       .from('fraud_tracking_attempts')
       .insert({
@@ -178,7 +178,7 @@ export async function trackPurchaseAttempt(db, data) {
 
 export async function trackCompletedPurchase(db, data) {
   try {
-    const supabase = getSupabase();
+    const supabase = db || getSupabase();
     const { error } = await supabase
       .from('fraud_tracking_purchases')
       .upsert({
@@ -220,17 +220,37 @@ export async function trackCompletedPurchase(db, data) {
 
 export async function trackFailedPurchase(db, data) {
   try {
+    const supabase = db || getSupabase();
+    const now = new Date().toISOString();
+
     if (data.attemptId) {
-      const supabase = getSupabase();
+      // Update existing attempt record
       await supabase
         .from('fraud_tracking_attempts')
         .update({
           status: 'failed',
           failure_reason: data.failureReason || 'unknown',
           success: false,
-          metadata: { failure_reason: data.failureReason, updated_at: new Date().toISOString() }
+          order_id: data.orderId || null,
+          metadata: { failure_reason: data.failureReason, updated_at: now }
         })
         .eq('id', data.attemptId);
+    } else if (data.userId || data.email) {
+      // No existing attempt — create a new failed attempt record so tracking tables are populated
+      await supabase
+        .from('fraud_tracking_attempts')
+        .insert({
+          user_id: data.userId || null,
+          email: data.email?.toLowerCase() || null,
+          order_id: data.orderId || null,
+          status: 'failed',
+          action: 'purchase_attempt',
+          failure_reason: data.failureReason || 'unknown',
+          success: false,
+          amount: 0,
+          currency: 'usd',
+          metadata: { ...(data.metadata || {}), failure_reason: data.failureReason, created_at: now }
+        });
     }
     return true;
   } catch (error) {
@@ -241,7 +261,7 @@ export async function trackFailedPurchase(db, data) {
 
 export async function getUserFraudStats(db, userId) {
   try {
-    const supabase = getSupabase();
+    const supabase = db || getSupabase();
     const now = new Date();
     const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
     const last7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -279,7 +299,7 @@ export async function getUserFraudStats(db, userId) {
 
 export async function checkBlocklist(db, userId, email, cardFingerprint = null) {
   try {
-    const supabase = getSupabase();
+    const supabase = db || getSupabase();
     const queries = [];
 
     if (userId) {
@@ -307,7 +327,7 @@ export async function checkBlocklist(db, userId, email, cardFingerprint = null) 
 
 export async function addToBlocklist(db, data) {
   try {
-    const supabase = getSupabase();
+    const supabase = db || getSupabase();
     const { data: result, error } = await supabase
       .from('fraud_blocklist')
       .insert({
@@ -333,7 +353,7 @@ export async function addToBlocklist(db, data) {
 
 export async function logPriceManipulationAttempt(db, data) {
   try {
-    const supabase = getSupabase();
+    const supabase = db || getSupabase();
     const { data: result, error } = await supabase
       .from('fraud_attempts')
       .insert({
@@ -388,7 +408,7 @@ export async function logPriceManipulationAttempt(db, data) {
 
 export async function getFraudAttempts(db, options = {}) {
   try {
-    const supabase = getSupabase();
+    const supabase = db || getSupabase();
     let query = supabase.from('fraud_attempts').select('*');
     if (options.type) query = query.eq('action', options.type);
 
