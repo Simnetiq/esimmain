@@ -247,6 +247,12 @@ export async function POST(request) {
     }
 
     const ipCountryCode = request.headers.get('cf-ipcountry') || null;
+
+    if (ipCountryCode && FRAUD_SIGNALS_CONFIG.BLOCKED_COUNTRIES.includes(ipCountryCode.toUpperCase())) {
+      await logPaymentAttempt(supabase, { packageId: order, email, userId, ip, userAgent, submittedPrice: total, status: 'country_blocked', blocked: true, blockReason: `Blocked country: ${ipCountryCode}` });
+      return NextResponse.json({ error: 'Payments are not available in your region.', code: 'COUNTRY_BLOCKED' }, { status: 403 });
+    }
+
     const fraudSignalsCheck = await checkUserBlocked(supabase, userId, email, null, ip);
     if (fraudSignalsCheck.blocked) {
       await logPaymentAttempt(supabase, { packageId: order, email, userId, ip, userAgent, submittedPrice: total, status: 'fraud_blocked', blocked: true, blockReason: fraudSignalsCheck.reason });

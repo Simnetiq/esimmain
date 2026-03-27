@@ -25,6 +25,17 @@ export async function GET(request) {
     const ipAddress = forwarded ? forwarded.split(',')[0].trim() : request.headers.get('x-real-ip') || null;
     const countryCode = request.headers.get('cf-ipcountry') || null;
 
+    if (countryCode && FRAUD_SIGNALS_CONFIG.BLOCKED_COUNTRIES.includes(countryCode.toUpperCase())) {
+      return NextResponse.json({
+        allowed: false,
+        blocked: true,
+        blockType: 'country_blocked',
+        reason: 'Payments are not available in your region.',
+        message: 'Payments are not available in your region.',
+        canContactSupport: false
+      }, { status: 403 });
+    }
+
     if (!userId && !email) {
       return NextResponse.json(
         { error: 'userId or email is required', code: 'MISSING_PARAMS' },
@@ -50,7 +61,7 @@ export async function GET(request) {
     }
 
     const legacyBlocklistCheck = await checkBlocklist(supabase, userId, email, cardFingerprint);
-    
+
     if (legacyBlocklistCheck.blocked) {
       return NextResponse.json({
         allowed: false,
@@ -106,6 +117,17 @@ export async function POST(request) {
     const forwarded = request.headers.get('x-forwarded-for');
     const ipAddress = forwarded ? forwarded.split(',')[0].trim() : request.headers.get('x-real-ip') || null;
     const countryCode = request.headers.get('cf-ipcountry') || null;
+
+    if (countryCode && FRAUD_SIGNALS_CONFIG.BLOCKED_COUNTRIES.includes(countryCode.toUpperCase())) {
+      return NextResponse.json({
+        allowed: false,
+        blocked: true,
+        blockType: 'country_blocked',
+        reason: 'Payments are not available in your region.',
+        message: 'Payments are not available in your region.',
+        canContactSupport: false
+      }, { status: 403 });
+    }
 
     if (!userId && !email) {
       return NextResponse.json(

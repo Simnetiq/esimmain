@@ -109,6 +109,7 @@ export function useFraudCheck() {
     if (
       errorResponse.code === 'FRAUD_BLOCKED' ||
       errorResponse.code === 'BLOCKED' ||
+      errorResponse.code === 'COUNTRY_BLOCKED' ||
       errorResponse.blockType
     ) {
       setIsBlocked(true);
